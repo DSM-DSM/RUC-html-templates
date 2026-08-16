@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>组会汇报模板 · 11 主题预览</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: #0e131c; color: #d3dae6;
+            max-width: 1140px; margin: 0 auto; padding: 48px 24px 64px;
+        }
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { font-size: 2em; font-weight: 700; letter-spacing: -0.01em; color: #fff; }
+        header .sub { color: #848fa3; margin-top: 12px; font-size: 0.95em; line-height: 1.65; }
+        header .rule {
+            width: 200px; height: 2px; margin: 24px auto 0;
+            background: linear-gradient(90deg, transparent, #5b84c5, #c9a25e, #3ddc84, #e4685b, transparent);
+            border-radius: 1px;
+        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+        .card {
+            background: #141a24; border-radius: 12px; border: 1px solid #1f2835;
+            overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45); border-color: #3a4555; }
+        .swatch { height: 80px; position: relative; display: flex; align-items: flex-end; padding: 10px 14px; }
+        .swatch .tag {
+            position: absolute; top: 10px; left: 12px;
+            font-size: 0.72em; font-weight: 600; letter-spacing: 0.05em;
+            background: rgba(0, 0, 0, 0.5); color: #d3dae6;
+            border-radius: 999px; padding: 2px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .swatch .sw-colors { display: flex; gap: 5px; }
+        .swatch .sw-colors span { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.5); }
+        .s-01 { background: radial-gradient(400px 180px at 20% -40px, rgba(10,132,255,0.16), transparent 65%), radial-gradient(400px 180px at 88% 115%, rgba(255,45,85,0.11), transparent 65%), #ffffff; }
+        .s-01 .tag { color: #1d1d1f; background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .s-02 { background: radial-gradient(400px 180px at 20% -40px, rgba(10,132,255,0.45), transparent 65%), radial-gradient(400px 180px at 88% 115%, rgba(255,55,95,0.32), transparent 65%), radial-gradient(300px 160px at 60% 45%, rgba(191,90,242,0.35), transparent 65%), #000; }
+        .s-03 { background: radial-gradient(600px 200px at 80% -40px, rgba(201,162,94,0.4), transparent 65%), #070b12; }
+        .s-04 { background: radial-gradient(350px 220px at 30% 0%, rgba(34,211,238,0.5), transparent 60%), radial-gradient(350px 220px at 100% 80%, rgba(167,139,250,0.5), transparent 65%), linear-gradient(160deg,#0b1120,#1c1735); }
+        .s-05 { background: radial-gradient(450px 200px at 50% -60px, rgba(179,64,47,0.08), transparent 70%), #f5f1e8; }
+        .s-05 .tag { color: #b3402f; background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .s-06 { background: radial-gradient(450px 180px at 80% -50px, rgba(61,220,132,0.2), transparent 70%), #0a0e14; }
+        .s-07 { background: repeating-linear-gradient(0deg, rgba(143,176,216,0.12) 0 1px, transparent 1px 22px), repeating-linear-gradient(90deg, rgba(143,176,216,0.12) 0 1px, transparent 1px 22px), #10325c; }
+        .s-08 { background: radial-gradient(1.5px 1.5px at 20% 30%, #e8eef7 50%, transparent 51%), radial-gradient(1px 1px at 60% 20%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 80% 60%, #e8eef7 50%, transparent 51%), radial-gradient(1.5px 1.5px at 35% 75%, #fff 50%, transparent 51%), linear-gradient(160deg, #0c1730, #070d1f); }
+        .s-09 { background: #ffffff; }
+        .s-09 .tag { color: #141414; background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .s-10 { background: radial-gradient(120% 60% at 50% -10%, rgba(94,234,212,0.35), transparent 55%), radial-gradient(80% 50% at 90% 40%, rgba(167,139,250,0.35), transparent 60%), #050510; }
+        .body { padding: 16px 20px 20px; display: flex; flex-direction: column; flex: 1; }
+        .body h2 { font-size: 1.12em; margin-bottom: 2px; color: #fff; }
+        .body .en { font-size: 0.74em; color: #6b7486; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+        .body .desc { font-size: 0.88em; color: #9ba5b8; line-height: 1.65; }
+        .body ul { list-style: none; margin: 10px 0 14px; font-size: 0.82em; color: #6b7486; line-height: 1.75; }
+        .body ul li::before { content: "·"; margin-right: 5px; color: #4a5568; }
+        .body .link {
+            margin-top: auto; display: block; text-align: center;
+            padding: 9px 0; border-radius: 8px; font-size: 0.88em;
+            font-weight: 600; text-decoration: none; color: #fff;
+            transition: filter .15s;
+        }
+        .body .link:hover { filter: brightness(1.15); }
+        .body .link-sub {
+            margin-top: 8px; background: transparent; color: #9ba5b8;
+            border: 1px solid #2a3442;
+        }
+        .body .link-sub:hover { filter: none; border-color: #4a5568; color: #d3dae6; }
+        footer { text-align: center; margin-top: 44px; font-size: 0.82em; color: #6b7486; line-height: 1.9; }
+        footer a { color: #5b84c5; }
+        @media (max-width: 640px) {
+            body { padding: 28px 14px 40px; }
+            header h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>组会汇报模板 · 11 主题预览</h1>
+    <div class="sub">同一套组件、同一套数据源（web_data/），11 种视觉世界 × 总览/子页面成对。点开对比，选出你的主题。</div>
+    <div class="rule"></div>
+</header>
+
+<div class="grid">
+    <div class="card">
+        <div class="swatch s-01"><span class="tag">01 · WWDC 浅色</span><div class="sw-colors"><span style="background:#007aff;"></span><span style="background:#af52de;"></span><span style="background:#ff2d55;"></span></div></div>
+        <div class="body">
+            <h2>WWDC 浅色</h2>
+            <div class="en">Apple Keynote Light</div>
+            <div class="desc">苹果官网白昼版：纯白画布 + 极淡蓝紫粉天光 + 官网按钮蓝，浅色 iOS 语义色。</div>
+            <ul><li>纯白画布 + 淡渐变天光</li><li>官网按钮蓝 #0071e3 系</li><li>浅色 iOS 语义色（文字加深保对比）</li></ul>
+            <a class="link" href="01_wwdc_light.html" style="background:#0071e3;">打开总览预览 →</a>
+            <a class="link link-sub" href="01_wwdc_light_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-02"><span class="tag">02 · WWDC 深色</span><div class="sw-colors"><span style="background:#0a84ff;"></span><span style="background:#bf5af2;"></span><span style="background:#ff375f;"></span></div></div>
+        <div class="body">
+            <h2>WWDC 深色</h2>
+            <div class="en">Apple Keynote Dark</div>
+            <div class="desc">苹果发布会黑夜版：纯黑舞台 + 蓝紫粉渐变追光 + 玻璃侧边栏，深色 iOS 语义色。</div>
+            <ul><li>纯黑舞台 + 渐变追光</li><li>玻璃材质侧边导航</li><li>深色 iOS 语义色</li></ul>
+            <a class="link" href="02_wwdc_dark.html" style="background:linear-gradient(90deg,#0a84ff,#bf5af2,#ff375f);">打开总览预览 →</a>
+            <a class="link link-sub" href="02_wwdc_dark_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-03"><span class="tag">03 · 深色奢华</span><div class="sw-colors"><span style="background:#c9a25e;"></span><span style="background:#070b12;"></span><span style="background:#38bdf8;"></span></div></div>
+        <div class="body">
+            <h2>深色奢华</h2>
+            <div class="en">Dark Premium</div>
+            <div class="desc">舞台聚光灯下的路演气场：近黑底 + 香槟金，结论如金箔发光。</div>
+            <ul><li>香槟金 #c9a25e 主强调</li><li>金色 hairline 与光晕</li><li>低饱和深色衬底</li></ul>
+            <a class="link" href="03_dark_premium.html" style="background:#c9a25e;">打开总览预览 →</a>
+            <a class="link link-sub" href="03_dark_premium_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-04"><span class="tag">04 · 玻璃拟态</span><div class="sw-colors"><span style="background:#22d3ee;"></span><span style="background:#a78bfa;"></span><span style="background:#0b1120;"></span></div></div>
+        <div class="body">
+            <h2>玻璃拟态</h2>
+            <div class="en">Glassmorphism</div>
+            <div class="desc">深色渐变宇宙 + 半透明玻璃卡片，信息浮于彩色光晕之上。</div>
+            <ul><li>三色光晕背景</li><li>卡片 backdrop blur 玻璃质感</li><li>青色主强调 + 紫罗兰光斑</li></ul>
+            <a class="link" href="04_glassmorphism.html" style="background:linear-gradient(90deg,#22d3ee,#a78bfa);">打开总览预览 →</a>
+            <a class="link link-sub" href="04_glassmorphism_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-05"><span class="tag">05 · 东方水墨</span><div class="sw-colors"><span style="background:#23211d;"></span><span style="background:#f5f1e8;"></span><span style="background:#b3402f;"></span></div></div>
+        <div class="body">
+            <h2>东方水墨</h2>
+            <div class="en">Ink & Vermilion</div>
+            <div class="desc">宣纸灰白 + 墨黑 + 朱砂印章，宋体书卷气，中文组会的文化记忆点。</div>
+            <ul><li>宣纸暖白底 + 墨色文字</li><li>朱砂主强调 + 印章点缀</li><li>宋体衬线标题</li></ul>
+            <a class="link" href="05_ink_vermilion.html" style="background:#b3402f;">打开总览预览 →</a>
+            <a class="link link-sub" href="05_ink_vermilion_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-06"><span class="tag">06 · 赛博终端</span><div class="sw-colors"><span style="background:#3ddc84;"></span><span style="background:#0a0e14;"></span><span style="background:#38bdf8;"></span></div></div>
+        <div class="body">
+            <h2>赛博终端</h2>
+            <div class="en">Cyber Terminal</div>
+            <div class="desc">一台正在运行的科研数据终端：深空底、等宽数字、荧光绿光标。</div>
+            <ul><li>荧光绿 #3ddc84 主强调</li><li>全站等宽数字</li><li>终端感 hairline</li></ul>
+            <a class="link" href="06_cyber_terminal.html" style="background:#3ddc84;">打开总览预览 →</a>
+            <a class="link link-sub" href="06_cyber_terminal_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-07"><span class="tag">07 · 蓝晒蓝图</span><div class="sw-colors"><span style="background:#8fb0d8;"></span><span style="background:#10325c;"></span><span style="background:#ffffff;"></span></div></div>
+        <div class="body">
+            <h2>蓝晒蓝图</h2>
+            <div class="en">Blueprint</div>
+            <div class="desc">一张施工蓝图：普鲁士蓝纸底、白色线条、坐标网格背景。</div>
+            <ul><li>全页坐标网格背景</li><li>白蓝线条体系</li><li>图纸式准星点缀</li></ul>
+            <a class="link" href="07_blueprint.html" style="background:#8fb0d8;">打开总览预览 →</a>
+            <a class="link link-sub" href="07_blueprint_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-08"><span class="tag">08 · 深空星图</span><div class="sw-colors"><span style="background:#e6c26a;"></span><span style="background:#0c1730;"></span><span style="background:#e8eef7;"></span></div></div>
+        <div class="body">
+            <h2>深空星图</h2>
+            <div class="en">Starmap</div>
+            <div class="desc">一张天文星图：深空夜空、满屏星点、金色星标与坐标。</div>
+            <ul><li>满屏星点背景</li><li>金色主强调 #e6c26a</li><li>衬线标题</li></ul>
+            <a class="link" href="08_starmap.html" style="background:#e6c26a;">打开总览预览 →</a>
+            <a class="link link-sub" href="08_starmap_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-09"><span class="tag">09 · 杂志编辑</span><div class="sw-colors"><span style="background:#141414;"></span><span style="background:#ffffff;"></span><span style="background:#c8372f;"></span></div></div>
+        <div class="body">
+            <h2>杂志编辑</h2>
+            <div class="en">Editorial</div>
+            <div class="desc">报刊版面：黑白高对比 + 衬线大标题 + 双线分章，有格调。</div>
+            <ul><li>黑白高对比 + 点缀红</li><li>衬线 display 标题</li><li>双线分节</li></ul>
+            <a class="link" href="09_editorial.html" style="background:#c8372f;">打开总览预览 →</a>
+            <a class="link link-sub" href="09_editorial_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-10"><span class="tag">10 · 极光之夜</span><div class="sw-colors"><span style="background:#5eead4;"></span><span style="background:#a78bfa;"></span><span style="background:#050510;"></span></div></div>
+        <div class="body">
+            <h2>极光之夜</h2>
+            <div class="en">Aurora Night</div>
+            <div class="desc">极地夜空：青绿紫极光渐变穹顶，深色玻璃卡面，冷静又炫酷。</div>
+            <ul><li>青绿紫极光穹顶</li><li>极光渐变 hairline</li><li>玻璃侧边栏</li></ul>
+            <a class="link" href="10_aurora_night.html" style="background:linear-gradient(90deg,#5eead4,#a78bfa);">打开总览预览 →</a>
+            <a class="link link-sub" href="10_aurora_night_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="swatch s-11"><span class="tag">11 · 人大红 Beamer</span><div class="sw-colors"><span style="background:#971f30;"></span><span style="background:#b83047;"></span><span style="background:#fdf8f8;"></span></div></div>
+        <div class="body">
+            <h2>人大红 Beamer</h2>
+            <div class="en">RUC Beamer</div>
+            <div class="desc">中国人民大学 LaTeX beamer 模板（RenminUniv.sty）的网页复刻：校徽红 #971f30 顶导底栏、校徽与背景水印、宋体衬线。</div>
+            <ul><li>校徽红 #971f30 定调全页</li><li>校徽 + background 水印</li><li>宋体/Georgia 衬线庄重感</li></ul>
+            <a class="link" href="11_ruc_beamer.html" style="background:#971f30;">打开总览预览 →</a>
+            <a class="link link-sub" href="11_ruc_beamer_sub.html">打开子页面预览 →</a>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>全部变体由 <code>themes/_build.mjs</code> 从主模板 <a href="../index.html">index.html</a> 与子页面模板 <a href="../01_example_method/index.html">01_example_method/</a> 成对生成，与主模板共享组件类名、JS 逻辑与数据 JSON。</p>
+    <p>每个主题一对文件：<code>0N_主题.html</code>（总览）+ <code>0N_主题_sub.html</code>（子页面），两页互相链接。</p>
+    <p>主题数据源路径为 <code>../web_data/</code>，需在 <code>lab-meeting-1</code> 的上级目录启动 HTTP 服务器预览。</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="stylesheet" id="theme-fonts" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <!-- TEMPLATE: 将「项目名」替换为你的项目名称 -->
+    <title>项目名 实验进度报告 · 总览</title>
+
+    <style>
+        /* ╔══════════════════════════════════════════════════════════════════════════╗
+           ║  【共享设计系统 CSS】                                                     ║
+           ║  此块在所有页面（总览页 + 子页面）中保持一致，逐字复制，不要各自微调。     ║
+           ║  自定义项目配色只需改第 1 节 :root 中的令牌。                            ║
+           ╚══════════════════════════════════════════════════════════════════════════╝ */
+
+        /* ═══════ 1. 设计令牌与 Reset ═══════ */
+        :root {
+            --bg: #f5f5f7; --card-bg: #ffffff; --card-radius: 12px;
+            --line: rgba(0,0,0,0.07);
+            --shadow: 0 1px 2px rgba(0,0,0,0.05),0 1px 3px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.09),0 2px 4px rgba(0,0,0,0.05);
+            /* 语义色已按浅色底文字对比度 ≥4.5:1 校准（原色过亮，小字不可读） */
+            --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+            --accent: #0e7490; --accent-light: #ecfeff;
+            --success: #059669; --success-bg: #ecfdf5;
+            --warning: #b45309; --warning-bg: #fffbeb;
+            --danger: #dc2626; --danger-bg: #fef2f2;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --sidebar-width: 260px;
+            --header-height: 52px;
+            --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            --font-mono: "SF Mono","Cascadia Code","Consolas",monospace;
+            --transition: 0.2s ease;
+            /* 位移类动效单独缓动：ease-out，苹果式 */
+            --ease-move: cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px}
+        ::selection{background:rgba(37,99,235,0.18);color:var(--gray-900)}
+        body{
+            font-family:var(--font-sans);background:var(--bg);
+            color:var(--gray-800);line-height:1.6;
+            overflow:hidden;height:100vh;
+        }
+        a{color:var(--primary);text-decoration:none}
+        a:hover{text-decoration:underline}
+        :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+
+        /* ═══════ 2. 应用布局（四区：顶部导航 / 侧栏导引 / 内容 / 底部声明栏） ═══════ */
+        #app{
+            display:grid;
+            grid-template-rows:var(--header-height) 1fr auto;
+            grid-template-columns:var(--sidebar-width) 6px 1fr;
+            grid-template-areas:"header header header" "sidebar resizer content" "footer footer footer";
+            height:100vh;
+            max-width:1500px;
+            margin:0 auto;
+        }
+
+        /* 侧边栏拖拽分隔条：调整 --sidebar-width；双击恢复默认 */
+        .resizer{
+            grid-area:resizer;
+            cursor:col-resize;position:relative;z-index:15;
+            background:transparent;outline:none;
+        }
+        .resizer::after{
+            content:"";position:absolute;left:50%;top:0;bottom:0;
+            /* 常态 1px、hover 2px 用 scaleX 表达（transform 合成器友好，不做 width 过渡） */
+            width:2px;transform:translateX(-50%) scaleX(0.5);
+            background:var(--line);
+            transition:background .15s,transform .15s;
+        }
+        .resizer:hover::after,.resizer.dragging::after{background:var(--primary);transform:translateX(-50%) scaleX(1)}
+        .resizer:focus-visible::after{background:var(--primary);transform:translateX(-50%) scaleX(1)}
+
+        /* ═══════ 3. 顶部导航（品牌区 + 子页面/工具链接 + 倒计时） ═══════ */
+        /* 顶导：固定高度不撑高（溢出交给 .nav-links 自身滚动）；
+           position:relative 使 z-index 生效，切换器面板可伸出头栏、盖在内容之上 */
+        #header{
+            grid-area:header;
+            height:var(--header-height);
+            position:relative;
+            background:var(--card-bg);
+            border-bottom:1px solid var(--line);
+            display:flex;align-items:center;gap:18px;
+            padding:0 20px;z-index:10;
+        }
+        .nav-brand{
+            display:flex;align-items:center;gap:7px;
+            font-size:1.1rem;font-weight:700;color:var(--gray-900);
+            letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;
+        }
+        .nav-brand a{color:var(--gray-900)}
+        .nav-brand a:hover{color:var(--primary-dark);text-decoration:none}
+        .nav-links{
+            display:flex;align-items:center;gap:4px;flex:1;min-width:0;
+            overflow-x:auto;scrollbar-width:none;
+        }
+        .nav-links::-webkit-scrollbar{display:none}
+        .nav-links a{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:4px 10px;border-radius:6px;
+            font-size:0.8rem;font-weight:500;color:var(--gray-600);
+            white-space:nowrap;transition:var(--transition);
+        }
+        .nav-links a:hover{background:var(--gray-100);color:var(--gray-900);text-decoration:none}
+        /* 当前页面链接高亮（JS 按 URL 自动检测） */
+        .nav-links a.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        /* 工具链接组（PDF/GitHub/主题切换器等）推至顶导最右 */
+        .nav-links .push-right{margin-left:auto}
+        .nav-links a.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .nav-links a:active{transform:scale(0.97)}
+        #header .header-right{display:flex;align-items:center;gap:12px;font-size:0.8rem;color:var(--gray-500);flex-shrink:0}
+        .countdown{background:var(--primary-light);color:var(--primary-dark);padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.78rem;white-space:nowrap}
+
+        /* ═══════ 3b. 底部声明栏（作者 / 机构 / 版本 / 更新时间 / logo 占位） ═══════ */
+        /* 底栏：固定高度 + 单行省略，页面缩放/窗口变化时始终位于底部固定区域 */
+        #footer{
+            grid-area:footer;
+            height:40px;
+            background:var(--card-bg);
+            border-top:1px solid var(--line);
+            display:flex;align-items:center;justify-content:space-between;gap:16px;
+            padding:0 20px;font-size:0.72rem;color:var(--gray-500);z-index:10;
+            overflow:hidden;
+        }
+        #footer .footer-meta{
+            display:flex;align-items:center;gap:8px;min-width:0;
+            flex-wrap:nowrap;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        }
+        #footer .footer-meta .sep{color:var(--gray-300);flex-shrink:0}
+        #footer .footer-meta strong{color:var(--gray-600);font-weight:600;flex-shrink:0}
+        #footer .footer-logo{flex-shrink:0}
+        /* TEMPLATE: 把 .logo-slot 占位替换为 <img src="你的logo.png" alt="机构 logo"> */
+        .logo-slot{
+            display:inline-flex;align-items:center;height:22px;padding:0 10px;
+            border:1px dashed var(--gray-300);border-radius:4px;
+            color:var(--gray-400);font-size:0.68rem;white-space:nowrap;
+        }
+
+        /* ═══════ 4. Sidebar ═══════ */
+        #sidebar{
+            grid-area:sidebar;
+            background:var(--card-bg);
+            border-right:1px solid var(--line);
+            overflow-y:auto;padding:8px 0;min-height:0;
+        }
+        .sidebar-section{margin-bottom:2px}
+        .sidebar-parent{
+            display:flex;align-items:center;gap:6px;
+            margin:0 10px;padding:9px 8px;cursor:pointer;
+            font-weight:600;font-size:0.88rem;color:var(--gray-700);
+            border-radius:8px;
+            transition:var(--transition);user-select:none;
+        }
+        .sidebar-parent:hover{background:var(--gray-100)}
+        .sidebar-parent .arrow{font-size:0.6rem;transition:transform 0.2s;margin-left:auto;color:var(--gray-400)}
+        .sidebar-parent.expanded .arrow{transform:rotate(90deg)}
+
+        /* 注意：展开态必须 max-height:none ， 固定值 + overflow:hidden 会裁剪导航项。
+           （none 与数值之间不可插值，故不声明对该属性的过渡动画，它是死代码且触发布局抖动） */
+        .sidebar-children{max-height:0;overflow:hidden}
+        .sidebar-children.open{max-height:none}
+
+        .sidebar-child{
+            display:flex;align-items:center;gap:6px;
+            margin:0 10px;padding:6px 8px 6px 26px;cursor:pointer;
+            font-size:0.8rem;color:var(--gray-600);
+            border-radius:8px;
+            transition:var(--transition);
+        }
+        .sidebar-child:hover{background:var(--gray-100);text-decoration:none}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary-dark);font-weight:500}
+
+        .sidebar-child .badge{margin-left:auto;font-size:0.62rem;padding:1px 6px;border-radius:10px;font-weight:500}
+        .badge-ok{background:var(--success-bg);color:var(--success)}
+        .badge-warn{background:var(--warning-bg);color:var(--warning)}
+        .badge-new{background:var(--gray-100);color:var(--gray-500)}
+        .badge-ext{background:var(--primary-light);color:var(--primary)}
+        .sidebar-child.ext-link{color:var(--primary);font-weight:500}
+
+        /* ═══════ 5. 内容区与卡片 ═══════ */
+        #content{
+            grid-area:content;
+            overflow-y:auto;padding:16px 20px 60px;
+            scroll-behavior:smooth;
+        }
+
+        .card{background:var(--card-bg);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:box-shadow var(--transition),border-color var(--transition)}
+        .card:hover{box-shadow:var(--shadow-hover);border-color:rgba(0,0,0,0.12)}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+        .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
+
+        /* --- 卡片两栏：左 .viz（图/表展示）+ 右 .explain（文字解释） ---
+           TEMPLATE: 卡片内容包进 .card-body，图表放 .viz、解释文字放 .explain；
+           不需要两栏的卡片（时间线/待办等）不写 .card-body 即可。 */
+        .card-body{
+            display:grid;grid-template-columns:minmax(0,1fr) 290px;
+            gap:6px 24px;align-items:start;
+        }
+        .card-body .viz{min-width:0}
+        /* 解释栏：flex 列 + 统一 gap；JS 按左栏折叠区位置做垂直对齐（不堆叠） */
+        .card-body .explain{min-width:0;display:flex;flex-direction:column;gap:10px}
+        .card-body .explain > *{margin:0}
+
+        /* --- 可折叠区：核心内容默认展开、细节默认折叠（汇报时有的放矢） ---
+           TEMPLATE: 结构为 .fold 容器 → .fold-head 按钮 → .fold-body（内含 .fold-inner 内容层）。
+           默认折叠不写 .open；核心内容加 .open 常开。 */
+        .fold{margin:10px 0}
+        .fold-head{
+            display:flex;align-items:center;gap:8px;width:100%;
+            padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;
+            background:var(--gray-50);cursor:pointer;font:inherit;
+            font-size:0.8rem;font-weight:600;color:var(--gray-700);text-align:left;
+            transition:var(--transition);
+        }
+        .fold-head:hover{background:var(--gray-100);color:var(--gray-900)}
+        .fold-head .fold-chevron{transition:transform .25s ease;color:var(--gray-400);font-size:0.7em}
+        .fold.open .fold-head .fold-chevron{transform:rotate(180deg)}
+        .fold-head .fold-hint{margin-left:auto;font-size:0.7rem;font-weight:400;color:var(--gray-400)}
+        .fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+        .fold.open .fold-body{grid-template-rows:1fr}
+        .fold-inner{overflow:hidden;min-height:0}
+        .fold-inner .fold-pad{padding-top:8px}
+
+        /* 小节标题：替代重复的内联 h4 样式；颜色用 c-* 变体（默认 gray） */
+        .section-h4{font-size:0.95rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--gray-300);font-weight:700}
+        .section-h4.c-primary{border-bottom-color:var(--primary)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .section-h4.c-success{border-bottom-color:var(--success)}
+        .section-h4.c-warning{border-bottom-color:var(--warning)}
+        .section-h4.c-danger{border-bottom-color:var(--danger)}
+
+        .status-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:600}
+        .status-ok{background:var(--success-bg);color:var(--success)}
+        .status-warn{background:var(--warning-bg);color:var(--warning)}
+        .status-danger{background:var(--danger-bg);color:var(--danger)}
+        .status-progress{background:var(--primary-light);color:var(--primary-dark)}
+        .status-new{background:var(--gray-100);color:var(--gray-500)}
+
+        /* 提示框：同色调浅底 + 圆形色点（无左侧粗色条） */
+        .info-box{padding:10px 14px 10px 34px;border-radius:10px;font-size:0.82rem;margin:8px 0;line-height:1.6;position:relative;border:1px solid transparent}
+        .info-box::before{content:'';position:absolute;left:14px;top:15px;width:8px;height:8px;border-radius:50%}
+        .info-box.info{background:var(--primary-light);border-color:rgba(37,99,235,0.22)}
+        .info-box.info::before{background:var(--primary)}
+        .info-box.success{background:var(--success-bg);border-color:rgba(5,150,105,0.22)}
+        .info-box.success::before{background:var(--success)}
+        .info-box.warning,.info-box.warn{background:var(--warning-bg);border-color:rgba(180,83,9,0.22)}
+        .info-box.warning::before,.info-box.warn::before{background:var(--warning)}
+        .info-box.danger{background:var(--danger-bg);border-color:rgba(220,38,38,0.22)}
+        .info-box.danger::before{background:var(--danger)}
+
+        /* 来源行（卡片头下的实验出处说明） */
+        .source-line{font-size:0.8rem;color:var(--gray-500);margin-bottom:10px;line-height:1.7}
+        .source-line code,.code-ref code{background:var(--gray-100);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:0.85em;color:var(--gray-700)}
+        /* 卡片底部代码引用页脚 */
+        .code-ref{font-size:0.72rem;color:var(--gray-400);margin-top:8px;line-height:1.8}
+
+        /* ═══════ 6. 数据表格 ═══════ */
+        .data-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        .data-table thead th{background:var(--gray-50);padding:7px 9px;text-align:center;font-weight:600;color:var(--gray-600);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.03em;border-bottom:2px solid var(--gray-200)}
+        .data-table tbody td{text-align:center;padding:6px 9px;border-bottom:1px solid var(--gray-100)}
+        .data-table tbody tr:hover{background:var(--gray-50)}
+        .data-table .num{font-family:var(--font-mono);text-align:center}
+        .data-table .highlight{font-weight:700;color:var(--primary-dark)}
+        .data-table .down{color:var(--danger)}.data-table .up{color:var(--success)}
+        .data-table .warn-cell{color:var(--warning);font-weight:600}
+
+        /* ═══════ 7. 指标卡与对比卡 ═══════ */
+        .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+        .metric-card{background:var(--card-bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+        .metric-card .metric-value{font-size:1.55rem;font-weight:800;font-family:var(--font-mono)}
+        .metric-card .metric-label{font-size:0.72rem;color:var(--gray-500);margin-top:3px}
+        .metric-card .metric-detail{font-size:0.7rem;color:var(--gray-400);margin-top:3px}
+
+        .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        /* 对比卡：白卡 + 顶部细条着色（整卡染色会让仪表盘主次不分） */
+        .compare-card{border-radius:var(--card-radius);padding:18px;border:1px solid var(--gray-200);border-top:2px solid var(--gray-300);text-align:center;background:var(--card-bg);box-shadow:var(--shadow)}
+        .compare-card.m1{border-top-color:var(--primary)}
+        .compare-card.m2{border-top-color:var(--success)}
+        .compare-card.m3{border-top-color:var(--gray-300)}
+        .compare-card .big-num{font-size:1.85rem;font-weight:800;font-family:var(--font-mono);margin:6px 0;color:var(--gray-900)}
+        .compare-card .delta{font-size:0.76rem}
+
+        /* ═══════ 7b. 3D 转盘仪表盘 ═══════
+           水平圆环 billboard 布局：Z 轴中心对称视角（上下 1:1），
+           卡面始终正面，深度用 scale + opacity + 投影深浅表达；
+           边框恒在（远端透明度地板 0.42 保证可见）。
+           JS 控制 turn 旋转角；卡片 transform/opacity/投影由 JS 按深度因子更新。 */
+        .carousel{margin:2px 0 12px}
+        .carousel-viewport{
+            /* Z 轴中心对称视角：上下比例 1:1；卡片水平居中，纵向无需大空间 */
+            perspective:1200px;perspective-origin:50% 50%;
+            height:240px;position:relative;overflow:hidden;
+            cursor:grab;touch-action:pan-y;
+            user-select:none;-webkit-user-select:none;
+        }
+        /* 椭圆轨道虚线：强化"圆环"结构感（颜色由主题覆盖层定制） */
+        .carousel-viewport::before{
+            content:"";position:absolute;left:50%;bottom:20px;transform:translateX(-50%);
+            width:min(74%,660px);height:16px;
+            border:2px dashed var(--gray-300);border-radius:50%;
+            opacity:.45;pointer-events:none;
+        }
+        /* 主题徽章：三色圆点随主题切换更新（JS 注入）；置于左上角，
+           避开中轴线，前方卡片的关键数值不被遮挡 */
+        .carousel-badge{
+            position:absolute;left:14px;top:14px;
+            display:flex;align-items:center;gap:5px;padding:7px 9px;
+            border-radius:999px;background:var(--card-bg);
+            border:1px solid var(--line);box-shadow:var(--shadow);
+            z-index:5;pointer-events:none;
+        }
+        .carousel-badge i{width:9px;height:9px;border-radius:50%;display:inline-block}
+        .carousel-viewport.dragging{cursor:grabbing}
+        .carousel-turn{
+            position:absolute;left:50%;top:50%;width:0;height:0;
+            transform-style:preserve-3d;
+        }
+        .carousel-item{
+            position:absolute;left:-100px;top:-65px;
+            width:200px;height:130px;
+            /* 与内卡同圆角：任何阴影/描边都贴圆角轮廓，杜绝直角边露出 */
+            border-radius:14px;
+            transform-style:preserve-3d;backface-visibility:hidden;
+            will-change:transform,opacity;
+        }
+        .carousel-item .ci-card{
+            width:100%;height:100%;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-top:2px solid var(--gray-300);
+            border-radius:14px;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+            padding:12px 14px;text-align:center;cursor:pointer;
+            /* 投影由 JS 每帧更新（随深度深浅），此处不设 box-shadow transition 避免追帧抖动 */
+            transition:border-color .25s;
+        }
+        .carousel-item:hover .ci-card{border-color:var(--primary)}
+        .carousel-item.sel .ci-card{
+            border-color:var(--primary);border-top-color:var(--primary);
+        }
+        .ci-name{font-weight:700;font-size:0.86rem;color:var(--gray-800)}
+        .ci-num{font-size:1.5rem;font-weight:800;font-family:var(--font-mono);color:var(--gray-900);line-height:1.15}
+        .ci-num small{font-size:0.8rem;font-weight:600;color:var(--gray-500)}
+        .ci-delta{font-size:0.72rem}
+        .ci-delta.up{color:var(--success);font-weight:600}
+        .ci-delta.down{color:var(--danger);font-weight:600}
+        /* 转盘下方选中项详情面板 */
+        .carousel-detail{
+            border:1px solid var(--gray-200);border-radius:12px;
+            background:var(--gray-50);padding:12px 18px;font-size:0.82rem;line-height:1.8;
+            display:flex;flex-wrap:wrap;gap:2px 26px;align-items:baseline;
+        }
+        .carousel-detail .cd-name{font-weight:700;color:var(--gray-900);font-size:0.9rem}
+        .carousel-detail .cd-item{white-space:nowrap}
+        .carousel-detail .cd-item strong{font-family:var(--font-mono)}
+        /* 转盘上的方法卡顶条色（沿用 m1/m2/m3 色轮） */
+        .carousel-item.ct-m1 .ci-card{border-top-color:var(--primary)}
+        .carousel-item.ct-m2 .ci-card{border-top-color:var(--success)}
+        .carousel-item.ct-m3 .ci-card{border-top-color:var(--gray-300)}
+
+        /* ═══════ 8. 图表组件 ═══════ */
+        .bar-chart{display:flex;align-items:center;gap:8px;margin:4px 0}
+        .bar-label{font-size:0.76rem;width:150px;text-align:right;color:var(--gray-600);flex-shrink:0}
+        .bar-track{flex:1;height:22px;background:var(--gray-100);border-radius:4px;position:relative;overflow:hidden}
+        .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;color:#fff;font-size:0.7rem;font-weight:600}
+        .bar-fill.blue{background:linear-gradient(90deg,#2563eb,#0e7490)}
+        .bar-fill.green{background:linear-gradient(90deg,#059669,#34d399)}
+        .bar-fill.orange{background:linear-gradient(90deg,#b45309,#fbbf24)}
+        .bar-fill.gray{background:linear-gradient(90deg,#9ca3af,#d1d5db)}
+
+        /* ═══════ 9. 时间线 ═══════ */
+        .timeline{position:relative;padding-left:28px}
+        .timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--gray-200)}
+        .timeline-node{position:relative;margin-bottom:18px}
+        /* 节点：实心圆 + 白环 + 同色细轮廓（无发光扩散） */
+        .timeline-dot{position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--card-bg);outline:2px solid var(--gray-300);outline-offset:0;z-index:1}
+        .timeline-node.past .timeline-dot{background:var(--success);outline-color:var(--success)}
+        /* 当前周：语义脉冲（仅透明度，不扩散光晕） */
+        .timeline-node.current .timeline-dot{background:var(--primary);outline-color:var(--primary);animation:pulse 2.4s ease-in-out infinite}
+        .timeline-node.future .timeline-dot{background:var(--gray-300);outline-color:var(--gray-300)}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+        .timeline-node.future .timeline-card{opacity:0.5;border-style:dashed}
+        .timeline-card{background:var(--card-bg);border:1px solid var(--gray-200);border-radius:10px;padding:12px}
+        .timeline-card.current{border-color:var(--primary)}
+        .timeline-date{font-size:0.74rem;color:var(--gray-500);margin-bottom:3px}
+        .timeline-summary{font-weight:700;font-size:0.9rem;margin-bottom:5px}
+        .timeline-list{margin:0;padding:0;list-style:none;font-size:0.8rem}
+        .timeline-list li{margin-bottom:2px;display:flex;align-items:flex-start;gap:4px}
+        .timeline-metric{font-size:0.72rem;margin-top:5px;color:var(--gray-500)}
+
+        /* 历史周默认折叠，点标题/圆点展开 */
+        .timeline-node.past.collapsed .timeline-list,
+        .timeline-node.past.collapsed .timeline-metric{display:none}
+        .timeline-node.past .timeline-toggle{cursor:pointer;font-size:0.7rem;color:var(--primary);margin-top:4px;display:inline-flex;align-items:center;gap:4px;user-select:none}
+        .timeline-node.past .timeline-toggle:hover{color:var(--primary-dark)}
+        .timeline-node.past .timeline-dot{cursor:pointer}
+        .timeline-node.past.collapsed .timeline-card{background:var(--gray-50);padding:8px 12px}
+
+        /* ═══════ 10. 待办清单 ═══════ */
+        .todo-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:0.82rem}
+        .todo-item input[type="checkbox"]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+        .todo-item.done label{text-decoration:line-through;color:var(--gray-400)}
+        .empty-state{text-align:center;padding:24px;color:var(--gray-400);font-size:0.8rem}
+
+        /* ═══════ 11. 公式与架构图 ═══════ */
+        .formula-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin:6px 0;overflow-x:auto}
+        .formula-label{font-size:0.7rem;color:var(--gray-500);text-transform:uppercase;margin-bottom:3px;font-weight:600}
+
+        .arch-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;flex-wrap:wrap}
+        .arch-block{background:var(--card-bg);border:2px solid var(--gray-200);border-radius:10px;padding:10px 14px;text-align:center;font-size:0.74rem;font-weight:600;min-width:90px}
+        .arch-block.wave{border-color:var(--primary);background:var(--primary-light)}
+        .arch-block.tab{border-color:var(--accent);background:var(--accent-light)}
+        .arch-block.fusion{border-color:var(--warning);background:var(--warning-bg)}
+        .arch-block.output{border-color:var(--gray-400);background:var(--gray-50)}
+        .arch-arrow{font-size:1.4rem;color:var(--gray-400)}
+
+        /* ═══════ 12. 图片与占位 ═══════ */
+        .figure{margin:8px 0;text-align:center}
+        .figure img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:inline-block}
+        .fig-caption{font-size:0.74rem;color:var(--gray-500);margin-top:4px}
+        .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        /* 模板预览用图片占位：接入真实图片时整块替换为 <img src="..."> 即可 */
+        .img-placeholder{
+            aspect-ratio:16/9;max-width:100%;border-radius:8px;
+            border:2px dashed var(--gray-300);background:var(--gray-50);
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            color:var(--gray-400);font-size:0.8rem;gap:4px;
+        }
+        .img-placeholder .ph-icon{font-size:1.8rem}
+
+        /* ═══════ 13. 快速链接卡 ═══════ */
+        .quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+        .quick-link-card{
+            background:var(--card-bg);border:1px solid var(--line);border-top:2px solid var(--gray-300);
+            border-radius:var(--card-radius);
+            box-shadow:var(--shadow);padding:16px 12px;text-align:center;
+            transition:box-shadow var(--transition),border-color var(--transition),transform 0.25s var(--ease-move);
+            cursor:pointer;display:block;
+        }
+        .quick-link-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);text-decoration:none;border-color:rgba(0,0,0,0.12)}
+        .quick-link-card:active{transform:scale(0.98)}
+        /* 图标容器：主题覆盖层可改底色/圆角实现风格迁移 */
+        .quick-link-card .ql-icon{
+            width:42px;height:42px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;
+            background:var(--primary-light);color:var(--primary-dark);border-radius:12px;
+            font-size:1.25rem;font-weight:700;
+            transition:background var(--transition),color var(--transition);
+        }
+        .quick-link-card:hover .ql-icon{background:var(--primary);color:#fff}
+        .quick-link-card .ql-title{font-weight:700;font-size:0.85rem;color:var(--gray-800);margin-bottom:3px}
+        .quick-link-card .ql-desc{font-size:0.7rem;color:var(--gray-500)}
+        .quick-link-card.ql-mdsed{border-top-color:var(--primary)}
+        .quick-link-card.ql-m1{border-top-color:var(--success)}
+        .quick-link-card.ql-m2{border-top-color:var(--warning)}
+        .quick-link-card.ql-m3{border-top-color:var(--gray-400)}
+
+        /* ═══════ 14. 修饰（滚动条 / 回到顶部） ═══════ */
+        #content::-webkit-scrollbar,#sidebar::-webkit-scrollbar{width:8px}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
+        #content::-webkit-scrollbar-track,#sidebar::-webkit-scrollbar-track{background:transparent}
+
+        #back-to-top{
+            position:fixed;bottom:28px;right:28px;width:40px;height:40px;
+            border-radius:50%;background:var(--card-bg);border:1px solid var(--gray-200);
+            box-shadow:var(--shadow-hover);cursor:pointer;font-size:1.1rem;color:var(--gray-600);
+            display:none;align-items:center;justify-content:center;z-index:20;
+            transition:var(--transition);
+        }
+        #back-to-top:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+        #back-to-top.visible{display:flex}
+
+        /* ═══════ 15. 响应式 ═══════ */
+        @media(max-width:1100px){
+            .card-body{grid-template-columns:minmax(0,1fr)}
+        }
+        @media(max-width:768px){
+            #app{grid-template-columns:1fr;grid-template-areas:"header" "content" "footer"}
+            #sidebar{display:none}
+            .resizer{display:none}
+            .compare-grid,.quick-links{grid-template-columns:1fr 1fr}
+            .metric-grid{grid-template-columns:1fr 1fr}
+            .fig-grid{grid-template-columns:1fr}
+            #content{padding:12px}
+            #header{padding:0 12px}
+            #footer{padding:0 12px}
+            .nav-links a{padding:4px 8px}
+        }
+        /* ═══════ 16. 减弱动效 ═══════ */
+        @media(prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            .timeline-node.current .timeline-dot{animation:none}
+            .quick-link-card:hover,.quick-link-card:active{transform:none}
+            .carousel-viewport{cursor:default}
+            *,*::before,*::after{transition-duration:0.01ms!important;animation-duration:0.01ms!important;animation-iteration-count:1!important}
+        }
+
+        /* ═══════ 17. 图标集 ═══════
+           stroke 线性 SVG（mask + currentColor）：图标颜色自动跟随所在文字颜色，
+           主题换色无需换图标。TEMPLATE: 复制卡片时标题图标用 <span class="ic ic-xxx"></span>，
+           可用图标见下方清单；如需新图标，按同一 24×24 stroke=2 风格补充 data URI。 */
+        .ic{display:inline-block;width:1em;height:1em;background:currentColor;flex-shrink:0;
+            -webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+        .ic-dashboard{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1.5'/%3E%3C/svg%3E")}
+        .ic-doc{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='M9 13h6M9 17h6'/%3E%3C/svg%3E")}
+        .ic-nav{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6h16M4 12h16M4 18h10'/%3E%3C/svg%3E")}
+        .ic-flask{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3v6L5 18a2.5 2.5 0 0 0 2.2 3.7h9.6A2.5 2.5 0 0 0 19 18l-5-9V3'/%3E%3Cpath d='M8.5 3h7'/%3E%3C/svg%3E")}
+        .ic-search{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E")}
+        .ic-calendar{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M8 3v4M16 3v4M3 10h18'/%3E%3C/svg%3E")}
+        .ic-clipboard{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='4' width='14' height='17' rx='2'/%3E%3Cpath d='M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1H9z'/%3E%3Cpath d='M9 11h6M9 15h6'/%3E%3C/svg%3E")}
+        .ic-check{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8.5 12.5l2.5 2.5 4.5-5'/%3E%3C/svg%3E")}
+        .ic-chart{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20V10M10 20V4M16 20v-6M22 20H2'/%3E%3C/svg%3E")}
+        .ic-bulb{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 22h4'/%3E%3Cpath d='M12 2a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 2z'/%3E%3C/svg%3E")}
+        .ic-archive{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='5' rx='1'/%3E%3Cpath d='M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9'/%3E%3Cpath d='M10 13h4'/%3E%3C/svg%3E")}
+        .ic-book{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z'/%3E%3Cpath d='M4 19a2 2 0 0 1 2-2h14'/%3E%3C/svg%3E")}
+        .ic-formula{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 4H6l6 8-6 8h12'/%3E%3C/svg%3E")}
+        .ic-code{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E")}
+        .ic-paper{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16v16H4z'/%3E%3Cpath d='M8 9h8M8 13h8M8 17h5'/%3E%3C/svg%3E")}
+        .ic-arrow{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E")}
+        .ic-palette{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='8.2' cy='9.5' r='1.5' fill='black'/%3E%3Ccircle cx='12.4' cy='7.6' r='1.5' fill='black'/%3E%3Ccircle cx='16' cy='10.4' r='1.5' fill='black'/%3E%3Ccircle cx='9' cy='14.6' r='1.5' fill='black'/%3E%3Ccircle cx='14.6' cy='15.2' r='1.5' fill='black'/%3E%3C/svg%3E")}
+
+        /* ═══════ 18. 主题一键切换器 ═══════
+           主题列表由 theme-pack.js（window.THEME_PACK）提供；选择写 localStorage 跨页连续。 */
+        .theme-switcher{position:relative}
+        .ts-btn{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.78rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .ts-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .ts-btn:active{transform:scale(0.97)}
+        .ts-panel{
+            /* fixed 定位（JS 打开时按按钮位置设置 top/right）：
+               脱离 header/nav-links 的 overflow 裁剪域，可覆盖任何内容 */
+            position:fixed;z-index:60;
+            width:250px;max-height:60vh;overflow-y:auto;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-radius:12px;
+            box-shadow:var(--shadow-hover);padding:8px;
+            display:flex;flex-direction:column;gap:2px;
+        }
+        .ts-panel[hidden]{display:none}
+        .ts-opt{
+            display:flex;align-items:center;gap:8px;
+            padding:7px 10px;border-radius:8px;border:none;background:transparent;
+            font-size:0.8rem;color:var(--gray-700);cursor:pointer;text-align:left;
+            font-family:inherit;
+        }
+        .ts-opt:hover{background:var(--gray-100)}
+        .ts-opt.sel{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .ts-opt .ts-dots{display:flex;gap:4px;flex-shrink:0}
+        .ts-opt .ts-dots i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);display:inline-block}
+        .ts-opt .ts-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ts-opt .ts-check{margin-left:auto;flex-shrink:0;visibility:hidden;font-size:0.9em}
+        .ts-opt.sel .ts-check{visibility:visible}
+        /* ═══ 共享设计系统 CSS 结束 ═══ */
+    
+        /* ═══════ 主题覆盖层 · 赛博终端 ═══════ */
+        :root {
+            --bg:#0a0e14; --card-bg:#0d141c; --card-radius:4px;
+            --line:rgba(61,220,132,0.14);
+            --shadow:0 1px 2px rgba(0,0,0,0.4),0 6px 18px rgba(0,0,0,0.4);
+            --shadow-hover:0 4px 12px rgba(0,0,0,0.5),0 10px 26px rgba(0,0,0,0.5);
+            --primary:#3ddc84; --primary-light:rgba(61,220,132,0.10); --primary-dark:#86efac;
+            --accent:#38bdf8; --accent-light:rgba(56,189,248,0.10);
+            --success:#3ddc84; --success-bg:rgba(61,220,132,0.10);
+            --warning:#fbbf24; --warning-bg:rgba(251,191,36,0.10);
+            --danger:#fb7185; --danger-bg:rgba(251,113,133,0.10);
+            --gray-50:#1c1c1e; --gray-100:#2c2c2e; --gray-200:#3a3a3c; --gray-300:#48484a; --gray-400:#8e8e93; --gray-500:#98989d; --gray-600:#a1a1a6; --gray-700:#d1d1d6; --gray-800:#f5f5f7; --gray-900:#ffffff;
+            --font-mono:"JetBrains Mono","Cascadia Code","SF Mono","Consolas",monospace;
+            --font-sans:"JetBrains Mono","PingFang SC","Microsoft YaHei",sans-serif;
+        }
+        body{background:
+            radial-gradient(800px 400px at 85% -80px, rgba(56,189,248,0.08), transparent 70%),
+            var(--bg);}
+        ::selection{background:rgba(61,220,132,0.35);color:#04100a}
+        #header{background:#0a1018;border-bottom:1px solid rgba(61,220,132,0.18)}
+        #sidebar{background:#0a1018}
+        .sidebar-child.active{background:rgba(61,220,132,0.10);color:var(--primary-dark)}
+        .card{box-shadow:0 1px 2px rgba(0,0,0,0.4),0 6px 18px rgba(0,0,0,0.4)}
+        .card:hover{border-color:rgba(61,220,132,0.3)}
+        .card-header{border-bottom:1px solid rgba(61,220,132,0.12)}
+        .countdown{background:rgba(61,220,132,0.10);color:var(--primary-dark);border-radius:4px}
+        .status-tag{border-radius:4px}
+        .badge-ok,.badge-warn,.badge-new,.badge-ext{border-radius:4px}
+        .bar-fill{border-radius:0}
+        .bar-track{border-radius:0;background:rgba(255,255,255,0.06)}
+        .bar-fill.blue{background:linear-gradient(90deg,#3ddc84,#38bdf8)}
+        .bar-fill.green{background:linear-gradient(90deg,#3ddc84,#86efac)}
+        .bar-fill.orange{background:linear-gradient(90deg,#fbbf24,#fcd34d)}
+        .bar-fill.gray{background:linear-gradient(90deg,#334155,#64748b)}
+        .info-box{border-radius:4px}
+        .info-box.info{border-color:rgba(61,220,132,0.3)}
+        .info-box.success{border-color:rgba(61,220,132,0.3)}
+        .info-box.warning,.info-box.warn{border-color:rgba(251,191,36,0.3)}
+        .info-box.danger{border-color:rgba(251,113,133,0.3)}
+        .source-line code,.code-ref code{background:rgba(61,220,132,0.08);color:var(--gray-700)}
+        .timeline-dot{border-radius:2px}
+        .img-placeholder{border-style:dashed;border-width:1px;border-color:rgba(61,220,132,0.3);background:rgba(61,220,132,0.03);border-radius:2px}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:#1e293b;border-radius:2px}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:#334155}
+        /* 图标容器：终端绿直角 */
+        .quick-link-card .ql-icon{background:rgba(61,220,132,0.12);color:var(--primary-dark);border-radius:4px}
+        .quick-link-card:hover .ql-icon{background:var(--primary);color:#04100a}
+        .carousel-viewport::before{border-color:rgba(61,220,132,0.35)}
+        .carousel-item .ci-card{position:relative}
+        .carousel-item .ci-card::before{content:"";position:absolute;left:10px;top:9px;width:7px;height:13px;background:var(--primary)}
+        .timeline-dot{border-radius:0}
+        .card-title::after{content:"";display:inline-block;width:7px;height:1em;margin-left:5px;background:var(--primary);animation:cursor-blink 1.1s steps(2,start) infinite}
+        @keyframes cursor-blink{0%,60%{opacity:1}61%,100%{opacity:0}}
+        /* ═══ 主题覆盖层结束 ═══ */
+    </style>
+
+    <!-- MathJax 配置（渲染器 CDN 改为按需加载：仅当汇总指标卡的公式实际显示时由
+         底部 ensureMathJax() 注入，避免无公式页面白加载约 1MB 解析器） -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: false,
+                packages: {'[+]': ['ams', 'newcommand', 'configMacros']},
+                /* TEMPLATE: 按需增减宏；宏全集见 sub_page.html */
+            },
+            chtml: { scale: 0.95 }
+        };
+    </script>
+</head>
+<body data-default-theme="06_cyber_terminal" data-asset-prefix="../">
+
+<div id="app">
+
+<!-- ═══════ HEADER（顶部导航：品牌区 + 子页面链接 + 倒计时） ═══════ -->
+<header id="header">
+    <!-- TEMPLATE: 项目名由 site_meta.project_name 渲染（见底部 JS），也可直接写死 -->
+    <div class="nav-brand">
+        <span class="ic ic-dashboard" style="font-size:1.05em;"></span>
+        <span id="project-name">项目名 实验进度报告</span>
+    </div>
+    <!-- TEMPLATE: 子页面入口集中在此（每个子页面一条，与子页面顶导互链） -->
+    <nav class="nav-links" id="nav-links">
+        <a href="06_cyber_terminal_sub.html"><span class="ic ic-paper"></span> 子页面示例（方法 + 论文详解）</a>
+        <a href="06_cyber_terminal_sub.html">① 方法1</a>
+        <a href="06_cyber_terminal_sub.html">② 方法2</a>
+    </nav>
+    <div class="header-right">
+        <span class="countdown" id="countdown">下次组会: ·</span>
+        <span id="current-date" style="font-size:0.72rem;"></span>
+        <!-- TEMPLATE: 主题一键切换器（10 主题由 theme-pack.js 提供，选择跨页保持） -->
+        <div class="theme-switcher" id="theme-switcher">
+            <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                <span class="ic ic-palette"></span><span class="ts-cur">主题</span>
+            </button>
+            <div class="ts-panel" id="ts-panel" hidden></div>
+        </div>
+    </div>
+</header>
+
+<!-- ═══════ SIDEBAR（页内导引：滚动高亮当前章节） ═══════ -->
+<nav id="sidebar">
+    <!-- TEMPLATE: 页内导航。新增卡片必须同步 3 处：
+         ① 此处 sidebar-child 的 data-target  ② 卡片 div 的 id  ③ 底部 JS sections 数组 -->
+    <div class="sidebar-section">
+        <div class="sidebar-parent expanded" onclick="toggleSidebar(this,'children-nav')">
+            <span class="ic ic-nav"></span> 页面内导航
+            <span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-nav">
+            <div class="sidebar-child active" data-target="sec-dashboard" onclick="scrollToSection('sec-dashboard',this)">
+                <span class="ic ic-dashboard"></span> 整体指标仪表盘
+            </div>
+            <div class="sidebar-child" data-target="sec-experiments" onclick="scrollToSection('sec-experiments',this)">
+                <span class="ic ic-flask"></span> 实验卡片
+            </div>
+            <div class="sidebar-child" data-target="sec-summary" onclick="scrollToSection('sec-summary',this)">
+                <span class="ic ic-search"></span> 汇总指标
+            </div>
+            <div class="sidebar-child" data-target="sec-timeline" onclick="scrollToSection('sec-timeline',this)">
+                <span class="ic ic-calendar"></span> 每周进度时间线
+            </div>
+            <div class="sidebar-child" data-target="sec-thisweek" onclick="scrollToSection('sec-thisweek',this)">
+                <span class="ic ic-clipboard"></span> 本周任务清单
+            </div>
+            <div class="sidebar-child" data-target="sec-todos" onclick="scrollToSection('sec-todos',this)">
+                <span class="ic ic-check"></span> 待办清单
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- 拖拽分隔条：调整左侧导引栏宽度（双击恢复默认） -->
+<div class="resizer" title="拖动调整侧边栏宽度（双击恢复默认）"></div>
+
+<!-- ═══════ CONTENT ═══════ -->
+<main id="content">
+
+<!-- ═══ Dashboard（数据驱动：由 web_data/report_data.json 渲染，见底部 renderDashboard） ═══ -->
+<div class="card" id="sec-dashboard">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-dashboard"></span> 整体指标仪表盘</div>
+        <span class="status-tag status-ok" id="dashboard-status">加载中...</span>
+    </div>
+    <!-- 3D 转盘：方法标签在水平圆环上滚动（自动旋转 / 拖拽 / 点击转到前方），
+         正前方卡片的详情实时显示在下方面板 -->
+    <div class="carousel">
+        <div class="carousel-viewport" id="carousel-viewport">
+            <div class="carousel-turn" id="carousel-turn"></div>
+        </div>
+        <div class="carousel-detail" id="carousel-detail"></div>
+    </div>
+    <div style="margin-top:8px;overflow-x:auto;" id="dashboard-table"></div>
+    <div style="margin-top:8px;text-align:center;font-size:0.7rem;color:var(--gray-500);" id="dashboard-note"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ═══ 实验卡片区（手写 HTML，每张卡片 = 一个实验方向/一次探索）             ═══
+     ═══ 卡片模板（以下「实验示例」卡片即完整示范，复制即可）：               ═══
+     ═══   .card [id="sec-xxx", 可选 style="border:2px solid var(--accent)"] ═══
+     ═══   ├─ .card-header > .card-title + .status-tag                      ═══
+     ═══   ├─ .source-line（实验出处/文档路径，用 <code> 包裹）              ═══
+     ═══   ├─ .info-box.info（问题背景）                                     ═══
+     ═══   ├─ .section-h4.c-*（分节标题，① ② ③ 编号 + 色变体）              ═══
+     ═══   ├─ .data-table / .figure / .info-box（结果表 / 图 / 结论）        ═══
+     ═══   └─ .code-ref（代码与数据文件引用页脚）                             ═══
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="card" id="sec-experiments">
+
+    <!-- ═══ 实验示例卡片（TEMPLATE: 用你的实验替换其中内容；新卡片插在本卡之后。
+          卡片内所有数值（0.8xxx / +0.xx / xx.x% / ~x.xM 等）与文字均为占位符，含义见 README「占位符说明」） ═══ -->
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-flask"></span> 实验示例卡片：方向 A · 模块改进</div>
+        <span class="status-tag status-ok">✅ 状态示例</span>
+    </div>
+    <p class="source-line">
+        来源: <code>docs/实验设计文档.md</code> |
+        实现: <code>src/models/module.py</code> |
+        分析: <code>analysis/experiment_analysis.ipynb</code>
+    </p>
+
+    <!-- 两栏结构：左 .viz = 图/表展示（细节折叠），右 .explain = 文字解释 -->
+    <div class="card-body">
+
+    <div class="viz">
+    <h4 class="section-h4 c-primary">① 核心指标：N 组变体对比（val 集口径）</h4>
+    <p style="font-size:0.72rem;color:var(--gray-500);margin:-4px 0 6px;">
+        ⚠️ 口径约定：主表为 <strong>val 集 (agg0)</strong> 口径，test 集 (agg1) 并列给出。
+    </p>
+    <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>变体</th><th>Val Macro AUROC (agg0) [95% CI]</th><th>Test Macro AUROC (agg1)</th><th>Δ val (pp)</th><th>Δ test (pp)</th><th>参数量</th><th>判定</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>变体 1（最优示例）</strong></td><td class="num highlight"><strong>0.8xxx [0.8xxx, 0.8xxx]</strong></td><td class="num">0.8xxx</td><td class="num up"><strong>+0.xx</strong></td><td class="num up"><strong>+0.xx</strong></td><td class="num">~x.xM</td><td>🟡 0.5~1pp</td></tr>
+        <tr><td>变体 2</td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num up">+0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td>🟢 &lt;0.5pp</td></tr>
+        <tr><td>对照（原结构）</td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num">0.00</td><td class="num">0.00</td><td class="num">0.xxM</td><td>baseline</td></tr>
+        <tr><td>变体 3</td><td class="num down">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num down">0.8xxx</td><td class="num down">−0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td>🔴 下跌</td></tr>
+    </tbody>
+    </table>
+
+    <!-- 折叠区：结果对比图（TEMPLATE: 把 .img-placeholder 整块替换为
+         <div class="figure"><img src="../../path/to/fig.png" alt="图注"><div class="fig-caption">图注文字</div></div>）
+         data-fold 与右栏 .explain-item 配对：折叠/展开时对应解释文字同步显隐 -->
+    <div class="fold" data-fold="exp-fig">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-chart"></span> 结果对比图（各变体指标柱状图/曲线图）
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <div class="figure">
+                <div class="img-placeholder"><span class="ph-icon">📈</span>图片占位：结果对比图<br>（替换为你的分析图 &lt;img src="..."&gt;）</div>
+                <div class="fig-caption">图 1 · 各变体指标对比（占位图注）</div>
+            </div>
+        </div></div></div>
+    </div>
+
+    <!-- 折叠区：消融数据与附图（data-fold 与右栏消融解释配对） -->
+    <div class="fold" data-fold="exp-abl">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-chart"></span> ② 消融数据：分组统计表 + 直方图/散点图
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <table class="data-table" style="max-width:780px;">
+            <thead><tr><th>维度</th><th>分组</th><th>N</th><th>mean Δ (pp)</th><th>改善率</th></tr></thead>
+            <tbody>
+                <tr><td rowspan="3">按某属性分组</td><td>分组 1</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+                <tr><td>分组 2</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+                <tr><td>分组 3</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+            </tbody>
+            </table>
+            <div class="fig-grid" style="margin-top:8px;">
+                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📊</span>图片占位：消融直方图</div><div class="fig-caption">分组 Δ 直方图（占位图注）</div></div>
+                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📈</span>图片占位：散点图</div><div class="fig-caption">属性 vs Δ 散点图（占位图注）</div></div>
+            </div>
+        </div></div></div>
+    </div>
+
+    <!-- 折叠区：后续行动 -->
+    <div class="fold">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-clipboard"></span> ③ 后续行动清单
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <table class="data-table" style="max-width:880px;">
+            <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+            <tbody>
+                <tr style="background:var(--success-bg);"><td>✅ 已闭环</td><td><s>示例已闭环任务</s></td><td><strong>已完成</strong>，（结论一句话）</td></tr>
+                <tr style="background:var(--danger-bg);"><td><strong>⭐ 主线</strong></td><td><strong>示例主线任务</strong></td><td>消融指向的下一步方向，（说明）</td></tr>
+                <tr><td>叠加</td><td>示例叠加实验</td><td>验证与其它方向的正交叠加效果</td></tr>
+                <tr><td>写作</td><td>示例写作任务</td><td>（章节/叙事说明）</td></tr>
+            </tbody>
+            </table>
+        </div></div></div>
+    </div>
+    </div>
+
+    <div class="explain">
+    <div class="info-box info">
+        <strong>📌 问题：</strong>（在此填写问题背景。本卡片是「实验卡片」的完整写法示范，结构为：问题背景 → ① 对比实验 → ② 消融分析 → ③ 后续行动，可按需增减小节。）
+    </div>
+    <!-- explain-item 与左栏同名 data-fold 折叠区联动：折叠时同步隐藏 -->
+    <div class="explain-item" data-fold="exp-fig">
+        <div class="info-box success">
+            <strong>📐 关键发现：</strong>（在此填写结论，例如：变体 1 是唯一通过门槛的方案（CI 下界 &gt; 对照点估计），涨幅具有统计可靠性；变体 3 不涨反跌，原因分析……）
+        </div>
+    </div>
+    <div class="explain-item" data-fold="exp-abl">
+        <h4 class="section-h4 c-accent">② 消融分析：增益来源</h4>
+        <div class="info-box info">
+            <strong>📌 两种假设，「增益从哪里来」：</strong>(a) 假设一（如结构信息被利用）；(b) 假设二（如独立参数化带来增益）。<strong>可检验的预测：</strong>（写出两种假设各自可区分的预测，例如 (a) 预测某类样本受益更多，Δ 应随某属性递增；(b) 预测增益均匀分布。）
+        </div>
+        <p style="font-size:0.82rem;line-height:1.7;color:var(--gray-700);margin-top:8px;">
+            <strong>数据与假设的对照：</strong>（在此填写分组统计是否支持假设 (a)，例如：各组 Δ 几乎相同、秩相关 ρ ≈ 0 且不显著，说明「随某属性递增」的趋势在统计上不存在。）
+        </p>
+        <div class="info-box success" style="margin-top:10px;">
+            <strong>📐 消融结论：</strong>（在此填写消融裁决，增益来自哪种机制、如何支持/否定了哪种假设。）
+        </div>
+    </div>
+    </div>
+
+    </div>
+
+    <p class="code-ref">
+        设计文档：<code>docs/实验设计文档.md</code> |
+        实现：<code>src/models/module.py</code> |
+        脚本：<code>src/run_experiment.sh</code> |
+        分析：<code>analysis/experiment_analysis.ipynb</code> | 图片：<code>analysis/experiment_*.png</code>
+    </p>
+
+    <!-- ═══════ TEMPLATE: 新实验卡片插入点 ═══════
+         复制上方「实验示例卡片」结构，替换 title/id/内容，
+         并同步侧边栏 data-target 与底部 JS sections 数组。 -->
+
+</div>
+
+<!-- ═══ 汇总指标卡（可选数据源驱动：web_data/metrics_summary.json，缺失时整卡隐藏） ═══ -->
+<div class="card" id="sec-summary" style="display:none;">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-search"></span> 汇总指标</div>
+    </div>
+    <div class="card-body">
+        <div class="viz">
+            <div class="metric-grid" id="summary-grid"></div>
+            <div id="summary-table" style="overflow-x:auto;margin-top:6px;"></div>
+        </div>
+        <div class="explain">
+            <div id="summary-formula" class="info-box info" style="display:none;">
+                <strong>📐 指标计算公式：</strong>
+                <!-- TEMPLATE: 替换为你的指标定义（LaTeX；以下为占位公式示意） -->
+                \[ \mathrm{Metric} = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}\bigl\{ \text{占位条件} \bigr\} \]
+                <span style="font-size:0.72rem;color:var(--gray-500);">占位说明：替换为你的指标口径说明（样本数、统计对象等）。</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ 每周进度时间线（数据驱动） ═══ -->
+<div class="card" id="sec-timeline">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-calendar"></span> 每周进度安排</div>
+    </div>
+    <div class="timeline" id="timeline-container">
+        <p class="empty-state">加载中...</p>
+    </div>
+</div>
+
+<!-- ═══ 本周任务（数据驱动） ═══ -->
+<div class="card" id="sec-thisweek">
+    <div class="card-header">
+        <div class="card-title" id="this-week-title"><span class="ic ic-clipboard"></span> 本周任务</div>
+        <span class="countdown" id="week-countdown"></span>
+    </div>
+    <div id="this-week-content">
+        <p class="empty-state">加载中...</p>
+    </div>
+</div>
+
+<!-- ═══ 待办清单（数据驱动） ═══ -->
+<div class="card" id="sec-todos">
+    <p class="empty-state">加载中...</p>
+</div>
+
+<div id="loading-msg" style="text-align:center;padding:40px;color:var(--gray-400);">
+    <p style="font-size:2rem;">⏳</p>
+    <p>正在加载数据...</p>
+</div>
+
+</main>
+
+<!-- ═══════ FOOTER（底部声明栏：site_meta 数据驱动，见底部 JS） ═══════ -->
+<footer id="footer">
+    <!-- TEMPLATE: 作者/机构/版本/更新时间来自 report_data.json 的 site_meta 字段；
+         logo 处把 .logo-slot 占位替换为 <img src="..." alt="机构 logo"> -->
+    <div class="footer-meta" id="footer-meta">
+        <strong>作者：</strong><span id="f-authors">·</span>
+        <span class="sep">·</span>
+        <strong>机构：</strong><span id="f-institution">·</span>
+        <span class="sep">·</span>
+        <span id="f-version">v·</span>
+        <span class="sep">·</span>
+        <strong>更新：</strong><span id="f-updated">·</span>
+    </div>
+    <div class="footer-logo"><span class="logo-slot">机构 logo 占位</span></div>
+</footer>
+
+</div>
+
+<!-- 回到顶部按钮 -->
+<button id="back-to-top" title="回到顶部" onclick="document.getElementById('content').scrollTo({top:0,behavior:'smooth'})"><span class="ic ic-arrow" style="font-size:1.05em;"></span></button>
+
+<!-- 主题包（唯一数据源：10 个主题 CSS + 元数据；先于下方切换器加载） -->
+<script src="../theme-pack.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   数据约定（详见 web_data/schema.md）：
+   - report_data.json 为唯一必须的数据源；metrics_summary.json 可选（缺失时汇总卡隐藏）
+   - 口径约定：agg1 = 测试集（大字主值），agg0 = 验证集（小字副值），Δ 主行为测试集口径
+   ═══════════════════════════════════════════════════════════════════════════ */
+let D = null, S = null;
+
+async function loadData() {
+    try {
+        const [r1, r2] = await Promise.all([
+            fetch('../web_data/report_data.json').then(r => r.ok ? r.json() : null),
+            fetch('../web_data/metrics_summary.json').then(r => r.ok ? r.json() : null)
+        ]);
+        D = r1; S = r2;
+        if (!D) throw new Error('report_data.json 加载失败');
+        document.getElementById('loading-msg').style.display = 'none';
+        initApp();
+    } catch (err) {
+        document.getElementById('loading-msg').innerHTML =
+            `<p style="font-size:2rem;">⚠️</p><p>数据加载失败: ${err.message}</p>
+            <p style="font-size:0.78rem;margin-top:12px;">请确保在站点目录上级启动 HTTP 服务器:<br><code>python -m http.server 8080</code><br>然后访问站点目录（如 <code>http://localhost:8080/&lt;站点目录名&gt;/</code>）</p>`;
+    }
+}
+
+function initApp() {
+    updateHeader();
+    renderSiteMeta();
+    renderDashboard();
+    renderSummaryMetrics();
+    renderTimeline();
+    renderThisWeek();
+    renderTodos();
+}
+
+/* ═══════ 站点元信息：顶部导航项目名 + 底部声明栏 ═══════
+   report_data.json 的 site_meta 字段（可选）：project_name / authors /
+   institution / version / updated。缺失时保留 HTML 占位符。 */
+function renderSiteMeta() {
+    const meta = D?.site_meta;
+    if (!meta) return;
+    if (meta.project_name) document.getElementById('project-name').textContent = meta.project_name;
+    document.getElementById('f-authors').textContent = meta.authors || '·';
+    document.getElementById('f-institution').textContent = meta.institution || '·';
+    document.getElementById('f-version').textContent = meta.version ? 'v' + meta.version : '·';
+    document.getElementById('f-updated').textContent = meta.updated || '·';
+}
+
+/* ═══════ 折叠区（.fold）：事件委托，点击 .fold-head 切换展开/收起 ═══════
+   带 data-fold 的折叠区与右栏 .explain-item[data-fold] 配对：
+   折叠/展开时对应解释文字同步隐藏/显示。 */
+function syncFoldExplains(fold, open) {
+    const key = fold.dataset.fold;
+    if (!key) return;
+    const card = fold.closest('.card');
+    if (!card) return;
+    card.querySelectorAll('.explain-item[data-fold="' + key + '"]').forEach(el => {
+        el.hidden = !open;
+    });
+    alignExplains(card);
+}
+
+/* ═══════ 解释对齐：右栏解释块与其左栏对应折叠区（data-fold）垂直对齐 ═══════
+   解释文字不再堆叠在上一个解释下方，而是贴在所解释的折叠框同一水平线。 */
+function alignExplains(card) {
+    const ex = card.querySelector('.explain');
+    if (!ex) return;
+    const exTop = ex.getBoundingClientRect().top;
+    let consumed = 0;   // 已占用的解释栏高度（含 10px gap）
+    for (const item of ex.children) {
+        if (item.hidden) continue;
+        const key = item.dataset ? item.dataset.fold : null;
+        if (key) {
+            const fold = card.querySelector('.fold[data-fold="' + key + '"]');
+            if (!fold) continue;
+            const targetTop = fold.getBoundingClientRect().top - exTop;
+            const mt = Math.max(0, targetTop - consumed);
+            item.style.marginTop = mt + 'px';
+            consumed = targetTop + item.getBoundingClientRect().height + 10;
+        } else {
+            item.style.marginTop = '0';
+            consumed += item.getBoundingClientRect().height + 10;
+        }
+    }
+}
+function alignAllExplains() {
+    document.querySelectorAll('.card').forEach(alignExplains);
+}
+
+document.addEventListener('click', function (e) {
+    const head = e.target.closest('.fold-head');
+    if (!head) return;
+    const fold = head.closest('.fold');
+    if (!fold) return;
+    const open = fold.classList.toggle('open');
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    syncFoldExplains(fold, open);
+});
+/* 初始状态同步：默认折叠的折叠区，其配对解释块初始隐藏；随后做首次对齐 */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fold:not(.open)[data-fold]').forEach(f => syncFoldExplains(f, false));
+    alignAllExplains();
+    window.addEventListener('resize', alignAllExplains);
+});
+
+/* ═══════ 侧边栏 ═══════ */
+function toggleSidebar(el, childrenId) {
+    el.classList.toggle('expanded');
+    document.getElementById(childrenId)?.classList.toggle('open');
+}
+
+function scrollToSection(targetId, childEl) {
+    document.querySelectorAll('.sidebar-child').forEach(c => c.classList.remove('active'));
+    if (childEl) childEl.classList.add('active');
+    const target = document.getElementById(targetId);
+    if (target) {
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+}
+
+/* 滚动处理（性能优化版）：scrollspy 高亮 + 回到顶部按钮显隐
+   合并为一个 rAF 节流 + passive 的滚动监听，每帧最多一次批量布局读取，
+   避免每个 scroll 事件都触发 offsetTop 强制同步布局造成卡顿。
+   TEMPLATE: 新增卡片时把新 id 追加进 sections 数组（与侧边栏 data-target、卡片 id 三处同步） */
+let scrollTracking = true;
+let scrollTicking = false;
+const scrollSections = ['sec-dashboard','sec-experiments','sec-summary','sec-timeline','sec-thisweek','sec-todos'];
+
+function handleContentScroll() {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+        scrollTicking = false;
+        const contentEl = document.getElementById('content');
+        document.getElementById('back-to-top').classList.toggle('visible', contentEl.scrollTop > 400);
+        if (!scrollTracking) return;
+        const line = contentEl.getBoundingClientRect().top + 60;
+        let active = scrollSections[0];
+        for (const id of scrollSections) {
+            const el = document.getElementById(id);
+            if (!el || el.style.display === 'none') continue;
+            if (el.getBoundingClientRect().top <= line) active = id;
+        }
+        document.querySelectorAll('.sidebar-child').forEach(c => {
+            c.classList.remove('active');
+            if (c.dataset.target === active) c.classList.add('active');
+        });
+    });
+}
+document.getElementById('content').addEventListener('scroll', handleContentScroll, { passive: true });
+
+/* ═══════ 侧边栏宽度拖拽伸缩 ═══════
+   拖动 #app 中间的 .resizer 分隔条调整 --sidebar-width（180~420px）；
+   宽度写入 localStorage 记忆；双击恢复默认。拖拽结束派发 resize 事件，
+   转盘 spread 与解释对齐自动重排。 */
+(function initResizer() {
+    const app = document.getElementById('app');
+    const resizer = app ? app.querySelector('.resizer') : null;
+    if (!resizer) return;
+    const root = document.documentElement;
+    const MIN = 180, MAX = 420, DEF = 260;
+    const KEY = 'labmeeting-sidebar-width';
+    try {
+        const saved = parseInt(localStorage.getItem(KEY) || '', 10);
+        if (saved >= MIN && saved <= MAX) root.style.setProperty('--sidebar-width', saved + 'px');
+    } catch (e) { /* localStorage 不可用时忽略记忆 */ }
+    let startX = 0, startW = DEF, lastW = DEF, pending = false;
+    const readW = () => parseFloat(getComputedStyle(app).gridTemplateColumns.split(' ')[0]) || DEF;
+    const setW = w => {
+        lastW = w;
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {   // rAF 节流：拖拽高频事件只每帧写一次 CSS 变量
+            pending = false;
+            root.style.setProperty('--sidebar-width', lastW + 'px');
+        });
+    };
+    const saveW = () => {
+        try { localStorage.setItem(KEY, String(Math.round(readW()))); } catch (e) {}
+        window.dispatchEvent(new Event('resize'));   // 转盘/解释对齐自适应重排
+    };
+    /* 无障碍：分隔条键盘可达，左右方向键 ±12px */
+    resizer.setAttribute('role', 'separator');
+    resizer.setAttribute('aria-orientation', 'vertical');
+    resizer.tabIndex = 0;
+    resizer.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        setW(Math.min(MAX, Math.max(MIN, readW() + (e.key === 'ArrowRight' ? 12 : -12))));
+        saveW();
+    });
+    resizer.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        resizer.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startW = readW();
+        resizer.classList.add('dragging');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+    });
+    resizer.addEventListener('pointermove', e => {
+        if (!resizer.classList.contains('dragging')) return;
+        setW(Math.min(MAX, Math.max(MIN, startW + e.clientX - startX)));
+    });
+    const endDrag = () => {
+        if (!resizer.classList.contains('dragging')) return;
+        resizer.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        saveW();
+    };
+    resizer.addEventListener('pointerup', endDrag);
+    resizer.addEventListener('pointercancel', endDrag);
+    /* 双击恢复默认宽度 */
+    resizer.addEventListener('dblclick', () => {
+        root.style.setProperty('--sidebar-width', '');
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        window.dispatchEvent(new Event('resize'));
+    });
+})();
+
+/* 组会倒计时：读 weekly_progress 最后一周的 saturday（组会日） */
+function updateHeader() {
+    const now = new Date();
+    document.getElementById('current-date').textContent =
+        now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+    let nextMeetingStr = null;
+    if (D && D.weekly_progress) {
+        const weeks = D.weekly_progress;
+        nextMeetingStr = weeks[weeks.length-1]?.saturday;
+    }
+    let nextMeeting = null, daysToMeeting = null;
+    if (nextMeetingStr) {
+        nextMeeting = new Date(nextMeetingStr+'T00:00:00');
+        daysToMeeting = Math.ceil((nextMeeting - now)/(1000*60*60*24));
+        if (daysToMeeting < 0) daysToMeeting = null;
+    }
+    if (daysToMeeting != null) {
+        document.getElementById('countdown').textContent =
+            `下次组会: ${nextMeeting.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} (${daysToMeeting}天后)`;
+        const wc = document.getElementById('week-countdown');
+        if (wc) wc.textContent = `📅 距下次组会还有 ${daysToMeeting} 天`;
+    } else {
+        document.getElementById('countdown').textContent = '下次组会: 待定';
+        const wc = document.getElementById('week-countdown');
+        if (wc) wc.textContent = '📅 下次组会日期待定';
+    }
+}
+
+/* ═══════ 仪表盘（数据驱动） ═══════
+   渲染 D.baseline + D.methods[]（自动适配方法数量），
+   预留 FUTURE_METHODS 扩展位：新方法出结果前填 null 显示"待开展"。 */
+function renderDashboard() {
+    if (!D) return;
+    const bl = D.baseline;
+    const base = bl.with_nan_mask ?? bl.original;          // TEMPLATE: 选主基线（with_nan_mask 优先，缺省回退 original）
+    const baseAgg0 = base.test_auroc_macro_agg0 ?? 0;
+    const baseAgg1 = base.test_auroc_macro_agg1 ?? 0;
+    const baseVR = bl.violation_rate_pct ?? null;           // TEMPLATE: 可选，无则省略 VR 显示
+
+    // ── 3D 转盘卡片数据（口径: 测试集 agg1 大字主值 + 验证集 agg0 副值，同旧对比卡） ──
+    const CLS = ['ct-m1','ct-m2','ct-m3','ct-m1','ct-m2','ct-m3'];
+    const carouselItems = [];
+    const mkDetail = (name, t, v, extra) =>
+        `<span class="cd-item">测试集 (agg1): <strong>${t}</strong> / 验证集 (agg0): <strong>${v}</strong>${extra ? ` · ${extra}` : ''}</span>`;
+    carouselItems.push({
+        cls: 'ct-m1', name: 'Baseline',
+        t: baseAgg1?.toFixed(4)||'·', v: baseAgg0?.toFixed(4),
+        deltaHtml: baseVR != null ? `<div class="ci-delta down">VR: ${baseVR.toFixed(2)}% (测试集)</div>` : '',
+        detailHtml: mkDetail('Baseline', baseAgg1?.toFixed(4)||'·', baseAgg0?.toFixed(4),
+            baseVR != null ? `VR ${baseVR.toFixed(2)}%` : '') + `<span class="cd-item">${base.run_name || 'main'}</span>`
+    });
+    for (let i = 0; i < (D.methods || []).length; i++) {
+        const m = D.methods[i];
+        const r = m.best_result;
+        const t = r?.test_auroc_macro_agg1, v = r?.test_auroc_macro_agg0;
+        const dt = t != null ? (t - baseAgg1) : null;
+        const dv = v != null ? (v - baseAgg0) : null;
+        const vr = m.subgroups ? (m.subgroups.squared?.best_vr ?? m.subgroups.linear?.best_vr ?? null) : null;
+        carouselItems.push({
+            cls: CLS[i % CLS.length], name: m.name,
+            t: t?.toFixed(4)||'·', v: v?.toFixed(4)||'·',
+            deltaHtml: dt != null
+                ? `<div class="ci-delta ${dt<0?'down':'up'}">Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}${vr != null ? ` · VR ${vr.toFixed(3)}%` : ''}</div>`
+                : '<div class="ci-delta">暂无数据</div>',
+            detailHtml: mkDetail(m.name, t?.toFixed(4)||'·', v?.toFixed(4)||'·',
+                (dt != null ? `Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}，Δ(验证集) ${dv>=0?'+':''}${dv.toFixed(4)}` : '') +
+                (vr != null ? `，VR ${vr.toFixed(3)}%` : '')) + `<span class="cd-item">${r?.run_name || m.status || ''}</span>`
+        });
+    }
+    // ── 未来扩展实验占位: 在此数组追加新方法卡片 ──
+    const FUTURE_METHODS = [
+        // { cls: 'ct-m2', name: '未来方法 (M-x)', t: '·', v: '·',
+        //   deltaHtml: '<div class="ci-delta">待开展</div>', detailHtml: '<span class="cd-item">待开展</span>' },
+    ];
+    for (const fm of FUTURE_METHODS) {
+        carouselItems.push({ cls: fm.cls, name: fm.name, t: fm.t, v: fm.v,
+            deltaHtml: fm.deltaHtml, detailHtml: fm.detailHtml });
+    }
+    initCarousel(carouselItems);
+
+    // 明细对比表
+    let tb = `<table class="data-table" style="min-width:760px;">
+    <thead><tr>
+    <th>方法</th><th>子类型 / 配置</th><th class="num">Val AUROC (agg0)</th><th class="num">Test AUROC (agg1)</th><th class="num">Δ val</th><th class="num">Δ test</th><th class="num">VR%</th><th class="num">备注</th>
+    </tr></thead><tbody>`;
+
+    tb += `<tr style="background:var(--gray-50);">
+    <td><strong>Baseline</strong></td>
+    <td style="color:var(--gray-500);">${base.run_name || 'main'}</td>
+    <td class="num highlight">${baseAgg0.toFixed(4)}</td>
+    <td class="num">${baseAgg1?.toFixed(4)||'·'}</td>
+    <td class="num">·</td>
+    <td class="num">·</td>
+    <td class="num ${baseVR!=null?'warn-cell':''}">${baseVR!=null?baseVR.toFixed(2)+'%':'·'}</td>
+    <td class="num">·</td></tr>`;
+
+    for (const m of (D.methods || [])) {
+        const done = m.status === 'completed';
+        // 有 subgroups 的方法（如按 variant_a/variant_b 分组）：每个分组一行
+        if (m.subgroups && Object.keys(m.subgroups).length) {
+            const sgEntries = Object.entries(m.subgroups);
+            sgEntries.forEach(([sgName, sg], si) => {
+                const agg1 = m.runs?.find(r =>
+                    (r.penalty_type ?? r.subtype) === sgName &&
+                    (r.weight ?? 0) === sg.best_agg0_weight)?.test_auroc_macro_agg1 ?? null;
+                const d0 = sg.best_agg0 - baseAgg0;
+                const d1 = agg1 != null ? (agg1 - baseAgg1) : null;
+                tb += `<tr style="background:var(--success-bg);">
+                ${si===0?`<td rowspan="${sgEntries.length}">${done?'<strong>':'<strong style="opacity:0.5;">'}${m.name}</strong></td>`:''}
+                <td>${sgName}</td>
+                <td class="num highlight up">${sg.best_agg0.toFixed(4)}</td>
+                <td class="num up">${agg1?.toFixed(4)||'·'}</td>
+                <td class="num up">${d0>=0?'+':''}${d0.toFixed(4)}</td>
+                <td class="num up">${d1!=null?((d1>=0?'+':'')+d1.toFixed(4)):'·'}</td>
+                <td class="num up" style="font-weight:700;">${sg.best_vr.toFixed(3)}%</td>
+                <td class="num">λ=${sg.best_agg0_weight}</td></tr>`;
+            });
+        } else {
+            const r = m.best_result;
+            const d0 = r?.test_auroc_macro_agg0 != null ? (r.test_auroc_macro_agg0 - baseAgg0) : null;
+            const d1 = r?.test_auroc_macro_agg1 != null ? (r.test_auroc_macro_agg1 - baseAgg1) : null;
+            tb += `<tr style="${done?'background:var(--success-bg);':'opacity:0.5;'}">
+            <td><strong>${m.name}</strong></td>
+            <td style="color:var(--gray-500);">${r?.run_name || (done?'·':'待开展')}</td>
+            <td class="num ${done?'highlight up':''}" style="${done?'':'color:var(--gray-400);'}">${r?.test_auroc_macro_agg0?.toFixed(4)||'·'}</td>
+            <td class="num ${done?'up':''}">${r?.test_auroc_macro_agg1?.toFixed(4)||'·'}</td>
+            <td class="num ${done?(d0>=0?'up':'down'):''}">${d0!=null?((d0>=0?'+':'')+d0.toFixed(4)):'·'}</td>
+            <td class="num ${done?(d1>=0?'up':'down'):''}">${d1!=null?((d1>=0?'+':'')+d1.toFixed(4)):'·'}</td>
+            <td class="num">·</td>
+            <td class="num">${r?.notes||'·'}</td></tr>`;
+        }
+    }
+
+    tb += `</tbody></table>`;
+    document.getElementById('dashboard-table').innerHTML = tb;
+    document.getElementById('dashboard-note').innerHTML =
+        '📐 口径: 各卡大字为 <strong>测试集 (agg1)</strong> 主指标、小字为验证集 (agg0)；Δ 主行为测试集口径、括号为验证集口径' +
+        (bl.reference_from_paper ? ` | 论文声称: ${bl.reference_from_paper}` : '');
+    document.getElementById('dashboard-status').textContent = '✅ 已更新';
+    document.getElementById('dashboard-status').className = 'status-tag status-ok';
+}
+
+/* ═══════ 3D 转盘引擎 ═══════
+   水平圆环：方法标签卡片绕竖直轴在地面圆环（X-Y 平面）上排列，斜上俯视，
+   正前方卡片大而亮、后方卡片小而暗。自动缓慢旋转；拖拽转动（带惯性）；
+   点击卡片平滑转到正前方；正前方卡片即选中，其详情实时渲染在下方面板。 */
+function initCarousel(items) {
+    const viewport = document.getElementById('carousel-viewport');
+    const turn = document.getElementById('carousel-turn');
+    const detail = document.getElementById('carousel-detail');
+    if (!viewport || !turn || !detail || items.length < 2) return;
+    const n = items.length;
+    const step = 360 / n;
+    // 环形分布：spread（水平像素半径）在 apply() 中按视窗宽度自适应
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    turn.innerHTML = items.map((it, i) => `
+        <div class="carousel-item ${it.cls}" data-i="${i}">
+            <div class="ci-card">
+                <div class="ci-name">${it.name}</div>
+                <div class="ci-num">${it.t}<small> / ${it.v}</small></div>
+                ${it.deltaHtml || ''}
+            </div>
+        </div>`).join('');
+    const els = Array.from(turn.children);   // HTMLCollection 无 forEach，转数组
+    let angle = 0, vel = 0, dragging = false, moved = 0, lastX = 0, startI = null;
+    let tween = null;   // {from, to, t} 点击卡片时的平滑转动
+    let front = -1;
+
+    // hover 状态量：每帧向 0/1 lerp 逼近（约 140ms 缓入缓出），
+    // 旋转中的卡片经过指针下方时阴影平滑加深/回落，不再二值跳变
+    const hoverAmt = new Float32Array(n);
+    let hovered = -1;
+    els.forEach((el, i) => {
+        el.addEventListener('pointerenter', () => { hovered = i; });
+        el.addEventListener('pointerleave', () => { if (hovered === i) hovered = -1; });
+    });
+
+    function apply() {
+        // Z 轴中心对称视角：卡片沿水平环 billboard 分布，上下完全对称（1:1）；
+        // 深度用 scale + opacity + 投影深浅表达，卡面始终正面，边框恒在
+        const spread = Math.min(300, viewport.clientWidth * 0.26);
+        for (let i = 0; i < n; i++) {
+            const aDeg = i * step + angle;
+            const a = aDeg * Math.PI / 180;
+            const d = Math.cos(a);                    // 1=正前方，-1=正后方
+            const t = (d + 1) / 2;                    // 深度 0~1，线性连续无折点
+            const scale = (0.72 + 0.28 * d) * (1 + 0.05 * hoverAmt[i]);   // 悬浮微抬升
+            const tilt = -Math.sin(a) * 16;           // 侧卡微倾面向圆心，前方为 0
+            els[i].style.transform =
+                `translateX(${(Math.sin(a) * spread).toFixed(1)}px) scale(${scale.toFixed(3)}) rotateY(${tilt.toFixed(1)}deg)`;
+            // 透明度地板 0.42：最远端卡片连同边框依然清晰可辨（边框一直有）
+            els[i].style.opacity = (0.42 + 0.58 * t).toFixed(2);
+            // 投影随深度单调加深：正前方最深、越远越浅；悬浮时再加深一档
+            const ts = Math.min(1, t + hoverAmt[i] * 0.4);
+            const ci = els[i].querySelector('.ci-card');
+            if (ci) ci.style.boxShadow =
+                `0 ${(2 + 6 * ts).toFixed(1)}px ${(8 + 16 * ts).toFixed(1)}px rgba(0,0,0,${(0.06 + 0.13 * ts).toFixed(2)})`;
+            els[i].style.zIndex = String(50 + Math.round(d * 50 + hoverAmt[i] * 30));
+        }
+        const idx = ((Math.round(-angle / step) % n) + n) % n;
+        if (idx !== front) {
+            front = idx;
+            for (let i = 0; i < n; i++) els[i].classList.toggle('sel', i === idx);
+            detail.innerHTML = `<span class="cd-name">${items[idx].name}</span>${items[idx].detailHtml}`;
+        }
+    }
+
+    viewport.addEventListener('pointerdown', e => {
+        dragging = true; moved = 0; lastX = e.clientX; vel = 0; tween = null;
+        startI = e.target.closest('.carousel-item')?.dataset.i ?? null;
+        viewport.setPointerCapture(e.pointerId);
+        viewport.classList.add('dragging');
+    });
+    viewport.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const dx = e.clientX - lastX; lastX = e.clientX;
+        angle += dx * 0.25; moved += Math.abs(dx); vel = dx * 0.25;
+    });
+    const endDrag = () => {
+        if (!dragging) return;
+        dragging = false;
+        viewport.classList.remove('dragging');
+        if (moved < 6 && startI != null) {
+            // 点击：平滑转到正前方（600ms ease-out）
+            tween = { from: angle, to: -startI * step, t: 0 };
+        }
+    };
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+
+    // ── 悬停暂停自动旋转（便于阅读旋转中的卡片；拖拽/点击不受影响） ──
+    // 注意：必须声明在下方 tick IIFE 之前，IIFE 立即执行，声明在后会撞 TDZ
+    let hovering = false;
+    viewport.addEventListener('pointerenter', () => { hovering = true; });
+    viewport.addEventListener('pointerleave', () => { hovering = false; });
+
+    let lastTs = performance.now();
+    (function tick(ts) {
+        const dt = Math.min(50, ts - lastTs); lastTs = ts;
+        // hover 状态量每帧平滑逼近目标（时间常数 ~140ms，与帧率无关）
+        const k = 1 - Math.exp(-dt / 140);
+        for (let i = 0; i < n; i++) hoverAmt[i] += ((i === hovered ? 1 : 0) - hoverAmt[i]) * k;
+        if (tween) {
+            tween.t += dt / 600;
+            const k = 1 - Math.pow(1 - Math.min(1, tween.t), 3);   // easeOutCubic
+            angle = tween.from + (tween.to - tween.from) * k;
+            if (tween.t >= 1) { angle = tween.to; tween = null; }
+        } else if (!dragging) {
+            if (vel !== 0) {
+                const f = Math.pow(0.94, dt / 16.7);
+                angle += vel * dt / 16.7; vel *= f;
+                if (Math.abs(vel) < 0.04) vel = 0;
+            } else if (!reduced && !hovering) {
+                angle += 0.40 * dt / 16.7;   // 自动旋转 ~24°/s（reduced-motion 或悬停时静止）
+            }
+        }
+        apply();
+        requestAnimationFrame(tick);
+    })(lastTs);
+    apply();
+    // 视窗宽度变化时重排环形分布（spread 自适应）
+    window.addEventListener('resize', apply);
+
+    // ── 环心主题徽章：三色圆点随主题切换更新 ──
+    const badge = document.createElement('div');
+    badge.className = 'carousel-badge';
+    badge.innerHTML = '<i></i><i></i><i></i>';
+    viewport.appendChild(badge);
+    function updateBadge(id) {
+        const t = window.THEME_PACK && THEME_PACK.find(x => x.id === id);
+        const swatch = t ? t.swatch : ['#2563eb', '#0e7490', '#059669'];
+        badge.querySelectorAll('i').forEach((el, i) => { el.style.background = swatch[i % swatch.length]; });
+    }
+    document.addEventListener('labmeeting-themechange', e => updateBadge(e.detail && e.detail.id));
+    let initTheme = null;
+    try { initTheme = localStorage.getItem('labmeeting-theme'); } catch (e) {}
+    updateBadge(initTheme || document.body.dataset.defaultTheme || 'default');
+
+}
+
+/* ═══════ 汇总指标卡（可选） ═══════
+   metrics_summary.json 结构见 web_data/schema.md；
+   S 缺失或结构不符时整卡保持隐藏。 */
+function renderSummaryMetrics() {
+    if (!S) return;
+    const card = document.getElementById('sec-summary');
+    card.style.display = 'block';
+    const results = S.per_run_results || {};
+    const baselineName = S.baseline_run ?? Object.keys(results)[0];
+    const baselineResult = results[baselineName];
+    const baseVR = baselineResult?.violations?.overall_violation_rate_pct ?? null;
+    let bestVR = baseVR, bestName = baselineName;
+    for (const [name, r] of Object.entries(results)) {
+        if (r.status === 'ok' && r.violations) {
+            const v = r.violations.overall_violation_rate_pct;
+            if (bestVR == null || v < bestVR) { bestVR = v; bestName = name; }
+        }
+    }
+    document.getElementById('summary-grid').innerHTML = `
+        <div class="metric-card"><div class="metric-label">Baseline 指标</div><div class="metric-value" style="color:var(--danger);">${baseVR?.toFixed(2)??'·'}%</div></div>
+        <div class="metric-card"><div class="metric-label">最优指标</div><div class="metric-value" style="color:var(--success);">${bestVR?.toFixed(2)??'·'}%</div><div class="metric-detail">${bestName}</div></div>
+        <div class="metric-card"><div class="metric-label">改善幅度</div><div class="metric-value" style="color:var(--success);">${(baseVR!=null&&bestVR!=null)?(baseVR-bestVR).toFixed(2):'·'}%</div></div>
+        <div class="metric-card"><div class="metric-label">约束对数</div><div class="metric-value">${S.n_pairs ?? '·'}</div></div>
+    `;
+    document.getElementById('summary-formula').style.display = 'block';
+    ensureMathJax();
+    const sortedRuns = Object.entries(results)
+        .filter(([,r]) => r.status === 'ok' && r.violations)
+        .sort((a,b) => (a[1].violations?.overall_violation_rate||0) - (b[1].violations?.overall_violation_rate||0))
+        .slice(0, 8);
+    let html = `<table class="data-table"><thead><tr><th>Run</th><th>指标%</th><th>Δ vs Baseline</th><th>受影响样本</th></tr></thead><tbody>`;
+    for (const [name, r] of sortedRuns) {
+        const v = r.violations;
+        if (!v) continue;
+        const delta = v.overall_violation_rate_pct - baseVR;
+        const cls = delta < -1 ? 'up' : (delta > 0 ? 'warn-cell' : '');
+        html += `<tr>
+        <td><code style="font-size:0.65rem;">${name}</code></td>
+        <td class="num highlight ${cls}">${v.overall_violation_rate_pct.toFixed(3)}%</td>
+        <td class="num ${cls}">${delta>=0?'+':''}${delta.toFixed(2)}%</td>
+        <td class="num">${v.n_samples_with_violations}/${v.n_samples}</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('summary-table').innerHTML = html;
+}
+
+/* ═══════ 时间线 ═══════ */
+function renderTimeline() {
+    if (!D) return;
+    const weeks = D.weekly_progress || [];
+    const now = new Date();
+
+    // 找当前周：区间包含今天的周；否则取最近一个已过去的周
+    let currentIdx = -1;
+    for (let i = 0; i < weeks.length; i++) {
+        const start = new Date(weeks[i].week_start + 'T00:00:00');
+        const end = new Date(weeks[i].saturday + 'T23:59:59');
+        if (now >= start && now <= end) { currentIdx = i; break; }
+    }
+    if (currentIdx < 0) {
+        for (let i = weeks.length - 1; i >= 0; i--) {
+            if (new Date(weeks[i].saturday + 'T00:00:00') <= now) { currentIdx = i; break; }
+        }
+    }
+    if (currentIdx < 0) currentIdx = weeks.length - 1;
+
+    let html = '';
+    weeks.slice().reverse().forEach((w, idx) => {
+        const origIdx = weeks.length - 1 - idx;
+        const sat = new Date(w.saturday + 'T00:00:00');
+        const isFuture = sat > now;
+        const isCurrent = origIdx === currentIdx;
+        const cls = isFuture ? 'future' : (isCurrent ? 'current' : 'past');
+        const isPast = cls === 'past';
+
+        html += `<div class="timeline-node ${cls}${isPast ? ' collapsed' : ''}" id="tl-${origIdx}">`;
+        html += `<div class="timeline-dot" ${isPast ? `onclick="toggleTimeline(${origIdx})"` : ''}></div>`;
+        html += `<div class="timeline-card ${isCurrent ? 'current' : ''}">`;
+        html += `<div class="timeline-date" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>📅 ${w.week_start || w.saturday} → ${w.saturday}（组会日）${isCurrent ? ' <span style="color:var(--primary);font-weight:700;">← 本周</span>' : ''}</div>`;
+        html += `<div class="timeline-summary" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>${w.summary}</div>`;
+        html += `<ul class="timeline-list">${(w.completed || []).map(c => `<li>✅ ${c}</li>`).join('')}${(w.issues || []).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')}${(w.next_steps || []).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')}</ul>`;
+        if (Object.keys(w.key_metrics || {}).length > 0) {
+            html += `<div class="timeline-metric">📊 ${Object.entries(w.key_metrics).map(([k, v]) => `${k}: <strong>${typeof v === 'number' ? v.toFixed(4) : v}</strong>`).join(' | ')}</div>`;
+        }
+        if (isPast) {
+            const totalItems = (w.completed || []).length + (w.issues || []).length + (w.next_steps || []).length;
+            html += `<div class="timeline-toggle" onclick="toggleTimeline(${origIdx})">▶ ${totalItems} 项详情</div>`;
+        }
+        html += `</div></div>`;
+    });
+    document.getElementById('timeline-container').innerHTML = html;
+}
+
+function toggleTimeline(idx) {
+    const node = document.getElementById('tl-' + idx);
+    if (!node) return;
+    const isCollapsed = node.classList.contains('collapsed');
+    node.classList.toggle('collapsed');
+    const toggle = node.querySelector('.timeline-toggle');
+    if (toggle) {
+        const totalItems = node.querySelectorAll('.timeline-list li').length;
+        toggle.textContent = isCollapsed ? `▼ ${totalItems} 项详情` : `▶ ${totalItems} 项详情`;
+    }
+}
+
+/* ═══════ 本周任务 ═══════ */
+function renderThisWeek() {
+    if (!D) return;
+    const weeks = D.weekly_progress || [];
+    const latest = weeks[weeks.length-1] || {};
+    document.getElementById('this-week-title').textContent = `📝 本周任务 (${latest.week_start||'·'} → ${latest.saturday||'·'})`;
+    document.getElementById('this-week-content').innerHTML = `
+    <div class="timeline-card current" style="margin-bottom:10px;">
+        <div class="timeline-date">📅 ${latest.week_start||'·'} → ${latest.saturday||'·'}（组会日）</div>
+        <div class="timeline-summary">${latest.summary||'·'}</div>
+    </div>
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">✅ 本周完成</h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.completed||[]).map(c => `<li>✅ ${c}</li>`).join('')||'<li>暂无</li>'}</ul>
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">⚠️ 遇到的问题</h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.issues||[]).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')||'<li>暂无</li>'}</ul>
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">📋 下周计划</h4>
+    <ul class="timeline-list">${(latest.next_steps||[]).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')||'<li>暂无</li>'}</ul>`;
+}
+
+/* ═══════ 待办清单 ═══════
+   TEMPLATE: 紧急任务用 urgent:true（红底），进行中用 in_progress:true（蓝 tag）。
+   若 report_data.json 提供 todos_note，会在清单末尾渲染一条成功提示框。 */
+function renderTodos() {
+    if (!D) return;
+    const todos = D.todo_list || [];
+    let html = '';
+    for (const cat of todos) {
+        html += `<h4 style="font-size:0.83rem;color:var(--gray-700);margin:14px 0 6px;padding-bottom:3px;border-bottom:2px solid var(--gray-200);">
+        ${cat.category.includes('紧急')?'🔴':'📌'} ${cat.category}</h4>`;
+        for (const item of cat.items) {
+            html += `
+        <div class="todo-item ${item.done?'done':''}" style="${item.urgent?'background:#fef2f2;border-radius:6px;padding:6px 8px;':''}">
+            <input type="checkbox" ${item.done?'checked':''} onchange="this.parentElement.classList.toggle('done')">
+            <label>${item.text}</label>
+            ${item.in_progress?'<span class="status-tag status-progress" style="font-size:0.62rem;">进行中</span>':''}
+            ${item.urgent?'<span class="status-tag status-danger" style="font-size:0.62rem;">紧急</span>':''}
+        </div>`;
+        }
+    }
+    const note = D.todos_note
+        ? `<div class="info-box success" style="margin-top:14px;">${D.todos_note}</div>` : '';
+    document.getElementById('sec-todos').innerHTML = `
+    <div class="card-header"><div class="card-title"><span class="ic ic-check"></span> 待办清单</div></div>
+    ${html || '<p class="empty-state">暂无待办</p>'}
+    ${note}`;
+}
+
+/* MathJax 按需加载：仅当汇总指标卡（含公式）实际显示时注入 CDN 渲染器，
+   无公式或 metrics_summary.json 缺失的页面零 MathJax 开销。 */
+let mathJaxLoading = false;
+function ensureMathJax() {
+    if (mathJaxLoading) return;
+    mathJaxLoading = true;
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    s.async = true;
+    document.head.appendChild(s);
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+
+/* 顶导当前页高亮：URL 与当前页一致的 nav-links 链接自动加 .active */
+(function highlightCurrentNav() {
+    document.querySelectorAll('.nav-links a[href]').forEach(a => {
+        try {
+            if (new URL(a.href, location.href).pathname === location.pathname) a.classList.add('active');
+        } catch (e) { /* 忽略无效 href */ }
+    });
+})();
+
+/* ═══════ 主题一键切换器 ═══════
+   主题列表来自 theme-pack.js（window.THEME_PACK）；选择写 localStorage，
+   跨页连续：子页面切换后返回主页仍保持所选主题（反之亦然）。 */
+(function initThemeSwitcher() {
+    if (!window.THEME_PACK || !THEME_PACK.length) return;
+    const KEY = 'labmeeting-theme';
+    const defTheme = document.body.dataset.defaultTheme || 'default';
+    const sw = document.getElementById('theme-switcher');
+    if (!sw) return;
+    const btn = sw.querySelector('.ts-btn');
+    const panel = document.getElementById('ts-panel');
+    const curLabel = sw.querySelector('.ts-cur');
+
+    // 面板：默认蓝系 + 10 个主题
+    const opts = [{ id: 'default', name: '默认蓝系', swatch: ['#2563eb', '#0e7490', '#059669'] }]
+        .concat(THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch })));
+    panel.innerHTML = opts.map(o =>
+        `<button class="ts-opt" type="button" data-theme="${o.id}">
+            <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
+            <span class="ts-name">${o.name}</span>
+            <span class="ts-check ic ic-check"></span>
+        </button>`).join('');
+
+    // 主题字体（webfont）：按需注入/替换 <link id="theme-fonts">；
+    // 加载失败或主题无字体时自动回退主题 CSS 里的系统字体栈
+    function applyFonts(t) {
+        let link = document.getElementById('theme-fonts');
+        if (!t || !t.fonts) { if (link) link.remove(); return; }
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-fonts';
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute('href') !== t.fonts) link.setAttribute('href', t.fonts);
+    }
+    function applyTheme(id) {
+        let el = document.getElementById('theme-overlay');
+        if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
+        const t = THEME_PACK.find(x => x.id === id);
+        // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
+        let css = (t && id !== defTheme) ? t.css : '';
+        // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
+        const prefix = document.body.dataset.assetPrefix || '';
+        if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
+        el.textContent = css;
+        applyFonts(t);
+        try { localStorage.setItem(KEY, id); } catch (e) {}
+        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
+        // 广播主题变化（转盘环心徽章等监听）
+        document.dispatchEvent(new CustomEvent('labmeeting-themechange', { detail: { id: id } }));
+    }
+
+    // 恢复：localStorage 优先，其次页面默认主题
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    applyTheme(saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+
+    // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
+    function openPanel() {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = Math.min(r.bottom + 8, window.innerHeight - 260) + 'px';
+        panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+        panel.hidden = false;
+    }
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = panel.hidden;
+        if (open) openPanel(); else panel.hidden = true;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', e => {
+        const opt = e.target.closest('.ts-opt');
+        if (!opt) return;
+        applyTheme(opt.dataset.theme);
+        panel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+})();
+</script>
+</body>
+</html>

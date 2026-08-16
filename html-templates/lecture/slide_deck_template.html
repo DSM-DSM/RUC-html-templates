@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<!--
+================================================================================
+  通用演示讲演 HTML 模板 (Generic Slide Deck Template)
+  ------------------------------------------------------------------------------
+  来源：从 TianTanAI 的 mr_lecture.html 与 reproduction_results.html
+        提炼的可迁移设计系统，示例内容已泛化为领域无关占位符，
+        可适用于任何背景的讲演：项目汇报、技术分享、论文解读、复现报告、
+        课程课件、会议讲解、方案评审……
+  ------------------------------------------------------------------------------
+  使用方法（三步）：
+    1. 主题：右下角切换方块随时换肤（17 套主题，选择保存在 localStorage，
+       跨页连续）；要固定主题就把 html/body 的 data-default-theme 改成目标 id。
+       主题数据源为同目录 theme-pack.js（改主题后重跑 style_previews/_build.mjs）。
+    2. 替换 <header> 封面、<div class="rb"> 链接条、<footer> 的占位内容
+    3. 按 "第一幕 / 第二幕 ..." 幕式结构复制 <div class="slide">…</div> 块填充内容
+  ------------------------------------------------------------------------------
+  组件速查（都可直接复制使用）：
+    .key-box     蓝色核心信息框（每张幻灯片的标配）
+    .warn-box    红色警告框（风险 / 阻塞 / 踩坑）
+    .success-box 绿色成功框（破局 / 结论 / 下一步）
+    .stat-grid / .stat-card   统计卡片（大数字 + 短标签，3 秒传递核心指标）
+    .badge       徽章，三组语义：
+                  结果质量 badge-ok(绿) / badge-warn(黄) / badge-bad(红)
+                  方向     badge-pos(绿↑) / badge-neg(红↓)
+                  进度     badge-done(绿) / badge-todo(灰) / badge-block(红)
+    .progress-row / .progress-bar  进度条（阶段 / 里程碑总览）
+    .forest-table  效果量条形图（森林图风格，用表格模拟，像素级对齐）
+    .fig3-grid / .fig3-cell  图文网格（多图并排对照）
+    .src-ref     灰色斜体来源注记
+    .ref         底部"📖 详细解读"参考块
+    MathJax      公式用 $...$ / $$...$$（不需要可整体删除）
+  可迁移性：纯静态 HTML + 少量原生 JS，无构建依赖，直接复制到任何项目即可。
+  ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
+================================================================================
+-->
+<html lang="zh-CN" data-default-theme="default">
+<head>
+    <link rel="stylesheet" id="theme-fonts" href="">
+<script>
+    /* 主题预设：先于正文设置 data-theme（决定装饰元素显隐，避免闪烁） */
+    (function () {
+        var t = null;
+        try { t = localStorage.getItem('lecture-theme'); } catch (e) {}
+        if (!/^(default|0[1-9]|1[0-6])$/.test(t || '')) {
+            t = document.documentElement.getAttribute('data-default-theme') || 'default';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+</script>
+<style id="decor-guard">
+    /* 主题专属装饰元素：仅当前主题匹配时显示（:not 写法不覆盖主题自身的 display 规则） */
+    html:not([data-theme="05"]) [data-decor="05"] { display: none !important; }
+    html:not([data-theme="07"]) [data-decor="07"] { display: none !important; }
+    html:not([data-theme="09"]) [data-decor="09"] { display: none !important; }
+    html:not([data-theme="10"]) [data-decor="10"] { display: none !important; }
+    html:not([data-theme="11"]) [data-decor="11"] { display: none !important; }
+    html:not([data-theme="12"]) [data-decor="12"] { display: none !important; }
+    html:not([data-theme="13"]) [data-decor="13"] { display: none !important; }
+</style>
+    <style id="theme-css">
+
+        /* ====================================================================
+           1. 设计令牌 (Design Tokens) —— 改这里即可换主题
+           ==================================================================== */
+        :root {
+            /* 主色板（推荐蓝系，从深到浅；也可替换为你项目的品牌色） */
+            --blue-dark: #1a5276;
+            --blue-mid: #2471a3;
+            --blue-light: #21618c;
+            /* 语义色：绿=成功/正向, 黄=警告/接近, 紫=前沿/智能, 红=风险/阻塞 */
+            --green: #27ae60;
+            --yellow: #f39c12;
+            --purple: #8e44ad;
+            --red: #e74c3c;
+            /* 中性色 */
+            --gray-d: #2c3e50;
+            --gray-m: #566573;
+            --bg: #fafbfc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 版心：单栏阅读流，1000px 居中；宽屏时让位给侧边导航 */
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 17px;
+            line-height: 1.85;
+            color: var(--gray-d);
+            background: var(--bg);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        a { color: var(--blue-light); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* 标题体系：h2 带下划线，h3 为每张幻灯片的标题 */
+        h2 {
+            font-size: 1.4em;
+            color: var(--blue-dark);
+            border-bottom: 2px solid #aed6f1;
+            padding-bottom: 6px;
+            margin: 2em 0 0.8em;
+        }
+        h3 {
+            font-size: 1.2em;
+            color: var(--blue-dark);
+            margin: 0 0 0.4em;
+        }
+
+        /* ====================================================================
+           2. 页面框架
+           ==================================================================== */
+
+        /* --- 封面 header：渐变横幅 + 副标题 + 元信息 --- */
+        header {
+            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.8em;
+        }
+        header .sub {
+            font-size: 1em;
+            opacity: 0.88;
+            margin-top: 8px;
+        }
+        /* 元信息行：项目名 / 日期 / 适用场景 / 预计时长 */
+        header .meta {
+            font-size: 0.85em;
+            opacity: 0.65;
+            margin-top: 6px;
+        }
+
+        /* --- 相关链接条 .rb (related bar)：页面顶部横向导航 --- */
+        .rb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 0;
+            justify-content: center;
+        }
+        .rb a {
+            padding: 5px 14px;
+            border-radius: 4px;
+            border: 1px solid #d5dbdb;
+            background: #fff;
+            font-size: 0.88em;
+        }
+        .rb a:hover { background: #eaf2f8; }
+
+        /* --- 幕头 .act-header："第一幕：主题（N张）"+ 副标题 ---
+           幕式叙事：把讲演分成若干"幕"，每幕一个 act-header + 若干 slide */
+        .act-header {
+            text-align: center;
+            margin: 32px 0 16px;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+            color: #fff;
+            border-radius: 10px;
+        }
+        .act-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.4em;
+            border: none;
+            padding: 0;
+        }
+        .act-header .sub {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        /* --- 幻灯片卡片 .slide：白色卡片 + 轻投影，一屏一卡 --- */
+        .slide {
+            background: #fff;
+            border-radius: 8px;
+            padding: 24px 28px;
+            margin: 16px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        /* 卡片标题下的灰色"核心问题"小字 */
+        .slide h3 .q {
+            font-size: 0.85em;
+            color: var(--gray-m);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+        /* 卡片底部参考资料块 */
+        .slide .ref {
+            font-size: 0.84em;
+            color: var(--gray-m);
+            margin-top: 14px;
+            padding: 10px 14px;
+            background: #f7f9fc;
+            border-radius: 4px;
+        }
+        .slide .ref a { font-weight: 600; }
+
+        /* --- 页脚 footer --- */
+        footer {
+            background: #fff;
+            border-radius: 8px;
+            padding: 18px 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            margin-top: 40px;
+            font-size: 0.88em;
+            color: var(--gray-m);
+            text-align: center;
+        }
+
+        /* ====================================================================
+           3. 内容块组件（复用重点）
+           ==================================================================== */
+
+        /* 三色提示框：左色条 + 浅底色，语义一眼可辨 */
+        .key-box {      /* 蓝 = 核心信息（每张卡必备，先给结论） */
+            background: #eaf2f8;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+        .key-box strong { color: var(--blue-dark); }
+
+        .warn-box {     /* 红 = 警告 / 缺失 / 坑 / 阻塞 */
+            background: #fdedec;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+        .warn-box strong { color: #922b21; }
+
+        .success-box {  /* 绿 = 成功 / 破局 / 结论 / 下一步 */
+            background: #e8f8f5;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 12px 0;
+        }
+        .success-box strong { color: #186a3b; }
+
+        /* 统计卡片：一排大数字，"一眼看懂"关键指标 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: #fafbfc;
+            border: 1px solid #d5dbdb;
+            border-radius: 6px;
+            padding: 14px;
+            text-align: center;
+        }
+        .stat-card .num { font-size: 2em; font-weight: bold; color: var(--blue-dark); line-height: 1.1; }
+        .stat-card .label { font-size: 0.82em; color: var(--gray-m); margin-top: 4px; }
+        .stat-card.green .num { color: #1d6b3d; }
+        .stat-card.yellow .num { color: #8a5c0e; }
+
+        /* 徽章：短状态标签。类名按语义分组，可自行重命名 */
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.82em;
+            font-weight: bold;
+            color: #fff;
+        }
+        /* 结果质量 */
+        .badge-ok   { background: #dcefe3; color: #1d6b3d; }   /* ✅ 通过 / 一致 / 达成 */
+        .badge-warn { background: #f7ecd4; color: #8a5c0e; }  /* ⚠️ 接近 / 注意 */
+        .badge-bad  { background: #f8dcd9; color: #a63a30; }     /* ✗ 失败 / 相反 / 缺失 */
+        /* 方向 */
+        .badge-pos  { background: #dcefe3; color: #1d6b3d; }   /* ↑ 正向 / 上升 */
+        .badge-neg  { background: #f8dcd9; color: #a63a30; }     /* ↓ 负向 / 下降 */
+        /* 进度 */
+        .badge-done  { background: #dcefe3; color: #1d6b3d; }  /* ✅ 完成 */
+        .badge-todo  { background: #e8edf3; color: #4e5f72; } /* ⬜ 待执行 */
+        .badge-block { background: #f8dcd9; color: #a63a30; }    /* 🔒 阻塞 */
+
+        /* 进度条：阶段 / 里程碑状态总览 */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .progress-row:last-child { border-bottom: none; }
+        .progress-step { font-weight: bold; min-width: 56px; color: var(--blue-dark); font-size: 0.9em; }
+        .progress-name { flex: 1; font-size: 0.92em; }
+        .progress-bar { width: 110px; height: 9px; background: #ecf0f1; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 5px; }
+
+        /* 图注：居中灰色斜体 */
+        .fig-caption {
+            text-align: center;
+            font-size: 0.84em;
+            color: var(--gray-m);
+            margin: -4px 0 12px;
+            font-style: italic;
+        }
+
+        /* 效果量条形图（森林图风格）：用表格模拟，避免图片渲染，保证对齐
+           适用于任何"多个条目的估计值 + 区间"对比场景 */
+        .forest-table { margin: 14px auto; border-collapse: collapse; }
+        .forest-table th { font-size: 0.82em; padding: 5px 10px; text-align: left; }
+        .forest-table td { font-size: 0.84em; padding: 4px 10px; border: none; text-align: left; }
+        .forest-table .f-pos, .forest-table .f-neg { font-weight: 600; font-size: 12.5px; }
+        .forest-table .axis-row td { font-size: 12px; }
+        .forest-table .f-bar { font-family: "Cascadia Code", "Fira Code", monospace; white-space: pre; font-size: 0.82em; }
+        .forest-table .axis-row td { border-top: 2px solid var(--gray-d); padding-top: 6px; }
+
+        /* 图文网格：多图并排对照（2 列，可调为 3 列） */
+        .fig3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 18px 0;
+        }
+        .fig3-cell {
+            background: #fafbfc;
+            border: 1px solid #d5dbdb;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .fig3-cell img { max-width: 100%; height: auto; border-radius: 4px; background: #fff; }
+        .fig3-cell .fig3-label { font-size: 0.9em; color: var(--blue-dark); margin: 8px 0 4px; }
+        .fig3-cell p { font-size: 0.82em; color: var(--gray-m); line-height: 1.6; text-align: left; margin: 0; }
+
+        /* 来源注记：灰斜体小字，置于表格 / 图片下方 */
+        .src-ref {
+            font-size: 0.82em;
+            color: #5d6d70;
+            font-style: italic;
+            display: inline-block;
+            margin-top: 6px;
+            border-top: 1px dotted #d5dbdb;
+            padding-top: 6px;
+        }
+
+        /* 数据表格：统一边框 + 表头浅蓝 + 隔行斑马纹 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.88em;
+        }
+        th, td {
+            border: 1px solid #d5dbdb;
+            padding: 7px 10px;
+            text-align: left;
+        }
+        th {
+            background: #ebf5fb;
+            font-weight: bold;
+            color: var(--blue-dark);
+        }
+        tr:nth-child(even) { background: #fafbfc; }
+
+        /* 行内单元格语义着色：pos=绿底（正向/支持）, neg=红底（负向/反对） */
+        td.pos, .row-pos td { background: #d5f5e3; }
+        td.neg, .row-neg td { background: #fadbd8; }
+
+        /* MathJax 公式横向溢出时可滚动 */
+        mjx-container { overflow-x: auto; overflow-y: hidden; }
+
+        /* ====================================================================
+           4. 侧边导航（固定左侧，滚动高亮当前幻灯片）
+           ==================================================================== */
+        .side-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 208px;
+            height: 100vh;
+            overflow-y: auto;
+            background: #fff;
+            border-right: 1px solid #d5dbdb;
+            padding: 16px 12px;
+            font-size: 0.82em;
+            z-index: 50;
+            display: none;
+            box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04);
+        }
+        .side-nav .nav-title {
+            font-weight: 700;
+            color: var(--blue-dark);
+            font-size: 1.05em;
+            padding: 2px 6px 10px;
+            border-bottom: 2px solid #aed6f1;
+            margin-bottom: 8px;
+        }
+        .side-nav .nav-act {
+            margin: 12px 0 4px;
+            padding: 5px 8px;
+            background: #eaf2f8;
+            border-radius: 4px;
+            font-weight: 700;
+            color: var(--blue-mid);
+            font-size: 0.92em;
+            line-height: 1.3;
+        }
+        .side-nav a {
+            display: block;
+            padding: 5px 8px;
+            color: var(--gray-d);
+            border-radius: 4px;
+            line-height: 1.4;
+        }
+        .side-nav a:hover { background: #f7f9fc; text-decoration: none; }
+        .side-nav a.active {
+            background: #eaf2f8;
+            font-weight: 600;
+            color: var(--blue-dark);
+        }
+
+        /* ====================================================================
+           5. 响应式：窄屏隐藏侧栏、正文变小、网格收单列
+           ==================================================================== */
+        @media (max-width: 768px) {
+            body { font-size: 15px; padding: 10px 12px; }
+            h1 { font-size: 1.5em; }
+            .fig3-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 1100px) {
+            body { max-width: 1246px; padding-left: 222px; }
+            .side-nav { display: block; }
+        }
+    
+        /* ═══ 森林图文字底线：px 定值，摆脱 em 嵌套链（任何基线下 ≥12px） ═══ */
+        .forest-table th, .forest-table td, .forest-table .f-pos, .forest-table .f-neg,
+        .forest-table .f-bar { font-size: 12.5px; }
+        .forest-table .axis-row td { font-size: 12px; color: inherit; opacity: 0.75; }
+</style>
+<style id="ts-css">
+    /* ── 主题切换方块：跨主题通用，独立于 theme-css（切主题时不随动） ── */
+    .ts-btn {
+        position: fixed; right: 20px; bottom: 20px;
+        width: 46px; height: 46px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(18, 18, 24, 0.88);
+        color: #fff;
+        cursor: pointer;
+        z-index: 9990;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+        transition: transform .15s ease-out, background-color .15s;
+    }
+    .ts-btn:hover { transform: translateY(-1px); background: rgba(30, 30, 40, 0.94); }
+    .ts-btn:active { transform: scale(0.96); }
+    .ts-btn svg { width: 20px; height: 20px; }
+    .ts-panel {
+        position: fixed; right: 20px; bottom: 76px;
+        width: 304px; max-height: min(480px, 72vh);
+        overflow-y: auto;
+        background: rgba(20, 20, 28, 0.97);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px;
+        padding: 14px;
+        z-index: 9991;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 13px;
+        color: #e8e8ee;
+        margin: 0;
+    }
+    .ts-panel[hidden] { display: none; }
+    .ts-head { font-size: 12px; color: #9a9aa8; letter-spacing: 0.04em; margin: 2px 4px 10px; }
+    .ts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .ts-opt {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #d5d5df;
+        font-size: 12.5px;
+        cursor: pointer;
+        text-align: left;
+        font-family: inherit;
+        margin: 0;
+        transition: background-color .15s, border-color .15s;
+    }
+    .ts-opt:hover { background: rgba(255, 255, 255, 0.10); }
+    .ts-opt.sel { border-color: rgba(255, 255, 255, 0.38); background: rgba(255, 255, 255, 0.13); color: #fff; }
+    .ts-dots { display: flex; gap: 3px; flex-shrink: 0; }
+    .ts-dots span { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.35); }
+    .ts-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 640px) {
+        .ts-panel { right: 12px; width: 264px; }
+        .ts-btn { right: 12px; bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .ts-btn, .ts-opt { transition: none; }
+    }
+</style>    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" href="data:,">
+    <title>{项目名} · {讲演主题} — 演示讲演</title>
+        <!-- MathJax 支持：需要公式时保留，不需要可整段删除 -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body data-default-theme="default" data-asset-prefix="">
+<!-- 侧边导航（无需手动填写，JS 自动根据 .act-header / .slide 生成目录） -->
+<nav class="side-nav" id="sideNav">
+    <div class="nav-title">📋 {讲演目录标题}</div>
+    <div id="navList"></div>
+</nav>
+
+<!-- ==================== 封面 header（替换为你的主题） ==================== -->
+<header>
+    <!-- 主题专属装饰（由 data-theme 控制显隐，各主题 CSS 自行定位） -->
+    <div class="seal" data-decor="05">演 示</div>
+    <span class="hole h1" data-decor="09"></span>
+    <span class="hole h2" data-decor="09"></span>
+    <div class="tab" data-decor="09">{分类：如 甲-科研-复现}</div>
+    <span class="dot d1" data-decor="10"></span>
+    <span class="dot d2" data-decor="10"></span>
+    <span class="dot d3" data-decor="10"></span>
+    <div class="bar-title" data-decor="10">{讲演主题} — 数据终端</div>
+    <span class="cross c1" data-decor="11"></span>
+    <span class="cross c2" data-decor="11"></span>
+    <span class="cross c3" data-decor="11"></span>
+    <span class="cross c4" data-decor="11"></span>
+    <span class="tick x" data-decor="11">X — {项目代号}</span>
+    <span class="tick y" data-decor="11">Y — {讲演主题}</span>
+    <span class="constellation" data-decor="12">{星区 / 主题代号}</span>
+    <span class="coord" data-decor="12">RA {赤经} · DEC {赤纬}</span>
+    <div class="num-block" data-decor="13">01</div>
+    <div class="kicker" data-decor="13">{主题代号} — {分类}</div>
+    <h1>{讲演大标题}</h1>
+    <div class="sub">{一句话副标题}</div>
+    <div class="meta">{项目名} · {日期} · 适合远程会议讲解 · 预计时长 {N}-{M} 分钟</div>
+    <div class="stamp" data-decor="09">已解密</div>
+    <div class="status" data-decor="10"><span class="prompt">$</span> <span class="path">~/project</span> --run presentation</div>
+    <div class="titleblock" data-decor="11">
+        <span><b>DWG</b> / {图号}</span>
+        <span><b>SCALE</b> / 1:1</span>
+        <span><b>REV</b> / {版本}</span>
+    </div>
+    <div class="ra" data-decor="12">✦ 观测历元 {历元} · 视星等 {星等} ✦</div>
+</header>
+
+<!-- 相关链接条：指向详细文档 / 数据 / 脚本 / 其他页面（按需增删） -->
+<div class="rb" style="margin-bottom:24px;">
+    <a href="#">📄 文档一</a>
+    <a href="#">📋 工作流</a>
+    <a href="#">📊 数据</a>
+    <a href="#">🔗 链接</a>
+</div>
+
+<!-- ==================== 第一幕：开场（替换为主题） ==================== -->
+<div class="act-header" data-act="I">
+<h2><span class="no" data-decor="07">壹</span>第一幕：{幕主题}（{N}张）</h2>
+    <div class="sub">{幕的副标题}</div>
+</div>
+
+<!-- 基础卡片：标题 + 核心问题 + 核心信息 + 表格 + 参考 -->
+<div class="slide">
+    <h3>1. {标题}<span class="q">核心问题：{这张幻灯片要回答的关键问题}</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>{一句话总结本张要点：先给结论，再给论证}</div>
+    <p>{正文段落。<strong>重点加粗</strong>，术语首次出现时<strong>加粗并附括号解释</strong>。</p>
+    <table>
+        <tr><th>维度</th><th>说明</th><th>结论</th></tr>
+        <tr><td>条目一</td><td>{内容}</td><td>{结论}</td></tr>
+        <tr class="row-pos"><td>正向项</td><td>{内容}</td><td>{绿底 = 正向 / 支持}</td></tr>
+        <tr class="row-neg"><td>负向项</td><td>{内容}</td><td>{红底 = 负向 / 反对}</td></tr>
+    </table>
+    <div class="ref">📖 详细解读：<a href="#">来源一</a> §X | <a href="#">来源二</a> §Y</div>
+</div>
+
+<!-- 统计卡片：用大数字 3 秒传递核心指标 -->
+<div class="slide">
+    <h3>2. 一眼看懂的统计卡片<span class="q">核心问题：如何用一屏数字快速传递关键指标？</span></h3>
+    <div class="stat-grid">
+        <div class="stat-card green"><div class="num">15/15</div><div class="label">达成目标</div></div>
+        <div class="stat-card yellow"><div class="num">12/15</div><div class="label">提前完成</div></div>
+        <div class="stat-card"><div class="num">0/15</div><div class="label">未达标</div></div>
+    </div>
+    <p><strong>提示：</strong>把数字与标签替换为你项目的核心指标（覆盖率、收益、性能提升、通过率等），
+        <code>green</code> / <code>yellow</code> 变体用于区分达标与预警。</p>
+    <div class="src-ref">📖 数据来源：{你的数据文件 / 统计口径}</div>
+</div>
+
+<!-- 三种提示框 + 公式 -->
+<div class="slide">
+    <h3>3. 提示框与公式演示<span class="q">核心问题：如何用三种颜色的提示框区分信息类型？</span></h3>
+    <div class="warn-box"><strong>关键发现：</strong>{警告、风险、阻塞或踩坑的原因与对策，红色提醒听众注意}</div>
+    <div class="key-box"><strong>核心信息：</strong>{结论、要点或下一步，蓝色是每张幻灯片的标配}</div>
+    <div class="success-box"><strong>破局关键：</strong>{成功经验、解决思路或收尾结论，绿色传递正向信号}</div>
+    <p>公式用 MathJax 渲染：行内公式 $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$，
+        独立成行用两个美元符 <code>$$...$$</code>。不需要公式时，删除
+        <code>&lt;script&gt;</code> 中的 MathJax 两行引用即可。</p>
+    <div class="src-ref">📖 文档出处：{文档 / 报告 / 规范编号}</div>
+</div>
+
+<!-- 进度条：阶段 / 里程碑总览 -->
+<div class="slide">
+    <h3>4. 进度总览<span class="q">核心问题：如何让听众一眼看到项目各阶段的状态？</span></h3>
+    <div class="progress-row">
+        <span class="progress-step">阶段一</span>
+        <span class="progress-name">需求分析与调研</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#27ae60;"></div></div>
+        <span class="badge badge-done">✅ 完成</span>
+    </div>
+    <div class="progress-row">
+        <span class="progress-step">阶段二</span>
+        <span class="progress-name">原型与验证</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#f39c12;"></div></div>
+        <span class="badge badge-warn">🟡 部分完成</span>
+    </div>
+    <div class="progress-row">
+        <span class="progress-step">阶段三</span>
+        <span class="progress-name">上线与推广</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#e74c3c;"></div></div>
+        <span class="badge badge-block">🔒 阻塞</span>
+    </div>
+    <div class="success-box"><strong>下一步优先级：</strong>{谁来做、做什么、何时开始}。</div>
+</div>
+
+<!-- ==================== 第二幕（复制上面的 slide 块填充） ==================== -->
+<div class="act-header" data-act="II">
+<h2><span class="no" data-decor="07">贰</span>第二幕：{幕主题}（{N}张）</h2>
+    <div class="sub">{幕的副标题}</div>
+</div>
+
+<!-- 图文网格：多图并排对照（可调列数） -->
+<div class="slide">
+    <h3>5. 多图并排对照<span class="q">核心问题：如何在一张幻灯片里对比多张图 / 多个面板？</span></h3>
+    <div class="fig3-grid">
+        <div class="fig3-cell">
+            <img alt="Panel a" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
+            <div class="fig3-label"><strong>a · {小标题}</strong></div>
+            <p>{解释文字}</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel b" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
+            <div class="fig3-label"><strong>b · {小标题}</strong></div>
+            <p>{解释文字}</p>
+        </div>
+    </div>
+    <div class="ref">详细解读：<a href="#">来源</a> | 图片出处：{出处}</div>
+</div>
+
+<!-- 效果量条形图（森林图风格）：多个条目的估计值 + 区间对比 -->
+<div class="slide">
+    <h3>6. 效果量条形图（森林图风格）<span class="q">核心问题：如何在同一张图里比较多个条目的估计值与不确定性？</span></h3>
+    <table class="forest-table">
+        <tr><th>条目</th><th>方向</th><th>估计值</th><th></th></tr>
+        <tr><td><span class="badge badge-pos f-pos">方案 A ↑</span></td><td>正向</td><td>+1.21</td><td class="f-bar">        ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-pos f-pos">方案 B ↑</span></td><td>正向</td><td>+0.37</td><td class="f-bar">       ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-neg f-neg">方案 C ↓</span></td><td>负向</td><td>−0.89</td><td class="f-bar">  ◀━━━●━━━━</td></tr>
+        <tr class="axis-row"><td colspan="3" style="text-align:right;">← 负向</td><td>正向 →</td><td>−1.00    0.00    +1.00</td></tr>
+    </table>
+    <p class="fig-caption">图 1. {图注：比较多个条目的点估计（●）与区间（━），左负右正}。</p>
+    <div class="ref">📎 {说明这张图对应你项目的哪份输出 / 哪张原图}</div>
+</div>
+
+<!-- ==================== 页脚 ==================== -->
+<footer>
+    <p class="brand" data-decor="13">{项目名}</p>
+    <p style="margin-top:10px;" class="exit" data-decor="10">[ 会话结束 ] — 感谢观看</p>
+    <p>
+        <strong>{项目名}：</strong>{一句话定位}<br>
+        <strong>最近更新：</strong>{日期} · <strong>主讲：</strong>{姓名}
+    </p>
+    <p style="margin-top:12px;">📎 相关链接：<a href="#">链接</a> · <a href="#">链接</a></p>
+</footer>
+
+<!-- ==================== 侧边导航 JS（自动生成目录 + 滚动高亮，勿改） ==================== -->
+<script>
+    (function () {
+        var navList = document.getElementById('navList');
+        if (!navList) return;
+        var linkMap = {};
+        var idx = 0;
+        var navEl = document.getElementById('sideNav');
+        document.querySelectorAll('.act-header, .slide').forEach(function (el) {
+            if (el.classList.contains('act-header')) {
+                var h2 = el.querySelector('h2');
+                if (!h2) return;
+                var d = document.createElement('div');
+                d.className = 'nav-act';
+                d.textContent = h2.textContent.trim();
+                navList.appendChild(d);
+            } else {
+                idx++;
+                var id = 'slide-' + idx;
+                el.id = id;
+                var h3 = el.querySelector('h3'), title = '';
+                if (h3) {
+                    var c = h3.cloneNode(true);
+                    var q = c.querySelector('.q');
+                    if (q) q.remove();
+                    title = c.textContent.trim();
+                }
+                if (!title) title = '第' + idx + '页';
+                var a = document.createElement('a');
+                a.href = '#' + id;
+                a.textContent = title;
+                a.dataset.target = id;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var t = document.getElementById(this.dataset.target);
+                    if (t) t.scrollIntoView({behavior: 'smooth', block: 'start'});
+                });
+                navList.appendChild(a);
+                linkMap[id] = a;
+            }
+        });
+        if ('IntersectionObserver' in window) {
+            var vis = new Set();
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) vis.add(e.target.id); else vis.delete(e.target.id);
+                });
+                var best = null, bt = Infinity;
+                vis.forEach(function (id) {
+                    var r = document.getElementById(id).getBoundingClientRect();
+                    if (r.top < bt) { bt = r.top; best = id; }
+                });
+                if (best) {
+                    Object.keys(linkMap).forEach(function (id) {
+                        linkMap[id].classList.toggle('active', id === best);
+                    });
+                    var act = linkMap[best], r = act.getBoundingClientRect(), nr = navEl.getBoundingClientRect();
+                    if (r.top < nr.top) navEl.scrollTop -= (nr.top - r.top + 4);
+                    else if (r.bottom > nr.bottom) navEl.scrollTop += (r.bottom - nr.bottom + 4);
+                }
+            }, {rootMargin: '-20% 0px -70% 0px'});
+            document.querySelectorAll('.act-header, .slide').forEach(function (el) { obs.observe(el); });
+        }
+    })();
+</script>
+<!-- ============ 主题切换方块（方块按钮 + 面板；JS 渲染选项，勿改结构） ============ -->
+<button id="themeSwitcher" class="ts-btn" type="button" aria-label="切换主题" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="7.5" cy="9.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="13.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="16.5" cy="11.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="15" cy="16" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/>
+    </svg>
+</button>
+<div id="themeSwitcherPanel" class="ts-panel" hidden>
+    <div class="ts-head">主题</div>
+    <div class="ts-grid" id="themeSwitcherGrid"></div>
+</div>
+<script src="theme-pack.js"></script>
+<script>
+    /* 主题切换方块：theme-pack.js 单一数据源 + localStorage 跨页连续 */
+    (function () {
+        var KEY = 'lecture-theme';
+        if (!window.LECTURE_THEME_PACK || !window.LECTURE_THEME_PACK.THEMES.length) return;
+        var btn = document.getElementById('themeSwitcher');
+        var panel = document.getElementById('themeSwitcherPanel');
+        var grid = document.getElementById('themeSwitcherGrid');
+        if (!btn || !panel || !grid) return;
+        var defTheme = document.body.getAttribute('data-default-theme') || 'default';
+        var assetPrefix = document.body.getAttribute('data-asset-prefix') || '';
+        function findEntry(id) {
+            if (id === 'default') return window.LECTURE_THEME_PACK.DEFAULT_THEME;
+            for (var i = 0; i < window.LECTURE_THEME_PACK.THEMES.length; i++) {
+                if (window.LECTURE_THEME_PACK.THEMES[i].id === id) return window.LECTURE_THEME_PACK.THEMES[i];
+            }
+            return null;
+        }
+        function applyFonts(fonts) {
+            var link = document.getElementById('theme-fonts');
+            if (!link) return;
+            if (fonts) link.setAttribute('href', fonts);
+            else link.removeAttribute('href');
+        }
+        function applyTheme(id, save) {
+            var entry = findEntry(id);
+            if (!entry) return;
+            var css = entry.css;
+            /* 素材路径：主模板在 lecture/ 根，css 内 url(../ 需去掉一层 */
+            if (assetPrefix === '') {
+                /* 两种引号写法都覆盖：url("../ 与 url(../ */
+                css = css.split('url("../').join('url("').split('url(../').join('url(');
+            }
+            document.getElementById('theme-css').textContent = css;
+            document.documentElement.setAttribute('data-theme', id);
+            applyFonts(entry.fonts || '');
+            var opts = grid.querySelectorAll('.ts-opt');
+            for (var i = 0; i < opts.length; i++) {
+                opts[i].classList.toggle('sel', opts[i].getAttribute('data-id') === id);
+            }
+            document.dispatchEvent(new CustomEvent('lecture-themechange', { detail: { id: id } }));
+            if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+        }
+        /* 选项：默认主题 + 16 主题 */
+        var entries = [{ id: 'default', name: window.LECTURE_THEME_PACK.DEFAULT_THEME.name, swatch: window.LECTURE_THEME_PACK.DEFAULT_THEME.swatch }]
+            .concat(window.LECTURE_THEME_PACK.THEMES.map(function (t) {
+                return { id: t.id, name: t.name, swatch: t.swatch };
+            }));
+        entries.forEach(function (e) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'ts-opt';
+            b.setAttribute('data-id', e.id);
+            var dots = document.createElement('span');
+            dots.className = 'ts-dots';
+            e.swatch.forEach(function (c) {
+                var d = document.createElement('span');
+                d.style.background = c;
+                dots.appendChild(d);
+            });
+            var nm = document.createElement('span');
+            nm.className = 'ts-name';
+            nm.textContent = e.name;
+            b.appendChild(dots);
+            b.appendChild(nm);
+            b.addEventListener('click', function () { applyTheme(e.id, true); });
+            grid.appendChild(b);
+        });
+        /* 开合 + 外部点击 / Esc 关闭 */
+        function setOpen(open) {
+            if (open) panel.removeAttribute('hidden'); else panel.setAttribute('hidden', '');
+            btn.setAttribute('aria-expanded', String(open));
+        }
+        btn.addEventListener('click', function () { setOpen(panel.hasAttribute('hidden')); });
+        document.addEventListener('click', function (ev) {
+            /* 点击按钮内部图标时事件目标是 svg，须用 btn.contains 判定，否则面板开完即关 */
+            if (!panel.hasAttribute('hidden') && !panel.contains(ev.target) && !btn.contains(ev.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape' && !panel.hasAttribute('hidden')) { setOpen(false); btn.focus(); }
+        });
+        /* 恢复顺序：localStorage 优先（校验合法性）→ 页面默认 */
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch (e) {}
+        if (saved && saved !== 'default' && !findEntry(saved)) saved = null;
+        applyTheme(saved || defTheme, false);
+    })();
+</script>
+</body>
+</html>

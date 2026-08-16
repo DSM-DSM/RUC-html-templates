@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <link rel="stylesheet" id="theme-fonts" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&display=swap">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <!-- TEMPLATE: 替换标题（方法名/论文名） -->
+    <title>子页面示例 · 方法概览 + 论文详解</title>
+
+    <!-- MathJax：可选。本模板的论文公式以 mineru 截图为主（见「论文详解」卡片），
+         本配置仅服务于「可选：LaTeX 重排版」小节；若完全用截图，可删除本块。
+         渲染器 CDN 改为按需加载：底部 DOMContentLoaded 检测到 .mathjax-process
+         元素存在才注入 script，避免截图模式页面白加载约 1MB 解析器。
+         宏定义按需增减。 -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']],
+                processEscapes: false,
+                packages: {'[+]': ['ams', 'newcommand', 'configMacros']},
+                /* TEMPLATE: 论文/方法页常用宏全集，不用的可删 */
+                macros: {
+                    R: '\\mathbb{R}',
+                    Hcal: '\\mathcal{H}',
+                    Lcal: '\\mathcal{L}',
+                    Ecal: '\\mathcal{E}',
+                    Pcal: '\\mathcal{P}',
+                    bce: '\\mathrm{BCE}',
+                    fbce: '\\mathrm{FBCE}',
+                    VR: '\\mathrm{VR}',
+                    CE: '\\mathrm{CE}',
+                    LSE: '\\mathrm{LSE}',
+                    AUROC: '\\mathrm{AUROC}',
+                    TPR: '\\mathrm{TPR}',
+                    FPR: '\\mathrm{FPR}',
+                    ReLU: '\\mathrm{ReLU}',
+                    softmax: '\\mathrm{softmax}',
+                    given: '\\mathrel{|}',
+                    ind: '\\mathbb{1}',
+                }
+            },
+            chtml: { scale: 0.95 }
+        };
+    </script>
+
+    <style>
+        /* ╔══════════════════════════════════════════════════════════════════════════╗
+           ║  【共享设计系统 CSS】与 index.html 同一套设计系统。                        ║
+           ║  与总览页的差异仅两处：                                                  ║
+           ║    ① 子页面变体 2 行（见下方「子页面变体」注释标记处）：                 ║
+           ║       --sidebar-width: 240px（总览页 260px）                            ║
+           ║       --header-height: 48px （总览页 52px）                             ║
+           ║       .nav-brand 字号 1rem（总览页 1.1rem）                             ║
+           ║    ② 省略「7b. 3D 转盘」小节（子页面无转盘组件）                        ║
+           ╚══════════════════════════════════════════════════════════════════════════╝ */
+
+        /* ═══════ 1. 设计令牌与 Reset ═══════ */
+        :root {
+            --bg: #f5f5f7; --card-bg: #ffffff; --card-radius: 12px;
+            --line: rgba(0,0,0,0.07);
+            --shadow: 0 1px 2px rgba(0,0,0,0.05),0 1px 3px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.09),0 2px 4px rgba(0,0,0,0.05);
+            /* 语义色已按浅色底文字对比度 ≥4.5:1 校准（原色过亮，小字不可读） */
+            --primary: #2563eb; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+            --accent: #0e7490; --accent-light: #ecfeff;
+            --success: #059669; --success-bg: #ecfdf5;
+            --warning: #b45309; --warning-bg: #fffbeb;
+            --danger: #dc2626; --danger-bg: #fef2f2;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            /* 子页面变体 1/2：240px / 48px（总览页 260px / 52px） */
+            --sidebar-width: 240px;
+            --header-height: 48px;
+            --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            --font-mono: "SF Mono","Cascadia Code","Consolas",monospace;
+            --transition: 0.2s ease;
+            /* 位移类动效单独缓动：ease-out，苹果式 */
+            --ease-move: cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px}
+        ::selection{background:rgba(37,99,235,0.18);color:var(--gray-900)}
+        body{
+            font-family:var(--font-sans);background:var(--bg);
+            color:var(--gray-800);line-height:1.6;
+            overflow:hidden;height:100vh;
+        }
+        a{color:var(--primary);text-decoration:none}
+        a:hover{text-decoration:underline}
+        :focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:4px}
+
+        /* ═══════ 2. 应用布局（四区：顶部导航 / 侧栏导引 / 内容 / 底部声明栏） ═══════ */
+        #app{
+            display:grid;
+            grid-template-rows:var(--header-height) 1fr auto;
+            grid-template-columns:var(--sidebar-width) 6px 1fr;
+            grid-template-areas:"header header header" "sidebar resizer content" "footer footer footer";
+            height:100vh;
+            max-width:1500px;
+            margin:0 auto;
+        }
+
+        /* 侧边栏拖拽分隔条：调整 --sidebar-width；双击恢复默认 */
+        .resizer{
+            grid-area:resizer;
+            cursor:col-resize;position:relative;z-index:15;
+            background:transparent;outline:none;
+        }
+        .resizer::after{
+            content:"";position:absolute;left:50%;top:0;bottom:0;
+            /* 常态 1px、hover 2px 用 scaleX 表达（transform 合成器友好，不做 width 过渡） */
+            width:2px;transform:translateX(-50%) scaleX(0.5);
+            background:var(--line);
+            transition:background .15s,transform .15s;
+        }
+        .resizer:hover::after,.resizer.dragging::after{background:var(--primary);transform:translateX(-50%) scaleX(1)}
+        .resizer:focus-visible::after{background:var(--primary);transform:translateX(-50%) scaleX(1)}
+
+        /* ═══════ 3. 顶部导航（品牌区 + 兄弟页面/工具链接） ═══════
+           子页面变体 3：品牌区字号 1rem（总览页 1.1rem），方法名较长时更稳 */
+        /* 顶导：固定高度不撑高（溢出交给 .nav-links 自身滚动）；
+           position:relative 使 z-index 生效，切换器面板可伸出头栏、盖在内容之上 */
+        #header{
+            grid-area:header;
+            height:var(--header-height);
+            position:relative;
+            background:var(--card-bg);
+            border-bottom:1px solid var(--line);
+            display:flex;align-items:center;gap:18px;
+            padding:0 20px;z-index:10;
+        }
+        .nav-brand{
+            display:flex;align-items:center;gap:7px;
+            font-size:1rem;font-weight:700;color:var(--gray-900);
+            letter-spacing:-0.01em;white-space:nowrap;flex-shrink:0;
+        }
+        .nav-brand a{color:var(--gray-900)}
+        .nav-brand a:hover{color:var(--primary-dark);text-decoration:none}
+        .nav-links{
+            display:flex;align-items:center;gap:4px;flex:1;min-width:0;
+            overflow-x:auto;scrollbar-width:none;
+        }
+        .nav-links::-webkit-scrollbar{display:none}
+        .nav-links a{
+            display:inline-flex;align-items:center;gap:5px;
+            padding:4px 10px;border-radius:6px;
+            font-size:0.8rem;font-weight:500;color:var(--gray-600);
+            white-space:nowrap;transition:var(--transition);
+        }
+        .nav-links a:hover{background:var(--gray-100);color:var(--gray-900);text-decoration:none}
+        /* 当前页面链接高亮（JS 按 URL 自动检测） */
+        .nav-links a.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        /* 工具链接组（PDF/GitHub/主题切换器等）推至顶导最右 */
+        .nav-links .push-right{margin-left:auto}
+        .nav-links a.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .nav-links a:active{transform:scale(0.97)}
+        #header .header-right{display:flex;align-items:center;gap:12px;font-size:0.8rem;color:var(--gray-500);flex-shrink:0}
+        .countdown{background:var(--primary-light);color:var(--primary-dark);padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.78rem;white-space:nowrap}
+
+        /* ═══════ 3b. 底部声明栏（作者 / 机构 / 版本 / 更新时间 / logo 占位） ═══════ */
+        /* 底栏：固定高度 + 单行省略，页面缩放/窗口变化时始终位于底部固定区域 */
+        #footer{
+            grid-area:footer;
+            height:40px;
+            background:var(--card-bg);
+            border-top:1px solid var(--line);
+            display:flex;align-items:center;justify-content:space-between;gap:16px;
+            padding:0 20px;font-size:0.72rem;color:var(--gray-500);z-index:10;
+            overflow:hidden;
+        }
+        #footer .footer-meta{
+            display:flex;align-items:center;gap:8px;min-width:0;
+            flex-wrap:nowrap;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        }
+        #footer .footer-meta .sep{color:var(--gray-300);flex-shrink:0}
+        #footer .footer-meta strong{color:var(--gray-600);font-weight:600;flex-shrink:0}
+        #footer .footer-logo{flex-shrink:0}
+        /* TEMPLATE: 把 .logo-slot 占位替换为 <img src="你的logo.png" alt="机构 logo"> */
+        .logo-slot{
+            display:inline-flex;align-items:center;height:22px;padding:0 10px;
+            border:1px dashed var(--gray-300);border-radius:4px;
+            color:var(--gray-400);font-size:0.68rem;white-space:nowrap;
+        }
+
+        /* ═══════ 4. Sidebar ═══════ */
+        #sidebar{
+            grid-area:sidebar;
+            background:var(--card-bg);
+            border-right:1px solid var(--line);
+            overflow-y:auto;padding:8px 0;min-height:0;
+        }
+        .sidebar-section{margin-bottom:2px}
+        .sidebar-parent{
+            display:flex;align-items:center;gap:6px;
+            margin:0 10px;padding:9px 8px;cursor:pointer;
+            font-weight:600;font-size:0.86rem;color:var(--gray-700);
+            border-radius:8px;
+            transition:var(--transition);user-select:none;
+        }
+        .sidebar-parent:hover{background:var(--gray-100)}
+        .sidebar-parent .arrow{font-size:0.6rem;transition:transform 0.2s;margin-left:auto;color:var(--gray-400)}
+        .sidebar-parent.expanded .arrow{transform:rotate(90deg)}
+
+        /* 注意：展开态必须 max-height:none ， 固定值 + overflow:hidden 会裁剪导航项。
+           （none 与数值之间不可插值，故不声明对该属性的过渡动画，它是死代码且触发布局抖动） */
+        .sidebar-children{max-height:0;overflow:hidden}
+        .sidebar-children.open{max-height:none}
+
+        .sidebar-child{
+            display:flex;align-items:center;gap:6px;
+            margin:0 10px;padding:6px 8px 6px 24px;cursor:pointer;
+            font-size:0.78rem;color:var(--gray-600);
+            border-radius:8px;
+            transition:var(--transition);
+        }
+        .sidebar-child:hover{background:var(--gray-100);text-decoration:none}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary-dark);font-weight:500}
+
+        .sidebar-child .badge{margin-left:auto;font-size:0.62rem;padding:1px 6px;border-radius:10px;font-weight:500}
+        .badge-ok{background:var(--success-bg);color:var(--success)}
+        .badge-warn{background:var(--warning-bg);color:var(--warning)}
+        .badge-new{background:var(--gray-100);color:var(--gray-500)}
+        .badge-ext{background:var(--primary-light);color:var(--primary)}
+        .sidebar-child.ext-link{color:var(--primary);font-weight:500}
+
+        /* ═══════ 5. 内容区与卡片 ═══════ */
+        #content{
+            grid-area:content;
+            overflow-y:auto;padding:16px 20px 60px;
+            scroll-behavior:smooth;
+        }
+
+        .card{background:var(--card-bg);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:box-shadow var(--transition),border-color var(--transition)}
+        .card:hover{box-shadow:var(--shadow-hover);border-color:rgba(0,0,0,0.12)}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+        .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
+
+        /* --- 卡片两栏：左 .viz（图/表展示）+ 右 .explain（文字解释） ---
+           TEMPLATE: 卡片内容包进 .card-body，图表放 .viz、解释文字放 .explain；
+           不需要两栏的卡片（方法概览等纯文字卡）不写 .card-body 即可。 */
+        .card-body{
+            display:grid;grid-template-columns:minmax(0,1fr) 290px;
+            gap:6px 24px;align-items:start;
+        }
+        .card-body .viz{min-width:0}
+        /* 解释栏：flex 列 + 统一 gap；JS 按左栏折叠区位置做垂直对齐（不堆叠） */
+        .card-body .explain{min-width:0;display:flex;flex-direction:column;gap:10px}
+        .card-body .explain > *{margin:0}
+
+        /* --- 可折叠区：核心内容默认展开、细节默认折叠（汇报时有的放矢） ---
+           TEMPLATE: 结构为 .fold 容器 → .fold-head 按钮 → .fold-body（内含 .fold-inner 内容层）。
+           默认折叠不写 .open；核心内容加 .open 常开。 */
+        .fold{margin:10px 0}
+        .fold-head{
+            display:flex;align-items:center;gap:8px;width:100%;
+            padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;
+            background:var(--gray-50);cursor:pointer;font:inherit;
+            font-size:0.8rem;font-weight:600;color:var(--gray-700);text-align:left;
+            transition:var(--transition);
+        }
+        .fold-head:hover{background:var(--gray-100);color:var(--gray-900)}
+        .fold-head .fold-chevron{transition:transform .25s ease;color:var(--gray-400);font-size:0.7em}
+        .fold.open .fold-head .fold-chevron{transform:rotate(180deg)}
+        .fold-head .fold-hint{margin-left:auto;font-size:0.7rem;font-weight:400;color:var(--gray-400)}
+        .fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+        .fold.open .fold-body{grid-template-rows:1fr}
+        .fold-inner{overflow:hidden;min-height:0}
+        .fold-inner .fold-pad{padding-top:8px}
+
+        /* 小节标题：替代重复的内联 h4 样式；颜色用 c-* 变体（默认 gray） */
+        .section-h4{font-size:0.95rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--gray-300);font-weight:700}
+        .section-h4.c-primary{border-bottom-color:var(--primary)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .section-h4.c-success{border-bottom-color:var(--success)}
+        .section-h4.c-warning{border-bottom-color:var(--warning)}
+        .section-h4.c-danger{border-bottom-color:var(--danger)}
+
+        .status-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.7rem;font-weight:600}
+        .status-ok{background:var(--success-bg);color:var(--success)}
+        .status-warn{background:var(--warning-bg);color:var(--warning)}
+        .status-danger{background:var(--danger-bg);color:var(--danger)}
+        .status-progress{background:var(--primary-light);color:var(--primary-dark)}
+        .status-new{background:var(--gray-100);color:var(--gray-500)}
+
+        /* 提示框：同色调浅底 + 圆形色点（无左侧粗色条） */
+        .info-box{padding:10px 14px 10px 34px;border-radius:10px;font-size:0.82rem;margin:8px 0;line-height:1.6;position:relative;border:1px solid transparent}
+        .info-box::before{content:'';position:absolute;left:14px;top:15px;width:8px;height:8px;border-radius:50%}
+        .info-box.info{background:var(--primary-light);border-color:rgba(37,99,235,0.22)}
+        .info-box.info::before{background:var(--primary)}
+        .info-box.success{background:var(--success-bg);border-color:rgba(5,150,105,0.22)}
+        .info-box.success::before{background:var(--success)}
+        .info-box.warning,.info-box.warn{background:var(--warning-bg);border-color:rgba(180,83,9,0.22)}
+        .info-box.warning::before,.info-box.warn::before{background:var(--warning)}
+        .info-box.danger{background:var(--danger-bg);border-color:rgba(220,38,38,0.22)}
+        .info-box.danger::before{background:var(--danger)}
+
+        /* 来源行（卡片头下的实验出处说明） */
+        .source-line{font-size:0.8rem;color:var(--gray-500);margin-bottom:10px;line-height:1.7}
+        .source-line code,.code-ref code{background:var(--gray-100);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:0.85em;color:var(--gray-700)}
+        /* 卡片底部代码引用页脚 */
+        .code-ref{font-size:0.72rem;color:var(--gray-400);margin-top:8px;line-height:1.8}
+
+        /* ═══════ 6. 数据表格 ═══════ */
+        .data-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+        .data-table thead th{background:var(--gray-50);padding:7px 9px;text-align:center;font-weight:600;color:var(--gray-600);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.03em;border-bottom:2px solid var(--gray-200)}
+        .data-table tbody td{text-align:center;padding:6px 9px;border-bottom:1px solid var(--gray-100)}
+        .data-table tbody tr:hover{background:var(--gray-50)}
+        .data-table .num{font-family:var(--font-mono);text-align:center}
+        .data-table .highlight{font-weight:700;color:var(--primary-dark)}
+        .data-table .down{color:var(--danger)}.data-table .up{color:var(--success)}
+        .data-table .warn-cell{color:var(--warning);font-weight:600}
+
+        /* ═══════ 7. 指标卡与对比卡 ═══════ */
+        .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+        .metric-card{background:var(--card-bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;box-shadow:var(--shadow)}
+        .metric-card .metric-value{font-size:1.55rem;font-weight:800;font-family:var(--font-mono)}
+        .metric-card .metric-label{font-size:0.72rem;color:var(--gray-500);margin-top:3px}
+        .metric-card .metric-detail{font-size:0.7rem;color:var(--gray-400);margin-top:3px}
+
+        .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        /* 对比卡：白卡 + 顶部细条着色（整卡染色会让仪表盘主次不分） */
+        .compare-card{border-radius:var(--card-radius);padding:18px;border:1px solid var(--gray-200);border-top:2px solid var(--gray-300);text-align:center;background:var(--card-bg);box-shadow:var(--shadow)}
+        .compare-card.m1{border-top-color:var(--primary)}
+        .compare-card.m2{border-top-color:var(--success)}
+        .compare-card.m3{border-top-color:var(--gray-300)}
+        .compare-card .big-num{font-size:1.85rem;font-weight:800;font-family:var(--font-mono);margin:6px 0;color:var(--gray-900)}
+        .compare-card .delta{font-size:0.76rem}
+
+        /* ═══════ 8. 图表组件 ═══════ */
+        .bar-chart{display:flex;align-items:center;gap:8px;margin:4px 0}
+        .bar-label{font-size:0.76rem;width:150px;text-align:right;color:var(--gray-600);flex-shrink:0}
+        .bar-track{flex:1;height:22px;background:var(--gray-100);border-radius:4px;position:relative;overflow:hidden}
+        .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;color:#fff;font-size:0.7rem;font-weight:600}
+        .bar-fill.blue{background:linear-gradient(90deg,#2563eb,#0e7490)}
+        .bar-fill.green{background:linear-gradient(90deg,#059669,#34d399)}
+        .bar-fill.orange{background:linear-gradient(90deg,#b45309,#fbbf24)}
+        .bar-fill.gray{background:linear-gradient(90deg,#9ca3af,#d1d5db)}
+
+        /* ═══════ 9. 时间线 ═══════ */
+        .timeline{position:relative;padding-left:28px}
+        .timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--gray-200)}
+        .timeline-node{position:relative;margin-bottom:18px}
+        /* 节点：实心圆 + 白环 + 同色细轮廓（无发光扩散） */
+        .timeline-dot{position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--card-bg);outline:2px solid var(--gray-300);outline-offset:0;z-index:1}
+        .timeline-node.past .timeline-dot{background:var(--success);outline-color:var(--success)}
+        /* 当前周：语义脉冲（仅透明度，不扩散光晕） */
+        .timeline-node.current .timeline-dot{background:var(--primary);outline-color:var(--primary);animation:pulse 2.4s ease-in-out infinite}
+        .timeline-node.future .timeline-dot{background:var(--gray-300);outline-color:var(--gray-300)}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+        .timeline-node.future .timeline-card{opacity:0.5;border-style:dashed}
+        .timeline-card{background:var(--card-bg);border:1px solid var(--gray-200);border-radius:10px;padding:12px}
+        .timeline-card.current{border-color:var(--primary)}
+        .timeline-date{font-size:0.74rem;color:var(--gray-500);margin-bottom:3px}
+        .timeline-summary{font-weight:700;font-size:0.9rem;margin-bottom:5px}
+        .timeline-list{margin:0;padding:0;list-style:none;font-size:0.8rem}
+        .timeline-list li{margin-bottom:2px;display:flex;align-items:flex-start;gap:4px}
+        .timeline-metric{font-size:0.72rem;margin-top:5px;color:var(--gray-500)}
+
+        .timeline-node.past.collapsed .timeline-list,
+        .timeline-node.past.collapsed .timeline-metric{display:none}
+        .timeline-node.past .timeline-toggle{cursor:pointer;font-size:0.7rem;color:var(--primary);margin-top:4px;display:inline-flex;align-items:center;gap:4px;user-select:none}
+        .timeline-node.past .timeline-toggle:hover{color:var(--primary-dark)}
+        .timeline-node.past .timeline-dot{cursor:pointer}
+        .timeline-node.past.collapsed .timeline-card{background:var(--gray-50);padding:8px 12px}
+
+        /* ═══════ 10. 待办清单 ═══════ */
+        .todo-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:0.82rem}
+        .todo-item input[type="checkbox"]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+        .todo-item.done label{text-decoration:line-through;color:var(--gray-400)}
+        .empty-state{text-align:center;padding:24px;color:var(--gray-400);font-size:0.8rem}
+
+        /* ═══════ 11. 公式与架构图 ═══════ */
+        .formula-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin:6px 0;overflow-x:auto}
+        .formula-label{font-size:0.7rem;color:var(--gray-500);text-transform:uppercase;margin-bottom:3px;font-weight:600}
+
+        .arch-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;flex-wrap:wrap}
+        .arch-block{background:var(--card-bg);border:2px solid var(--gray-200);border-radius:10px;padding:10px 14px;text-align:center;font-size:0.76rem;font-weight:600;min-width:90px}
+        .arch-block.wave{border-color:var(--primary);background:var(--primary-light)}
+        .arch-block.tab{border-color:var(--accent);background:var(--accent-light)}
+        .arch-block.fusion{border-color:var(--warning);background:var(--warning-bg)}
+        .arch-block.output{border-color:var(--gray-400);background:var(--gray-50)}
+        .arch-arrow{font-size:1.4rem;color:var(--gray-400)}
+
+        /* ═══════ 12. 图片与占位 ═══════ */
+        .figure{margin:8px 0;text-align:center}
+        .figure img{max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:inline-block}
+        .fig-caption{font-size:0.74rem;color:var(--gray-500);margin-top:4px}
+        .fig-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        /* 图片/公式截图占位：接入真实图片时整块替换为 <img src="...">（见各占位符旁 TEMPLATE 注释）
+           占位符含义见 README「占位符说明」表。 */
+        .img-placeholder{
+            aspect-ratio:16/9;max-width:100%;border-radius:8px;
+            border:2px dashed var(--gray-300);background:var(--gray-50);
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            color:var(--gray-400);font-size:0.8rem;gap:4px;text-align:center;padding:0 12px;
+        }
+        .img-placeholder .ph-icon{font-size:1.8rem}
+
+        /* ═══════ 13. 快速链接卡 ═══════ */
+        .quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+        .quick-link-card{
+            background:var(--card-bg);border:1px solid var(--line);border-top:2px solid var(--gray-300);
+            border-radius:var(--card-radius);
+            box-shadow:var(--shadow);padding:16px 12px;text-align:center;
+            transition:box-shadow var(--transition),border-color var(--transition),transform 0.25s var(--ease-move);
+            cursor:pointer;display:block;
+        }
+        .quick-link-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);text-decoration:none;border-color:rgba(0,0,0,0.12)}
+        .quick-link-card:active{transform:scale(0.98)}
+        .quick-link-card .ql-icon{font-size:1.6rem;margin-bottom:6px}
+        .quick-link-card .ql-title{font-weight:700;font-size:0.85rem;color:var(--gray-800);margin-bottom:3px}
+        .quick-link-card .ql-desc{font-size:0.7rem;color:var(--gray-500)}
+        .quick-link-card.ql-mdsed{border-top-color:var(--primary)}
+        .quick-link-card.ql-m1{border-top-color:var(--success)}
+        .quick-link-card.ql-m2{border-top-color:var(--warning)}
+        .quick-link-card.ql-m3{border-top-color:var(--gray-400)}
+
+        /* ═══════ 14. 修饰（滚动条 / 回到顶部） ═══════ */
+        #content::-webkit-scrollbar,#sidebar::-webkit-scrollbar{width:8px}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:4px}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:var(--gray-400)}
+        #content::-webkit-scrollbar-track,#sidebar::-webkit-scrollbar-track{background:transparent}
+
+        #back-to-top{
+            position:fixed;bottom:28px;right:28px;width:40px;height:40px;
+            border-radius:50%;background:var(--card-bg);border:1px solid var(--gray-200);
+            box-shadow:var(--shadow-hover);cursor:pointer;font-size:1.1rem;color:var(--gray-600);
+            display:none;align-items:center;justify-content:center;z-index:20;
+            transition:var(--transition);
+        }
+        #back-to-top:hover{background:var(--primary-light);color:var(--primary);border-color:var(--primary)}
+        #back-to-top.visible{display:flex}
+
+        /* ═══════ 15. 响应式 ═══════ */
+        @media(max-width:1100px){
+            .card-body{grid-template-columns:minmax(0,1fr)}
+        }
+        @media(max-width:768px){
+            #app{grid-template-columns:1fr;grid-template-areas:"header" "content" "footer"}
+            #sidebar{display:none}
+            .resizer{display:none}
+            .compare-grid,.quick-links{grid-template-columns:1fr 1fr}
+            .metric-grid{grid-template-columns:1fr 1fr}
+            .fig-grid{grid-template-columns:1fr}
+            #content{padding:12px}
+            #header{padding:0 12px}
+            #footer{padding:0 12px}
+            .nav-links a{padding:4px 8px}
+        }
+        /* ═══════ 16. 减弱动效 ═══════ */
+        @media(prefers-reduced-motion:reduce){
+            html{scroll-behavior:auto}
+            .timeline-node.current .timeline-dot{animation:none}
+            .quick-link-card:hover,.quick-link-card:active{transform:none}
+            *,*::before,*::after{transition-duration:0.01ms!important;animation-duration:0.01ms!important;animation-iteration-count:1!important}
+        }
+
+        /* ═══════ 17. 图标集 ═══════
+           stroke 线性 SVG（mask + currentColor）：图标颜色自动跟随所在文字颜色，
+           主题换色无需换图标。TEMPLATE: 复制卡片时标题图标用 <span class="ic ic-xxx"></span>，
+           可用图标见下方清单；如需新图标，按同一 24×24 stroke=2 风格补充 data URI。 */
+        .ic{display:inline-block;width:1em;height:1em;background:currentColor;flex-shrink:0;
+            -webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+        .ic-dashboard{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1.5'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1.5'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1.5'/%3E%3C/svg%3E")}
+        .ic-doc{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='M9 13h6M9 17h6'/%3E%3C/svg%3E")}
+        .ic-nav{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6h16M4 12h16M4 18h10'/%3E%3C/svg%3E")}
+        .ic-flask{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3v6L5 18a2.5 2.5 0 0 0 2.2 3.7h9.6A2.5 2.5 0 0 0 19 18l-5-9V3'/%3E%3Cpath d='M8.5 3h7'/%3E%3C/svg%3E")}
+        .ic-search{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M21 21l-4.3-4.3'/%3E%3C/svg%3E")}
+        .ic-calendar{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M8 3v4M16 3v4M3 10h18'/%3E%3C/svg%3E")}
+        .ic-clipboard{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='4' width='14' height='17' rx='2'/%3E%3Cpath d='M9 4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1H9z'/%3E%3Cpath d='M9 11h6M9 15h6'/%3E%3C/svg%3E")}
+        .ic-check{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M8.5 12.5l2.5 2.5 4.5-5'/%3E%3C/svg%3E")}
+        .ic-chart{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20V10M10 20V4M16 20v-6M22 20H2'/%3E%3C/svg%3E")}
+        .ic-bulb{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 22h4'/%3E%3Cpath d='M12 2a6 6 0 0 0-4 10.5c.8.7 1 1.5 1 2.5h6c0-1 .2-1.8 1-2.5A6 6 0 0 0 12 2z'/%3E%3C/svg%3E")}
+        .ic-archive{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='5' rx='1'/%3E%3Cpath d='M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9'/%3E%3Cpath d='M10 13h4'/%3E%3C/svg%3E")}
+        .ic-book{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 0-2 2z'/%3E%3Cpath d='M4 19a2 2 0 0 1 2-2h14'/%3E%3C/svg%3E")}
+        .ic-formula{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 4H6l6 8-6 8h12'/%3E%3C/svg%3E")}
+        .ic-code{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E")}
+        .ic-paper{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 4h16v16H4z'/%3E%3Cpath d='M8 9h8M8 13h8M8 17h5'/%3E%3C/svg%3E")}
+        .ic-arrow{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 19V5M5 12l7-7 7 7'/%3E%3C/svg%3E")}
+        .ic-palette{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Ccircle cx='8.2' cy='9.5' r='1.5' fill='black'/%3E%3Ccircle cx='12.4' cy='7.6' r='1.5' fill='black'/%3E%3Ccircle cx='16' cy='10.4' r='1.5' fill='black'/%3E%3Ccircle cx='9' cy='14.6' r='1.5' fill='black'/%3E%3Ccircle cx='14.6' cy='15.2' r='1.5' fill='black'/%3E%3C/svg%3E")}
+
+        /* ═══════ 18. 主题一键切换器 ═══════
+           主题列表由 theme-pack.js（window.THEME_PACK）提供；选择写 localStorage 跨页连续。 */
+        .theme-switcher{position:relative}
+        .ts-btn{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.78rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .ts-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .ts-btn:active{transform:scale(0.97)}
+        .ts-panel{
+            /* fixed 定位（JS 打开时按按钮位置设置 top/right）：
+               脱离 header/nav-links 的 overflow 裁剪域，可覆盖任何内容 */
+            position:fixed;z-index:60;
+            width:250px;max-height:60vh;overflow-y:auto;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-radius:12px;
+            box-shadow:var(--shadow-hover);padding:8px;
+            display:flex;flex-direction:column;gap:2px;
+        }
+        .ts-panel[hidden]{display:none}
+        .ts-opt{
+            display:flex;align-items:center;gap:8px;
+            padding:7px 10px;border-radius:8px;border:none;background:transparent;
+            font-size:0.8rem;color:var(--gray-700);cursor:pointer;text-align:left;
+            font-family:inherit;
+        }
+        .ts-opt:hover{background:var(--gray-100)}
+        .ts-opt.sel{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .ts-opt .ts-dots{display:flex;gap:4px;flex-shrink:0}
+        .ts-opt .ts-dots i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);display:inline-block}
+        .ts-opt .ts-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ts-opt .ts-check{margin-left:auto;flex-shrink:0;visibility:hidden;font-size:0.9em}
+        .ts-opt.sel .ts-check{visibility:visible}
+        /* ═══ 共享设计系统 CSS 结束 ═══ */
+    
+        /* ═══════ 主题覆盖层 · 杂志编辑 ═══════ */
+        :root {
+            --bg:#ffffff; --card-bg:#ffffff; --card-radius:2px;
+            --line:rgba(20,20,20,0.14);
+            --shadow:0 1px 0 rgba(20,20,20,0.12);
+            --shadow-hover:0 2px 8px rgba(20,20,20,0.12);
+            --primary:#141414; --primary-light:#f2f2f2; --primary-dark:#000000;
+            --accent:#c8372f; --accent-light:#fbefee;
+            --success:#1a7f37; --success-bg:#eef7f0;
+            --warning:#9a6700; --warning-bg:#faf4e3;
+            --danger:#c8372f; --danger-bg:#fbefee;
+            --font-sans:"Playfair Display","Songti SC","STSong","SimSun","PingFang SC",serif;
+        }
+        body{background:var(--bg)}
+        ::selection{background:rgba(200,55,47,0.15);color:var(--gray-900)}
+        #header{border-bottom:2px solid var(--gray-900)}
+        #sidebar{border-right:1px solid rgba(20,20,20,0.18)}
+        .sidebar-child.active{background:var(--primary-light);color:var(--gray-900);font-weight:700}
+        .card{box-shadow:none;border:1px solid rgba(20,20,20,0.14)}
+        .card:hover{border-color:var(--gray-900);box-shadow:0 2px 8px rgba(20,20,20,0.10)}
+        .card-header{border-bottom:1px solid var(--gray-900)}
+        /* 双线分节 */
+        .section-h4{border-bottom:2px solid var(--gray-900);padding-bottom:6px;font-weight:800}
+        .section-h4.c-primary{border-bottom-color:var(--gray-900)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .section-h4.c-success{border-bottom-color:var(--success)}
+        .section-h4.c-warning{border-bottom-color:var(--warning)}
+        .section-h4.c-danger{border-bottom-color:var(--danger)}
+        .countdown{background:var(--gray-900);color:#fff;border-radius:2px}
+        .status-tag{border-radius:2px;font-weight:700}
+        .badge-ok,.badge-warn,.badge-new,.badge-ext{border-radius:2px}
+        .data-table thead th{border-bottom:2px solid var(--gray-900)}
+        .bar-fill{border-radius:0}
+        .bar-track{border-radius:0;border:1px solid rgba(20,20,20,0.14);background:#fff}
+        .bar-fill.blue{background:#141414}
+        .bar-fill.green{background:#1a7f37}
+        .bar-fill.orange{background:#9a6700}
+        .bar-fill.gray{background:#6b7280}
+        .info-box{border-radius:2px;border-style:solid;border-width:1px}
+        .info-box.info{border-color:rgba(20,20,20,0.3);background:#fafafa}
+        .info-box.success{border-color:rgba(26,127,55,0.3)}
+        .info-box.warning,.info-box.warn{border-color:rgba(154,103,0,0.3)}
+        .info-box.danger{border-color:rgba(200,55,47,0.3)}
+        .timeline-dot{outline-width:1px;border-radius:0}
+        .timeline::before{background:var(--gray-900);width:1px}
+        .img-placeholder{border-style:solid;border-width:1px;border-color:rgba(20,20,20,0.25);background:#fafafa;border-radius:2px}
+        .metric-card,.compare-card,.quick-link-card{border-radius:2px;box-shadow:none}
+        .quick-link-card{border-top-width:3px}
+        /* 图标容器：编辑风黑块白图标 */
+        .quick-link-card .ql-icon{background:var(--gray-900);color:#ffffff;border-radius:2px}
+        .quick-link-card:hover .ql-icon{background:var(--accent)}
+        .carousel-viewport::before{border-color:var(--gray-900);border-style:solid}
+        .carousel-item .ci-card{position:relative}
+        .carousel-item .ci-card::before{content:"";position:absolute;left:0;top:-2px;width:34%;height:2px;background:var(--gray-900)}
+        .timeline-dot{border-radius:0}
+        .card-body .viz p:first-of-type::first-letter,.card-body .explain p:first-of-type::first-letter{font-size:2.1em;font-weight:800;float:left;line-height:.95;margin:3px 7px 0 0;color:var(--accent)}
+        /* ═══ 主题覆盖层结束 ═══ */
+    </style>
+</head>
+<body data-default-theme="default" data-asset-prefix="../">
+
+<div id="app">
+
+<!-- ═══════ HEADER（顶部导航：品牌区（返回总览）+ 兄弟页面/工具链接） ═══════ -->
+<header id="header">
+    <!-- TEMPLATE: 品牌区 = 当前方法页标题（本页自身；点击返回总览） -->
+    <div class="nav-brand">
+        <span class="ic ic-paper" style="font-size:1.05em;"></span>
+        <a href="09_editorial.html" id="page-title">② 子页面示例（方法概览 + 论文详解）</a>
+    </div>
+    <!-- TEMPLATE: 总览入口（站点名由 site_meta.project_name 渲染）+ 兄弟页面 + 工具链接集中在此；
+         路径相对本页面文件 -->
+    <nav class="nav-links" id="nav-links">
+        <a href="09_editorial.html"><span class="ic ic-dashboard"></span> <span id="overview-name">项目名 实验进度报告</span></a>
+        <a href="09_editorial_sub.html">① 方法1</a>
+        <a href="09_editorial_sub.html">③ 方法3</a>
+        <a class="push-right" href="../literature/示例论文.pdf" target="_blank">📕 PDF</a>
+        <a href="https://github.com/example/repo" target="_blank">🐙 GitHub</a>
+        <!-- TEMPLATE: 主题一键切换器（10 主题由 theme-pack.js 提供，选择跨页保持） -->
+        <div class="theme-switcher" id="theme-switcher">
+            <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                <span class="ic ic-palette"></span><span class="ts-cur">主题</span>
+            </button>
+            <div class="ts-panel" id="ts-panel" hidden></div>
+        </div>
+    </nav>
+</header>
+
+<nav id="sidebar">
+    <!-- TEMPLATE: 页内导航（由底部 buildInpageNav 按 groups 配置动态生成） -->
+    <div class="sidebar-section" id="sidebar-inpage" style="display:none;">
+        <div class="sidebar-parent expanded" onclick="toggleSidebar(this,'children-inpage')">
+            <span class="ic ic-nav"></span> 页内导航
+            <span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-inpage"></div>
+    </div>
+
+    <!-- TEMPLATE: 第 3 组 = 失败实验归档（可折叠，无内容时保留占位文字） -->
+    <div class="sidebar-section">
+        <div class="sidebar-parent" onclick="toggleSidebar(this,'children-archive')">
+            <span class="ic ic-archive"></span> 错误/失败实验归档
+            <span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children" id="children-archive">
+            <div class="sidebar-child" style="color:var(--gray-400);font-size:0.68rem;">（归档内容待补充）</div>
+        </div>
+    </div>
+</nav>
+
+<!-- 拖拽分隔条：调整左侧导引栏宽度（双击恢复默认） -->
+<div class="resizer" title="拖动调整侧边栏宽度（双击恢复默认）"></div>
+
+<main id="content">
+
+<!-- ═══════ 卡片 1：方法概览 ═══════
+     TEMPLATE: 子页面的第一张卡，论文来源 + 核心创新 + 方法分类，右上角 status-tag。
+     所有文字均为占位，替换为你的方法信息。 -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">② 子页面示例（方法概览）</div>
+        <span class="status-tag status-warn">🟡 状态示例</span>
+    </div>
+    <div style="font-size:0.85rem;line-height:1.7;margin-bottom:12px;">
+        <p><strong>论文：</strong>《示例论文标题》（示例作者，示例会议 年份）</p>
+        <p><strong>核心创新：</strong>（在此填写方法的核心创新，一句话说清它解决了什么问题、怎么解决。）</p>
+        <p><strong>方法分类：</strong> <em>占位：结构约束 / 概率校准 / 后处理 / 架构改进 等</em> · 是否需要修改模型架构或训练目标。</p>
+    </div>
+
+    <div class="info-box info">
+        <strong>🔑 关键洞察：</strong>（在此填写对方法的理解，它与已有方法的关系、本质是什么。）
+    </div>
+</div>
+
+<!-- ═══════ 卡片 2：论文详解（mineru 解析模式） ═══════
+     TEMPLATE: 本卡片演示「论文详解」部分的标准写法，用 mineru 技能解析论文 PDF，
+     将关键数学公式以【截图】形式展示（mineru 输出的图片），并配公式说明文字。
+
+     mineru 工作流（详见 README「论文详解与 mineru 工作流」）：
+       1. 用 mineru 技能解析论文 PDF → 输出目录含 markdown + images/
+       2. 从输出 images/ 挑选关键公式截图，复制到站点内（如 ../literature_output/images/）
+       3. 每个公式一个小节：.figure 放公式截图 + fig-caption 标公式编号 + 下方段落写公式说明
+     截图模式的优点：精确还原论文公式排版与编号、无需手写 LaTeX 转写（转写易错）。 -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-paper"></span> 论文详解（mineru 解析）</div>
+    </div>
+    <p class="source-line">
+        论文: <code>literature/示例论文.pdf</code> |
+        解析输出: <code>literature_output/示例论文/</code>（mineru 生成：markdown + <code>images/</code>）|
+        公式截图: <code>literature_output/示例论文/images/eq_*.jpg</code>
+    </p>
+
+    <!-- 两栏结构：左 .viz = 公式截图/图表（细节折叠），右 .explain = 使用说明与公式解释 -->
+    <div class="card-body">
+
+    <div class="viz">
+    <h4 class="section-h4 c-primary">① 关键公式一（公式名称占位）</h4>
+    <!-- TEMPLATE: 公式截图占位，把 .img-placeholder 整块替换为：
+         <div class="figure"><img src="../literature_output/示例论文/images/eq_1.jpg" alt="Eq. 1"><div class="fig-caption">Eq. 1 · 公式名称（mineru 解析截图）</div></div>
+         占位符含义：此位置放 mineru 输出的【关键公式截图】。 -->
+    <div class="figure">
+        <div class="img-placeholder"><span class="ph-icon">🧮</span>公式截图占位：mineru 输出 images/ 中的公式图片<br>（如 eq_1.jpg，替换为 <code>&lt;img src="..."&gt;</code>）</div>
+        <div class="fig-caption">Eq. 1 · 公式名称（mineru 解析截图，占位图注）</div>
+    </div>
+
+    <!-- 折叠区：公式二（data-fold 与右栏「② 公式说明」配对） -->
+    <div class="fold" data-fold="sub-eq2">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-formula"></span> ② 关键公式二（公式名称占位）
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <!-- TEMPLATE: 同①，每个关键公式一个小节：截图 + 编号图注 + 说明段落 -->
+            <div class="figure">
+                <div class="img-placeholder"><span class="ph-icon">🧮</span>公式截图占位：mineru 输出 images/ 中的公式图片<br>（如 eq_2.jpg，替换为 <code>&lt;img src="..."&gt;</code>）</div>
+                <div class="fig-caption">Eq. 2 · 公式名称（mineru 解析截图，占位图注）</div>
+            </div>
+        </div></div></div>
+    </div>
+
+    <!-- 折叠区：LaTeX 重排版（data-fold 与右栏「③ 何时用 LaTeX」配对） -->
+    <div class="fold" data-fold="sub-latex">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-formula"></span> ③ 可选：LaTeX 重排版（MathJax）
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <div class="formula-card mathjax-process"><div class="formula-label">示例 LaTeX 公式（占位）</div>
+            \[
+            \Lcal = -\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{C} \bigl[ y_{ij} \log\hat{y}_{ij} + (1-y_{ij})\log(1-\hat{y}_{ij}) \bigr]
+            \]
+            <small>占位说明：替换为你的公式。</small></div>
+        </div></div></div>
+    </div>
+
+    <!-- 折叠区：论文图表 -->
+    <div class="fold">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-chart"></span> ④ 论文图表示例（架构图/流程图）
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <!-- TEMPLATE: 论文插图占位，把 .img-placeholder 整块替换为：
+                 <div class="figure"><img src="../literature_output/示例论文/images/fig1.jpg" alt="论文图"><div class="fig-caption">Fig. 1 · 说明（来源: 论文）</div></div>
+                 占位符含义：此位置放论文的架构图/流程图（mineru 输出或论文截图）。 -->
+            <div class="figure">
+                <div class="img-placeholder"><span class="ph-icon">🏗️</span>论文插图占位：论文架构图/流程图<br>（mineru 输出或论文截图，替换为 <code>&lt;img src="..."&gt;</code>）</div>
+                <div class="fig-caption">Fig. 1 · 论文插图说明（占位图注）</div>
+            </div>
+            <div class="arch-diagram">
+                <div class="arch-block wave">输入模块<br><small>占位</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-block tab">中间模块<br><small>占位</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-block fusion">融合/变换<br><small>占位</small></div>
+                <div class="arch-arrow">→</div>
+                <div class="arch-block output">输出<br><small>占位</small></div>
+            </div>
+        </div></div></div>
+    </div>
+    </div>
+
+    <div class="explain">
+    <div class="info-box info">
+        <strong>🔑 使用说明：</strong>本部分公式展示采用「<strong>公式截图 + 说明文字</strong>」模式，公式图片来自 mineru 解析论文 PDF 的输出（保留原论文排版与编号），下方文字解释公式含义。相比手写 LaTeX，截图模式能精确还原论文公式且无需转写。
+    </div>
+    <h4 class="section-h4 c-primary">① 公式说明</h4>
+    <div style="font-size:0.82rem;line-height:1.7;color:var(--gray-700);">
+        <strong>公式说明：</strong>（在此填写该公式的内容说明，符号含义、作用、在模型中的位置。此说明文字由你根据论文内容撰写。）
+    </div>
+    <!-- explain-item 与左栏同名 data-fold 折叠区联动：折叠时同步隐藏 -->
+    <div class="explain-item" data-fold="sub-eq2">
+        <h4 class="section-h4 c-accent">② 公式说明</h4>
+        <div style="font-size:0.82rem;line-height:1.7;color:var(--gray-700);">
+            <strong>公式说明：</strong>（在此填写该公式的内容说明。）
+        </div>
+    </div>
+    <div class="explain-item" data-fold="sub-latex">
+        <div class="info-box warning" style="margin-top:12px;">
+            <strong>③ 何时用 LaTeX：</strong>需要自行重排版/改动公式时（如讨论、推导扩展），可用 MathJax 手写 LaTeX；仅展示论文公式时用上方截图即可，可删除本小节与页面头部 MathJax 配置。
+        </div>
+    </div>
+    </div>
+
+    </div>
+</div>
+
+<!-- ═══════ 卡片 3：实验记录（h4 ①②③ 小节模式） ═══════
+     TEMPLATE: 每次实验一个小节：背景 → 配置/结果表 → 结论 info-box。
+     小节标题用 .section-h4 + c-* 色变体区分状态（失败=danger / 部分成功=warning / 成功=success）。
+     数值 0.8xxx 等均为占位符（见 README「占位符说明」）。 -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-flask"></span> 实验记录</div>
+    </div>
+
+    <!-- 两栏结构：左 .viz = 实验结果表（配置对比折叠），右 .explain = 设计/结论文字 -->
+    <div class="card-body">
+
+    <div class="viz">
+    <h4 class="section-h4 c-danger">① 实验 1（占位：实验名与日期）</h4>
+    <table class="data-table" style="max-width:760px;">
+    <thead><tr><th>指标</th><th>val (agg0)</th><th>test (agg1)</th><th>Δ vs baseline</th></tr></thead>
+    <tbody>
+        <tr><td><strong>实验 1</strong></td><td class="num down">0.8xxx</td><td class="num down">0.8xxx</td><td class="num down">−0.0xxx</td></tr>
+    </tbody>
+    </table>
+
+    <h4 class="section-h4 c-accent">② 实验 2（占位：修正方案）</h4>
+    <table class="data-table" style="max-width:760px;">
+    <thead><tr><th>指标</th><th>val (agg0)</th><th>test (agg1)</th><th>Δ vs baseline</th></tr></thead>
+    <tbody>
+        <tr><td><strong>实验 2</strong></td><td class="num">0.8xxx</td><td class="num">0.8xxx</td><td class="num down">−0.0xxx</td></tr>
+    </tbody>
+    </table>
+
+    <h4 class="section-h4 c-success">③ 实验 3（占位：最终方案）</h4>
+    <table class="data-table" style="max-width:760px;">
+    <thead><tr><th>指标</th><th>val (agg0)</th><th>test (agg1)</th><th>Δ vs baseline</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td><strong>实验 3</strong></td><td class="num highlight up">0.8xxx</td><td class="num highlight up">0.8xxx</td><td class="num up"><strong>+0.0xxx</strong></td></tr>
+    </tbody>
+    </table>
+
+    <!-- 折叠区：配置对比 -->
+    <div class="fold">
+        <button class="fold-head" type="button" aria-expanded="false">
+            <span class="ic ic-code"></span> 实验配置对比（训练日志 FULL PARSED CONFIG）
+            <span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint">点击展开 / 收起</span>
+        </button>
+        <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+            <table class="data-table" style="max-width:920px;">
+            <thead><tr><th>配置项</th><th>实验 1</th><th>实验 2</th><th>实验 3</th></tr></thead>
+            <tbody>
+                <tr><td>模块 A 初始化</td><td>继承</td><td>继承</td><td>随机</td></tr>
+                <tr><td>模块 B 初始化</td><td>继承</td><td>随机</td><td>随机</td></tr>
+                <tr><td>学习率</td><td class="num">1e-3</td><td class="num">1e-4</td><td class="num">1e-4</td></tr>
+                <tr><td>结果</td><td class="down">失败占位</td><td class="warn-cell">追平占位</td><td class="up">+0.0xxx</td></tr>
+            </tbody>
+            </table>
+        </div></div></div>
+    </div>
+    </div>
+
+    <div class="explain">
+    <div class="info-box info">
+        <strong>① 设计：</strong>（在此填写实验设计，初始方案与预期。）
+    </div>
+    <div class="info-box danger" style="margin-top:10px;">
+        <strong>🔴 失败：</strong>（在此填写失败现象与根因，失败实验同样记录，见「失败归档」卡片。）
+    </div>
+    <div class="info-box info">
+        <strong>② 修正：</strong>（在此填写基于实验 1 教训的修正方案。）
+    </div>
+    <div class="info-box warning" style="margin-top:10px;">
+        <strong>⚠️ 部分成功：</strong>（在此填写进展与遗留问题。）
+    </div>
+    <div class="info-box success" style="margin-top:10px;">
+        <strong>📐 结论：</strong>（在此填写最终结论。完整配置对比见左侧折叠区。）
+    </div>
+    </div>
+
+    </div>
+</div>
+
+<!-- ═══════ 卡片 4：失败/错误实验归档 ═══════
+     TEMPLATE: 有价值的失败也归档，一行一个，标注根因与教训 -->
+<div class="card" style="border:2px solid var(--warning);">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-archive"></span> 错误/失败实验归档</div>
+        <span class="status-tag status-warn">⚠️ 教训记录</span>
+    </div>
+    <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>实验</th><th>现象</th><th>根因</th><th>教训</th></tr></thead>
+    <tbody>
+        <tr><td><strong>实验 1（占位）</strong></td><td class="num down">失败现象占位</td><td>根因占位</td><td>教训占位</td></tr>
+        <tr><td><strong>实验 X（占位）</strong></td><td class="num warn-cell">异常现象占位</td><td>根因占位</td><td>教训占位</td></tr>
+    </tbody>
+    </table>
+</div>
+
+<!-- ═══════ 卡片 5：关键发现与后续规划 ═══════ -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title"><span class="ic ic-bulb"></span> 关键发现与后续规划</div>
+    </div>
+
+    <!-- 两栏结构：左 .viz = 后续规划表，右 .explain = 关键发现与代码位置 -->
+    <div class="card-body">
+
+    <div class="viz">
+    <h4 class="section-h4 c-warning">⏳ 后续规划</h4>
+    <table class="data-table" style="max-width:820px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--danger-bg);"><td><strong>🔴 高</strong></td><td>占位任务</td><td>（说明）</td></tr>
+        <tr><td>🟡 中</td><td>占位任务</td><td>（说明）</td></tr>
+        <tr><td>🟢 低</td><td>占位任务</td><td>（说明）</td></tr>
+    </tbody>
+    </table>
+    </div>
+
+    <div class="explain">
+    <h4 class="section-h4 c-success">💡 关键发现</h4>
+    <div class="info-box success">
+        <ol style="margin:6px 0 0 16px;font-size:0.78rem;line-height:1.8;">
+        <li><strong>发现一：</strong>（占位，结论 + 支撑数据。）</li>
+        <li><strong>发现二：</strong>（占位。）</li>
+        <li><strong>发现三：</strong>（占位。）</li>
+        </ol>
+    </div>
+
+    <h4 class="section-h4 c-primary">📚 相关代码位置</h4>
+    <p class="code-ref">
+        实现：<code>src/models/模块名.py</code> |
+        脚本：<code>src/run_实验名.sh</code> |
+        分析：<code>analysis/实验名_analysis.ipynb</code> |
+        设计文档：<code>docs/实验设计文档.md</code>
+    </p>
+    </div>
+
+    </div>
+</div>
+
+</main>
+
+<!-- ═══════ FOOTER（底部声明栏：site_meta 数据驱动，见底部 JS） ═══════ -->
+<footer id="footer">
+    <!-- TEMPLATE: 作者/机构/版本/更新时间来自 report_data.json 的 site_meta 字段；
+         logo 处把 .logo-slot 占位替换为 <img src="..." alt="机构 logo"> -->
+    <div class="footer-meta" id="footer-meta">
+        <strong>作者：</strong><span id="f-authors">·</span>
+        <span class="sep">·</span>
+        <strong>机构：</strong><span id="f-institution">·</span>
+        <span class="sep">·</span>
+        <span id="f-version">v·</span>
+        <span class="sep">·</span>
+        <strong>更新：</strong><span id="f-updated">·</span>
+    </div>
+    <div class="footer-logo"><span class="logo-slot">机构 logo 占位</span></div>
+</footer>
+
+</div>
+
+<!-- 回到顶部按钮 -->
+<button id="back-to-top" title="回到顶部" onclick="document.getElementById('content').scrollTo({top:0,behavior:'smooth'})"><span class="ic ic-arrow" style="font-size:1.05em;"></span></button>
+
+<!-- 主题包（唯一数据源：10 个主题 CSS + 元数据；先于下方切换器加载） -->
+<script src="../theme-pack.js"></script>
+<script>
+/* ═══════ 主题一键切换器 ═══════
+   主题列表来自 theme-pack.js（window.THEME_PACK）；选择写 localStorage，
+   跨页连续：子页面切换后返回主页仍保持所选主题（反之亦然）。 */
+(function initThemeSwitcher() {
+    if (!window.THEME_PACK || !THEME_PACK.length) return;
+    const KEY = 'labmeeting-theme';
+    const defTheme = document.body.dataset.defaultTheme || 'default';
+    const sw = document.getElementById('theme-switcher');
+    if (!sw) return;
+    const btn = sw.querySelector('.ts-btn');
+    const panel = document.getElementById('ts-panel');
+    const curLabel = sw.querySelector('.ts-cur');
+
+    // 面板：默认蓝系 + 10 个主题
+    const opts = [{ id: 'default', name: '默认蓝系', swatch: ['#2563eb', '#0e7490', '#059669'] }]
+        .concat(THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch })));
+    panel.innerHTML = opts.map(o =>
+        `<button class="ts-opt" type="button" data-theme="${o.id}">
+            <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
+            <span class="ts-name">${o.name}</span>
+            <span class="ts-check ic ic-check"></span>
+        </button>`).join('');
+
+    // 主题字体（webfont）：按需注入/替换 <link id="theme-fonts">；
+    // 加载失败或主题无字体时自动回退主题 CSS 里的系统字体栈
+    function applyFonts(t) {
+        let link = document.getElementById('theme-fonts');
+        if (!t || !t.fonts) { if (link) link.remove(); return; }
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-fonts';
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute('href') !== t.fonts) link.setAttribute('href', t.fonts);
+    }
+    function applyTheme(id) {
+        let el = document.getElementById('theme-overlay');
+        if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
+        const t = THEME_PACK.find(x => x.id === id);
+        // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
+        let css = (t && id !== defTheme) ? t.css : '';
+        // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
+        const prefix = document.body.dataset.assetPrefix || '';
+        if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
+        el.textContent = css;
+        applyFonts(t);
+        try { localStorage.setItem(KEY, id); } catch (e) {}
+        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
+    }
+
+    // 恢复：localStorage 优先，其次页面默认主题
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    applyTheme(saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+
+    // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
+    function openPanel() {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = Math.min(r.bottom + 8, window.innerHeight - 260) + 'px';
+        panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+        panel.hidden = false;
+    }
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = panel.hidden;
+        if (open) openPanel(); else panel.hidden = true;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', e => {
+        const opt = e.target.closest('.ts-opt');
+        if (!opt) return;
+        applyTheme(opt.dataset.theme);
+        panel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+})();
+
+function toggleSidebar(el, childrenId) {
+    el.classList.toggle('expanded');
+    document.getElementById(childrenId)?.classList.toggle('open');
+}
+
+/* ═══════ 页内导航（buildInpageNav） ═══════
+   groups = 导航树：顶层对应一张卡片（selector 指向卡片的 #id 或 '#sec-main'），
+   children 对应卡片内的小节（h4Id）。
+   新增小节必须同步 3 处：
+     ① groups 里加 child 项（label + h4Id）
+     ② 给 h4 分配 id（下方「h4 id 分配」代码块，按文本片段匹配）
+     ③ 若 h4 属于新卡片，还要给卡片分配 id 并加 groups 顶层项 */
+function buildInpageNav() {
+    const section = document.getElementById('sidebar-inpage');
+    if (!section) return;
+    section.style.display = 'block';
+
+    /* ── 卡片 id 分配：按 .card-title 文本匹配 ── */
+    const mainCard = document.querySelector('#content > .card');
+    if (mainCard && !mainCard.id) mainCard.id = 'sec-main';
+    document.querySelectorAll('#content .card').forEach(card => {
+        if (card.id) return;
+        const t = card.querySelector('.card-title');
+        if (!t) return;
+        const txt = t.textContent.trim();
+        /* TEMPLATE: 在此为每张卡片分配 id（文本片段 → id 映射） */
+        if (txt.includes('论文详解')) card.id = 'sec-paper';
+        else if (txt.includes('实验记录')) card.id = 'sec-experiments';
+        else if (txt.includes('归档')) card.id = 'sec-archive';
+        else if (txt.includes('关键发现')) card.id = 'sec-findings';
+    });
+
+    /* ── h4 id 分配：按文本片段匹配 ── */
+    document.querySelectorAll('#content h4').forEach(h4 => {
+        const t = h4.textContent.trim();
+        /* TEMPLATE: 在此为每个小节分配 id */
+        if (t.includes('关键公式一')) h4.id = 'h4-eq1';
+        else if (t.includes('关键公式二')) h4.id = 'h4-eq2';
+        else if (t.includes('LaTeX 重排版')) h4.id = 'h4-latex';
+        else if (t.includes('论文图表示例')) h4.id = 'h4-fig';
+        else if (t.includes('实验 1')) h4.id = 'h4-exp1';
+        else if (t.includes('实验 2')) h4.id = 'h4-exp2';
+        else if (t.includes('实验 3')) h4.id = 'h4-exp3';
+        else if (t.includes('实验配置对比')) h4.id = 'h4-config';
+        else if (t.includes('关键发现')) h4.id = 'h4-findings';
+        else if (t.includes('后续规划')) h4.id = 'h4-plan';
+    });
+
+    /* ── 导航树配置（唯一需要手写的部分） ── */
+    const groups = [
+        {label: '② 子页面示例（方法概览）', selector: '#sec-main',
+         children: []},
+        {label: '📄 论文详解（mineru 解析）', selector: '#sec-paper',
+         children: [
+            {label: '① 关键公式一', h4Id: 'h4-eq1'},
+            {label: '② 关键公式二', h4Id: 'h4-eq2'},
+            {label: '③ 可选：LaTeX 重排版', h4Id: 'h4-latex'},
+            {label: '④ 论文图表示例', h4Id: 'h4-fig'},
+         ]},
+        {label: '🧪 实验记录', selector: '#sec-experiments',
+         children: [
+            {label: '① 实验 1（占位）', h4Id: 'h4-exp1'},
+            {label: '② 实验 2（占位）', h4Id: 'h4-exp2'},
+            {label: '③ 实验 3（占位）', h4Id: 'h4-exp3'},
+            {label: '📋 实验配置对比', h4Id: 'h4-config'},
+         ]},
+        {label: '🗄️ 错误/失败实验归档', selector: '#sec-archive',
+         children: []},
+        {label: '💡 关键发现与后续规划', selector: '#sec-findings',
+         children: [
+            {label: '关键发现', h4Id: 'h4-findings'},
+            {label: '后续规划', h4Id: 'h4-plan'},
+         ]},
+    ];
+
+    const container = document.getElementById('children-inpage');
+    let html = '';
+    groups.forEach((g, gi) => {
+        const targetId = g.selector.replace('#', '');
+        const el = document.getElementById(targetId);
+        if (!el) return;
+        if (g.children && g.children.length) {
+            const parentId = 'inpage-parent-' + gi;
+            html += `<div class="sidebar-child" onclick="var p=document.getElementById('${parentId}');var a=this.querySelector('.arrow-inpage');var isHidden=p.style.display==='none';p.style.display=isHidden?'block':'none';a.style.transform=isHidden?'rotate(0deg)':'rotate(90deg)';document.getElementById('${targetId}').scrollIntoView({behavior:'smooth',block:'start'});" style="font-weight:600;display:flex;align-items:center;">${g.label}<span class="arrow-inpage" style="font-size:0.55rem;color:var(--gray-400);margin-left:auto;transition:transform 0.2s;">▼</span></div>`;
+            html += `<div id="${parentId}" style="display:block;">`;
+            g.children.forEach(ch => {
+                if (document.getElementById(ch.h4Id)) {
+                    html += `<div class="sidebar-child" onclick="document.getElementById('${ch.h4Id}').scrollIntoView({behavior:'smooth',block:'start'})" style="padding-left:42px;">${ch.label}</div>`;
+                }
+            });
+            html += '</div>';
+        } else {
+            html += `<div class="sidebar-child" onclick="document.getElementById('${targetId}').scrollIntoView({behavior:'smooth',block:'start'})" style="font-weight:600;">${g.label}</div>`;
+        }
+    });
+    container.innerHTML = html;
+}
+
+/* ═══════ 侧边栏宽度拖拽伸缩 ═══════
+   拖动 #app 中间的 .resizer 分隔条调整 --sidebar-width（180~420px）；
+   宽度写入 localStorage 记忆；双击恢复默认。拖拽结束派发 resize 事件，
+   解释对齐自动重排。 */
+(function initResizer() {
+    const app = document.getElementById('app');
+    const resizer = app ? app.querySelector('.resizer') : null;
+    if (!resizer) return;
+    const root = document.documentElement;
+    const MIN = 180, MAX = 420, DEF = 240;
+    const KEY = 'labmeeting-sidebar-width';
+    try {
+        const saved = parseInt(localStorage.getItem(KEY) || '', 10);
+        if (saved >= MIN && saved <= MAX) root.style.setProperty('--sidebar-width', saved + 'px');
+    } catch (e) { /* localStorage 不可用时忽略记忆 */ }
+    let startX = 0, startW = DEF, lastW = DEF, pending = false;
+    const readW = () => parseFloat(getComputedStyle(app).gridTemplateColumns.split(' ')[0]) || DEF;
+    const setW = w => {
+        lastW = w;
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {   // rAF 节流：拖拽高频事件只每帧写一次 CSS 变量
+            pending = false;
+            root.style.setProperty('--sidebar-width', lastW + 'px');
+        });
+    };
+    const saveW = () => {
+        try { localStorage.setItem(KEY, String(Math.round(readW()))); } catch (e) {}
+        window.dispatchEvent(new Event('resize'));   // 解释对齐自适应重排
+    };
+    /* 无障碍：分隔条键盘可达，左右方向键 ±12px */
+    resizer.setAttribute('role', 'separator');
+    resizer.setAttribute('aria-orientation', 'vertical');
+    resizer.tabIndex = 0;
+    resizer.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+        e.preventDefault();
+        setW(Math.min(MAX, Math.max(MIN, readW() + (e.key === 'ArrowRight' ? 12 : -12))));
+        saveW();
+    });
+    resizer.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        resizer.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startW = readW();
+        resizer.classList.add('dragging');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+    });
+    resizer.addEventListener('pointermove', e => {
+        if (!resizer.classList.contains('dragging')) return;
+        setW(Math.min(MAX, Math.max(MIN, startW + e.clientX - startX)));
+    });
+    const endDrag = () => {
+        if (!resizer.classList.contains('dragging')) return;
+        resizer.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        saveW();
+    };
+    resizer.addEventListener('pointerup', endDrag);
+    resizer.addEventListener('pointercancel', endDrag);
+    /* 双击恢复默认宽度 */
+    resizer.addEventListener('dblclick', () => {
+        root.style.setProperty('--sidebar-width', '');
+        try { localStorage.removeItem(KEY); } catch (e) {}
+        window.dispatchEvent(new Event('resize'));
+    });
+})();
+
+/* 回到顶部按钮显隐（rAF 节流 + passive 监听） */
+function initBackToTop() {
+    const btn = document.getElementById('back-to-top');
+    const content = document.getElementById('content');
+    let ticking = false;
+    content.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            ticking = false;
+            btn.classList.toggle('visible', content.scrollTop > 400);
+        });
+    }, { passive: true });
+}
+
+/* ═══════ 折叠区（.fold）：事件委托，点击 .fold-head 切换展开/收起 ═══════
+   带 data-fold 的折叠区与右栏 .explain-item[data-fold] 配对同步显隐。 */
+function syncFoldExplains(fold, open) {
+    const key = fold.dataset.fold;
+    if (!key) return;
+    const card = fold.closest('.card');
+    if (!card) return;
+    card.querySelectorAll('.explain-item[data-fold="' + key + '"]').forEach(el => {
+        el.hidden = !open;
+    });
+    alignExplains(card);
+}
+
+/* ═══════ 解释对齐：右栏解释块与其左栏对应折叠区（data-fold）垂直对齐 ═══════
+   解释文字不再堆叠在上一个解释下方，而是贴在所解释的折叠框同一水平线。 */
+function alignExplains(card) {
+    const ex = card.querySelector('.explain');
+    if (!ex) return;
+    const exTop = ex.getBoundingClientRect().top;
+    let consumed = 0;   // 已占用的解释栏高度（含 10px gap）
+    for (const item of ex.children) {
+        if (item.hidden) continue;
+        const key = item.dataset ? item.dataset.fold : null;
+        if (key) {
+            const fold = card.querySelector('.fold[data-fold="' + key + '"]');
+            if (!fold) continue;
+            const targetTop = fold.getBoundingClientRect().top - exTop;
+            const mt = Math.max(0, targetTop - consumed);
+            item.style.marginTop = mt + 'px';
+            consumed = targetTop + item.getBoundingClientRect().height + 10;
+        } else {
+            item.style.marginTop = '0';
+            consumed += item.getBoundingClientRect().height + 10;
+        }
+    }
+}
+function alignAllExplains() {
+    document.querySelectorAll('.card').forEach(alignExplains);
+}
+
+document.addEventListener('click', function (e) {
+    const head = e.target.closest('.fold-head');
+    if (!head) return;
+    const fold = head.closest('.fold');
+    if (!fold) return;
+    const open = fold.classList.toggle('open');
+    head.setAttribute('aria-expanded', open ? 'true' : 'false');
+    syncFoldExplains(fold, open);
+});
+/* 初始状态同步：默认折叠的折叠区，其配对解释块初始隐藏；随后做首次对齐 */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fold:not(.open)[data-fold]').forEach(f => syncFoldExplains(f, false));
+    alignAllExplains();
+    window.addEventListener('resize', alignAllExplains);
+});
+
+/* ═══════ 站点元信息：底部声明栏（轻量 fetch，仅读 site_meta） ═══════
+   与总览页共用 web_data/report_data.json；加载失败时保留占位符。 */
+function loadSiteMeta() {
+    fetch('../web_data/report_data.json')
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+            const meta = d?.site_meta;
+            if (!meta) return;
+            if (meta.project_name) document.getElementById('overview-name').textContent = meta.project_name;
+            document.getElementById('f-authors').textContent = meta.authors || '·';
+            document.getElementById('f-institution').textContent = meta.institution || '·';
+            document.getElementById('f-version').textContent = meta.version ? 'v' + meta.version : '·';
+            document.getElementById('f-updated').textContent = meta.updated || '·';
+        })
+        .catch(() => {});
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    buildInpageNav();
+    initBackToTop();
+    loadSiteMeta();
+    /* 顶导当前页高亮：URL 与当前页一致的 nav-links 链接自动加 .active */
+    document.querySelectorAll('.nav-links a[href]').forEach(a => {
+        try {
+            if (new URL(a.href, location.href).pathname === location.pathname) a.classList.add('active');
+        } catch (e) { /* 忽略无效 href */ }
+    });
+    /* MathJax 按需加载：仅当页面存在 .mathjax-process 元素（LaTeX 重排版小节）
+       时才注入 CDN 渲染器；纯截图模式页面零 MathJax 开销。 */
+    if (document.querySelector('.mathjax-process')) {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+        s.async = true;
+        document.head.appendChild(s);
+    }
+});
+</script>
+</body>
+</html>

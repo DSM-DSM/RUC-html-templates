@@ -1,0 +1,42 @@
+{
+  "n_pairs": 999,
+  "baseline_run": "run__baseline",
+  "per_run_results": {
+    "run__baseline": {
+      "status": "ok",
+      "violations": {
+        "overall_violation_rate": 0.1,
+        "overall_violation_rate_pct": 10.0,
+        "n_samples_with_violations": 999,
+        "n_samples": 9999
+      }
+    },
+    "run__method1_a": {
+      "status": "ok",
+      "violations": {
+        "overall_violation_rate": 0.0001,
+        "overall_violation_rate_pct": 0.01,
+        "n_samples_with_violations": 8,
+        "n_samples": 9999
+      }
+    },
+    "run__method1_b": {
+      "status": "ok",
+      "violations": {
+        "overall_violation_rate": 0.0005,
+        "overall_violation_rate_pct": 0.05,
+        "n_samples_with_violations": 41,
+        "n_samples": 9999
+      }
+    },
+    "run__method2_v2": {
+      "status": "ok",
+      "violations": {
+        "overall_violation_rate": 0.0001,
+        "overall_violation_rate_pct": 0.01,
+        "n_samples_with_violations": 8,
+        "n_samples": 9999
+      }
+    }
+  }
+}

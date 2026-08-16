@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<!-- impeccable-disable flat-type-hierarchy -- 内部生成基座（
+        /* impeccable-disable kicker-above-heading -- 蓝图坐标轴标注为本主题本体：X/Y 轴标签是施工图纸语汇 */
+/* impeccable-disable repeating-stripes-gradient -- 蓝图坐标网格为本主题本体（施工图纸语汇），非 AI 装饰条纹 */
+        /* ============ 1. 设计令牌 ============ */
+        :root {
+            --blue-paper: #10325c;
+            --blue-deep: #0b2342;
+            --blue-mid: #1d4477;
+            --line-w: #dfe8f2;
+            --line-soft: #8fb0d8;
+            --line-grid: rgba(143, 176, 216, 0.20);
+            --ink-w: #dce7f4;
+            --ink-w2: #a8c6ea;
+            --orange: #ffb454;
+            --red: #ff6b5e;
+            --green: #7fd6a2;
+            --yellow: #ffd166;
+            --purple: #c7a8f0;
+            --mono: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+            --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* 坐标网格：固定层一次性绘制，滚动不重绘（替代 background-attachment: fixed） */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(0deg, var(--line-grid) 0 1px, transparent 1px 25px),
+                repeating-linear-gradient(90deg, var(--line-grid) 0 1px, transparent 1px 25px);
+        }
+
+        body {
+            font-family: var(--sans);
+            font-size: 16px;
+            line-height: 1.85;
+            color: var(--ink-w);
+            background: var(--blue-paper);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        a { color: var(--line-soft); text-decoration: none; border-bottom: 1px dashed var(--line-soft); }
+        a:hover { color: var(--ink-w); border-bottom-color: var(--ink-w); }
+
+        ::selection { background: rgba(255, 180, 84, 0.30); color: #fff; }
+        :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; border-radius: 2px; }
+
+        h2 {
+            font-size: 1.4em;
+            color: var(--ink-w);
+            margin: 2em 0 0.9em;
+            border-bottom: 2px solid var(--line-soft);
+            padding-bottom: 8px;
+            letter-spacing: 0.04em;
+            font-family: var(--mono);
+        }
+        h3 {
+            font-size: 1.18em;
+            color: var(--ink-w);
+            margin: 0 0 0.5em;
+            font-family: var(--mono);
+            letter-spacing: 0.02em;
+        }
+
+        /* ============ 2. 页面框架 ============ */
+
+        /* --- 封面 header：图纸标题栏（四角准星 + 白框 + 图名） --- */
+        header {
+            position: relative;
+            background: var(--blue-paper);
+            border: 2px solid var(--line-w);
+            border-radius: 0;
+            padding: 48px 40px 40px;
+            margin-bottom: 22px;
+            box-shadow: 0 0 0 1px var(--line-grid);
+        }
+        /* 四角准星 */
+        header .cross {
+            position: absolute;
+            width: 14px; height: 14px;
+        }
+        header .cross::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 6px;
+            width: 14px; height: 2px;
+            background: var(--line-w);
+        }
+        header .cross::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 6px;
+            width: 2px; height: 14px;
+            background: var(--line-w);
+        }
+        header .cross.c1 { top: -7px; left: -7px; }
+        header .cross.c2 { top: -7px; right: -7px; }
+        header .cross.c3 { bottom: -7px; left: -7px; }
+        header .cross.c4 { bottom: -7px; right: -7px; }
+        header .tick {
+            position: absolute;
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--line-soft);
+        }
+        header .tick.x { top: 8px; right: 14px; letter-spacing: 0.1em; }
+        header .tick.y { left: 8px; top: 14px; writing-mode: vertical-rl; letter-spacing: 0.1em; }
+        header h1 {
+            margin: 0;
+            color: var(--ink-w);
+            font-size: 2.1em;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-align: center;
+            font-family: var(--mono);
+            border-bottom: 2px solid var(--line-soft);
+            padding-bottom: 18px;
+        }
+        header .sub {
+            text-align: center;
+            font-size: 0.98em;
+            color: var(--line-soft);
+            margin-top: 14px;
+            letter-spacing: 0.03em;
+        }
+        header .meta {
+            text-align: center;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 10px;
+            font-family: var(--mono);
+            letter-spacing: 0.05em;
+        }
+        /* 底部标题栏信息行 */
+        header .titleblock {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line-soft);
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--line-soft);
+            letter-spacing: 0.06em;
+        }
+        header .titleblock span b { color: var(--orange); font-weight: 400; }
+
+        /* --- 相关链接条 .rb：图纸索引 --- */
+        .rb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 4px 0 14px;
+            justify-content: center;
+        }
+        .rb a {
+            padding: 5px 16px;
+            border: 1px solid var(--line-soft);
+            background: #1c3d65;
+            color: var(--line-soft);
+            font-size: 0.84em;
+            font-family: var(--mono);
+            letter-spacing: 0.03em;
+            transition: border-color .2s, color .2s, background .2s;
+        }
+        .rb a:hover { border-color: var(--orange); color: var(--orange); background: rgba(255, 180, 84, 0.08); text-decoration: none; }
+
+        /* --- 幕头 .act-header：图纸分区框 --- */
+        .act-header {
+            text-align: center;
+            margin: 40px 0 18px;
+            padding: 22px 20px;
+            background: #1a3b64;
+            border: 2px solid var(--line-soft);
+            border-radius: 0;
+            position: relative;
+        }
+        /* 分区编号：左上角橙色块 */
+        .act-header h2 {
+            margin: 0;
+            color: var(--ink-w);
+            font-size: 1.3em;
+            font-weight: 700;
+            border: none;
+            padding: 0;
+            letter-spacing: 0.04em;
+        }
+        .act-header .sub {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+        .act-header::before {
+            content: "◇ SECTION";
+            position: absolute;
+            top: -10px; left: 14px;
+            background: var(--blue-paper);
+            padding: 0 8px;
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--orange);
+            letter-spacing: 0.1em;
+        }
+
+        /* --- 幻灯片 .slide：细部图框 --- */
+        .slide {
+            background: #183962;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 26px 28px;
+            margin: 16px 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(3, 12, 26, 0.30);
+        }
+        .slide h3 .q {
+            font-size: 0.84em;
+            color: var(--line-soft);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+            letter-spacing: 0.02em;
+        }
+        /* 图号戳：右下角 */
+        .slide::after {
+            content: "FIG." attr(id);
+            position: absolute;
+            right: 8px; bottom: 4px;
+            font-family: var(--mono);
+            font-size: 0.62em;
+            color: rgba(168, 198, 234, 0.35);
+            letter-spacing: 0.1em;
+        }
+        .slide .ref {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #0e2a4f;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            font-family: var(--mono);
+        }
+        .slide .ref::before { content: "◈ 制图依据: "; color: var(--orange); }
+        .slide .ref a { font-weight: 600; color: var(--ink-w); }
+
+        /* --- 页脚 footer：图纸尾注 --- */
+        footer {
+            background: #1a3b64;
+            border: 2px solid var(--line-soft);
+            border-radius: 0;
+            padding: 20px 26px;
+            margin-top: 44px;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            text-align: center;
+            font-family: var(--mono);
+            letter-spacing: 0.03em;
+        }
+
+        /* ============ 3. 内容组件 ============ */
+
+        /* 三色提示框：白线 2px 顶线（图纸强调色） */
+        .key-box {
+            background: #1b3c66;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .key-box strong { color: var(--ink-w); }
+
+        .warn-box {
+            background: #21365c;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .warn-box strong { color: #ff8578; }
+
+        .success-box {
+            background: #183d61;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .success-box strong { color: var(--green); }
+
+        /* 统计卡片：读数框 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: #1a3b64;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 20px 14px;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 2.1em;
+            font-weight: 700;
+            color: var(--ink-w);
+            line-height: 1.15;
+            font-family: var(--mono);
+            letter-spacing: -0.01em;
+        }
+        .stat-card .label { font-size: 0.82em; color: var(--line-soft); margin-top: 6px; letter-spacing: 0.04em; }
+        .stat-card.green .num { color: var(--green); }
+        .stat-card.yellow .num { color: var(--yellow); }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 0;
+            font-size: 0.8em;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-family: var(--mono);
+            color: var(--blue-deep);
+            background: var(--line-soft);
+        }
+        .badge-ok   { background: var(--green); }
+        .badge-warn { background: var(--yellow); }
+        .badge-bad  { background: #b44338; color: #fff; }
+        .badge-pos  { background: var(--green); }
+        .badge-neg  { background: #b44338; color: #fff; }
+        .badge-done  { background: var(--green); }
+        .badge-todo  { background: var(--line-soft); }
+        .badge-block { background: #b44338; color: #fff; }
+
+        /* 进度条 */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line-grid);
+        }
+        .progress-row:last-child { border-bottom: none; }
+        .progress-step { font-weight: 700; min-width: 64px; color: var(--orange); font-size: 0.86em; font-family: var(--mono); }
+        .progress-name { flex: 1; font-size: 0.9em; color: var(--ink-w); }
+        .progress-bar { width: 120px; height: 8px; background: var(--blue-deep); border: 1px solid var(--line-soft); border-radius: 0; overflow: hidden; }
+        .progress-fill { height: 100%; }
+
+        /* 图注 */
+        .fig-caption {
+            text-align: center;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin: -4px 0 14px;
+            letter-spacing: 0.03em;
+            font-family: var(--mono);
+        }
+
+        /* 森林图 */
+        .forest-table { margin: 16px auto; border-collapse: collapse; }
+        .forest-table th { font-size: 12px; padding: 6px 12px; text-align: left; color: var(--line-soft); letter-spacing: 0.05em; font-family: var(--mono); }
+        .forest-table td { font-size: 12.5px; padding: 5px 12px; border: none; text-align: left; }
+        .forest-table .f-pos, .forest-table .f-neg { font-weight: 700; font-size: 12.5px; }
+        .forest-table .f-bar { font-family: var(--mono); white-space: pre; font-size: 12.5px; color: var(--line-soft); }
+        .forest-table .axis-row td { border-top: 2px solid var(--line-soft); padding-top: 8px; font-size: 12px; }
+
+        /* 图文网格 */
+        .fig3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 18px 0;
+        }
+        .fig3-cell {
+            background: #183962;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 12px;
+            text-align: center;
+        }
+        .fig3-cell img { max-width: 100%; height: auto; background: var(--blue-deep); }
+        .fig3-cell .fig3-label { font-size: 0.88em; color: var(--orange); margin: 8px 0 6px; font-family: var(--mono); }
+        .fig3-cell p { font-size: 0.86em; color: var(--line-soft); line-height: 1.7; text-align: left; margin: 0; }
+
+        /* 来源注记 */
+        .src-ref {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            display: inline-block;
+            margin-top: 8px;
+            border-top: 1px dotted var(--line-soft);
+            padding-top: 8px;
+            font-family: var(--mono);
+        }
+
+        /* 数据表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 13px 0;
+            font-size: 0.88em;
+        }
+        th, td {
+            border: 1px solid var(--line-soft);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background: #0d294c;
+            color: var(--ink-w);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        tr:nth-child(even) { background: #163760; }
+        td.pos, .row-pos td { background: #1b4263; }
+        td.neg, .row-neg td { background: #28385c; }
+
+        mjx-container { overflow-x: auto; overflow-y: hidden; }
+
+        /* ============ 4. 侧边导航：图纸索引 ============ */
+        .side-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 208px;
+            height: 100vh;
+            overflow-y: auto;
+            background: #0b2342;
+            border-right: 2px solid var(--line-soft);
+            padding: 16px 12px;
+            font-size: 0.8em;
+            z-index: 50;
+            display: none;
+        }
+        .side-nav .nav-title {
+            font-weight: 700;
+            color: var(--ink-w);
+            font-size: 1.0em;
+            padding: 2px 6px 10px;
+            border-bottom: 2px solid var(--line-soft);
+            margin-bottom: 8px;
+            letter-spacing: 0.04em;
+            font-family: var(--mono);
+        }
+        .side-nav .nav-act {
+            margin: 12px 0 4px;
+            padding: 5px 8px;
+            background: #2d3745;
+            border: 1px solid var(--orange);
+            border-radius: 0;
+            font-weight: 700;
+            color: var(--orange);
+            font-size: 0.86em;
+            line-height: 1.3;
+            font-family: var(--mono);
+        }
+        .side-nav a {
+            display: block;
+            padding: 5px 8px;
+            color: var(--line-soft);
+            border-radius: 0;
+            line-height: 1.4;
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+        }
+        .side-nav a:hover { background: rgba(223, 232, 242, 0.08); color: var(--ink-w); text-decoration: none; }
+        .side-nav a.active {
+            background: #233244;
+            font-weight: 600;
+            color: var(--orange);
+            border-top: 1px solid var(--orange);
+            border-bottom: 1px solid var(--orange);
+        }
+
+        /* ============ 5. 响应式 ============ */
+        @media (max-width: 768px) {
+            body { font-size: 14px; padding: 12px 12px; }
+            header h1 { font-size: 1.6em; }
+            header .titleblock { flex-direction: column; gap: 4px; }
+            .slide { padding: 20px 18px; }
+            .fig3-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 1100px) {
+            body { max-width: 1246px; padding-left: 232px; }
+            .side-nav { display: block; }
+        }
+    
+        /* ═══ 森林图文字底线：px 定值，摆脱 em 嵌套链（任何基线下 ≥12px） ═══ */
+        .forest-table th, .forest-table td, .forest-table .f-pos, .forest-table .f-neg,
+        .forest-table .f-bar { font-size: 12.5px; }
+        .forest-table .axis-row td { font-size: 12px; color: inherit; opacity: 0.75; }
+ 占位无真实样式），非发布页面 -->
+<!--
+================================================================================
+  讲演模板风格预览 · 生成基座（勿手改本文件——改 theme-pack.js 后重跑 _build.mjs）
+  ------------------------------------------------------------------------------
+  本骨架 = 16 个风格变体的联合：共享同一套组件结构与演示内容，
+          主题专属装饰元素（data-decor）由 data-theme 控制显隐，
+          主题 CSS 全部来自 ../theme-pack.js（唯一数据源）。
+================================================================================
+-->
+<html lang="zh-CN" data-default-theme="11">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" href="data:,">
+    <title>{产品名} · 产品发布汇报 — 演示讲演 · 蓝晒蓝图</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" id="theme-fonts" href="https://fonts.googleapis.com">
+<script>
+    /* 主题预设：先于正文设置 data-theme（决定装饰元素显隐，避免闪烁） */
+    (function () {
+        var t = null;
+        try { t = localStorage.getItem('lecture-theme'); } catch (e) {}
+        if (!/^(default|0[1-9]|1[0-6])$/.test(t || '')) {
+            t = document.documentElement.getAttribute('data-default-theme') || 'default';
+        }
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+</script>
+<style id="decor-guard">
+    /* 主题专属装饰元素：仅当前主题匹配时显示（:not 写法不覆盖主题自身的 display 规则） */
+    html:not([data-theme="05"]) [data-decor="05"] { display: none !important; }
+    html:not([data-theme="07"]) [data-decor="07"] { display: none !important; }
+    html:not([data-theme="09"]) [data-decor="09"] { display: none !important; }
+    html:not([data-theme="10"]) [data-decor="10"] { display: none !important; }
+    html:not([data-theme="11"]) [data-decor="11"] { display: none !important; }
+    html:not([data-theme="12"]) [data-decor="12"] { display: none !important; }
+    html:not([data-theme="13"]) [data-decor="13"] { display: none !important; }
+</style>
+    <style id="theme-css">
+
+        /* impeccable-disable kicker-above-heading -- 蓝图坐标轴标注为本主题本体：X/Y 轴标签是施工图纸语汇 */
+/* impeccable-disable repeating-stripes-gradient -- 蓝图坐标网格为本主题本体（施工图纸语汇），非 AI 装饰条纹 */
+        /* ============ 1. 设计令牌 ============ */
+        :root {
+            --blue-paper: #10325c;
+            --blue-deep: #0b2342;
+            --blue-mid: #1d4477;
+            --line-w: #dfe8f2;
+            --line-soft: #8fb0d8;
+            --line-grid: rgba(143, 176, 216, 0.20);
+            --ink-w: #dce7f4;
+            --ink-w2: #a8c6ea;
+            --orange: #ffb454;
+            --red: #ff6b5e;
+            --green: #7fd6a2;
+            --yellow: #ffd166;
+            --purple: #c7a8f0;
+            --mono: "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+            --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* 坐标网格：固定层一次性绘制，滚动不重绘（替代 background-attachment: fixed） */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(0deg, var(--line-grid) 0 1px, transparent 1px 25px),
+                repeating-linear-gradient(90deg, var(--line-grid) 0 1px, transparent 1px 25px);
+        }
+
+        body {
+            font-family: var(--sans);
+            font-size: 16px;
+            line-height: 1.85;
+            color: var(--ink-w);
+            background: var(--blue-paper);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 24px;
+        }
+
+        a { color: var(--line-soft); text-decoration: none; border-bottom: 1px dashed var(--line-soft); }
+        a:hover { color: var(--ink-w); border-bottom-color: var(--ink-w); }
+
+        ::selection { background: rgba(255, 180, 84, 0.30); color: #fff; }
+        :focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; border-radius: 2px; }
+
+        h2 {
+            font-size: 1.4em;
+            color: var(--ink-w);
+            margin: 2em 0 0.9em;
+            border-bottom: 2px solid var(--line-soft);
+            padding-bottom: 8px;
+            letter-spacing: 0.04em;
+            font-family: var(--mono);
+        }
+        h3 {
+            font-size: 1.18em;
+            color: var(--ink-w);
+            margin: 0 0 0.5em;
+            font-family: var(--mono);
+            letter-spacing: 0.02em;
+        }
+
+        /* ============ 2. 页面框架 ============ */
+
+        /* --- 封面 header：图纸标题栏（四角准星 + 白框 + 图名） --- */
+        header {
+            position: relative;
+            background: var(--blue-paper);
+            border: 2px solid var(--line-w);
+            border-radius: 0;
+            padding: 48px 40px 40px;
+            margin-bottom: 22px;
+            box-shadow: 0 0 0 1px var(--line-grid);
+        }
+        /* 四角准星 */
+        header .cross {
+            position: absolute;
+            width: 14px; height: 14px;
+        }
+        header .cross::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 6px;
+            width: 14px; height: 2px;
+            background: var(--line-w);
+        }
+        header .cross::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 6px;
+            width: 2px; height: 14px;
+            background: var(--line-w);
+        }
+        header .cross.c1 { top: -7px; left: -7px; }
+        header .cross.c2 { top: -7px; right: -7px; }
+        header .cross.c3 { bottom: -7px; left: -7px; }
+        header .cross.c4 { bottom: -7px; right: -7px; }
+        header .tick {
+            position: absolute;
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--line-soft);
+        }
+        header .tick.x { top: 8px; right: 14px; letter-spacing: 0.1em; }
+        header .tick.y { left: 8px; top: 14px; writing-mode: vertical-rl; letter-spacing: 0.1em; }
+        header h1 {
+            margin: 0;
+            color: var(--ink-w);
+            font-size: 2.1em;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-align: center;
+            font-family: var(--mono);
+            border-bottom: 2px solid var(--line-soft);
+            padding-bottom: 18px;
+        }
+        header .sub {
+            text-align: center;
+            font-size: 0.98em;
+            color: var(--line-soft);
+            margin-top: 14px;
+            letter-spacing: 0.03em;
+        }
+        header .meta {
+            text-align: center;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 10px;
+            font-family: var(--mono);
+            letter-spacing: 0.05em;
+        }
+        /* 底部标题栏信息行 */
+        header .titleblock {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            padding-top: 12px;
+            border-top: 1px solid var(--line-soft);
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--line-soft);
+            letter-spacing: 0.06em;
+        }
+        header .titleblock span b { color: var(--orange); font-weight: 400; }
+
+        /* --- 相关链接条 .rb：图纸索引 --- */
+        .rb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 4px 0 14px;
+            justify-content: center;
+        }
+        .rb a {
+            padding: 5px 16px;
+            border: 1px solid var(--line-soft);
+            background: #1c3d65;
+            color: var(--line-soft);
+            font-size: 0.84em;
+            font-family: var(--mono);
+            letter-spacing: 0.03em;
+            transition: border-color .2s, color .2s, background .2s;
+        }
+        .rb a:hover { border-color: var(--orange); color: var(--orange); background: rgba(255, 180, 84, 0.08); text-decoration: none; }
+
+        /* --- 幕头 .act-header：图纸分区框 --- */
+        .act-header {
+            text-align: center;
+            margin: 40px 0 18px;
+            padding: 22px 20px;
+            background: #1a3b64;
+            border: 2px solid var(--line-soft);
+            border-radius: 0;
+            position: relative;
+        }
+        /* 分区编号：左上角橙色块 */
+        .act-header h2 {
+            margin: 0;
+            color: var(--ink-w);
+            font-size: 1.3em;
+            font-weight: 700;
+            border: none;
+            padding: 0;
+            letter-spacing: 0.04em;
+        }
+        .act-header .sub {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 6px;
+            letter-spacing: 0.02em;
+        }
+        .act-header::before {
+            content: "◇ SECTION";
+            position: absolute;
+            top: -10px; left: 14px;
+            background: var(--blue-paper);
+            padding: 0 8px;
+            font-family: var(--mono);
+            font-size: 0.8em;
+            color: var(--orange);
+            letter-spacing: 0.1em;
+        }
+
+        /* --- 幻灯片 .slide：细部图框 --- */
+        .slide {
+            background: #183962;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 26px 28px;
+            margin: 16px 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(3, 12, 26, 0.30);
+        }
+        .slide h3 .q {
+            font-size: 0.84em;
+            color: var(--line-soft);
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+            letter-spacing: 0.02em;
+        }
+        /* 图号戳：右下角 */
+        .slide::after {
+            content: "FIG." attr(id);
+            position: absolute;
+            right: 8px; bottom: 4px;
+            font-family: var(--mono);
+            font-size: 0.62em;
+            color: rgba(168, 198, 234, 0.35);
+            letter-spacing: 0.1em;
+        }
+        .slide .ref {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #0e2a4f;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            font-family: var(--mono);
+        }
+        .slide .ref::before { content: "◈ 制图依据: "; color: var(--orange); }
+        .slide .ref a { font-weight: 600; color: var(--ink-w); }
+
+        /* --- 页脚 footer：图纸尾注 --- */
+        footer {
+            background: #1a3b64;
+            border: 2px solid var(--line-soft);
+            border-radius: 0;
+            padding: 20px 26px;
+            margin-top: 44px;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            text-align: center;
+            font-family: var(--mono);
+            letter-spacing: 0.03em;
+        }
+
+        /* ============ 3. 内容组件 ============ */
+
+        /* 三色提示框：白线 2px 顶线（图纸强调色） */
+        .key-box {
+            background: #1b3c66;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .key-box strong { color: var(--ink-w); }
+
+        .warn-box {
+            background: #21365c;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .warn-box strong { color: #ff8578; }
+
+        .success-box {
+            background: #183d61;
+            border-left: 1px solid var(--line-soft);
+            border-right: 1px solid var(--line-soft);
+            border-bottom: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 13px 16px;
+            margin: 13px 0;
+        }
+        .success-box strong { color: var(--green); }
+
+        /* 统计卡片：读数框 */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+        .stat-card {
+            background: #1a3b64;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 20px 14px;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 2.1em;
+            font-weight: 700;
+            color: var(--ink-w);
+            line-height: 1.15;
+            font-family: var(--mono);
+            letter-spacing: -0.01em;
+        }
+        .stat-card .label { font-size: 0.82em; color: var(--line-soft); margin-top: 6px; letter-spacing: 0.04em; }
+        .stat-card.green .num { color: var(--green); }
+        .stat-card.yellow .num { color: var(--yellow); }
+
+        /* 徽章 */
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 0;
+            font-size: 0.8em;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-family: var(--mono);
+            color: var(--blue-deep);
+            background: var(--line-soft);
+        }
+        .badge-ok   { background: var(--green); }
+        .badge-warn { background: var(--yellow); }
+        .badge-bad  { background: #b44338; color: #fff; }
+        .badge-pos  { background: var(--green); }
+        .badge-neg  { background: #b44338; color: #fff; }
+        .badge-done  { background: var(--green); }
+        .badge-todo  { background: var(--line-soft); }
+        .badge-block { background: #b44338; color: #fff; }
+
+        /* 进度条 */
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line-grid);
+        }
+        .progress-row:last-child { border-bottom: none; }
+        .progress-step { font-weight: 700; min-width: 64px; color: var(--orange); font-size: 0.86em; font-family: var(--mono); }
+        .progress-name { flex: 1; font-size: 0.9em; color: var(--ink-w); }
+        .progress-bar { width: 120px; height: 8px; background: var(--blue-deep); border: 1px solid var(--line-soft); border-radius: 0; overflow: hidden; }
+        .progress-fill { height: 100%; }
+
+        /* 图注 */
+        .fig-caption {
+            text-align: center;
+            font-size: 0.86em;
+            color: var(--line-soft);
+            margin: -4px 0 14px;
+            letter-spacing: 0.03em;
+            font-family: var(--mono);
+        }
+
+        /* 森林图 */
+        .forest-table { margin: 16px auto; border-collapse: collapse; }
+        .forest-table th { font-size: 12px; padding: 6px 12px; text-align: left; color: var(--line-soft); letter-spacing: 0.05em; font-family: var(--mono); }
+        .forest-table td { font-size: 12.5px; padding: 5px 12px; border: none; text-align: left; }
+        .forest-table .f-pos, .forest-table .f-neg { font-weight: 700; font-size: 12.5px; }
+        .forest-table .f-bar { font-family: var(--mono); white-space: pre; font-size: 12.5px; color: var(--line-soft); }
+        .forest-table .axis-row td { border-top: 2px solid var(--line-soft); padding-top: 8px; font-size: 12px; }
+
+        /* 图文网格 */
+        .fig3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin: 18px 0;
+        }
+        .fig3-cell {
+            background: #183962;
+            border: 1px solid var(--line-soft);
+            border-radius: 0;
+            padding: 12px;
+            text-align: center;
+        }
+        .fig3-cell img { max-width: 100%; height: auto; background: var(--blue-deep); }
+        .fig3-cell .fig3-label { font-size: 0.88em; color: var(--orange); margin: 8px 0 6px; font-family: var(--mono); }
+        .fig3-cell p { font-size: 0.86em; color: var(--line-soft); line-height: 1.7; text-align: left; margin: 0; }
+
+        /* 来源注记 */
+        .src-ref {
+            font-size: 0.86em;
+            color: var(--line-soft);
+            display: inline-block;
+            margin-top: 8px;
+            border-top: 1px dotted var(--line-soft);
+            padding-top: 8px;
+            font-family: var(--mono);
+        }
+
+        /* 数据表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 13px 0;
+            font-size: 0.88em;
+        }
+        th, td {
+            border: 1px solid var(--line-soft);
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background: #0d294c;
+            color: var(--ink-w);
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        tr:nth-child(even) { background: #163760; }
+        td.pos, .row-pos td { background: #1b4263; }
+        td.neg, .row-neg td { background: #28385c; }
+
+        mjx-container { overflow-x: auto; overflow-y: hidden; }
+
+        /* ============ 4. 侧边导航：图纸索引 ============ */
+        .side-nav {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 208px;
+            height: 100vh;
+            overflow-y: auto;
+            background: #0b2342;
+            border-right: 2px solid var(--line-soft);
+            padding: 16px 12px;
+            font-size: 0.8em;
+            z-index: 50;
+            display: none;
+        }
+        .side-nav .nav-title {
+            font-weight: 700;
+            color: var(--ink-w);
+            font-size: 1.0em;
+            padding: 2px 6px 10px;
+            border-bottom: 2px solid var(--line-soft);
+            margin-bottom: 8px;
+            letter-spacing: 0.04em;
+            font-family: var(--mono);
+        }
+        .side-nav .nav-act {
+            margin: 12px 0 4px;
+            padding: 5px 8px;
+            background: #2d3745;
+            border: 1px solid var(--orange);
+            border-radius: 0;
+            font-weight: 700;
+            color: var(--orange);
+            font-size: 0.86em;
+            line-height: 1.3;
+            font-family: var(--mono);
+        }
+        .side-nav a {
+            display: block;
+            padding: 5px 8px;
+            color: var(--line-soft);
+            border-radius: 0;
+            line-height: 1.4;
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+        }
+        .side-nav a:hover { background: rgba(223, 232, 242, 0.08); color: var(--ink-w); text-decoration: none; }
+        .side-nav a.active {
+            background: #233244;
+            font-weight: 600;
+            color: var(--orange);
+            border-top: 1px solid var(--orange);
+            border-bottom: 1px solid var(--orange);
+        }
+
+        /* ============ 5. 响应式 ============ */
+        @media (max-width: 768px) {
+            body { font-size: 14px; padding: 12px 12px; }
+            header h1 { font-size: 1.6em; }
+            header .titleblock { flex-direction: column; gap: 4px; }
+            .slide { padding: 20px 18px; }
+            .fig3-grid { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 1100px) {
+            body { max-width: 1246px; padding-left: 232px; }
+            .side-nav { display: block; }
+        }
+    
+        /* ═══ 森林图文字底线：px 定值，摆脱 em 嵌套链（任何基线下 ≥12px） ═══ */
+        .forest-table th, .forest-table td, .forest-table .f-pos, .forest-table .f-neg,
+        .forest-table .f-bar { font-size: 12.5px; }
+        .forest-table .axis-row td { font-size: 12px; color: inherit; opacity: 0.75; }
+
+    </style>
+<style id="ts-css">
+    /* ── 主题切换方块：跨主题通用，独立于 theme-css（切主题时不随动） ── */
+    .ts-btn {
+        position: fixed; right: 20px; bottom: 20px;
+        width: 46px; height: 46px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(18, 18, 24, 0.88);
+        color: #fff;
+        cursor: pointer;
+        z-index: 9990;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+        transition: transform .15s ease-out, background-color .15s;
+    }
+    .ts-btn:hover { transform: translateY(-1px); background: rgba(30, 30, 40, 0.94); }
+    .ts-btn:active { transform: scale(0.96); }
+    .ts-btn svg { width: 20px; height: 20px; }
+    .ts-panel {
+        position: fixed; right: 20px; bottom: 76px;
+        width: 304px; max-height: min(480px, 72vh);
+        overflow-y: auto;
+        background: rgba(20, 20, 28, 0.97);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 14px;
+        padding: 14px;
+        z-index: 9991;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5);
+        font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 13px;
+        color: #e8e8ee;
+        margin: 0;
+    }
+    .ts-panel[hidden] { display: none; }
+    .ts-head { font-size: 12px; color: #9a9aa8; letter-spacing: 0.04em; margin: 2px 4px 10px; }
+    .ts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .ts-opt {
+        display: flex; align-items: center; gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.05);
+        color: #d5d5df;
+        font-size: 12.5px;
+        cursor: pointer;
+        text-align: left;
+        font-family: inherit;
+        margin: 0;
+        transition: background-color .15s, border-color .15s;
+    }
+    .ts-opt:hover { background: rgba(255, 255, 255, 0.10); }
+    .ts-opt.sel { border-color: rgba(255, 255, 255, 0.38); background: rgba(255, 255, 255, 0.13); color: #fff; }
+    .ts-dots { display: flex; gap: 3px; flex-shrink: 0; }
+    .ts-dots span { width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.35); }
+    .ts-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (max-width: 640px) {
+        .ts-panel { right: 12px; width: 264px; }
+        .ts-btn { right: 12px; bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .ts-btn, .ts-opt { transition: none; }
+    }
+</style>
+    <!-- MathJax 支持：需要公式时保留，不需要可整段删除 -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\(', '\)']], displayMath: [['$$', '$$'], ['\[', '\]']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body data-default-theme="11" data-asset-prefix="../">
+
+<!-- 方向契约：风格候选 #1 · 深色奢华·路演风（见文件头部注释） -->
+<nav class="side-nav" id="sideNav">
+    <div class="nav-title">讲演目录</div>
+    <div id="navList"></div>
+</nav>
+
+<header>
+    <!-- 主题专属装饰（由 data-theme 控制显隐，各主题 CSS 自行定位） -->
+    <div class="seal" data-decor="05">演 示</div>
+    <span class="hole h1" data-decor="09"></span>
+    <span class="hole h2" data-decor="09"></span>
+    <div class="tab" data-decor="09">{分类：如 甲-科研-复现}</div>
+    <span class="dot d1" data-decor="10"></span>
+    <span class="dot d2" data-decor="10"></span>
+    <span class="dot d3" data-decor="10"></span>
+    <div class="bar-title" data-decor="10">{讲演主题} — 数据终端</div>
+    <span class="cross c1" data-decor="11"></span>
+    <span class="cross c2" data-decor="11"></span>
+    <span class="cross c3" data-decor="11"></span>
+    <span class="cross c4" data-decor="11"></span>
+    <span class="tick x" data-decor="11">X — {项目代号}</span>
+    <span class="tick y" data-decor="11">Y — {讲演主题}</span>
+    <span class="constellation" data-decor="12">{星区 / 主题代号}</span>
+    <span class="coord" data-decor="12">RA {赤经} · DEC {赤纬}</span>
+    <div class="num-block" data-decor="13">01</div>
+    <div class="kicker" data-decor="13">{主题代号} — {分类}</div>
+    <h1>产品发布汇报</h1>
+    <div class="sub">从洞察到决策：一次完整的产品叙事</div>
+    <div class="meta">{团队 / 项目名} · {日期} · 适合远程讲解 · 预计 30-40 分钟</div>
+    <div class="stamp" data-decor="09">已解密</div>
+    <div class="status" data-decor="10"><span class="prompt">$</span> <span class="path">~/project</span> --run presentation</div>
+    <div class="titleblock" data-decor="11">
+        <span><b>DWG</b> / {图号}</span>
+        <span><b>SCALE</b> / 1:1</span>
+        <span><b>REV</b> / {版本}</span>
+    </div>
+    <div class="ra" data-decor="12">✦ 观测历元 {历元} · 视星等 {星等} ✦</div>
+</header>
+
+<div class="rb">
+    <a href="#">产品文档</a>
+    <a href="#">数据看板</a>
+    <a href="#">项目仓库</a>
+    <a href="#">更多资料</a>
+</div>
+
+<!-- ==================== 第一幕 ==================== -->
+<div class="act-header" data-act="I">
+<h2><span class="no" data-decor="07">壹</span>第一幕 · 现状与目标</h2>
+    <div class="sub">我们在哪里，要去哪里</div>
+</div>
+
+<div class="slide">
+    <h3>1. 背景与核心问题<span class="q">核心问题：这个项目为什么值得做？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>一句话结论：先给结论，再给论证。这是每张卡片的标准开场。</div>
+    <p>正文段落。<strong>重点加粗</strong>，首次出现的术语加粗并附括号解释。三种提示框、统计卡片、进度条、效果对比图等组件都在本页展示，可直接复制到你的内容中。</p>
+    <table>
+        <tr><th>维度</th><th>现状</th><th>目标</th></tr>
+        <tr><td>指标一</td><td>{当前值}</td><td>{目标值}</td></tr>
+        <tr class="row-pos"><td>达成项</td><td>{内容}</td><td>绿底 = 正向 / 支持</td></tr>
+        <tr class="row-neg"><td>差距项</td><td>{内容}</td><td>红底 = 负向 / 差距</td></tr>
+    </table>
+    <div class="ref">参考：<a href="#">资料一</a> · <a href="#">资料二</a> · 详细解读见配套说明文档</div>
+</div>
+
+<div class="slide">
+    <h3>2. 一眼看懂的统计卡片<span class="q">核心问题：如何用一屏数字快速传递关键指标？</span></h3>
+    <div class="stat-grid">
+        <div class="stat-card green"><div class="num">+38%</div><div class="label">转化率提升</div></div>
+        <div class="stat-card yellow"><div class="num">12/15</div><div class="label">里程碑提前完成</div></div>
+        <div class="stat-card"><div class="num">99.98%</div><div class="label">服务可用性</div></div>
+    </div>
+    <p>「大数字 + 短标签」三秒抓住注意力。<code>green</code> / <code>yellow</code> 变体区分达标与预警，数字替换为你项目的核心指标即可。</p>
+    <div class="src-ref">数据来源：{你的数据文件 / 统计口径}</div>
+</div>
+
+<div class="slide">
+    <h3>3. 关键发现与风险<span class="q">核心问题：如何用三种颜色的提示框区分信息类型？</span></h3>
+    <div class="warn-box"><strong>关键风险：</strong>{警告、阻塞或踩坑的原因与对策，红色提醒听众注意}</div>
+    <div class="key-box"><strong>核心判断：</strong>{结论、要点或下一步，蓝色是每张卡片的标配}</div>
+    <div class="success-box"><strong>破局方案：</strong>{成功经验、解决思路或收尾结论，绿色传递正向信号}</div>
+    <p>公式用 MathJax 渲染：行内 $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$，独立成行用两个美元符。不需要公式时删除 MathJax 两行引用即可。</p>
+    <div class="src-ref">文档出处：{文档 / 报告 / 规范编号}</div>
+</div>
+
+<!-- ==================== 第二幕 ==================== -->
+<div class="act-header" data-act="II">
+<h2><span class="no" data-decor="07">贰</span>第二幕 · 进展与方案</h2>
+    <div class="sub">我们走到了哪一步，打算怎么做</div>
+</div>
+
+<div class="slide">
+    <h3>4. 进度总览<span class="q">核心问题：如何让听众一眼看到项目各阶段的状态？</span></h3>
+    <div class="progress-row">
+        <span class="progress-step">阶段一</span>
+        <span class="progress-name">需求分析与调研</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#4ade80;"></div></div>
+        <span class="badge badge-done">完成</span>
+    </div>
+    <div class="progress-row">
+        <span class="progress-step">阶段二</span>
+        <span class="progress-name">原型与验证</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#fbbf24;"></div></div>
+        <span class="badge badge-warn">部分完成</span>
+    </div>
+    <div class="progress-row">
+        <span class="progress-step">阶段三</span>
+        <span class="progress-name">上线与推广</span>
+        <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#f87171;"></div></div>
+        <span class="badge badge-block">阻塞</span>
+    </div>
+    <div class="success-box"><strong>下一步优先级：</strong>{谁来做、做什么、何时开始}。</div>
+</div>
+
+<div class="slide">
+    <h3>5. 多方案并排对照<span class="q">核心问题：如何在一张幻灯片里对比多个方案？</span></h3>
+    <div class="fig3-grid">
+        <div class="fig3-cell">
+            <img alt="方案 A" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
+            <div class="fig3-label">方案 A · {一句话} </div>
+            <p>{要点与取舍}</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="方案 B" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
+            <div class="fig3-label">方案 B · {一句话}</div>
+            <p>{要点与取舍}</p>
+        </div>
+    </div>
+    <div class="ref">参考：<a href="#">来源</a> · 图片出处：{出处}</div>
+</div>
+
+<div class="slide">
+    <h3>6. 效果对比<span class="q">核心问题：如何在同一张图里比较多个条目的估计值与不确定性？</span></h3>
+    <table class="forest-table">
+        <tr><th>条目</th><th>方向</th><th>估计值</th><th></th></tr>
+        <tr><td><span class="badge badge-pos f-pos">方案 A</span></td><td>正向</td><td>+1.21</td><td class="f-bar">        ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-pos f-pos">方案 B</span></td><td>正向</td><td>+0.37</td><td class="f-bar">       ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-neg f-neg">方案 C</span></td><td>负向</td><td>−0.89</td><td class="f-bar">  ◀━━━●━━━━</td></tr>
+        <tr class="axis-row"><td colspan="3" style="text-align:right;">← 负向</td><td>正向 →</td><td>−1.00    0.00    +1.00</td></tr>
+    </table>
+    <p class="fig-caption">图 1. {图注：比较多个条目的点估计（●）与区间（━），左负右正}。</p>
+    <div class="ref">对应输出：{你项目的哪份结果 / 哪张原图}</div>
+</div>
+
+<footer>
+    <p class="brand" data-decor="13">{项目名}</p>
+    <p style="margin-top:10px;" class="exit" data-decor="10">[ 会话结束 ] — 感谢观看</p>
+    <p><strong>{项目名}：</strong>{一句话定位}<br>
+       <strong>最近更新：</strong>{日期} · <strong>主讲：</strong>{姓名}</p>
+    <p style="margin-top:12px;">相关链接：<a href="#">链接</a> · <a href="#">链接</a></p>
+</footer>
+
+<!-- 侧边导航 JS（自动生成目录 + 滚动高亮，勿改） -->
+<script>
+    (function () {
+        var navList = document.getElementById('navList');
+        if (!navList) return;
+        var linkMap = {};
+        var idx = 0;
+        var navEl = document.getElementById('sideNav');
+        document.querySelectorAll('.act-header, .slide').forEach(function (el) {
+            if (el.classList.contains('act-header')) {
+                var h2 = el.querySelector('h2');
+                if (!h2) return;
+                var d = document.createElement('div');
+                d.className = 'nav-act';
+                d.textContent = h2.textContent.trim();
+                navList.appendChild(d);
+            } else {
+                idx++;
+                var id = 'slide-' + idx;
+                el.id = id;
+                var h3 = el.querySelector('h3'), title = '';
+                if (h3) {
+                    var c = h3.cloneNode(true);
+                    var q = c.querySelector('.q');
+                    if (q) q.remove();
+                    title = c.textContent.trim();
+                }
+                if (!title) title = '第' + idx + '页';
+                var a = document.createElement('a');
+                a.href = '#' + id;
+                a.textContent = title;
+                a.dataset.target = id;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var t = document.getElementById(this.dataset.target);
+                    if (t) t.scrollIntoView({behavior: 'smooth', block: 'start'});
+                });
+                navList.appendChild(a);
+                linkMap[id] = a;
+            }
+        });
+        if ('IntersectionObserver' in window) {
+            var vis = new Set();
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) vis.add(e.target.id); else vis.delete(e.target.id);
+                });
+                var best = null, bt = Infinity;
+                vis.forEach(function (id) {
+                    var r = document.getElementById(id).getBoundingClientRect();
+                    if (r.top < bt) { bt = r.top; best = id; }
+                });
+                if (best) {
+                    Object.keys(linkMap).forEach(function (id) {
+                        linkMap[id].classList.toggle('active', id === best);
+                    });
+                    var act = linkMap[best], r = act.getBoundingClientRect(), nr = navEl.getBoundingClientRect();
+                    if (r.top < nr.top) navEl.scrollTop -= (nr.top - r.top + 4);
+                    else if (r.bottom > nr.bottom) navEl.scrollTop += (r.bottom - nr.bottom + 4);
+                }
+            }, {rootMargin: '-20% 0px -70% 0px'});
+            document.querySelectorAll('.act-header, .slide').forEach(function (el) { obs.observe(el); });
+        }
+    })();
+</script>
+
+<!-- ============ 主题切换方块（方块按钮 + 面板；JS 渲染选项，勿改结构） ============ -->
+<button id="themeSwitcher" class="ts-btn" type="button" aria-label="切换主题" aria-expanded="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <circle cx="7.5" cy="9.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="13.5" cy="7.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="16.5" cy="11.5" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="15" cy="16" r="1.3" fill="currentColor" stroke="none"/>
+        <circle cx="9" cy="15" r="1.3" fill="currentColor" stroke="none"/>
+    </svg>
+</button>
+<div id="themeSwitcherPanel" class="ts-panel" hidden>
+    <div class="ts-head">主题</div>
+    <div class="ts-grid" id="themeSwitcherGrid"></div>
+</div>
+<script src="../theme-pack.js"></script>
+<script>
+    /* 主题切换方块：theme-pack.js 单一数据源 + localStorage 跨页连续 */
+    (function () {
+        var KEY = 'lecture-theme';
+        if (!window.LECTURE_THEME_PACK || !window.LECTURE_THEME_PACK.THEMES.length) return;
+        var btn = document.getElementById('themeSwitcher');
+        var panel = document.getElementById('themeSwitcherPanel');
+        var grid = document.getElementById('themeSwitcherGrid');
+        if (!btn || !panel || !grid) return;
+        var defTheme = document.body.getAttribute('data-default-theme') || 'default';
+        var assetPrefix = document.body.getAttribute('data-asset-prefix') || '';
+        function findEntry(id) {
+            if (id === 'default') return window.LECTURE_THEME_PACK.DEFAULT_THEME;
+            for (var i = 0; i < window.LECTURE_THEME_PACK.THEMES.length; i++) {
+                if (window.LECTURE_THEME_PACK.THEMES[i].id === id) return window.LECTURE_THEME_PACK.THEMES[i];
+            }
+            return null;
+        }
+        function applyFonts(fonts) {
+            var link = document.getElementById('theme-fonts');
+            if (!link) return;
+            if (fonts) link.setAttribute('href', fonts);
+            else link.removeAttribute('href');
+        }
+        function applyTheme(id, save) {
+            var entry = findEntry(id);
+            if (!entry) return;
+            var css = entry.css;
+            /* 素材路径：主模板在 lecture/ 根，css 内 url(../ 需去掉一层 */
+            if (assetPrefix === '') {
+                /* 两种引号写法都覆盖：url("../ 与 url(../ */
+                css = css.split('url("../').join('url("').split('url(../').join('url(');
+            }
+            document.getElementById('theme-css').textContent = css;
+            document.documentElement.setAttribute('data-theme', id);
+            applyFonts(entry.fonts || '');
+            var opts = grid.querySelectorAll('.ts-opt');
+            for (var i = 0; i < opts.length; i++) {
+                opts[i].classList.toggle('sel', opts[i].getAttribute('data-id') === id);
+            }
+            document.dispatchEvent(new CustomEvent('lecture-themechange', { detail: { id: id } }));
+            if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+        }
+        /* 选项：默认主题 + 16 主题 */
+        var entries = [{ id: 'default', name: window.LECTURE_THEME_PACK.DEFAULT_THEME.name, swatch: window.LECTURE_THEME_PACK.DEFAULT_THEME.swatch }]
+            .concat(window.LECTURE_THEME_PACK.THEMES.map(function (t) {
+                return { id: t.id, name: t.name, swatch: t.swatch };
+            }));
+        entries.forEach(function (e) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'ts-opt';
+            b.setAttribute('data-id', e.id);
+            var dots = document.createElement('span');
+            dots.className = 'ts-dots';
+            e.swatch.forEach(function (c) {
+                var d = document.createElement('span');
+                d.style.background = c;
+                dots.appendChild(d);
+            });
+            var nm = document.createElement('span');
+            nm.className = 'ts-name';
+            nm.textContent = e.name;
+            b.appendChild(dots);
+            b.appendChild(nm);
+            b.addEventListener('click', function () { applyTheme(e.id, true); });
+            grid.appendChild(b);
+        });
+        /* 开合 + 外部点击 / Esc 关闭 */
+        function setOpen(open) {
+            if (open) panel.removeAttribute('hidden'); else panel.setAttribute('hidden', '');
+            btn.setAttribute('aria-expanded', String(open));
+        }
+        btn.addEventListener('click', function () { setOpen(panel.hasAttribute('hidden')); });
+        document.addEventListener('click', function (ev) {
+            /* 点击按钮内部图标时事件目标是 svg，须用 btn.contains 判定，否则面板开完即关 */
+            if (!panel.hasAttribute('hidden') && !panel.contains(ev.target) && !btn.contains(ev.target)) setOpen(false);
+        });
+        document.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Escape' && !panel.hasAttribute('hidden')) { setOpen(false); btn.focus(); }
+        });
+        /* 恢复顺序：localStorage 优先（校验合法性）→ 页面默认 */
+        var saved = null;
+        try { saved = localStorage.getItem(KEY); } catch (e) {}
+        if (saved && saved !== 'default' && !findEntry(saved)) saved = null;
+        applyTheme(saved || defTheme, false);
+    })();
+</script>
+</body>
+</html>

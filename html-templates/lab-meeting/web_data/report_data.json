@@ -1,0 +1,159 @@
+{
+  "generated_at": "2026-08-16",
+  "site_meta": {
+    "project_name": "示例项目 · 实验进度报告",
+    "authors": "占位：作者姓名",
+    "institution": "占位：学校 / 机构名称",
+    "version": "1.0.0",
+    "updated": "2026-08-16"
+  },
+  "project": {
+    "name": "示例项目（占位：替换为你的项目名）",
+    "repo": "https://github.com/example/project",
+    "description": "占位：一句话描述你的项目（如：在 XX 基准上通过 XX 方法提升 XX 指标）",
+    "core_idea": "占位：核心思想一句话"
+  },
+  "baseline": {
+    "original": {
+      "run_name": "run__baseline_v0",
+      "test_auroc_macro_agg0": 0.8,
+      "test_auroc_macro_agg1": 0.81,
+      "best_val_auroc_macro": 0.8
+    },
+    "with_nan_mask": {
+      "run_name": "run__baseline",
+      "test_auroc_macro_agg0": 0.81,
+      "test_auroc_macro_agg1": 0.82,
+      "best_val_auroc_macro": 0.81
+    },
+    "violation_rate_pct": 10.0,
+    "reference_from_paper": "论文声称值占位：如 macro-AUROC = 0.8xxx (95% CI: 0.8xxx–0.8xxx)"
+  },
+  "methods": [
+    {
+      "name": "方法 1（示例）",
+      "status": "completed",
+      "best_result": {
+        "test_auroc_macro_agg0": 0.812,
+        "test_auroc_macro_agg1": 0.822,
+        "run_name": "run__method1_b",
+        "weight": 10,
+        "penalty_type": "variant_b",
+        "notes": "占位：备注（如 最优配置说明）"
+      },
+      "runs": [
+        {"run_name": "run__method1_a", "method": "method1", "weight": 0.1, "test_auroc_macro_agg0": 0.8108, "test_auroc_macro_agg1": 0.8208, "date": "2026-07-11", "subtype": "variant_a", "notes": "占位"},
+        {"run_name": "run__method1_b", "method": "method1", "weight": 10, "test_auroc_macro_agg0": 0.812, "test_auroc_macro_agg1": 0.822, "date": "2026-07-12", "subtype": "variant_b", "notes": "占位"}
+      ],
+      "subgroups": {
+        "variant_a": {
+          "runs": ["run__method1_a"],
+          "best_vr": 0.02,
+          "best_vr_weight": 5,
+          "best_agg0": 0.8108,
+          "best_agg0_weight": 0.1
+        },
+        "variant_b": {
+          "runs": ["run__method1_b"],
+          "best_vr": 0.05,
+          "best_vr_weight": 10,
+          "best_agg0": 0.812,
+          "best_agg0_weight": 10
+        }
+      }
+    },
+    {
+      "name": "方法 2（示例）",
+      "status": "completed",
+      "best_result": {
+        "test_auroc_macro_agg0": 0.811,
+        "test_auroc_macro_agg1": 0.821,
+        "run_name": "run__method2_v2",
+        "notes": "占位：备注"
+      },
+      "runs": [],
+      "subgroups": {}
+    },
+    {
+      "name": "方法 3（示例）",
+      "status": "pending",
+      "best_result": null,
+      "runs": [],
+      "subgroups": {}
+    }
+  ],
+  "weekly_progress": [
+    {
+      "week_start": "2026-07-27",
+      "saturday": "2026-08-01",
+      "summary": "占位：本周总结一句话",
+      "completed": [
+        "占位：完成事项 1",
+        "占位：完成事项 2"
+      ],
+      "issues": [
+        "占位：遇到的问题"
+      ],
+      "next_steps": [
+        "占位：下周计划 1",
+        "占位：下周计划 2"
+      ],
+      "key_metrics": {"占位指标名": 0.8, "占位指标名 2": "占位"}
+    },
+    {
+      "week_start": "2026-08-02",
+      "saturday": "2026-08-08",
+      "summary": "占位：本周总结一句话",
+      "completed": [
+        "占位：完成事项 1"
+      ],
+      "issues": [],
+      "next_steps": [
+        "占位：下周计划"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-08-09",
+      "saturday": "2026-08-15",
+      "summary": "占位：本周总结一句话",
+      "completed": [
+        "占位：完成事项 1"
+      ],
+      "issues": [],
+      "next_steps": [
+        "占位：下周计划"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-08-16",
+      "saturday": "2026-08-22",
+      "summary": "占位：本周任务（示例）",
+      "completed": [],
+      "issues": [],
+      "next_steps": [
+        "占位：下周计划 1",
+        "占位：下周计划 2"
+      ],
+      "key_metrics": {}
+    }
+  ],
+  "todo_list": [
+    {
+      "category": "🔴 紧急",
+      "items": [
+        {"text": "占位：紧急待办 1", "done": false, "urgent": true, "in_progress": true},
+        {"text": "占位：紧急待办 2", "done": false, "urgent": false, "in_progress": false}
+      ]
+    },
+    {
+      "category": "📌 常规",
+      "items": [
+        {"text": "占位：常规待办 1", "done": false, "urgent": false, "in_progress": false},
+        {"text": "占位：已完成待办示例", "done": true, "urgent": false, "in_progress": false}
+      ]
+    }
+  ],
+  "todos_note": "<strong>占位说明：</strong> <code>todos_note</code> 字段在待办清单末尾渲染一条提示框（可含 <code>&lt;code&gt;</code>/<code>&lt;a&gt;</code>），不需要时删除该字段即可。"
+}
