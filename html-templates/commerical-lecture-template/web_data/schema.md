@@ -59,9 +59,9 @@
 
 | 字段 | 说明 |
 |---|---|
-| `products` | 1-2 项：`{name, desc, shot}`。`shot` 填图片路径（如 `assets/line01-a.png`）则渲染真实截图；留空 `""` 则渲染内置「产品截图占位」框 |
-| `metrics` | 2 项：`{value, label}` |
-| `build` | 构建流程 4 步：`{step, title, desc}`（step 为 `"01"` 式半角编号） |
+| `products` | 任意项；超过 2 个时产出页自动分页（每页 ≤2 张产品卡）。每项 `{name, desc, shot, build?}`：`shot` 填图片路径（如 `assets/line01-a.webp`）则渲染真实截图（16:9 矩形左上角对齐裁切），留空 `""` 则渲染内置「产品截图占位」框；`build` 可选——该产品自己的构建步骤（`{step, title, desc}` 数组），填写后点击此产品卡时右侧「如何构建」栏切换为它，未填则回退到本章 `outcomes.build` |
+| `metrics` | 2 项：`{value, label}`（仅产出页第 1 分页显示） |
+| `build` | 本章默认构建流程 4 步：`{step, title, desc}`（step 为 `"01"` 式半角编号）；产出页右侧「如何构建」默认显示第 1 个产品的 `build`（若其未填则显示本章此字段，多分页时按分页切分） |
 
 ### `closing`
 

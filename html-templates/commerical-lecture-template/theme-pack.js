@@ -211,7 +211,7 @@
                 "body[data-theme='ruc'] .stage-hero .stage-inner{margin-left:clamp(170px,20vw,260px);margin-right:auto;width:min(1120px,calc(100% - clamp(170px,20vw,260px) - clamp(40px,8vw,160px)))}" +
                 "@media (max-width:760px){body[data-theme='ruc'] .hero-logo{display:none}body[data-theme='ruc'] .stage-hero .stage-inner{margin-left:auto;margin-right:auto;width:min(1120px,100% - clamp(40px,8vw,160px))}}" +
                 "body[data-theme='ruc'] .preview-card{position:relative;overflow:hidden}" +
-                "body[data-theme='ruc'] .preview-card::after{content:\"\";position:absolute;right:0;bottom:0;width:42%;height:78%;background:url(assets/ruc-bg.png) no-repeat right bottom;background-size:contain;opacity:.45;mix-blend-mode:multiply;pointer-events:none}" +
+                "body[data-theme='ruc'] .preview-card::after{content:\"\";position:absolute;right:0;bottom:0;width:42%;height:78%;background:url(assets/ruc-bg.webp) no-repeat right bottom;background-size:contain;opacity:.45;mix-blend-mode:multiply;pointer-events:none}" +
                 "body[data-theme='ruc'] .preview-card>*{position:relative;z-index:1}"
         }
     ];

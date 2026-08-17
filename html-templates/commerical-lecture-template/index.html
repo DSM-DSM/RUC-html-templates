@@ -305,6 +305,7 @@ svg text { font-family: var(--font-sans); }
 .preview-card:hover { border-color: var(--accent-strong); background: var(--surface-2); transform: translateY(-2px); }
 .preview-card:active { transform: scale(.97); }
 .preview-card.featured { grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 44px; padding: 36px 40px; }
+.preview-card.span-all { grid-column: 1 / -1; }
 .preview-no { font-size: 56px; font-weight: 300; letter-spacing: -.01em; color: var(--accent); line-height: 1; }
 .preview-card:not(.featured) .preview-no { font-size: 34px; }
 .preview-body { flex: 1; }
@@ -312,6 +313,7 @@ svg text { font-family: var(--font-sans); }
 .preview-card:not(.featured) .preview-title { font-size: 17px; }
 .preview-theme { margin-top: 6px; font-size: 14px; color: var(--text-low); }
 .preview-go { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-faint); flex: none; transition: color 200ms ease; }
+.preview-body .preview-go { margin-top: 14px; }
 .preview-card:hover .preview-go { color: var(--accent); }
 .preview-go svg { width: 14px; height: 14px; transition: transform 200ms var(--ease-out); }
 .preview-card:hover .preview-go svg { transform: translateX(4px); }
@@ -376,6 +378,8 @@ svg text { font-family: var(--font-sans); }
 
 /* Slide 2/3 · Skill */
 .two-col { display: grid; grid-template-columns: 1.05fr .95fr; gap: 72px; align-items: center; }
+/* 产出页：左列（产品图）加宽、右列（构建说明）右移变窄，为放大图留完整展示空间 */
+.two-col.outcomes { grid-template-columns: 1.6fr .8fr; gap: 52px; }
 .skill-no { font-family: var(--font-mono); font-size: 13px; color: var(--text-faint); }
 .skill-name { margin-top: 14px; font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; color: var(--text-hi); letter-spacing: .01em; }
 .skill-tagline { margin-top: 10px; font-size: 16px; color: var(--accent); opacity: .95; }
@@ -392,15 +396,39 @@ svg text { font-family: var(--font-sans); }
 /* Slide 4 · 产出与构建 */
 .col-heading { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); margin-bottom: 22px; }
 .col-heading::after { content: ""; display: block; width: 26px; height: 2px; margin-top: 8px; background: var(--accent); border-radius: 1px; opacity: .8; }
-.product { display: flex; gap: 20px; align-items: flex-start; }
+.product { display: flex; gap: 20px; align-items: flex-start; cursor: pointer; }
 .product + .product { margin-top: 20px; }
+/* 产出卡片点击聚焦：点卡片全宽放大并切换「如何构建」，再点同一张还原（仅多产品时由 JS 触发 .focus） */
+.product { overflow: hidden; }
+.product.focus { flex-direction: column; gap: 12px; }
+/* 放大同用 16:9 标准矩形：宽度撑满左列，cover 左上角对齐与缩略态同一规则，
+   只是把 46% 宽换成 100% 宽（约 400px 高，与标题/metrics 同屏容纳） */
+.product.focus .shot { width: 100%; }
+.product.focus .product-cap { padding-top: 0; }
+.products.focus .product:not(.focus) { display: none; }
+/* 聚焦切换用 fade-through 交换：只动画 opacity，布局瞬时切换，避免回流抖动 */
+@keyframes fade-swap { 0% { opacity: 1; } 45% { opacity: .45; } 100% { opacity: 1; } }
+.products.swap { animation: fade-swap 240ms var(--ease-out); }
+.product-hint {
+  margin-left: 12px; font-size: 11px; font-family: var(--font-mono);
+  color: var(--text-faint); letter-spacing: .02em;
+}
+/* 产品名标签：明确标明右侧「如何构建」当前显示的是哪个产品的内容，随点击联动切换 */
+.build-label {
+  margin-left: 8px; font-size: 12px; font-weight: 500; color: var(--text-low);
+  letter-spacing: .02em; display: inline-block; vertical-align: bottom;
+  max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+/* 标准化矩形限制器：缩略与放大统一 16:9 矩形，超出部分自左上角对齐裁切
+   （保留左上角主体，溢出裁右侧/下侧），占不满由 cover 放大填满。 */
 .shot {
-  flex: none; width: 46%; border: 1px solid var(--border); border-radius: 8px;
+  flex: none; width: 46%; aspect-ratio: 16 / 9; border: 1px solid var(--border); border-radius: 8px;
   overflow: hidden; background: var(--bg-1);
   box-shadow: var(--shadow-float);
 }
-.shot svg { width: 100%; height: auto; }
-.shot img { width: 100%; height: auto; }
+.shot svg { width: 100%; height: 100%; }
+/* cover 左上角对齐：图片从左上角起适配 16:9 矩形，溢出裁切右侧/下侧，保证左上角主体可见 */
+.shot img { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
 .shot .ph-text { fill: var(--text-low); font-size: 12px; }
 .shot .ph-icon { stroke: var(--text-faint); stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .product-cap { padding-top: 4px; }
@@ -555,6 +583,8 @@ svg text { font-family: var(--font-sans); }
   .slide, .chapter.dir-prev .slide { transition: opacity 200ms ease; transform: none !important; }
   .reveal { transition: opacity 200ms ease; transform: none; }
   .build-steps li::after { transition: none; }
+  .product, .product .shot { transition: none; }
+  .products.swap { animation: none; }
   .slide.active .build-steps li::after { transform: scaleY(1); }
   .converge .c-path { animation-duration: 1ms; }
   .converge.drawn .c-path { animation: none; stroke-dashoffset: 0; }
@@ -666,24 +696,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       <div class="spine-wrap" id="spineWrap" aria-hidden="true">
         <svg class="spine" id="spineSvg" viewBox="0 0 1200 300">
           <path class="spine-path" id="spinePath" d="M 20 250 C 100 250, 140 220, 180 220 C 300 220, 480 80, 600 80 C 720 80, 900 140, 1020 140 C 1110 140, 1150 190, 1180 190"/>
-          <g class="spine-node" data-node="0">
-            <circle class="halo" cx="180" cy="220" r="13"/>
-            <circle cx="180" cy="220" r="4.5" fill="#cbb7fb"/>
-            <text class="no" x="180" y="196" text-anchor="middle">01</text>
-            <text class="title" x="180" y="252" text-anchor="middle">个人科研开展</text>
-          </g>
-          <g class="spine-node" data-node="1">
-            <circle class="halo" cx="600" cy="80" r="13"/>
-            <circle cx="600" cy="80" r="4.5" fill="#cbb7fb"/>
-            <text class="no" x="600" y="52" text-anchor="middle">02</text>
-            <text class="title" x="600" y="112" text-anchor="middle">团队科研协作</text>
-          </g>
-          <g class="spine-node" data-node="2">
-            <circle class="halo" cx="1020" cy="140" r="13"/>
-            <circle cx="1020" cy="140" r="4.5" fill="#cbb7fb"/>
-            <text class="no" x="1020" y="116" text-anchor="middle">03</text>
-            <text class="title" x="1020" y="172" text-anchor="middle">从个人到团队</text>
-          </g>
+          <g class="spine-nodes"></g>
           <circle class="traveler-halo" r="8"/>
           <circle class="traveler" r="3.5" fill="#cbb7fb"/>
           <circle class="spine-end-halo" cx="1180" cy="190" r="10"/>
@@ -699,7 +712,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     </div>
   </section>
 
-  <!-- ============ 三个章节 Deck（占位，由 JS 填充） ============ -->
+  <!-- ============ 章节 Deck（占位，由 JS 按 lines 填充，支持任意条线） ============ -->
   <section class="chapter" id="chapter-0" data-chapter="0" aria-label="章节一">
     <div class="chapter-bg" aria-hidden="true"></div>
     <div class="chapter-num num" aria-hidden="true">01</div>
@@ -739,6 +752,19 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
     </footer>
   </section>
+  <section class="chapter" id="chapter-3" data-chapter="3" aria-label="章节四">
+    <div class="chapter-bg" aria-hidden="true"></div>
+    <div class="chapter-num num" aria-hidden="true">04</div>
+    <div class="slides"></div>
+    <aside class="slide-rail" aria-hidden="true"></aside>
+    <footer class="deck-foot">
+      <span class="deck-label"></span>
+      <div class="deck-nav">
+        <button class="deck-btn" data-nav="prev" aria-label="上一页"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5.5 8 10 13"/></svg></button>
+        <button class="deck-btn" data-nav="next" aria-label="下一页"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l4.5 5L6 13"/></svg></button>
+      </div>
+    </footer>
+  </section>
 
   <!-- ============ 汇流收尾 ============ -->
   <section class="stage stage-closing" id="closing">
@@ -758,7 +784,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       </div>
     </div>
     <footer class="page-foot">
-      <span class="foot-logo" aria-hidden="true"><img src="assets/ruc-logo-1.png" alt=""></span>
+      <span class="foot-logo" aria-hidden="true"><img src="assets/ruc-logo-1.webp" alt=""></span>
       <span class="foot-brand">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true">
           <circle cx="12" cy="4.5" r="2.2"/><circle cx="4.5" cy="18" r="2.2"/><circle cx="19.5" cy="18" r="2.2"/>
@@ -804,7 +830,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   }
   function productShot(p) {
     if (p && p.shot) {
-      return '<img src="' + esc(p.shot) + '" alt="' + esc(p.name) + ' 截图" loading="lazy">';
+      return '<img src="' + esc(p.shot) + '" alt="' + esc(p.name) + ' 截图" loading="lazy" decoding="async">';
     }
     return placeholderShot();
   }
@@ -844,36 +870,82 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       "</div>" +
       "</div></div></div>";
   }
-  function slideOutcomes(line) {
-    var products = line.outcomes.products.map(function (p, j) {
-      return '<figure class="product reveal" style="--d:' + (60 + j * 90) + 'ms">' +
-        '<div class="shot">' + productShot(p) + "</div>" +
-        '<figcaption class="product-cap"><b>' + esc(p.name) + "</b><span>" + esc(p.desc) + "</span></figcaption>" +
-        "</figure>";
-    }).join("");
-    var metrics = line.outcomes.metrics.map(function (m, j) {
-      return '<div class="om reveal" style="--d:' + (260 + j * 70) + 'ms"><span class="v num">' + esc(m.value) + '</span><span class="l">' + esc(m.label) + "</span></div>";
-    }).join("");
-    var steps = line.outcomes.build.map(function (b, j) {
-      return '<li class="reveal" style="--d:' + (120 + j * 110) + 'ms">' +
+  function buildStepsHtml(build, delay0) {
+    return (build || []).map(function (b, j) {
+      return '<li class="reveal" style="--d:' + (delay0 + j * 110) + 'ms">' +
         '<span class="b-step num">' + esc(b.step) + "</span>" +
         '<b class="b-title">' + esc(b.title) + "</b>" +
         '<span class="b-desc">' + esc(b.desc) + "</span></li>";
     }).join("");
+  }
+
+  /* 产出与构建页：产品超过 2 个时分页（每页 ≤2 张产品卡）。
+     右侧「如何构建」默认显示第一个产品自己的构建过程，点击产品卡时切换为对应产品的构建。 */
+  function slideOutcomes(line, part, parts) {
+    var prods = line.outcomes.products || [];
+    var psize = Math.ceil(prods.length / parts);
+    var chunk = prods.slice(part * psize, (part + 1) * psize);
+    var products = chunk.map(function (p, j) {
+      var buildAttr = p.build && p.build.length
+        ? " data-build='" + esc(JSON.stringify(p.build)) + "'"
+        : "";
+      return '<figure class="product reveal" style="--d:' + (60 + j * 90) + 'ms"' +
+        buildAttr + ' data-name="' + esc(p.name) + '">' +
+        '<div class="shot">' + productShot(p) + "</div>" +
+        '<figcaption class="product-cap"><b>' + esc(p.name) + "</b><span>" + esc(p.desc) + "</span></figcaption>" +
+        "</figure>";
+    }).join("");
+    var metricsHtml = "";
+    if (part === 0) {
+      var metrics = (line.outcomes.metrics || []).map(function (m, j) {
+        return '<div class="om reveal" style="--d:' + (260 + j * 70) + 'ms"><span class="v num">' + esc(m.value) + '</span><span class="l">' + esc(m.label) + "</span></div>";
+      }).join("");
+      metricsHtml = '<div class="outcome-metrics">' + metrics + "</div>";
+    }
+    var bsize = Math.ceil((line.outcomes.build || []).length / parts);
+    var lineSteps = (line.outcomes.build || []).slice(part * bsize, (part + 1) * bsize);
+    var defBuild = (chunk[0] && chunk[0].build && chunk[0].build.length) ? chunk[0].build : lineSteps;
+    var defLabel = chunk[0] ? chunk[0].name : (line.title || "");
+    var steps = buildStepsHtml(defBuild, 120);
+    var hint = chunk.length > 1
+      ? '<span class="product-hint">点击产品卡片可放大查看 · 再点一次还原</span>'
+      : "";
+    var tag = parts > 1
+      ? "产出与构建 0" + (part + 1) + " / 0" + parts
+      : "产出与构建";
     return '<div class="slide">' +
-      '<span class="slide-tag num">产出与构建</span>' +
+      '<span class="slide-tag num">' + esc(tag) + "</span>" +
       '<div class="slide-inner">' +
-      '<div class="two-col">' +
+      '<div class="two-col outcomes">' +
       "<div>" +
-      '<span class="col-heading reveal" style="--d:0ms">产出</span>' +
-      '<div class="products">' + products + "</div>" +
-      '<div class="outcome-metrics">' + metrics + "</div>" +
+      hint +
+      '<div class="products" data-default-build=\'' + esc(JSON.stringify(defBuild)) + '\' data-default-label="' + esc(defLabel) + '">' + products + "</div>" +
+      metricsHtml +
       "</div>" +
       "<div>" +
-      '<span class="col-heading reveal" style="--d:0ms">如何构建</span>' +
+      '<span class="col-heading reveal" style="--d:0ms">如何构建<span class="build-label">· ' + esc(defLabel) + "</span></span>" +
       '<ol class="build-steps">' + steps + "</ol>" +
       "</div>" +
       "</div></div></div>";
+  }
+
+  /* 右侧「如何构建」跟随左侧点击的产品切换为其自身构建过程 */
+  function setBuildFor(box, p) {
+    var twoCol = box.closest(".two-col");
+    if (!twoCol) return;
+    var ol = twoCol.querySelector(".build-steps");
+    var label = twoCol.querySelector(".build-label");
+    if (!ol) return;
+    var build = [];
+    var name = box.dataset.defaultLabel || "";
+    if (p && p.dataset.build) {
+      try { build = JSON.parse(p.dataset.build); } catch (err) { build = []; }
+      name = p.dataset.name || name;
+    } else {
+      try { build = JSON.parse(box.dataset.defaultBuild || "[]"); } catch (err) { build = []; }
+    }
+    ol.innerHTML = buildStepsHtml(build, 0);
+    if (label) label.textContent = "· " + name;
   }
 
   /* ---------- 渲染 ---------- */
@@ -897,6 +969,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     renderMetrics(data.overview.metrics || []);
     renderPreview(data.lines);
     renderSpineV(data.lines);
+    renderSpine(data.lines);
     /* chapters */
     data.lines.forEach(function (line, i) {
       renderChapter(i, line);
@@ -924,16 +997,22 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   }
 
   function renderPreview(lines) {
+    var oddTail = (lines.length - 1) % 2 === 1;
     $("#linePreview").innerHTML = lines.map(function (line, i) {
-      return '<a class="preview-card' + (i === 0 ? " featured" : "") + '" href="#chapter-' + i + '" data-goto="' + i + '">' +
-        '<span class="preview-no num">' + esc(line.no) + "</span>" +
-        '<div class="preview-body">' +
+      var extra = i === 0 ? " featured" : (oddTail && i === lines.length - 1 ? " span-all" : "");
+      var go = '<span class="preview-go">进入章节' +
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>' +
+        "</span>";
+      var body = '<div class="preview-body">' +
         '<h3 class="preview-title">' + esc(line.title) + "</h3>" +
         '<p class="preview-theme">' + esc(line.theme) + "</p>" +
-        "</div>" +
-        '<span class="preview-go">进入章节' +
-        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>' +
-        "</span></a>";
+        (i === 0 ? go : "") +
+        "</div>";
+      return '<a class="preview-card' + extra + '" href="#chapter-' + i + '" data-goto="' + i + '">' +
+        '<span class="preview-no num">' + esc(line.no) + "</span>" +
+        body +
+        (i === 0 ? "" : go) +
+        "</a>";
     }).join("");
   }
 
@@ -949,6 +1028,25 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     }).join("");
   }
 
+  /* 叙事轴节点：按线数量沿路径取点生成（支持任意条线） */
+  function renderSpine(lines) {
+    var path = $("#spinePath");
+    var g = $(".spine-nodes");
+    if (!path || !g) return;
+    var total = 0;
+    try { total = path.getTotalLength(); } catch (e) { total = 0; }
+    g.innerHTML = lines.map(function (line, i) {
+      var pt = { x: 180 + i * 420, y: 220 };
+      try { pt = path.getPointAtLength(total * (i + 1) / (lines.length + 1)); } catch (e) {}
+      return '<g class="spine-node" data-node="' + i + '">' +
+        '<circle class="halo" cx="' + pt.x.toFixed(1) + '" cy="' + pt.y.toFixed(1) + '" r="13"/>' +
+        '<circle cx="' + pt.x.toFixed(1) + '" cy="' + pt.y.toFixed(1) + '" r="4.5" fill="#cbb7fb"/>' +
+        '<text class="no" x="' + pt.x.toFixed(1) + '" y="' + (pt.y - 24).toFixed(1) + '" text-anchor="middle">' + esc(line.no) + "</text>" +
+        '<text class="title" x="' + pt.x.toFixed(1) + '" y="' + (pt.y + 32).toFixed(1) + '" text-anchor="middle">' + esc(line.title) + "</text>" +
+        "</g>";
+    }).join("");
+  }
+
   function renderChapterNav(lines) {
     $("#chapterNav").innerHTML = lines.map(function (line, i) {
       return '<button class="chapter-nav-btn" data-goto="' + i + '">' +
@@ -960,7 +1058,9 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     var ch = $("#chapter-" + i);
     var slides = [slideIntro(line)];
     line.skills.forEach(function (s, j) { slides.push(slideSkill(s, j)); });
-    slides.push(slideOutcomes(line));
+    var nProds = (line.outcomes.products || []).length;
+    var parts = nProds > 2 ? Math.ceil(nProds / 2) : 1;
+    for (var p = 0; p < parts; p++) { slides.push(slideOutcomes(line, p, parts)); }
     ch.querySelector(".slides").innerHTML = slides.join("");
     var rail = ch.querySelector(".slide-rail");
     rail.innerHTML = slides.map(function () { return '<i class="rail-dot"></i>'; }).join("") +
@@ -988,6 +1088,14 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       s.classList.toggle("active", on);
       s.setAttribute("aria-hidden", on ? "false" : "true");
     });
+    /* 翻页时复位产出卡片聚焦态与构建栏 */
+    Array.prototype.slice.call(ch.querySelectorAll(".products")).forEach(function (box) {
+      box.classList.remove("focus");
+      Array.prototype.slice.call(box.querySelectorAll(".product")).forEach(function (p) {
+        p.classList.remove("focus");
+      });
+      setBuildFor(box, null);
+    });
     Array.prototype.slice.call(ch.querySelectorAll(".rail-dot")).forEach(function (d, j) {
       d.classList.toggle("on", j === idx);
     });
@@ -997,7 +1105,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   function pad(n) { return n < 10 ? "0" + n : "" + n; }
 
   function chapterAt(i) { return document.getElementById("chapter-" + i); }
-  function sectionAfter(i) { return i < 2 ? chapterAt(i + 1) : $("#closing"); }
+  function sectionAfter(i) { return i < D.lines.length - 1 ? chapterAt(i + 1) : $("#closing"); }
   function sectionBefore(i) { return i > 0 ? chapterAt(i - 1) : $("#overview"); }
 
   function gotoSection(el) {
@@ -1136,9 +1244,45 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       });
     });
 
+    /* 产出卡片点击聚焦（事件委托，覆盖所有章节的产出页）：
+       点卡片放大并切换「如何构建」栏，再点同一张（或点容器空白）还原。 */
+    function replaySwap(box) {
+      box.classList.remove("swap");
+      void box.offsetWidth; /* 重触发 fade-through 交换动画 */
+      box.classList.add("swap");
+    }
+    function releaseProducts(box) {
+      box.classList.remove("focus");
+      Array.prototype.slice.call(box.querySelectorAll(".product")).forEach(function (x) {
+        x.classList.remove("focus");
+      });
+      setBuildFor(box, null);
+      replaySwap(box);
+    }
+    document.addEventListener("click", function (e) {
+      var p = e.target.closest ? e.target.closest(".product") : null;
+      var box = p ? p.closest(".products") : null;
+      if (p && box) {
+        if (box.classList.contains("focus") && p.classList.contains("focus")) {
+          releaseProducts(box); /* 再点同一张 → 还原 */
+        } else {
+          box.classList.add("focus");
+          Array.prototype.slice.call(box.querySelectorAll(".product")).forEach(function (x) {
+            x.classList.toggle("focus", x === p);
+          });
+          setBuildFor(box, p);
+          replaySwap(box);
+        }
+        return;
+      }
+      /* 点击 .products 容器空白 → 还原（容器外不处理，避免干扰翻页/链接） */
+      var box2 = e.target.closest ? e.target.closest(".products") : null;
+      if (box2 && box2.classList.contains("focus")) releaseProducts(box2);
+    });
+
     /* hero CTA */
     $("#heroCta").addEventListener("click", function () { gotoSection($("#overview")); });
-    $("#ctaSecondary").addEventListener("click", function () { gotoSection(chapterAt(0)); });
+    $("#ctaSecondary").addEventListener("click", function () { gotoSection($("#overview")); });
 
     /* 顶栏滚动态 + 滚轮提示 */
     window.addEventListener("scroll", function () {
@@ -1158,7 +1302,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   /* ---------- 叙事轴滚动驱动 ---------- */
   var spinePath = null, traveler = null, travelerHalo = null, spineSvg = null;
   var spineVFill = null, spineVNodes = [], spineNodes = [];
-  var spineLen = 0, overviewVisible = false, ticking = false;
+  var spineLen = 0, overviewVisible = false, ticking = false, lastP = -1;
 
   function bindSpine() {
     spineSvg = $("#spineSvg");
@@ -1198,6 +1342,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     var vh = window.innerHeight;
     var p = Math.min(1, Math.max(0, (vh * 0.8 - ov.top) / (ov.height - vh * 0.6)));
     if (reduceMotion) { p = 1; }
+    if (Math.abs(p - lastP) < 0.002) return; /* 进度未变则跳过(滚动驱动,无空闲帧循环) */
+    lastP = p;
     var pt = spinePath.getPointAtLength(p * spineLen);
     if (traveler) {
       traveler.setAttribute("cx", pt.x.toFixed(1));
@@ -1205,11 +1351,10 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       travelerHalo.setAttribute("cx", pt.x.toFixed(1));
       travelerHalo.setAttribute("cy", pt.y.toFixed(1));
     }
-    var lit = Math.floor(p * 3 - 0.001) + (p >= 0.99 ? 3 : p >= 0.66 ? 3 : p >= 0.33 ? 2 : p >= 0.001 ? 1 : 0);
+    var lit = p >= 0.99 ? spineNodes.length : Math.min(spineNodes.length, Math.floor(p * (spineNodes.length + 1) - 0.001) + (p > 0 ? 1 : 0));
     spineNodes.forEach(function (n, j) { n.classList.toggle("lit", j < lit); });
     spineVNodes.forEach(function (n, j) { n.classList.toggle("lit", j < lit); });
     if (spineVFill) spineVFill.style.transform = "scaleY(" + p.toFixed(3) + ")";
-    if (overviewVisible && !reduceMotion) requestAnimationFrame(driveSpine);
   }
 
   /* ---------- 汇流绘制 ---------- */

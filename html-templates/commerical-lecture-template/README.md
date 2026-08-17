@@ -29,7 +29,7 @@
 | 墨夜 Nocturne | 暗 | 暖黑墨底 + 朱砂，宣纸的夜版 |
 | 人大红 RUC | 亮 | 校徽红 `#971f30`：红底顶栏 + hero 最左侧竖版校徽组合 + 白底页脚红分隔线 + 预览卡校徽水印 |
 
-> **人大红主题的校徽**：`assets/ruc-emblem.svg`（官方单色校徽矢量）与网页排版的「中国人民大学 / RENMIN UNIVERSITY OF CHINA」标准字组合成官方「中英文标准组合（上下）」的竖版效果，置于 **hero 最左侧、导航栏下方**（垂直居中，主内容自动右移）；页脚另有一枚横版校徽（`ruc-logo-1.png`）。移动端（<760px）竖版组合自动隐藏、内容恢复居中。需要让页面**默认以人大红打开**时，把 `<body data-default-theme="twilight">` 改为 `data-default-theme="ruc"` 即可。
+> **人大红主题的校徽**：`assets/ruc-emblem.svg`（官方单色校徽矢量）与网页排版的「中国人民大学 / RENMIN UNIVERSITY OF CHINA」标准字组合成官方「中英文标准组合（上下）」的竖版效果，置于 **hero 最左侧、导航栏下方**（垂直居中，主内容自动右移）；页脚另有一枚横版校徽（`ruc-logo-1.webp`）。移动端（<760px）竖版组合自动隐藏、内容恢复居中。需要让页面**默认以人大红打开**时，把 `<body data-default-theme="twilight">` 改为 `data-default-theme="ruc"` 即可。
 
 **主题维护**：所有主题定义在 `theme-pack.js`（唯一数据源），每个主题 = 一段 CSS token 覆盖（约 40 行）。新增主题 = 在 pack 数组里加一个 `{id, name, swatch, css}` 条目；改主题 = 改对应 css 字符串。基座组件颜色必须全部走 `var(--token)`（约 40 个 token 在 index.html 的 `:root`），硬编码颜色会导致换肤失效。
 
@@ -66,7 +66,7 @@ commerical-lecture/
 1. **`meta`**：`title_line1` / `title_line2` / `subtitle`（汇报主题）、`presenter`（汇报人）、`institution`（课题组/机构）、`date`
 2. **`overview`**：`lede` 导语；`metrics` 三格真实数据（技能数 / 产出项目数 / 协作人次等）
 3. **`lines[0..2]`**：每条线的 `title` / `theme` / `intro`、1-2 个真实 skill（`name` / `tagline` / `purpose` / `capabilities`）、`outcomes.products`（名称 + 描述 + `shot` 截图路径）、`outcomes.metrics`、`outcomes.build` 四步构建过程
-4. **产品截图**：把真实截图放入 `assets/`（建议命名 `line01-a.png`、`line01-b.png`、`line02-a.png`…），在 `shot` 字段填路径；不填则显示内置占位框
+4. **产品截图**：把真实截图放入 `assets/`（建议命名 `line01-a.png`、`line01-b.png`、`line03-a.png`…），在 `shot` 字段填路径；不填则显示内置占位框
 5. **`closing`**：合作邀约文案、两个按钮文案
 
 > 每条线 `skills` 允许 1-2 项：填 1 项时该章自动省略 Skill ②页（3 页制）。页面结构与样式在替换文案后自动适配，无需改代码。
