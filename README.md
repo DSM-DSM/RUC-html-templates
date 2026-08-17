@@ -8,6 +8,8 @@
 ![RUC](https://img.shields.io/badge/中国人民大学-视觉规范-971f30?style=for-the-badge)
 ![离线可用](https://img.shields.io/badge/lecture_模板-双击即用-blue?style=for-the-badge)
 
+> ⭐ **如果这套模板帮到了你，请在 Gitee 仓库页面右上角点一个 Star**——这是对作者最直接的支持，也欢迎将该项目分享给身边的同学，让更多同学看到并使用这个仓库。谢谢！
+
 所有模板均为原生 HTML + CSS + JavaScript，**不需要安装 Node.js、不需要 npm install、不需要任何构建步骤**——会用浏览器就会用，会改文字就会定制。专为不熟悉前端开发的科研工作者（尤其是人文社科背景的同学）设计。
 
 ---
@@ -90,21 +92,53 @@ python -m http.server 8080
 
 ## 4. 📖 实战案例：五分钟上手 lecture 模板
 
-以一位同学第一次使用本仓库为例，从零到看到网页渲染效果，全程不需要写任何代码：
+以一位同学第一次使用本仓库为例，从零到看到网页渲染效果，全程不需要写任何代码。
+
+先看整体路线图（第一个分岔取决于你电脑上有没有装 git，之后是线性四步）：
+
+```mermaid
+flowchart LR
+    A["📥 下载<br>本仓库"] --> B{"装了<br>git？"}
+    B -- "没装" --> C["📦 方式 A<br>网页下载 ZIP<br>解压到 D 盘"]
+    B -- "已装" --> D["🌿 方式 B<br>git clone<br>到 D 盘"]
+    C --> E["📂 得到<br>D:\ruc-html-templates"]
+    D --> E
+    E --> F["🌐 双击模板文件<br>浏览器打开"]
+    F --> G["🎨 切换主题<br>选 14 人大红"]
+    G --> H["✏️ 替换占位符<br>完成 🎉"]
+```
 
 **第 1 步 · 下载仓库** 📥
 
-在 Gitee 仓库页面点击绿色的「**克隆/下载**」按钮，选择「**下载 ZIP**」，得到整个仓库的压缩包；解压到任意位置（如 `D:\`）。也可以用 git 命令：
+先把整个仓库下载到你的电脑上。有两种方式，**任选其一即可**（没装 git 的同学直接用方式 A）：
+
+**方式 A：网页下载 ZIP（推荐，不需要安装任何软件）** 📦
+
+1. 用浏览器打开本仓库的 Gitee 页面（也就是你正在看这份 README 的页面）；
+2. 点击页面右侧的绿色「**克隆/下载**」按钮；
+3. 在弹出的面板中选择「**下载 ZIP**」——浏览器会把整个仓库打包成一个压缩包，下载到你的「下载」文件夹（文件名类似 `ruc-html-templates.zip`）；
+4. 打开「文件资源管理器」（按键盘 `Win + E`），进入「下载」文件夹，找到这个压缩包；
+5. 在压缩包上**右键 →「全部解压缩」（Extract All）**，目标位置填 `D:\`，点击「解压缩」；
+6. 解压完成后，D 盘下会出现一个 `ruc-html-templates` 文件夹（名字可能带有少量后缀，不影响使用）——这就是下载好的完整仓库。
+
+**方式 B：git clone（需要电脑上已安装 git）** 🌿
+
+git 是程序员常用的版本管理工具，**普通同学的电脑上通常没有安装**。不确定自己装没装？在终端（Windows 按 `Win + R`，输入 `powershell` 回车打开)里输入 `git --version` 回车：显示出 `git version 2.xx.x` 就是装了；提示「无法将 git 识别为 cmdlet…」就是没装——没装就用上面的方式 A，或者先去 [git-scm.com/downloads](https://git-scm.com/downloads) 下载安装（安装时一路「下一步」默认选项即可）。
+
+装好 git 后，在终端里逐行输入下面两条命令（第一行是进入 D 盘，第二行是把仓库下载到 D 盘下、自动创建 `D:\ruc-html-templates` 文件夹）：
 
 ```bash
-git clone <仓库地址>
+cd D:\
+git clone https://gitee.com/AiALi7-9-22/ruc-html-templates.git D:\ruc-html-templates
 ```
+
+回车后等进度走完，D 盘下就会出现 `ruc-html-templates` 文件夹。
 
 > ⚠️ 请下载**整个仓库**而不是只拿单个文件：`slide_deck_template.html` 依赖同目录的 `theme-pack.js`（主题包），目录结构被打乱会导致主题切换失效。
 
 **第 2 步 · 用浏览器打开模板** 🌐
 
-进入 `html-templates/lecture/` 文件夹，**直接双击 `slide_deck_template.html`**——浏览器会立刻渲染出完整的讲演网页：
+打开第 1 步得到的文件夹（如 `D:\ruc-html-templates`），依次进入 `html-templates` → `lecture` 文件夹，**直接双击 `slide_deck_template.html`**——浏览器会立刻渲染出完整的讲演网页：
 
 - 左侧自动生成讲演目录，点击可平滑跳转，滚动时自动高亮当前位置；
 - 页面从上到下是「封面 → 第一幕 → 若干幻灯片卡 → 第二幕 → … → 页脚」的讲演结构；
@@ -349,7 +383,18 @@ RUC-html-templates/
 └── README.md                  ← 本文件
 ```
 
-制作人大红主题时，校徽红取值 `#971f30`、标准字组合等均对照官方视觉识别系统素材实现；如需更高精度的校徽图片，可从 `中国人民大学视觉识别系统/` 目录的源文件导出。
+### 🏫 中国人民大学视觉识别系统（官方 VI 素材）
+
+`html-templates/中国人民大学视觉识别系统/` 保存了**学校官方视觉识别（VI）素材的源文件**：校徽（彩色 / 单色 / 负形）、中文与英文标准字、中英文标准组合（左右 / 居中 / 上下）、底纹与辅助图形等，格式为 EPS / PSD。
+
+素材下载自中国人民大学官网「学校标志」页面：
+[https://www.ruc.edu.cn/xuexiaobiaozhi1924747550510977025.html](https://www.ruc.edu.cn/xuexiaobiaozhi1924747550510977025.html)
+
+制作人大红主题时，校徽红取值 `#971f30`、标准字组合等均对照上述官方素材实现；如需更高精度的校徽图片，可从该目录的源文件导出。
+
+### 📐 RUC Beamer LaTeX 模板（人大红主题的复刻蓝本）
+
+三个模板中「人大红」主题的网页实现（校徽红 `#971f30`、校徽与水印位置、宋体衬线标题等），参考并复刻自 **Overleaf 上的人大 RUC Beamer LaTeX 模板**；原始 LaTeX 模板文件完整保存在 `html-templates/lecture/ruc_beamer_templates/`，内含样式包 `RenminUniv.sty`、校徽与背景图素材、示例 `slide.tex`。需要直接做 LaTeX 幻灯片的同学，也可以使用该目录在 Overleaf / 本地 LaTeX 环境编译。
 
 ## 12. 👤 作者信息
 
@@ -363,3 +408,7 @@ RUC-html-templates/
 ---
 
 *若在使用中发现问题或有改进建议，欢迎通过仓库 Issue 或邮件联系作者。* ✨
+
+## 🌱 本项目持续更新中
+
+三个模板会随实际使用不断迭代：新主题、新组件乃至新模板（课程课件、学术海报等）都会陆续加入。欢迎 **Star ⭐ + Watch** 本仓库，第一时间获取更新动态。
