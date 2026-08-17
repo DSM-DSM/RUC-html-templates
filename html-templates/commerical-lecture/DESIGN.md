@@ -146,7 +146,7 @@ components:
 - **Surface One** (`#0f1011`): 一档上移的面板底，产品截图框与错误卡片底。
 - **Surface Two** (`#17181c`): 截图框顶部色条与占位 SVG 内层，最浅的「实」面。
 - **Twilight Deep 深紫** (`#1b1938`): 星云渐变中段（`--deep-0` 到 `--bg-0` 之间），Superhuman 暮色。
-- **Void Deep 深紫底** (`#0b0a1c`): 星云渐变起点、favicon 底，比午夜底更偏紫。
+- **Void Deep 深紫底** (`#0b0a1c`): 星云渐变起点，比午夜底更偏紫。
 - **Whisper Border 细语边框** (`rgba(255,255,255,.08)`): 标准边框——chip、截图框、deck 圆钮、ghost 按钮、code 框。
 - **Soft Border 柔边框** (`rgba(255,255,255,.05)`): 更弱的边框——顶栏下缘、预览卡、能力列表分隔、指标分隔、页脚。
 - **Text Hi** (`#f7f8f8`): 主标题与强调文字，非纯白。

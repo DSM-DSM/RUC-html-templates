@@ -126,7 +126,7 @@ const indexHtml = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <link rel="icon" href="data:,">
+    <link rel="icon" type="image/svg+xml" href="../ruc_beamer_templates/pic/中国人民大学-logo.svg">
     <title>演示讲演模板 · ${THEMES.length} 风格预览</title>
     <!-- impeccable-disable repeating-stripes-gradient -- 预览入口顶部多色规则线为 16 主题色标合辑，非 AI 装饰条纹 -->
     <style>

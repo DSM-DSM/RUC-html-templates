@@ -40,6 +40,8 @@ function buildTheme(t) {
     html = html.replace('<body data-default-theme="default">', '<body data-default-theme="' + t.id + '">');
     html = html.replace('<body data-default-theme="default" data-asset-prefix="">', '<body data-default-theme="' + t.id + '" data-asset-prefix="../">');
     html = html.split('src="theme-pack.js"').join('src="../theme-pack.js"');
+    // favicon：变体在 themes/ 子目录，相对路径上移一层
+    html = html.split('<link rel="icon" type="image/svg+xml" href="assets/ruc-logo.svg">').join('<link rel="icon" type="image/svg+xml" href="../assets/ruc-logo.svg">');
     // 主题字体：有 webfont 的主题在 head 预置 link（切换器会按需替换）
     if (t.fonts) {
         html = html.replace('<head>', '<head>\n    <link rel="stylesheet" id="theme-fonts" href="' + t.fonts + '">');
@@ -119,6 +121,7 @@ const indexHtml = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/svg+xml" href="../assets/ruc-logo.svg">
     <title>组会汇报模板 · ${THEMES.length} 主题预览</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
