@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<!--
+================================================================================
+  阅读路径规划模板 (Reading Path Template)
+  ------------------------------------------------------------------------------
+  来源：从 TianTanAI 项目 paper-explainer 技能维护的 nav/reading_path.html
+        提炼的完整架构。阅读路径是论文详解的「导览门户」——用「阶段 + 步骤」
+        把多篇论文组织成一条渐进式学习路线，每站说明「学什么 + 为什么在这一站」。
+  ------------------------------------------------------------------------------
+  对应技能：.claude/skills/paper-explainer/SKILL.md（Step 9.4：导航页同步更新）
+  配套模板：knowledge_supplement_template.html（背景知识页，本页 .supp 会指向它）
+             ../papers/paper_explainer_page_template.html（论文详解页，step 指向它）
+             ../knowledge_graph_template.html（知识图谱页）
+  成品命名：reading_path.html
+  ------------------------------------------------------------------------------
+  使用方法（三步）：
+    1. 替换 :root 色板为你的项目主题色（与知识图谱页、论文页保持一致）
+    2. 替换 <header> 中的标题、副标题、元信息占位符
+    3. 按「第零阶段 / 第一阶段 / …」的 .phase 分组，逐个复制 .step 块填充
+       （每个 .step = 一篇论文或一个知识点；新增论文时在对应阶段末尾追加 .step）
+  链接替换规则：模板间互链已指向 *_template.html（预览可直接跳转）；
+    实际生成页面时把互链改回成品文件名（去掉 _template 后缀），
+    论文示例链接替换为真实论文文件名（../papers/ 子目录下）。
+  ------------------------------------------------------------------------------
+  组件速查（都可直接复制使用）：
+    .phase     阶段分隔条（淡蓝背景，居中，标出「第N阶段」主题）
+    .step      步骤卡片（白底 + 左侧蓝色粗边框），内含：
+                 h3          步骤标题（超链接指向论文详解页）
+                 .goal       学习目标（绿色，一句话）
+                 .why        为什么在这一站（灰色小字，串联前后逻辑）
+                 .links      跳转链接组（快速导引 / 补充知识点）
+    .supp      黄色虚线提示框（引导读者去「背景知识页」补课）
+    .rb        底部导航栏（知识图谱 / 补充知识点 / 阅读路径首页）
+  ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
+================================================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{项目主题}阅读路径规划 - {项目名}</title>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 与知识图谱页、论文页保持同源
+       ==================================================================== */
+    :root {
+      --blue-dark:  #1a5276;   /* 主色（深） */
+      --blue-mid:   #2471a3;   /* 主色（中） */
+      --blue-light: #2980b9;   /* 主色（浅，链接/边框） */
+      --green:  #27ae60;       /* 语义色：学习目标 */
+      --yellow: #f39c12;       /* 语义色：补充提示 */
+      --purple: #8e44ad;       /* 语义色：前沿 */
+      --gray-d:  #2c3e50;      /* 正文 */
+      --gray-m:  #566573;      /* 次要文字 */
+      --gray-l:  #d5dbdb;      /* 边框 */
+      --bg:      #fafbfc;      /* 页面背景 */
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 17px; line-height: 1.85; color: var(--gray-d);
+      background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 20px 24px;
+    }
+    a { color: var(--blue-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h2 { font-size: 1.4em; color: var(--blue-dark); border-bottom: 2px solid #aed6f1; padding-bottom: 6px; margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--blue-mid); margin: 1.2em 0 0.5em; }
+
+    /* ====================================================================
+       页眉 (header) —— 渐变居中，标题 + 副标题 + 元信息
+       ==================================================================== */
+    header {
+      background: linear-gradient(135deg, #1a5276 0%, #2471a3 100%);
+      color: #fff; border-radius: 10px; padding: 28px 32px;
+      margin-bottom: 28px; text-align: center;
+    }
+    header h1 { margin: 0; color: #fff; font-size: 1.8em; }
+    header .sub { font-size: 1.05em; opacity: 0.88; margin-top: 10px; }
+    header .mt  { font-size: 0.85em; opacity: 0.7;  margin-top: 8px; }
+
+    /* ====================================================================
+       阶段分隔条 (.phase) —— 标出「第N阶段」主题
+       ==================================================================== */
+    .phase {
+      background: #ebf5fb; border-radius: 8px; padding: 14px 20px;
+      margin: 28px 0 12px; text-align: center;
+    }
+    .phase h2 { margin: 0; border: none; font-size: 1.25em; color: var(--blue-dark); }
+
+    /* ====================================================================
+       步骤卡片 (.step) —— 每一站 = 一篇论文 / 一个知识点
+       ==================================================================== */
+    .step {
+      background: #fff; border-left: 5px solid var(--blue-light); border-radius: 6px;
+      padding: 20px 24px; margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .step h3 { margin-top: 0; color: #1a5276; }
+    .step .goal { color: #27ae60; font-weight: 600; margin: 6px 0; }          /* 学习目标 */
+    .step .why  { color: #7f8c8d; font-size: 0.9em; margin-top: 4px; }        /* 为什么在这一站 */
+    .step .links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .step .links a {
+      padding: 6px 14px; border-radius: 4px; border: 1px solid #d5dbdb;
+      background: #fff; font-size: 0.88em; font-weight: 600;
+    }
+    .step .links a:hover { background: #eaf2f8; text-decoration: none; }
+
+    /* ====================================================================
+       补充提示框 (.supp) —— 引导读者去背景知识页补课
+       ==================================================================== */
+    .supp {
+      background: #fff; border: 2px dashed var(--yellow); border-radius: 10px;
+      padding: 20px 24px; margin: 30px 0; text-align: center;
+    }
+    .supp h3 { color: #b7950b; margin-top: 0; }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: #fff; border-radius: 8px; padding: 18px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-top: 40px;
+      font-size: 0.88em; color: var(--gray-m); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; }
+    .rb a {
+      padding: 5px 14px; border-radius: 4px; border: 1px solid #d5dbdb;
+      background: #fff; font-size: 0.88em;
+    }
+    .rb a:hover { background: #eaf2f8; text-decoration: none; }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 10px 12px; }
+      h1 { font-size: 1.5em; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <h1>{项目主题}阅读路径规划</h1>
+  <div class="sub">{一句话副标题：从入门到前沿的渐进式学习路线 —— N篇论文 + 基础知识的完整学习地图}</div>
+  <div class="mt">{项目名} 项目 · {YYYY-MM-DD} · 可根据需要选择{2-6}站阅读</div>
+</header>
+
+<!-- ============ 第零阶段：基础知识（可选） ============ -->
+<!-- 说明：阶段用 .phase 分隔；每站用 .step，内含 .goal(学什么) + .why(为何这站) + .links(跳转) -->
+<div class="phase"><h2>第零阶段：{基础预备知识}</h2></div>
+
+<div class="step">
+  <!-- 模板库暂无基础知识页模板，示例链接指向背景知识页（预览可点）；
+       若项目有独立基础知识页，替换为实际文件名 -->
+  <h3><a href="knowledge_supplement_template.html">0. {基础知识概念速查}</a></h3>
+  <div class="goal">学习目标：{一句话——掌握哪些基础概念，建立怎样的知识体系}</div>
+  <div class="why">为什么是第零站：{一句话——为什么先学这些才能读懂后面的论文，避免被术语卡住}</div>
+  <div class="links">
+    <a href="knowledge_supplement_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<!-- ============ 第一阶段：示例（复制此 .phase + .step 组合扩展） ============ -->
+<div class="phase"><h2>第一阶段：{主题一}</h2></div>
+
+<div class="step">
+  <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
+  <h3><a href="../papers/paper_explainer_page_template.html">1. {论文1简称/标题}</a></h3>
+  <div class="goal">学习目标：{一句话——这一站要掌握什么方法/概念}</div>
+  <div class="why">为什么是第一站：{一句话——为什么这个顺序，它与前后站的关系}</div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<div class="step">
+  <h3><a href="../papers/paper_explainer_page_template.html">2. {论文2简称/标题}</a></h3>
+  <div class="goal">学习目标：{一句话}</div>
+  <div class="why">为什么是第二站：{一句话——与第一站如何衔接}</div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<!-- ============ 后续阶段（按需复制） ============ -->
+<!--
+<div class="phase"><h2>第二阶段：{主题二}</h2></div>
+<div class="step">
+  <h3><a href="../papers/paper_explainer_page_template.html">3. {论文3简称}</a></h3>
+  <div class="goal">学习目标：{...}</div>
+  <div class="why">为什么是这一站：{...}</div>
+  <div class="links"><a href="../papers/paper_explainer_page_template.html">快速导引</a> <a href="knowledge_supplement_template.html">补充知识点</a></div>
+</div>
+-->
+
+<!-- ============ 补充提示 ============ -->
+<div class="supp">
+  <h3>需要补充背景知识？</h3>
+  <p>遇到不熟悉的概念（{如 IV三大假设 / cis-pQTL / coloc共定位 / LLM CoT 等}），请访问 <strong><a href="knowledge_supplement_template.html">需要补充的知识点</a></strong> 页面。</p>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="rb">
+    <strong>导航：</strong>
+    <a href="../knowledge_graph_template.html">知识图谱</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+  <p style="margin-top:12px;">{项目名} 项目 · {N}篇论文 · {YYYY-MM-DD}</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<!--
+================================================================================
+  跨论文知识图谱模板 (Knowledge Graph Template)
+  ------------------------------------------------------------------------------
+  来源：从 TianTanAI 项目 paper-explainer 技能维护的 knowledge_graph.html
+        提炼的完整架构。知识图谱是所有论文详解页的「关联中枢」——
+        用 5 个板块把多篇论文的概念关联、方法关系、推荐阅读顺序组织起来。
+  ------------------------------------------------------------------------------
+  对应技能：.claude/skills/paper-explainer/SKILL.md（Step 8：更新知识图谱）
+  配套模板：paper_explainer_page_template.html（单篇论文详解页）
+  固定命名：knowledge_graph.html（不随论文变化）
+  ------------------------------------------------------------------------------
+  使用方法（四步）：
+    1. 替换 :root 色板为你的项目主题色（与论文详解页保持一致）
+    2. 替换 kg-header 中的项目名、论文数、概念数、交叉关系数
+    3. 每新增一篇论文，依次更新下方 5 个板块（见各板块内注释）
+    4. 最后把 kg-header 和 footer 的「最后更新」日期统一为当天
+  链接替换规则：模板间互链已指向 *_template.html（预览可直接跳转）；
+    实际生成页面时把互链改回成品文件名（去掉 _template 后缀），
+    论文示例链接替换为真实论文文件名（papers/ 子目录下）。
+  ------------------------------------------------------------------------------
+  五大板块（新增论文时必须全部同步更新）：
+    1. 概念关联图谱  .network-grid + .paper-node  （新增论文节点 + 独有/共享/桥梁标签）
+    2. 概念-论文对照矩阵  table.matrix            （新增一列 + 新概念行）
+    3. 论文间关系卡片  .rel-card + .rel-type      （新论文与每篇已有论文的关系）
+    4. 推荐阅读路径  ol.roadmap-steps             （必要时调整顺序）
+    5. 论文索引  .paper-links                     （新增一个链接条目）
+  ------------------------------------------------------------------------------
+  标签语义（概念关联图谱中的三种标签 + 新概念标签）：
+    .tag.shared   蓝色「共享基础」——多篇论文都用到的核心方法/概念
+    .tag.unique   黄色「独有」——仅该论文特有的概念
+    .tag.bridge   紫色「桥梁」——连接不同论文的概念
+    .tag.new      绿色「新概念」——本次新增论文引入的概念
+  ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
+================================================================================
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{项目主题} 知识图谱 - {项目名}</title>
+<style>
+/* ====================================================================
+   设计令牌 (Design Tokens) —— 与论文详解页保持一致
+   ==================================================================== */
+:root {
+  --blue-deep: #1a5276;
+  --blue-mid: #2471a3;
+  --blue-link: #2980b9;
+  --blue-bg: #eaf2f8;
+  --green: #27ae60;
+  --purple: #8e44ad;
+  --gray-dark: #2c3e50;
+  --gray-mid: #7f8c8d;
+  --bg: #fafbfc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-size: 17px; line-height: 1.75; color: var(--gray-dark);
+  background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 20px 24px;
+}
+a { color: var(--blue-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h2 { color: var(--blue-deep); font-size: 1.5em; margin: 44px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #d4e6f1; }
+h3 { color: var(--blue-mid); font-size: 1.22em; margin: 32px 0 10px; }
+
+/* 页眉（渐变色块 + 统计） */
+.kg-header {
+  background: linear-gradient(135deg, #1a5276 0%, #2471a3 100%);
+  color: #fff; border-radius: 10px; padding: 24px 28px; margin-bottom: 28px;
+}
+.kg-header h1 { margin: 0 0 6px; font-size: 1.6em; }
+.kg-stats { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 16px; font-size: .9em; }
+.kg-stat { background: rgba(255,255,255,.15); border-radius: 6px; padding: 8px 14px; }
+
+/* 顶部导航栏 */
+.top-nav-bar {
+  background: #fff; border: 1px solid #d5dbdb; border-radius: 8px;
+  padding: 10px 18px; margin-bottom: 24px; display: flex; flex-wrap: wrap;
+  gap: 10px 20px; align-items: center; font-size: .94em;
+}
+.top-nav-bar .current { color: var(--gray-mid); font-weight: 600; }
+
+/* ====================================================================
+   板块 1：概念关联图谱 (.network-grid)
+   ==================================================================== */
+.network-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+@media (max-width: 700px) { .network-grid { grid-template-columns: 1fr; } }
+.paper-node { background: #fff; border: 2px solid var(--blue-link); border-radius: 10px; padding: 18px 20px; }
+.paper-node .node-title { font-size: 1.05em; font-weight: 700; color: var(--blue-deep); margin-bottom: 8px; }
+.paper-node .node-meta { font-size: .85em; color: var(--gray-mid); margin-bottom: 10px; }
+.concept-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .78em; font-weight: 600; }
+.tag.shared { background: #eaf2f8; color: #2471a3; }
+.tag.unique { background: #fef9e7; color: #b8730a; }
+.tag.bridge { background: #f4ecf7; color: #8e44ad; }
+.tag.new { background: #e8f8f5; color: #1e8449; }
+
+/* ====================================================================
+   板块 2：概念-论文对照矩阵 (table.matrix)
+   ==================================================================== */
+table.matrix { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .84em; }
+table.matrix th { background: var(--blue-deep); color: #fff; padding: 8px 8px; text-align: center; font-size: .85em; }
+table.matrix th:first-child { min-width: 160px; text-align: left; }
+table.matrix td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; text-align: center; vertical-align: middle; }
+table.matrix td:first-child { text-align: left; font-weight: 600; }
+table.matrix tr:nth-child(even) td { background: #f8f9fa; }
+/* 单元格标记：checkmark=核心/覆盖, partial=提及, cross=未涉及 */
+.checkmark { color: #27ae60; }
+.cross { color: #e74c3c; }
+.partial { color: #f39c12; }
+
+/* ====================================================================
+   板块 3：论文间关系卡片 (.rel-card)
+   ==================================================================== */
+.rel-card { background: #fff; border: 1px solid #d5dbdb; border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+.rel-card h4 { margin: 0 0 6px; font-size: 1em; color: var(--blue-deep); }
+.rel-type {
+  display: inline-block; padding: 2px 10px; border-radius: 4px;
+  font-size: .78em; font-weight: 600; margin-right: 8px; color: #fff;
+}
+.rel-generalizes { background: #8e44ad; }  /* 推广/升级 */
+.rel-shares      { background: #2471a3; }  /* 共享基础 */
+.rel-complements { background: #27ae60; }  /* 互补 */
+
+/* ====================================================================
+   板块 4：推荐阅读路径 (ol.roadmap-steps)
+   ==================================================================== */
+.roadmap-steps { list-style: none; padding: 0; counter-reset: step; }
+.roadmap-steps li {
+  background: #fff; border-left: 4px solid var(--blue-link); padding: 14px 18px;
+  margin: 10px 0; border-radius: 0 6px 6px 0; counter-increment: step;
+}
+.roadmap-steps li::before {
+  content: counter(step); display: inline-block; width: 26px; height: 26px;
+  line-height: 26px; text-align: center; border-radius: 50%;
+  background: var(--blue-deep); color: #fff; font-weight: 700; font-size: .85em; margin-right: 10px;
+}
+
+/* ====================================================================
+   板块 5：论文索引 (.paper-links)
+   ==================================================================== */
+.paper-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.paper-links a { padding: 6px 14px; border-radius: 4px; border: 1px solid #d5dbdb; background: #fff; font-size: .88em; }
+.paper-links a:hover { background: #eaf2f8; text-decoration: none; }
+
+footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; font-size: .88em; color: var(--gray-mid); }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP NAV ============ -->
+<!-- 说明：current=知识图谱；依次列出所有论文详解 + 阅读路径等导航页 -->
+<div class="top-nav-bar">
+  <span class="current">&#x2190; 知识图谱</span>
+  <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
+  <a href="papers/paper_explainer_page_template.html">{论文1简称}</a>
+  <a href="papers/paper_explainer_page_template.html">{论文2简称}</a>
+  <a href="papers/paper_explainer_page_template.html">{论文3简称}</a>
+  <a href="nav/reading_path_template.html">阅读路径</a>
+  <a href="nav/knowledge_supplement_template.html">补充知识</a>
+</div>
+
+<!-- ============ HEADER ============ -->
+<div class="kg-header">
+  <h1>&#x1F5FA;&#xFE0F; {项目主题}研究知识图谱</h1>
+  <div style="font-size:.9em;opacity:.85;margin-top:8px;">项目：{项目名} &middot; 最后更新：{YYYY-MM-DD}</div>
+  <div class="kg-stats">
+    <div class="kg-stat">&#x1F4C4; 论文数：{N}</div>
+    <div class="kg-stat">&#x1F3F7;&#xFE0F; 核心概念：{N+}</div>
+    <div class="kg-stat">&#x1F517; 交叉关系：{N+}</div>
+  </div>
+</div>
+
+<!-- ============ 板块 1：概念关联图谱 ============ -->
+<h2>1. 概念关联图谱</h2>
+<div class="network-grid">
+
+  <!-- 一个 paper-node = 一篇论文。三组 concept-tags 分别放：
+       独有/新概念 (.tag.unique/.tag.new) → 共享基础 (.tag.shared) → 桥梁 (.tag.bridge) -->
+  <div class="paper-node">
+    <div class="node-title">{论文1 简称}</div>
+    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="concept-tags"><span class="tag unique">{独有概念1}</span> <span class="tag unique">{独有概念2}</span></div>
+    <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
+    <div class="concept-tags"><span class="tag bridge">{桥梁概念1}</span></div>
+  </div>
+
+  <div class="paper-node">
+    <div class="node-title">{论文2 简称}</div>
+    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="concept-tags"><span class="tag new">{新概念1}</span> <span class="tag new">{新概念2}</span></div>
+    <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
+    <div class="concept-tags"><span class="tag bridge">{桥梁概念1}（&#x2194;{论文1简称}）</span></div>
+  </div>
+
+  <!-- 若某论文概念较多、需占满整行，加 style="grid-column: 1 / -1;" -->
+  <!--
+  <div class="paper-node" style="grid-column: 1 / -1;">
+    <div class="node-title">{论文3 简称}</div>
+    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="concept-tags"><span class="tag new">{...}</span></div>
+    <div class="concept-tags"><span class="tag shared">{...}</span></div>
+    <div class="concept-tags"><span class="tag bridge">{...}</span></div>
+  </div>
+  -->
+</div>
+
+<!-- ============ 板块 2：概念-论文对照矩阵 ============ -->
+<!-- 说明：每新增一篇论文 → 表头加一列；每新增一个概念 → 加一行。
+     单元格：checkmark(核心/覆盖) / partial(提及) / cross(未涉及) -->
+<h2>2. 概念-论文对照矩阵</h2>
+<table class="matrix">
+  <tr><th>核心概念</th><th>{论文1简称}</th><th>{论文2简称}</th><th>{论文3简称}</th></tr>
+  <tr><td>{概念 A}</td><td class="checkmark">核心</td><td class="partial">提及</td><td class="cross"></td></tr>
+  <tr><td>{概念 B}</td><td class="checkmark">详细</td><td class="checkmark">应用</td><td class="partial">提及</td></tr>
+  <tr><td>{概念 C（新增论文独有）}</td><td class="cross"></td><td class="cross"></td><td class="checkmark">核心输出</td></tr>
+</table>
+
+<!-- ============ 板块 3：论文间关系卡片 ============ -->
+<!-- 说明：每新增一篇论文 → 为新论文与每篇已有论文各加一张 .rel-card。
+     rel-type 三选一：rel-shares(共享基础) / rel-complements(互补) / rel-generalizes(推广升级) -->
+<h2>3. 论文间关系卡片</h2>
+
+<div class="rel-card">
+  <h4><span class="rel-type rel-shares">共享基础</span> {论文1简称} / {论文2简称}</h4>
+  <p>{两篇论文的具体关系描述——共享了什么、在哪个维度互补/推广，禁止泛泛而谈「两者相关」。}</p>
+</div>
+
+<div class="rel-card">
+  <h4><span class="rel-type rel-complements">互补</span> {论文2简称} / {论文3简称}</h4>
+  <p>{具体关系描述。}</p>
+</div>
+
+<div class="rel-card">
+  <h4><span class="rel-type rel-generalizes">推广升级</span> {论文1简称} / {论文3简称}</h4>
+  <p>{具体关系描述。}</p>
+</div>
+
+<!-- ============ 板块 4：推荐阅读路径 ============ -->
+<h2>4. 推荐阅读路径</h2>
+<ol class="roadmap-steps">
+  <li><strong>入门：{第一步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
+  <li><strong>深入：{第二步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
+  <li><strong>应用：{第三步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
+</ol>
+
+<!-- ============ 板块 5：论文索引 ============ -->
+<h2>5. 论文索引</h2>
+<div class="paper-links">
+  <a href="papers/paper_explainer_page_template.html"><strong>{论文1简称} ({期刊} {年份})</strong></a>
+  <a href="papers/paper_explainer_page_template.html"><strong>{论文2简称} ({期刊} {年份})</strong></a>
+  <a href="papers/paper_explainer_page_template.html"><strong>{论文3简称} ({期刊} {年份})</strong></a>
+</div>
+
+<footer>
+  <p><strong>知识图谱说明：</strong>本图谱随项目论文数量的增加而动态更新。</p>
+  <p style="font-size:.85em;color:#aaa;">{项目名} 项目 &middot; 最后更新：{YYYY-MM-DD} &middot; 论文数：{N}</p>
+</footer>
+
+</body>
+</html>

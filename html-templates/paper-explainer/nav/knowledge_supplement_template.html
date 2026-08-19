@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!--
+================================================================================
+  背景知识补充页模板 (Knowledge Supplement Template)
+  ------------------------------------------------------------------------------
+  来源：从 TianTanAI 项目 paper-explainer 技能维护的 nav/knowledge_supplement.html
+        提炼的完整架构。背景知识页是阅读路径的「随行词典」——把论文中反复
+        出现、但正文不会展开讲的背景概念，用「概念卡片 + 定义框」集中速查，
+        每个概念都回链到用到了它的论文。
+  ------------------------------------------------------------------------------
+  对应技能：.claude/skills/paper-explainer/SKILL.md（Step 9.4：导航页同步更新）
+  配套模板：reading_path_template.html（阅读路径页，.supp 会指向本页）
+             ../papers/paper_explainer_page_template.html（论文详解页，概念回链它）
+             ../knowledge_graph_template.html（知识图谱页）
+  成品命名：knowledge_supplement.html
+  ------------------------------------------------------------------------------
+  使用方法（三步）：
+    1. 替换 :root 色板为你的项目主题色（与阅读路径页、知识图谱页保持一致）
+    2. 替换 <header> 中的标题、副标题占位符
+    3. 为每个「需要补充的背景概念」复制一个 .concept 块：
+         h3          概念名
+         .def-box    简明定义（白话，2-4 句）
+         .papers     相关论文（回链用到了该概念的论文）
+         .links      跳转链接（跳转到论文 / 返回路径主页）
+       新增论文涉及新概念时，在末尾追加 .concept。
+  链接替换规则：模板间互链已指向 *_template.html（预览可直接跳转）；
+    实际生成页面时把互链改回成品文件名（去掉 _template 后缀），
+    论文示例链接替换为真实论文文件名（../papers/ 子目录下）。
+  ------------------------------------------------------------------------------
+  组件速查（都可直接复制使用）：
+    .concept   概念卡片（白底 + 阴影），一个卡片 = 一个背景概念
+    .def-box   定义框（淡蓝背景 + 左侧蓝色边框），承载概念的简明解释
+    .papers    「相关论文」灰色小字行（回链论文）
+    .links     跳转链接组（跳转到具体论文 / 返回路径主页）
+    .rb        底部导航栏（知识图谱 / 阅读路径 / 基础生物学）
+  ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
+================================================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>需要补充的知识点 - {项目名}</title>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 与阅读路径页、知识图谱页同源
+       ==================================================================== */
+    :root {
+      --blue-dark:  #1a5276;
+      --blue-mid:   #2471a3;
+      --blue-light: #2980b9;
+      --green:  #27ae60;
+      --yellow: #f39c12;
+      --purple: #8e44ad;
+      --red:    #e74c3c;
+      --gray-d: #2c3e50;
+      --gray-m: #566573;
+      --bg:     #fafbfc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 17px; line-height: 1.85; color: var(--gray-d);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 20px 24px;
+    }
+    a { color: var(--blue-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h2 { font-size: 1.5em; color: var(--blue-dark); border-bottom: 2px solid #aed6f1; padding-bottom: 6px; margin: 2em 0 0.8em; }
+    h3 { font-size: 1.25em; color: var(--blue-mid); margin: 1.5em 0 0.6em; }
+
+    /* ====================================================================
+       页眉 (header) —— 渐变左对齐，标题 + 副标题
+       ==================================================================== */
+    header {
+      background: linear-gradient(135deg, #1a5276 0%, #2471a3 100%);
+      color: #fff; border-radius: 10px; padding: 28px 32px; margin-bottom: 28px;
+    }
+    header h1 { margin: 0; font-size: 1.8em; }
+    header .sub { font-size: 1em; opacity: 0.85; margin-top: 8px; }
+
+    /* ====================================================================
+       概念卡片 (.concept) —— 一个卡片 = 一个背景概念
+       ==================================================================== */
+    .concept {
+      background: #fff; border-radius: 8px; padding: 20px 24px;
+      margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .concept h3 { margin-top: 0; }
+    .concept .papers { font-size: 0.88em; color: var(--gray-m); margin-top: 8px; }
+    .concept .links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept .links a {
+      padding: 5px 12px; border-radius: 4px; border: 1px solid #d5dbdb;
+      background: #fff; font-size: 0.85em;
+    }
+    .concept .links a:hover { background: #eaf2f8; }
+
+    /* ====================================================================
+       定义框 (.def-box) —— 承载概念的简明白话解释
+       ==================================================================== */
+    .def-box {
+      background: #eaf2f8; border-left: 4px solid var(--blue-light);
+      border-radius: 4px; padding: 12px 16px; margin: 12px 0;
+    }
+    .def-box strong { color: var(--blue-dark); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: #fff; border-radius: 8px; padding: 18px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-top: 40px;
+      font-size: 0.88em; color: var(--gray-m); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; }
+    .rb a {
+      padding: 5px 14px; border-radius: 4px; border: 1px solid #d5dbdb;
+      background: #fff; font-size: 0.88em;
+    }
+    .rb a:hover { background: #eaf2f8; }
+  </style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <h1>需要补充的知识点</h1>
+  <div class="sub">{项目主题}的背景概念速查——每个知识点配有简明解释和相关论文链接</div>
+</header>
+
+<!-- ============ 概念卡片（复制此块扩展） ============ -->
+<!-- 说明：一个 .concept = 一个背景概念；内含 .def-box(定义) + .papers(相关论文) + .links(跳转) -->
+
+<div class="concept">
+  <h3>{概念 1 名称（如：孟德尔随机化原理与 IV 三大假设）}</h3>
+  <div class="def-box">
+    <p>{简明白话解释，2-4 句。术语首次出现附英文，如「工具变量（instrumental variable, IV）」；可加（1）（2）（3）分点列出核心要点。}</p>
+  </div>
+  <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
+  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者1}</a>, <a href="../papers/paper_explainer_page_template.html">{作者2}</a></div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">跳转到{作者1}论文</a>
+    <a href="../papers/paper_explainer_page_template.html">跳转到{作者2}论文</a>
+    <a href="reading_path_template.html">返回路径主页</a>
+  </div>
+</div>
+
+<div class="concept">
+  <h3>{概念 2 名称（如：顺式 pQTL 与共定位分析）}</h3>
+  <div class="def-box">
+    <p>{简明解释。示例：pQTL 是影响蛋白表达水平的基因位点；cis-pQTL 位于编码基因附近，水平多效性风险较小；共定位分析验证蛋白与疾病是否共享同一因果变异……}</p>
+  </div>
+  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者3}</a></div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">跳转到{作者3}论文</a>
+    <a href="reading_path_template.html">返回路径主页</a>
+  </div>
+</div>
+
+<!-- ============ 更多概念（按需复制） ============ -->
+<!--
+<div class="concept">
+  <h3>{概念 3 名称}</h3>
+  <div class="def-box"><p>{简明解释}</p></div>
+  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者}</a></div>
+  <div class="links"><a href="../papers/paper_explainer_page_template.html">跳转到{作者}论文</a> <a href="reading_path_template.html">返回路径主页</a></div>
+</div>
+-->
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="rb">
+    <strong>导航：</strong>
+    <a href="../knowledge_graph_template.html">知识图谱</a>
+    <a href="reading_path_template.html">阅读路径主页</a>
+    <a href="knowledge_supplement_template.html">返回顶部</a>
+  </div>
+  <p style="margin-top:12px;">{项目名} 项目 · 补充知识点 · {YYYY-MM-DD}</p>
+</footer>
+
+</body>
+</html>
