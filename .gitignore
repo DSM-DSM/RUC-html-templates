@@ -9,8 +9,6 @@
 # Claude Code
 .claude/
 
-# Proofcheck workspace (output per-paper)
-papers/
 .baton/
 
 # html Design

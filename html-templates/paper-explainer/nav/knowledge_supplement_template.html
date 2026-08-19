@@ -8,6 +8,8 @@
         出现、但正文不会展开讲的背景概念，用「概念卡片 + 定义框」集中速查，
         每个概念都回链到用到了它的论文。
   ------------------------------------------------------------------------------
+  视觉系统：学术纸感 · 内容优先，全 CSS 变量令牌；../theme-pack.js 提供 8 套
+  明暗主题，右下角切换方块，localStorage 跨页连续（键 paper-explainer-theme）。
   对应技能：.claude/skills/paper-explainer/SKILL.md（Step 9.4：导航页同步更新）
   配套模板：reading_path_template.html（阅读路径页，.supp 会指向本页）
              ../papers/paper_explainer_page_template.html（论文详解页，概念回链它）
@@ -15,7 +17,8 @@
   成品命名：knowledge_supplement.html
   ------------------------------------------------------------------------------
   使用方法（三步）：
-    1. 替换 :root 色板为你的项目主题色（与阅读路径页、知识图谱页保持一致）
+    1. 主题已内置 8 套（theme-pack.js），无需再改色板；如需自定义品牌色，
+       改 :root 令牌或在 theme-pack.js 追加条目（见模板 guide）
     2. 替换 <header> 中的标题、副标题占位符
     3. 为每个「需要补充的背景概念」复制一个 .concept 块：
          h3          概念名
@@ -28,11 +31,11 @@
     论文示例链接替换为真实论文文件名（../papers/ 子目录下）。
   ------------------------------------------------------------------------------
   组件速查（都可直接复制使用）：
-    .concept   概念卡片（白底 + 阴影），一个卡片 = 一个背景概念
-    .def-box   定义框（淡蓝背景 + 左侧蓝色边框），承载概念的简明解释
+    .concept   概念卡片（表面色 + 细边 + 微阴影），一个卡片 = 一个背景概念
+    .def-box   定义框（定义色淡底 + 1px 同系细边），承载概念的简明解释
     .papers    「相关论文」灰色小字行（回链论文）
     .links     跳转链接组（跳转到具体论文 / 返回路径主页）
-    .rb        底部导航栏（知识图谱 / 阅读路径 / 基础生物学）
+    .rb        底部导航栏（知识图谱 / 阅读路径）
   ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
 ================================================================================
 -->
@@ -40,98 +43,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>需要补充的知识点 - {项目名}</title>
+  <title>需要补充的知识点 · {项目名}</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script src="../theme-pack.js"></script>
   <style>
     /* ====================================================================
-       设计令牌 (Design Tokens) —— 与阅读路径页、知识图谱页同源
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
        ==================================================================== */
     :root {
-      --blue-dark:  #1a5276;
-      --blue-mid:   #2471a3;
-      --blue-light: #2980b9;
-      --green:  #27ae60;
-      --yellow: #f39c12;
-      --purple: #8e44ad;
-      --red:    #e74c3c;
-      --gray-d: #2c3e50;
-      --gray-m: #566573;
-      --bg:     #fafbfc;
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-      font-size: 17px; line-height: 1.85; color: var(--gray-d);
-      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 20px 24px;
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
     }
-    a { color: var(--blue-light); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    h2 { font-size: 1.5em; color: var(--blue-dark); border-bottom: 2px solid #aed6f1; padding-bottom: 6px; margin: 2em 0 0.8em; }
-    h3 { font-size: 1.25em; color: var(--blue-mid); margin: 1.5em 0 0.6em; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.4em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--ink); font-weight: 600; margin: 1.4em 0 0.6em; }
+    p { margin: 10px 0; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
 
     /* ====================================================================
-       页眉 (header) —— 渐变左对齐，标题 + 副标题
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
        ==================================================================== */
     header {
-      background: linear-gradient(135deg, #1a5276 0%, #2471a3 100%);
-      color: #fff; border-radius: 10px; padding: 28px 32px; margin-bottom: 28px;
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 28px 4px 22px; margin-bottom: 30px;
     }
-    header h1 { margin: 0; font-size: 1.8em; }
-    header .sub { font-size: 1em; opacity: 0.85; margin-top: 8px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+    }
+    header .sub { font-size: .96em; color: var(--ink-2); margin-top: 6px; }
 
     /* ====================================================================
        概念卡片 (.concept) —— 一个卡片 = 一个背景概念
        ==================================================================== */
     .concept {
-      background: #fff; border-radius: 8px; padding: 20px 24px;
-      margin: 18px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
     }
-    .concept h3 { margin-top: 0; }
-    .concept .papers { font-size: 0.88em; color: var(--gray-m); margin-top: 8px; }
-    .concept .links { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .concept h2 { margin: 0 0 8px; font-size: 1.15em; font-family: var(--font-body); border: none; padding: 0; }
+    .concept h2::after { display: none; }
+    .concept .papers { font-size: .9em; color: var(--ink-2); margin-top: 10px; }
+    .concept .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
     .concept .links a {
-      padding: 5px 12px; border-radius: 4px; border: 1px solid #d5dbdb;
-      background: #fff; font-size: 0.85em;
+      padding: 5px 13px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
     }
-    .concept .links a:hover { background: #eaf2f8; }
+    .concept .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
 
     /* ====================================================================
        定义框 (.def-box) —— 承载概念的简明白话解释
        ==================================================================== */
     .def-box {
-      background: #eaf2f8; border-left: 4px solid var(--blue-light);
-      border-radius: 4px; padding: 12px 16px; margin: 12px 0;
+      background: var(--c-def-bg); border: 1px solid var(--c-def-bd);
+      border-radius: var(--radius-s); padding: 12px 16px; margin: 12px 0;
     }
-    .def-box strong { color: var(--blue-dark); }
+    .def-box strong { color: var(--c-def-fg); }
 
     /* ====================================================================
        页脚 (footer) + 底部导航栏 (.rb)
        ==================================================================== */
     footer {
-      background: #fff; border-radius: 8px; padding: 18px 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-top: 40px;
-      font-size: 0.88em; color: var(--gray-m); text-align: center;
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .9em; color: var(--ink-2); text-align: center;
     }
-    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
     .rb a {
-      padding: 5px 14px; border-radius: 4px; border: 1px solid #d5dbdb;
-      background: #fff; font-size: 0.88em;
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
     }
-    .rb a:hover { background: #eaf2f8; }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
   </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P || !id) return;
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+<div class="progress" aria-hidden="true"></div>
 
 <!-- ============ HEADER ============ -->
 <header>
   <h1>需要补充的知识点</h1>
-  <div class="sub">{项目主题}的背景概念速查——每个知识点配有简明解释和相关论文链接</div>
+  <div class="sub">{项目主题}的背景概念速查，每个知识点配有简明解释和相关论文链接</div>
 </header>
 
 <!-- ============ 概念卡片（复制此块扩展） ============ -->
 <!-- 说明：一个 .concept = 一个背景概念；内含 .def-box(定义) + .papers(相关论文) + .links(跳转) -->
 
 <div class="concept">
-  <h3>{概念 1 名称（如：孟德尔随机化原理与 IV 三大假设）}</h3>
+  <h2>{概念 1 名称（如：孟德尔随机化原理与 IV 三大假设）}</h2>
   <div class="def-box">
     <p>{简明白话解释，2-4 句。术语首次出现附英文，如「工具变量（instrumental variable, IV）」；可加（1）（2）（3）分点列出核心要点。}</p>
   </div>
@@ -145,7 +247,7 @@
 </div>
 
 <div class="concept">
-  <h3>{概念 2 名称（如：顺式 pQTL 与共定位分析）}</h3>
+  <h2>{概念 2 名称（如：顺式 pQTL 与共定位分析）}</h2>
   <div class="def-box">
     <p>{简明解释。示例：pQTL 是影响蛋白表达水平的基因位点；cis-pQTL 位于编码基因附近，水平多效性风险较小；共定位分析验证蛋白与疾病是否共享同一因果变异……}</p>
   </div>
@@ -156,13 +258,15 @@
   </div>
 </div>
 
-<!-- ============ 更多概念（按需复制） ============ -->
-<!--
+<!-- 更多概念（按需复制）：
 <div class="concept">
-  <h3>{概念 3 名称}</h3>
+  <h2>{概念 3 名称}</h2>
   <div class="def-box"><p>{简明解释}</p></div>
   <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者}</a></div>
-  <div class="links"><a href="../papers/paper_explainer_page_template.html">跳转到{作者}论文</a> <a href="reading_path_template.html">返回路径主页</a></div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">跳转到{作者}论文</a>
+    <a href="reading_path_template.html">返回路径主页</a>
+  </div>
 </div>
 -->
 
@@ -172,10 +276,87 @@
     <strong>导航：</strong>
     <a href="../knowledge_graph_template.html">知识图谱</a>
     <a href="reading_path_template.html">阅读路径主页</a>
-    <a href="knowledge_supplement_template.html">返回顶部</a>
+    <a href="#">返回顶部</a>
   </div>
   <p style="margin-top:12px;">{项目名} 项目 · 补充知识点 · {YYYY-MM-DD}</p>
 </footer>
 
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  apply((function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })() || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
 </body>
 </html>

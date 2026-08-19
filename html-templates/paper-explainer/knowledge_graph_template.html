@@ -7,12 +7,15 @@
         提炼的完整架构。知识图谱是所有论文详解页的「关联中枢」——
         用 5 个板块把多篇论文的概念关联、方法关系、推荐阅读顺序组织起来。
   ------------------------------------------------------------------------------
+  视觉系统：学术纸感 · 内容优先，全 CSS 变量令牌；theme-pack.js 提供 8 套
+  明暗主题，右下角切换方块，localStorage 跨页连续（键 paper-explainer-theme）。
   对应技能：.claude/skills/paper-explainer/SKILL.md（Step 8：更新知识图谱）
-  配套模板：paper_explainer_page_template.html（单篇论文详解页）
+  配套模板：papers/paper_explainer_page_template.html（单篇论文详解页）
   固定命名：knowledge_graph.html（不随论文变化）
   ------------------------------------------------------------------------------
   使用方法（四步）：
-    1. 替换 :root 色板为你的项目主题色（与论文详解页保持一致）
+    1. 主题已内置 8 套（theme-pack.js），无需再改色板；如需自定义品牌色，
+       改 :root 令牌或在 theme-pack.js 追加条目（见模板 guide）
     2. 替换 kg-header 中的项目名、论文数、概念数、交叉关系数
     3. 每新增一篇论文，依次更新下方 5 个板块（见各板块内注释）
     4. 最后把 kg-header 和 footer 的「最后更新」日期统一为当天
@@ -29,7 +32,7 @@
   ------------------------------------------------------------------------------
   标签语义（概念关联图谱中的三种标签 + 新概念标签）：
     .tag.shared   蓝色「共享基础」——多篇论文都用到的核心方法/概念
-    .tag.unique   黄色「独有」——仅该论文特有的概念
+    .tag.unique   琥珀「独有」——仅该论文特有的概念
     .tag.bridge   紫色「桥梁」——连接不同论文的概念
     .tag.new      绿色「新概念」——本次新增论文引入的概念
   ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
@@ -39,138 +42,266 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{项目主题} 知识图谱 - {项目名}</title>
+<title>{项目主题} 知识图谱 · {项目名}</title>
+<link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+<script src="theme-pack.js"></script>
 <style>
 /* ====================================================================
-   设计令牌 (Design Tokens) —— 与论文详解页保持一致
+   设计令牌 (Design Tokens) —— 默认主题「纸墨」，与论文详解页同源；
+   其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
    ==================================================================== */
 :root {
-  --blue-deep: #1a5276;
-  --blue-mid: #2471a3;
-  --blue-link: #2980b9;
-  --blue-bg: #eaf2f8;
-  --green: #27ae60;
-  --purple: #8e44ad;
-  --gray-dark: #2c3e50;
-  --gray-mid: #7f8c8d;
-  --bg: #fafbfc;
+  color-scheme: light;
+  --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+  --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+  --rule: #e4e3db; --rule-strong: #cfcec3;
+  --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+  --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+  --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+  --radius: 10px; --radius-s: 7px;
+  --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+  --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+  --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+  /* 标签/徽章语义色（fg / bg / border） */
+  --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+  --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+  --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+  --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+  --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+  --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+  --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+  --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
-  font-size: 17px; line-height: 1.75; color: var(--gray-dark);
-  background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 20px 24px;
+  font-family: var(--font-body);
+  font-size: 17px; line-height: 1.75; color: var(--ink);
+  background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 26px 24px 60px;
+  transition: background-color .25s ease, color .25s ease;
 }
-a { color: var(--blue-link); text-decoration: none; }
-a:hover { text-decoration: underline; }
-h2 { color: var(--blue-deep); font-size: 1.5em; margin: 44px 0 14px; padding-bottom: 8px; border-bottom: 2px solid #d4e6f1; }
-h3 { color: var(--blue-mid); font-size: 1.22em; margin: 32px 0 10px; }
+a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+::selection { background: var(--sel); }
+html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+body::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+h2 {
+  font-family: var(--font-display); font-weight: 600; color: var(--ink);
+  font-size: 1.45em; line-height: 1.4; margin: 46px 0 16px; padding-bottom: 9px;
+  border-bottom: 1px solid var(--rule-strong); position: relative;
+}
+h2::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 56px; height: 2px; background: var(--accent); }
+h3 { color: var(--ink); font-size: 1.18em; font-weight: 600; margin: 30px 0 10px; }
+p { margin: 10px 0; }
+.ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
-/* 页眉（渐变色块 + 统计） */
-.kg-header {
-  background: linear-gradient(135deg, #1a5276 0%, #2471a3 100%);
-  color: #fff; border-radius: 10px; padding: 24px 28px; margin-bottom: 28px;
+/* 顶部阅读进度条 */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+  background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
 }
-.kg-header h1 { margin: 0 0 6px; font-size: 1.6em; }
-.kg-stats { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 16px; font-size: .9em; }
-.kg-stat { background: rgba(255,255,255,.15); border-radius: 6px; padding: 8px 14px; }
+/* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+html.rv-on .rv.in {
+  opacity: 1; transform: translateY(0);
+  transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+  .progress { transition: none; }
+}
 
 /* 顶部导航栏 */
 .top-nav-bar {
-  background: #fff; border: 1px solid #d5dbdb; border-radius: 8px;
-  padding: 10px 18px; margin-bottom: 24px; display: flex; flex-wrap: wrap;
-  gap: 10px 20px; align-items: center; font-size: .94em;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+  gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
 }
-.top-nav-bar .current { color: var(--gray-mid); font-weight: 600; }
+.top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+.top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+.top-nav-bar .sep { color: var(--rule-strong); }
+
+/* ====================================================================
+   页眉（期刊刊头式：顶部粗规线 + 衬线标题 + 统计数字）
+   ==================================================================== */
+.kg-header { border-top: 2px solid var(--ink); padding: 24px 2px 20px; margin-bottom: 30px; border-bottom: 1px solid var(--rule-strong); }
+.kg-header h1 {
+  font-family: var(--font-display); font-weight: 600; color: var(--ink);
+  font-size: 1.66em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+}
+.kg-sub { font-size: .9em; color: var(--ink-2); }
+.kg-stats { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px 34px; }
+.kg-stat { display: flex; align-items: baseline; gap: 8px; }
+.kg-stat b {
+  font-family: var(--font-display); font-weight: 600; font-size: 1.7em; line-height: 1;
+  color: var(--accent); font-variant-numeric: tabular-nums;
+}
+.kg-stat span { font-size: .84em; color: var(--ink-2); }
 
 /* ====================================================================
    板块 1：概念关联图谱 (.network-grid)
    ==================================================================== */
-.network-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.network-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
 @media (max-width: 700px) { .network-grid { grid-template-columns: 1fr; } }
-.paper-node { background: #fff; border: 2px solid var(--blue-link); border-radius: 10px; padding: 18px 20px; }
-.paper-node .node-title { font-size: 1.05em; font-weight: 700; color: var(--blue-deep); margin-bottom: 8px; }
-.paper-node .node-meta { font-size: .85em; color: var(--gray-mid); margin-bottom: 10px; }
+.paper-node {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow);
+  transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+}
+.paper-node:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+.paper-node .node-title { font-size: 1.05em; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.paper-node .node-meta { font-size: .84em; color: var(--ink-3); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
 .concept-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .78em; font-weight: 600; }
-.tag.shared { background: #eaf2f8; color: #2471a3; }
-.tag.unique { background: #fef9e7; color: #b8730a; }
-.tag.bridge { background: #f4ecf7; color: #8e44ad; }
-.tag.new { background: #e8f8f5; color: #1e8449; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .78em; font-weight: 600; border: 1px solid transparent; }
+.tag.shared { background: var(--c-def-bg); color: var(--c-def-fg); border-color: var(--c-def-bd); }
+.tag.unique { background: var(--c-ex-bg);  color: var(--c-ex-fg);  border-color: var(--c-ex-bd); }
+.tag.bridge { background: var(--c-th-bg);  color: var(--c-th-fg);  border-color: var(--c-th-bd); }
+.tag.new    { background: var(--c-int-bg); color: var(--c-int-fg); border-color: var(--c-int-bd); }
 
 /* ====================================================================
    板块 2：概念-论文对照矩阵 (table.matrix)
    ==================================================================== */
-table.matrix { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .84em; }
-table.matrix th { background: var(--blue-deep); color: #fff; padding: 8px 8px; text-align: center; font-size: .85em; }
+table.matrix { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .86em; font-variant-numeric: tabular-nums; }
+table.matrix th { background: var(--accent-deep); color: var(--on-accent); padding: 9px 10px; text-align: center; font-size: .9em; font-weight: 600; }
 table.matrix th:first-child { min-width: 160px; text-align: left; }
-table.matrix td { padding: 7px 8px; border-bottom: 1px solid #e0e0e0; text-align: center; vertical-align: middle; }
-table.matrix td:first-child { text-align: left; font-weight: 600; }
-table.matrix tr:nth-child(even) td { background: #f8f9fa; }
+table.matrix td { padding: 8px 10px; border-bottom: 1px solid var(--rule); text-align: center; vertical-align: middle; }
+table.matrix td:first-child { text-align: left; font-weight: 500; }
+table.matrix tr:nth-child(even) td { background: var(--surface-2); }
 /* 单元格标记：checkmark=核心/覆盖, partial=提及, cross=未涉及 */
-.checkmark { color: #27ae60; }
-.cross { color: #e74c3c; }
-.partial { color: #f39c12; }
+.checkmark { color: var(--c-int-fg); font-weight: 600; }
+.cross { color: var(--c-wa-fg); }
+.partial { color: var(--c-ex-fg); }
 
 /* ====================================================================
    板块 3：论文间关系卡片 (.rel-card)
    ==================================================================== */
-.rel-card { background: #fff; border: 1px solid #d5dbdb; border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
-.rel-card h4 { margin: 0 0 6px; font-size: 1em; color: var(--blue-deep); }
-.rel-type {
-  display: inline-block; padding: 2px 10px; border-radius: 4px;
-  font-size: .78em; font-weight: 600; margin-right: 8px; color: #fff;
+.rel-card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 16px 20px; margin: 12px 0; box-shadow: var(--shadow);
+  transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, background-color .25s ease;
 }
-.rel-generalizes { background: #8e44ad; }  /* 推广/升级 */
-.rel-shares      { background: #2471a3; }  /* 共享基础 */
-.rel-complements { background: #27ae60; }  /* 互补 */
+.rel-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+.rel-card h3 { margin: 0 0 6px; font-size: 1em; color: var(--ink); font-weight: 600; }
+.rel-type {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: .78em; font-weight: 600; margin-right: 8px; color: var(--rel-ink);
+}
+.rel-generalizes { background: var(--rel-gen); }    /* 推广/升级 */
+.rel-shares      { background: var(--rel-share); }  /* 共享基础 */
+.rel-complements { background: var(--rel-comp); }   /* 互补 */
 
 /* ====================================================================
    板块 4：推荐阅读路径 (ol.roadmap-steps)
    ==================================================================== */
 .roadmap-steps { list-style: none; padding: 0; counter-reset: step; }
 .roadmap-steps li {
-  background: #fff; border-left: 4px solid var(--blue-link); padding: 14px 18px;
-  margin: 10px 0; border-radius: 0 6px 6px 0; counter-increment: step;
+  background: var(--surface); border: 1px solid var(--rule); padding: 14px 18px;
+  margin: 10px 0; border-radius: var(--radius-s); counter-increment: step; box-shadow: var(--shadow);
 }
 .roadmap-steps li::before {
   content: counter(step); display: inline-block; width: 26px; height: 26px;
   line-height: 26px; text-align: center; border-radius: 50%;
-  background: var(--blue-deep); color: #fff; font-weight: 700; font-size: .85em; margin-right: 10px;
+  background: var(--accent-deep); color: var(--on-accent);
+  font-family: var(--font-display); font-weight: 600; font-size: .9em; margin-right: 10px;
 }
+.roadmap-steps p { margin: 4px 0 0; font-size: .9em; color: var(--ink-2); }
 
 /* ====================================================================
    板块 5：论文索引 (.paper-links)
    ==================================================================== */
 .paper-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.paper-links a { padding: 6px 14px; border-radius: 4px; border: 1px solid #d5dbdb; background: #fff; font-size: .88em; }
-.paper-links a:hover { background: #eaf2f8; text-decoration: none; }
+.paper-links a {
+  padding: 6px 14px; border-radius: 999px; border: 1px solid var(--rule);
+  background: var(--surface); font-size: .88em;
+  transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+}
+.paper-links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
 
-footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; font-size: .88em; color: var(--gray-mid); }
+footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-strong); font-size: .88em; color: var(--ink-2); }
+
+@media (max-width: 768px) {
+  body { font-size: 15px; padding: 14px 14px 48px; }
+  .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .kg-stats { gap: 10px 22px; }
+}
+@media print { .progress { display: none !important; } }
 </style>
+<style id="theme-css"></style>
+<!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+<style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+<script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P || !id) return;
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
 </head>
 <body>
+<div class="progress" aria-hidden="true"></div>
 
 <!-- ============ TOP NAV ============ -->
 <!-- 说明：current=知识图谱；依次列出所有论文详解 + 阅读路径等导航页 -->
 <div class="top-nav-bar">
-  <span class="current">&#x2190; 知识图谱</span>
+  <span class="current">← 知识图谱</span>
+  <span class="sep">|</span>
   <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
   <a href="papers/paper_explainer_page_template.html">{论文1简称}</a>
   <a href="papers/paper_explainer_page_template.html">{论文2简称}</a>
   <a href="papers/paper_explainer_page_template.html">{论文3简称}</a>
-  <a href="nav/reading_path_template.html">阅读路径</a>
-  <a href="nav/knowledge_supplement_template.html">补充知识</a>
+  <span class="sep">|</span>
+  <a href="nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>阅读路径</a>
+  <a href="nav/knowledge_supplement_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.2a2.4 2.4 0 0 1 4.7.8c0 1.6-2.3 1.9-2.3 3.2M12 16.8v.4"/></svg>补充知识</a>
 </div>
 
 <!-- ============ HEADER ============ -->
 <div class="kg-header">
-  <h1>&#x1F5FA;&#xFE0F; {项目主题}研究知识图谱</h1>
-  <div style="font-size:.9em;opacity:.85;margin-top:8px;">项目：{项目名} &middot; 最后更新：{YYYY-MM-DD}</div>
+  <h1>{项目主题}研究知识图谱</h1>
+  <div class="kg-sub">项目：{项目名} · 最后更新：{YYYY-MM-DD}</div>
   <div class="kg-stats">
-    <div class="kg-stat">&#x1F4C4; 论文数：{N}</div>
-    <div class="kg-stat">&#x1F3F7;&#xFE0F; 核心概念：{N+}</div>
-    <div class="kg-stat">&#x1F517; 交叉关系：{N+}</div>
+    <div class="kg-stat"><b>{N}</b><span>论文数</span></div>
+    <div class="kg-stat"><b>{N+}</b><span>核心概念</span></div>
+    <div class="kg-stat"><b>{N+}</b><span>交叉关系</span></div>
   </div>
 </div>
 
@@ -182,7 +313,7 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
        独有/新概念 (.tag.unique/.tag.new) → 共享基础 (.tag.shared) → 桥梁 (.tag.bridge) -->
   <div class="paper-node">
     <div class="node-title">{论文1 简称}</div>
-    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
     <div class="concept-tags"><span class="tag unique">{独有概念1}</span> <span class="tag unique">{独有概念2}</span></div>
     <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
     <div class="concept-tags"><span class="tag bridge">{桥梁概念1}</span></div>
@@ -190,7 +321,7 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
 
   <div class="paper-node">
     <div class="node-title">{论文2 简称}</div>
-    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
     <div class="concept-tags"><span class="tag new">{新概念1}</span> <span class="tag new">{新概念2}</span></div>
     <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
     <div class="concept-tags"><span class="tag bridge">{桥梁概念1}（&#x2194;{论文1简称}）</span></div>
@@ -200,7 +331,7 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
   <!--
   <div class="paper-node" style="grid-column: 1 / -1;">
     <div class="node-title">{论文3 简称}</div>
-    <div class="node-meta">{期刊} {年份} &middot; {作者 et al.}</div>
+    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
     <div class="concept-tags"><span class="tag new">{...}</span></div>
     <div class="concept-tags"><span class="tag shared">{...}</span></div>
     <div class="concept-tags"><span class="tag bridge">{...}</span></div>
@@ -214,9 +345,9 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
 <h2>2. 概念-论文对照矩阵</h2>
 <table class="matrix">
   <tr><th>核心概念</th><th>{论文1简称}</th><th>{论文2简称}</th><th>{论文3简称}</th></tr>
-  <tr><td>{概念 A}</td><td class="checkmark">核心</td><td class="partial">提及</td><td class="cross"></td></tr>
+  <tr><td>{概念 A}</td><td class="checkmark">核心</td><td class="partial">提及</td><td class="cross">未涉及</td></tr>
   <tr><td>{概念 B}</td><td class="checkmark">详细</td><td class="checkmark">应用</td><td class="partial">提及</td></tr>
-  <tr><td>{概念 C（新增论文独有）}</td><td class="cross"></td><td class="cross"></td><td class="checkmark">核心输出</td></tr>
+  <tr><td>{概念 C（新增论文独有）}</td><td class="cross">未涉及</td><td class="cross">未涉及</td><td class="checkmark">核心输出</td></tr>
 </table>
 
 <!-- ============ 板块 3：论文间关系卡片 ============ -->
@@ -225,26 +356,26 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
 <h2>3. 论文间关系卡片</h2>
 
 <div class="rel-card">
-  <h4><span class="rel-type rel-shares">共享基础</span> {论文1简称} / {论文2简称}</h4>
-  <p>{两篇论文的具体关系描述——共享了什么、在哪个维度互补/推广，禁止泛泛而谈「两者相关」。}</p>
+  <h3><span class="rel-type rel-shares">共享基础</span> {论文1简称} / {论文2简称}</h3>
+  <p>{两篇论文的具体关系描述：共享了什么、在哪个维度互补/推广，禁止泛泛而谈「两者相关」。}</p>
 </div>
 
 <div class="rel-card">
-  <h4><span class="rel-type rel-complements">互补</span> {论文2简称} / {论文3简称}</h4>
+  <h3><span class="rel-type rel-complements">互补</span> {论文2简称} / {论文3简称}</h3>
   <p>{具体关系描述。}</p>
 </div>
 
 <div class="rel-card">
-  <h4><span class="rel-type rel-generalizes">推广升级</span> {论文1简称} / {论文3简称}</h4>
+  <h3><span class="rel-type rel-generalizes">推广升级</span> {论文1简称} / {论文3简称}</h3>
   <p>{具体关系描述。}</p>
 </div>
 
 <!-- ============ 板块 4：推荐阅读路径 ============ -->
 <h2>4. 推荐阅读路径</h2>
 <ol class="roadmap-steps">
-  <li><strong>入门：{第一步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
-  <li><strong>深入：{第二步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
-  <li><strong>应用：{第三步主题}</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> —— {这一步学什么}。</p></li>
+  <li><strong>入门：{第一步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
+  <li><strong>深入：{第二步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
+  <li><strong>应用：{第三步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
 </ol>
 
 <!-- ============ 板块 5：论文索引 ============ -->
@@ -257,8 +388,85 @@ footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #d4e6f1; fon
 
 <footer>
   <p><strong>知识图谱说明：</strong>本图谱随项目论文数量的增加而动态更新。</p>
-  <p style="font-size:.85em;color:#aaa;">{项目名} 项目 &middot; 最后更新：{YYYY-MM-DD} &middot; 论文数：{N}</p>
+  <p style="font-size:.85em;color:var(--ink-3);">{项目名} 项目 · 最后更新：{YYYY-MM-DD} · 论文数：{N}</p>
 </footer>
 
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  apply((function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })() || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
 </body>
 </html>
