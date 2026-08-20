@@ -348,7 +348,9 @@ svg text { font-family: var(--font-sans); }
 .slide.active { opacity: 1; transform: none; pointer-events: auto; }
 .slide-inner {
   width: min(1120px, 100% - clamp(40px, 8vw, 160px)); margin: 0 auto;
-  height: 100%; display: flex; flex-direction: column; justify-content: center;
+  height: 100%; display: flex; flex-direction: column;
+  justify-content: center; /* fallback：不支持 safe 对齐的旧引擎 */
+  justify-content: safe center; /* 溢出时安全贴顶而非两端外溢，内容不侵入顶部 padding 区撞 slide-tag */
   padding: 96px 0 92px;
 }
 .slide-tag {
@@ -402,16 +404,25 @@ svg text { font-family: var(--font-sans); }
 .product { overflow: hidden; }
 .product.focus { flex-direction: column; gap: 12px; }
 /* 放大同用 16:9 标准矩形：宽度撑满左列，cover 左上角对齐与缩略态同一规则，
-   只是把 46% 宽换成 100% 宽（约 400px 高，与标题/metrics 同屏容纳） */
-.product.focus .shot { width: 100%; }
+   只是把 46% 宽换成 100% 宽（约 400px 高，与标题/metrics 同屏容纳）。
+   max-height 兜底矮视口（如 125% 缩放 768p≈519px 高）：按 100vh-300px 预算（去上下 padding
+   与 caption 后的可用高度）压图，防止内容溢出滚动后 absolute 的 slide-tag 盖住图顶 */
+.product.focus .shot { width: 100%; max-height: min(100vh - 300px, 400px); }
 .product.focus .product-cap { padding-top: 0; }
 .products.focus .product:not(.focus) { display: none; }
+/* 放大看图时左列指标行让位（还原即恢复），给图与说明腾出完整高度预算 */
+.two-col.outcomes .products.focus ~ .outcome-metrics { display: none; }
 /* 聚焦切换用 fade-through 交换：只动画 opacity，布局瞬时切换，避免回流抖动 */
 @keyframes fade-swap { 0% { opacity: 1; } 45% { opacity: .45; } 100% { opacity: 1; } }
 .products.swap { animation: fade-swap 240ms var(--ease-out); }
+/* 产品区整体下移：与 absolute 的 slide-tag 行（top:80px + 胶囊高）拉开净距，
+   即使内容溢出贴顶，第一张图也不越过 padding-top(116px) 线与标签重叠 */
+.products { margin-top: 14px; }
+/* 操作提示并入 slide-tag 行（页面标签旁）：脱离左列内容流，
+   不随内容滚动/溢出，也就不会被 slide-tag 胶囊盖住或被大图推出可视区 */
 .product-hint {
-  margin-left: 12px; font-size: 11px; font-family: var(--font-mono);
-  color: var(--text-faint); letter-spacing: .02em;
+  margin-left: 2px; font-size: 11px; font-family: var(--font-mono); font-style: normal;
+  color: var(--text-faint); letter-spacing: .02em; opacity: .9;
 }
 /* 产品名标签：明确标明右侧「如何构建」当前显示的是哪个产品的内容，随点击联动切换 */
 .build-label {
@@ -438,6 +449,19 @@ svg text { font-family: var(--font-sans); }
 .outcome-metrics .om { display: flex; flex-direction: column; gap: 2px; }
 .outcome-metrics .om .v { font-size: 26px; font-weight: 300; color: var(--text-hi); letter-spacing: -.01em; }
 .outcome-metrics .om .l { font-size: 12px; color: var(--text-faint); }
+/* 矮视口（≤700px 高，覆盖 125% 缩放 768p 笔记本≈519px 与 620~700px 的中矮窗口）：
+   产出页两列高度预算不足（左列两卡+metrics ~499px / 右列构建步骤 ~473px > 可用 423px@vh635），
+   溢出滚动会让 absolute 的 slide-tag 盖住滚上来的内容顶部——压缩间距与字号、隐藏指标行，
+   让两列整体入屏免滚动（safe center 只保证默认态贴顶不遮，滚动态需靠不溢出兜底） */
+@media (max-height: 700px) {
+  .outcome-metrics { display: none; }
+  .col-heading { margin-bottom: 12px; }
+  .build-steps li { padding-bottom: 14px; }
+  .build-steps .b-desc { font-size: 12px; line-height: 1.5; }
+  .product + .product { margin-top: 14px; }
+  /* 只限缩略图高；focus 放大图走上面 min(100vh-300px,400px) 预算，保留放大效果 */
+  .two-col.outcomes .product:not(.focus) .shot { max-height: 146px; }
+}
 .build-steps { position: relative; }
 .build-steps li { position: relative; padding: 0 0 30px 44px; }
 .build-steps li::before {
@@ -907,18 +931,19 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     var defBuild = (chunk[0] && chunk[0].build && chunk[0].build.length) ? chunk[0].build : lineSteps;
     var defLabel = chunk[0] ? chunk[0].name : (line.title || "");
     var steps = buildStepsHtml(defBuild, 120);
+    /* 提示随 slide-tag 固定在页面标签行（absolute 定位、不参与内容滚动），
+       避免放左列顶部时被溢出内容推出可视区、或与 slide-tag 胶囊重叠 */
     var hint = chunk.length > 1
-      ? '<span class="product-hint">点击产品卡片可放大查看 · 再点一次还原</span>'
+      ? '<em class="product-hint">点击产品卡片可放大查看 · 再点一次还原</em>'
       : "";
     var tag = parts > 1
       ? "产出与构建 0" + (part + 1) + " / 0" + parts
       : "产出与构建";
     return '<div class="slide">' +
-      '<span class="slide-tag num">' + esc(tag) + "</span>" +
+      '<span class="slide-tag num">' + esc(tag) + hint + "</span>" +
       '<div class="slide-inner">' +
       '<div class="two-col outcomes">' +
       "<div>" +
-      hint +
       '<div class="products" data-default-build=\'' + esc(JSON.stringify(defBuild)) + '\' data-default-label="' + esc(defLabel) + '">' + products + "</div>" +
       metricsHtml +
       "</div>" +
@@ -1258,6 +1283,13 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       });
       setBuildFor(box, null);
       replaySwap(box);
+      resetScroll(box);
+    }
+    /* 放大/还原都回到初始视角：清掉内容滚动残留，
+       防止 absolute 的 slide-tag 盖住滚上来的内容顶部 */
+    function resetScroll(box) {
+      var si = box.closest(".slide-inner");
+      if (si) si.scrollTop = 0;
     }
     document.addEventListener("click", function (e) {
       var p = e.target.closest ? e.target.closest(".product") : null;
@@ -1272,6 +1304,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
           });
           setBuildFor(box, p);
           replaySwap(box);
+          resetScroll(box);
         }
         return;
       }
