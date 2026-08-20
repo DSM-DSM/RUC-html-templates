@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!--
+================================================================================
+  阅读路径规划模板 (Reading Path Template)
+  ------------------------------------------------------------------------------
+  来源：从 TianTanAI 项目 paper-explainer 技能维护的 nav/reading_path.html
+        提炼的完整架构。阅读路径是论文详解的「导览门户」——用「阶段 + 步骤」
+        把多篇论文组织成一条渐进式学习路线，每站说明「学什么 + 为什么在这一站」。
+  ------------------------------------------------------------------------------
+  视觉系统：学术纸感 · 内容优先，全 CSS 变量令牌；../theme-pack.js 提供 8 套
+  明暗主题，右下角切换方块，localStorage 跨页连续（键 paper-explainer-theme）。
+  对应技能：.claude/skills/paper-explainer/SKILL.md（Step 9.4：导航页同步更新）
+  配套模板：knowledge_supplement_template.html（背景知识页，本页 .supp 会指向它）
+             ../papers/paper_explainer_page_template.html（论文详解页，step 指向它）
+             ../knowledge_graph_template.html（知识图谱页）
+  成品命名：reading_path.html
+  ------------------------------------------------------------------------------
+  使用方法（三步）：
+    1. 主题已内置 8 套（theme-pack.js），无需再改色板；如需自定义品牌色，
+       改 :root 令牌或在 theme-pack.js 追加条目（见模板 guide）
+    2. 替换 <header> 中的标题、副标题、元信息占位符
+    3. 按「第零阶段 / 第一阶段 / …」的 .phase 分组，逐个复制 .step 块填充
+       （每个 .step = 一篇论文或一个知识点；新增论文时在对应阶段末尾追加 .step）
+  链接替换规则：模板间互链已指向 *_template.html（预览可直接跳转）；
+    实际生成页面时把互链改回成品文件名（去掉 _template 后缀），
+    论文示例链接替换为真实论文文件名（../papers/ 子目录下）。
+  ------------------------------------------------------------------------------
+  组件速查（都可直接复制使用）：
+    .phase     阶段分隔条（次级表面 + 上下发丝线，标出「第N阶段」主题）
+    .step      步骤卡片（表面色 + 细边 + 悬停微浮起），内含：
+                 h3          步骤标题（超链接指向论文详解页）
+                 .goal       学习目标（绿色，一句话，旗帜图标）
+                 .why        为什么在这一站（灰色小字，串联前后逻辑）
+                 .links      跳转链接组（快速导引 / 补充知识点）
+    .supp      虚线提示框（引导读者去「背景知识页」补课）
+    .rb        底部导航栏（知识图谱 / 补充知识点 / 阅读路径首页）
+  ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
+================================================================================
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{项目主题}阅读路径规划 · {项目名}</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与知识图谱页、论文页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.35em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.12em; color: var(--ink); font-weight: 600; margin: 1.2em 0 0.5em; }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题居中
+       ==================================================================== */
+    header {
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 30px 24px 24px; margin-bottom: 30px; text-align: center;
+    }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 8px;
+    }
+    header .sub { font-size: 1em; color: var(--ink-2); margin-top: 8px; }
+    header .mt  { font-size: .9em; color: var(--ink-3); margin-top: 10px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       阶段分隔条 (.phase) —— 标出「第N阶段」主题
+       ==================================================================== */
+    .phase {
+      background: var(--surface-2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+      padding: 13px 20px; margin: 30px 0 14px; text-align: center;
+    }
+    .phase h2 { margin: 0; font-size: 1.2em; color: var(--ink); }
+
+    /* ====================================================================
+       步骤卡片 (.step) —— 每一站 = 一篇论文 / 一个知识点
+       ==================================================================== */
+    .step {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+    }
+    .step:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .step h3 { margin-top: 0; color: var(--ink); }
+    .step h3 a { display: inline-flex; align-items: baseline; gap: 7px; }
+    .step .goal {
+      color: var(--c-int-fg); font-weight: 500; margin: 8px 0 4px;
+      display: flex; align-items: baseline; gap: 7px;
+    }
+    .step .goal::before {
+      content: ""; width: 13px; height: 13px; flex: none; align-self: center; background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4M5 4h11l-2 4 2 4H5'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 21V4M5 4h11l-2 4 2 4H5'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+    .step .why  { color: var(--ink-2); font-size: .9em; margin-top: 4px; }
+    .step .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .step .links a {
+      padding: 6px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em; font-weight: 500;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .step .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    /* ====================================================================
+       补充提示框 (.supp) —— 引导读者去背景知识页补课
+       ==================================================================== */
+    .supp {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius);
+      padding: 22px 26px; margin: 32px 0; text-align: center;
+    }
+    .supp h3 { color: var(--c-ex-fg); margin-top: 0; display: inline-flex; align-items: center; gap: 8px; }
+    .supp h3::before {
+      content: ""; width: 15px; height: 15px; flex: none; background: currentColor;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.2a2.4 2.4 0 0 1 4.7.8c0 1.6-2.3 1.9-2.3 3.2M12 16.8v.4'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.2a2.4 2.4 0 0 1 4.7.8c0 1.6-2.3 1.9-2.3 3.2M12 16.8v.4'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+    .supp p { color: var(--ink-2); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .88em; color: var(--ink-2); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
+    .rb a {
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P || !id) return;
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <h1>{项目主题}阅读路径规划</h1>
+  <div class="sub">{一句话副标题：从入门到前沿的渐进式学习路线，N 篇论文 + 基础知识的完整学习地图}</div>
+  <div class="mt">{项目名} 项目 · {YYYY-MM-DD} · 可根据需要选择 {2-6} 站阅读</div>
+</header>
+
+<!-- ============ 第零阶段：基础知识（可选） ============ -->
+<!-- 说明：阶段用 .phase 分隔；每站用 .step，内含 .goal(学什么) + .why(为何这站) + .links(跳转) -->
+<div class="phase"><h2>第零阶段：{基础预备知识}</h2></div>
+
+<div class="step">
+  <!-- 模板库暂无基础知识页模板，示例链接指向背景知识页（预览可点）；
+       若项目有独立基础知识页，替换为实际文件名 -->
+  <h3><a href="knowledge_supplement_template.html">0. {基础知识概念速查}</a></h3>
+  <div class="goal">学习目标：{一句话，掌握哪些基础概念，建立怎样的知识体系}</div>
+  <div class="why">为什么是第零站：{一句话，为什么先学这些才能读懂后面的论文，避免被术语卡住}</div>
+  <div class="links">
+    <a href="knowledge_supplement_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<!-- ============ 第一阶段：示例（复制此 .phase + .step 组合扩展） ============ -->
+<div class="phase"><h2>第一阶段：{主题一}</h2></div>
+
+<div class="step">
+  <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
+  <h3><a href="../papers/paper_explainer_page_template.html">1. {论文1简称/标题}</a></h3>
+  <div class="goal">学习目标：{一句话，这一站要掌握什么方法/概念}</div>
+  <div class="why">为什么是第一站：{一句话，为什么这个顺序，它与前后站的关系}</div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<div class="step">
+  <h3><a href="../papers/paper_explainer_page_template.html">2. {论文2简称/标题}</a></h3>
+  <div class="goal">学习目标：{一句话}</div>
+  <div class="why">为什么是第二站：{一句话，与第一站如何衔接}</div>
+  <div class="links">
+    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+</div>
+
+<!-- ============ 后续阶段（按需复制） ============ -->
+<!--
+<div class="phase"><h2>第二阶段：{主题二}</h2></div>
+<div class="step">
+  <h3><a href="../papers/paper_explainer_page_template.html">3. {论文3简称}</a></h3>
+  <div class="goal">学习目标：{...}</div>
+  <div class="why">为什么是这一站：{...}</div>
+  <div class="links"><a href="../papers/paper_explainer_page_template.html">快速导引</a> <a href="knowledge_supplement_template.html">补充知识点</a></div>
+</div>
+-->
+
+<!-- ============ 补充提示 ============ -->
+<div class="supp">
+  <h3>需要补充背景知识？</h3>
+  <p>遇到不熟悉的概念（{如 IV 三大假设 / cis-pQTL / coloc 共定位 / LLM CoT 等}），请访问 <strong><a href="knowledge_supplement_template.html">需要补充的知识点</a></strong> 页面。</p>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="rb">
+    <strong>导航：</strong>
+    <a href="../knowledge_graph_template.html">知识图谱</a>
+    <a href="knowledge_supplement_template.html">补充知识点</a>
+  </div>
+  <p style="margin-top:12px;">{项目名} 项目 · {N} 篇论文 · {YYYY-MM-DD}</p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  apply((function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })() || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>
