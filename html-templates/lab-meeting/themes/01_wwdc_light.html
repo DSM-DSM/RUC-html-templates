@@ -191,6 +191,25 @@
         }
 
         .card{background:var(--card-bg);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:box-shadow var(--transition),border-color var(--transition)}
+        /* M29 性能优化：content-visibility 让视口外的卡片跳过布局与绘制（长页面滚动/锚点跳转的关键优化）；
+           contain-intrinsic-size 提供占位高度避免滚动条抖动；打印时豁免（保证完整输出）
+           注意：页内锚点跳转须走 revealForScroll / jumpTo 先强制渲染目标卡（见 scrollToSection） */
+        .card{content-visibility:auto;contain-intrinsic-size:auto 900px;contain:layout style}
+        @media print{.card{content-visibility:visible;contain:none}}
+
+        /* ═══════ M29 三段式组件（图表介绍 / 结论 takeaway）——图表单元 = 介绍 + 图表 + 结论 ═══════
+           重点前置：fig-intro 让读者带着问题看图；takeaway 的结论可独立成立（汇报时先给结论）。
+           左侧色条用 inset box-shadow 而非 border-left（craft-floor：border-left > 1px 反模式）。 */
+        .fig-intro{font-size:0.875rem;color:var(--gray-600);margin:2px 0 8px;line-height:1.65}
+        .fig-intro strong{color:var(--gray-800)}
+        .takeaway{display:block;margin:10px 0 4px;padding:8px 14px;background:var(--success-bg);
+                  border-top:2px solid var(--success);border-radius:0 0 4px 4px;font-size:0.9rem;line-height:1.7}
+        .takeaway .tk-label{font-weight:700;color:var(--success);margin-right:2px}
+        .takeaway.warn{background:var(--warning-bg);border-top-color:var(--warning)}
+        .takeaway.warn .tk-label{color:var(--warning)}
+        .takeaway.danger{background:var(--danger-bg);border-top-color:var(--danger)}
+        .takeaway.danger .tk-label{color:var(--danger)}
+        .takeaway ul{margin:4px 0 0 18px}
         .card:hover{box-shadow:var(--shadow-hover);border-color:rgba(0,0,0,0.12)}
         .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
         .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
@@ -362,6 +381,35 @@
         .carousel-item.ct-m2 .ci-card{border-top-color:var(--success)}
         .carousel-item.ct-m3 .ci-card{border-top-color:var(--gray-300)}
 
+        /* ═══════ 7c. 仪表盘网格视图（分组折叠，与 7b 转盘二选一，按钮切换） ═══════
+           多卡片时转盘会拥挤：切到网格视图，同族方法收进 <details> 分组折叠，
+           组头显示该组最优 agg1 与张数（移植自线上 week_report M29 分组折叠）。
+           数据驱动：methods[].group 字段可选（见 web_data/schema.md）；
+           Baseline 固定进「基准」组，无 group 字段的方法进「方法总览」组。 */
+        .dash-view-toggle{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.75rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .dash-view-toggle:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .dash-view-toggle:active{transform:scale(0.97)}
+        #dashboard-cards{display:block}   /* 分组容器：还原块级，避免 details 被排成 grid 子项 */
+        .dash-group{margin-bottom:10px;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;background:var(--card-bg)}
+        .dash-group>summary{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--gray-50);cursor:pointer;font-weight:600;font-size:0.875rem;color:var(--gray-700);list-style:none;transition:background .2s ease,color .2s ease;user-select:none}
+        .dash-group>summary::-webkit-details-marker{display:none}
+        .dash-group>summary:hover{background:var(--primary-light);color:var(--primary-dark)}
+        .dash-group>summary::before{content:'▸';color:var(--gray-400);transition:transform .2s ease;font-size:0.8em}
+        .dash-group[open]>summary::before{transform:rotate(90deg)}
+        .dash-group .dg-best{font-family:var(--font-mono);font-size:0.8125rem;color:var(--primary-dark);font-weight:700}
+        .dash-group .dg-count{margin-left:auto;font-size:0.75rem;font-weight:500;color:var(--gray-500)}
+        .dash-group>.compare-grid{padding:12px;margin:0}
+        .dash-group .cc-name{font-weight:700;font-size:0.85rem;color:var(--gray-800)}
+        .dash-group .big-num small{font-size:0.8rem;font-weight:600;color:var(--gray-500)}
+        .dash-group .cc-sub{font-size:0.72rem;color:var(--gray-400);margin-top:3px;min-height:1em}
+        #dashboard-cards .compare-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+        #dashboard-cards .compare-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--primary)}
         /* ═══════ 8. 图表组件 ═══════ */
         .bar-chart{display:flex;align-items:center;gap:8px;margin:4px 0}
         .bar-label{font-size:0.76rem;width:150px;text-align:right;color:var(--gray-600);flex-shrink:0}
@@ -495,6 +543,7 @@
             html{scroll-behavior:auto}
             .timeline-node.current .timeline-dot{animation:none}
             .quick-link-card:hover,.quick-link-card:active{transform:none}
+            #dashboard-cards .compare-card:hover{transform:none}
             .carousel-viewport{cursor:default}
             *,*::before,*::after{transition-duration:0.01ms!important;animation-duration:0.01ms!important;animation-iteration-count:1!important}
         }
@@ -621,6 +670,8 @@
         /* ═══ 主题覆盖层结束 ═══ */
     </style>
 
+
+
     <!-- MathJax 配置（渲染器 CDN 改为按需加载：仅当汇总指标卡的公式实际显示时由
          底部 ensureMathJax() 注入，避免无公式页面白加载约 1MB 解析器） -->
     <script>
@@ -708,16 +759,25 @@
 <div class="card" id="sec-dashboard">
     <div class="card-header">
         <div class="card-title"><span class="ic ic-dashboard"></span> 整体指标仪表盘</div>
-        <span class="status-tag status-ok" id="dashboard-status">加载中...</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <!-- 仪表盘双视图切换：卡片少用转盘（自动旋转逐张聚焦），卡片多时切分组折叠网格一览全貌；
+                 选择记忆在 localStorage（labmeeting-dashboard-view） -->
+            <button class="dash-view-toggle" id="dash-view-toggle" type="button" aria-pressed="false" title="切换仪表盘展示方式">
+                <span class="ic ic-nav"></span><span id="dash-view-label">网格视图</span>
+            </button>
+            <span class="status-tag status-ok" id="dashboard-status">加载中...</span>
+        </div>
     </div>
     <!-- 3D 转盘：方法标签在水平圆环上滚动（自动旋转 / 拖拽 / 点击转到前方），
          正前方卡片的详情实时显示在下方面板 -->
-    <div class="carousel">
+    <div class="carousel" id="dash-carousel">
         <div class="carousel-viewport" id="carousel-viewport">
             <div class="carousel-turn" id="carousel-turn"></div>
         </div>
         <div class="carousel-detail" id="carousel-detail"></div>
     </div>
+    <!-- 网格视图（与上方转盘互斥，dash-view-toggle 切换；组内卡片与转盘同数据源） -->
+    <div id="dashboard-cards" hidden></div>
     <div style="margin-top:8px;overflow-x:auto;" id="dashboard-table"></div>
     <div style="margin-top:8px;text-align:center;font-size:0.7rem;color:var(--gray-500);" id="dashboard-note"></div>
 </div>
@@ -942,6 +1002,7 @@
 
 <!-- 主题包（唯一数据源：10 个主题 CSS + 元数据；先于下方切换器加载） -->
 <script src="../theme-pack.js"></script>
+    <script>window.__PREVIEW_THEME__="01_wwdc_light";</script>
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
    数据约定（详见 web_data/schema.md）：
@@ -1053,12 +1114,22 @@ function toggleSidebar(el, childrenId) {
     document.getElementById(childrenId)?.classList.toggle('open');
 }
 
+// M29：跳转前强制渲染目标卡片 —— content-visibility:auto 下目标若在视口外，
+// 滚动位置会按「估算高度」计算而偏移；先置 visible、下一帧再滚动即可命中真实位置
+function revealForScroll(el) {
+    const card = el.closest('.card') || el;
+    card.style.contentVisibility = 'visible';
+    setTimeout(() => { card.style.contentVisibility = ''; }, 800);
+}
 function scrollToSection(targetId, childEl) {
     document.querySelectorAll('.sidebar-child').forEach(c => c.classList.remove('active'));
     if (childEl) childEl.classList.add('active');
     const target = document.getElementById(targetId);
     if (target) {
-        target.scrollIntoView({behavior:'smooth',block:'start'});
+        revealForScroll(target);
+        requestAnimationFrame(() => {
+            target.scrollIntoView({behavior:'smooth',block:'start'});
+        });
     }
 }
 
@@ -1210,7 +1281,9 @@ function renderDashboard() {
     carouselItems.push({
         cls: 'ct-m1', name: 'Baseline',
         t: baseAgg1?.toFixed(4)||'·', v: baseAgg0?.toFixed(4),
+        tn: baseAgg1 ?? null, vn: baseAgg0 ?? null, grp: '基准',   // tn/vn: 数值（网格分组头排序用）
         deltaHtml: baseVR != null ? `<div class="ci-delta down">VR: ${baseVR.toFixed(2)}% (测试集)</div>` : '',
+        detailRun: base.run_name || 'main',
         detailHtml: mkDetail('Baseline', baseAgg1?.toFixed(4)||'·', baseAgg0?.toFixed(4),
             baseVR != null ? `VR ${baseVR.toFixed(2)}%` : '') + `<span class="cd-item">${base.run_name || 'main'}</span>`
     });
@@ -1224,9 +1297,11 @@ function renderDashboard() {
         carouselItems.push({
             cls: CLS[i % CLS.length], name: m.name,
             t: t?.toFixed(4)||'·', v: v?.toFixed(4)||'·',
+            tn: t ?? null, vn: v ?? null, grp: m.group || null,   // group: 可选分组字段（schema.md）
             deltaHtml: dt != null
                 ? `<div class="ci-delta ${dt<0?'down':'up'}">Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}${vr != null ? ` · VR ${vr.toFixed(3)}%` : ''}</div>`
                 : '<div class="ci-delta">暂无数据</div>',
+            detailRun: r?.run_name || m.status || '',
             detailHtml: mkDetail(m.name, t?.toFixed(4)||'·', v?.toFixed(4)||'·',
                 (dt != null ? `Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}，Δ(验证集) ${dv>=0?'+':''}${dv.toFixed(4)}` : '') +
                 (vr != null ? `，VR ${vr.toFixed(3)}%` : '')) + `<span class="cd-item">${r?.run_name || m.status || ''}</span>`
@@ -1242,6 +1317,8 @@ function renderDashboard() {
             deltaHtml: fm.deltaHtml, detailHtml: fm.detailHtml });
     }
     initCarousel(carouselItems);
+    renderDashboardGrid(carouselItems);
+    initDashViewToggle();
 
     // 明细对比表
     let tb = `<table class="data-table" style="min-width:760px;">
@@ -1420,7 +1497,9 @@ function initCarousel(items) {
                 angle += 0.40 * dt / 16.7;   // 自动旋转 ~24°/s（reduced-motion 或悬停时静止）
             }
         }
-        apply();
+        // 网格视图激活时转盘 display:none（offsetParent 为 null）——跳过每帧样式写入省电省力；
+        // rAF 链保持，切回转盘视图后自动恢复渲染（spread 按恢复后的视窗宽度重算）
+        if (viewport.offsetParent !== null) apply();
         requestAnimationFrame(tick);
     })(lastTs);
     apply();
@@ -1444,6 +1523,64 @@ function initCarousel(items) {
 
 }
 
+/* 📎📎📎📎📎📎📎📎📎📎 仪表盘双视图：转盘（少卡逐张聚焦）/ 分组折叠网格（多卡一览） 📎📎📎📎📎📎📎📎📎📎
+   两视图共用 renderDashboard 构建的同一份卡片数据（单一数据源）；
+   视图选择记忆在 localStorage（labmeeting-dashboard-view），刷新后保持。 */
+const DASH_VIEW_KEY = 'labmeeting-dashboard-view';
+function renderDashboardGrid(items) {
+    const box = document.getElementById('dashboard-cards');
+    if (!box) return;
+    // 分组：group 字段优先，Baseline 固定「基准」，缺省进「方法总览」；组序按数据出现顺序
+    const grpOf = it => it.grp || (it.name === 'Baseline' ? '基准' : '方法总览');
+    const order = [], byGrp = {};
+    for (const it of items) {
+        const g = grpOf(it);
+        if (!byGrp[g]) { byGrp[g] = []; order.push(g); }
+        byGrp[g].push(it);
+    }
+    let html = '';
+    for (const g of order) {
+        const cards = byGrp[g];
+        const withNum = cards.filter(c => c.tn != null);
+        const best = withNum.length ? withNum.reduce((a, b) => b.tn > a.tn ? b : a) : null;
+        html += `<details class="dash-group"${g === order[0] ? ' open' : ''}>`
+            + `<summary>${g}<span class="dg-best">${best ? best.t : '—'}</span>`
+            + `<span class="dg-count">${cards.length} 张</span></summary>`
+            + `<div class="compare-grid">${cards.map(it => `
+                <div class="compare-card ${it.cls.replace('ct-', 'm')}">
+                    <div class="cc-name">${it.name}</div>
+                    <div class="big-num">${it.t}<small> / ${it.v}</small></div>
+                    ${it.deltaHtml || ''}
+                    <div class="cc-sub">${it.detailRun || ''}</div>
+                </div>`).join('')}</div></details>`;
+    }
+    box.innerHTML = html;
+}
+
+function setDashView(v, save) {
+    const car = document.getElementById('dash-carousel');
+    const grid = document.getElementById('dashboard-cards');
+    if (!car || !grid) return;
+    car.style.display = (v === 'carousel') ? '' : 'none';
+    grid.hidden = (v !== 'grid');
+    const lbl = document.getElementById('dash-view-label');
+    const btn = document.getElementById('dash-view-toggle');
+    if (lbl) lbl.textContent = (v === 'carousel') ? '网格视图' : '转盘视图';
+    if (btn) btn.setAttribute('aria-pressed', v === 'grid' ? 'true' : 'false');
+    if (save) { try { localStorage.setItem(DASH_VIEW_KEY, v); } catch (e) {} }
+}
+function initDashViewToggle() {
+    const btn = document.getElementById('dash-view-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+        const cur = document.getElementById('dashboard-cards').hidden ? 'carousel' : 'grid';
+        setDashView(cur === 'carousel' ? 'grid' : 'carousel', true);
+    });
+    // 恢复记忆的视图偏好（不反写存储）
+    let saved = null;
+    try { saved = localStorage.getItem(DASH_VIEW_KEY); } catch (e) {}
+    setDashView(saved === 'grid' ? 'grid' : 'carousel', false);
+}
 /* ═══════ 汇总指标卡（可选） ═══════
    metrics_summary.json 结构见 web_data/schema.md；
    S 缺失或结构不符时整卡保持隐藏。 */
@@ -1660,6 +1797,10 @@ document.addEventListener('DOMContentLoaded', loadData);
         let el = document.getElementById('theme-overlay');
         if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
         const t = THEME_PACK.find(x => x.id === id);
+        // 内联默认主题（baked-theme）随选择启停：选其他主题时禁用之，否则它的直接规则
+        //（如 #header{background:var(--primary)}）会压过主题包仅改 :root 令牌的覆盖方式
+        const baked = document.getElementById('baked-theme');
+        if (baked) baked.disabled = (id !== defTheme);
         // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
         let css = (t && id !== defTheme) ? t.css : '';
         // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
@@ -1667,7 +1808,8 @@ document.addEventListener('DOMContentLoaded', loadData);
         if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
         el.textContent = css;
         applyFonts(t);
-        try { localStorage.setItem(KEY, id); } catch (e) {}
+        // 变体页（__PREVIEW_THEME__ 存在）不写全局偏好：预览内的试切不污染用户选择
+        if (!window.__PREVIEW_THEME__) { try { localStorage.setItem(KEY, id); } catch (e) {} }
         curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
         panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
         // 广播主题变化（转盘环心徽章等监听）
@@ -1677,7 +1819,10 @@ document.addEventListener('DOMContentLoaded', loadData);
     // 恢复：localStorage 优先，其次页面默认主题
     let saved = null;
     try { saved = localStorage.getItem(KEY); } catch (e) {}
-    applyTheme(saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+    // 变体页（__PREVIEW_THEME__ 由构建脚本注入）永远打开在自己烘焙的主题上，不读全局偏好；
+    // 基座页按 saved → 页面默认回落（存量旧值仅当命中主题包真实主题或显式的 default 才沿用）
+    const previewTheme = window.__PREVIEW_THEME__ || null;
+    applyTheme(previewTheme || (saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme));
 
     // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
     function openPanel() {

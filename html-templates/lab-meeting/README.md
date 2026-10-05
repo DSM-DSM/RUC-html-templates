@@ -48,15 +48,19 @@ python -m http.server 8080
 
 ## 主题变体（themes/）
 
-10 个主题与主模板共享**同一套组件类名、JS 渲染逻辑与数据源**（`web_data/`），差异只在 `<style>` 末尾的「主题覆盖层」——`:root` 令牌重定义 + 组件皮肤覆盖。每个主题**成对生成总览页与子页面**：`0N_主题.html`（总览）+ `0N_主题_sub.html`（子页面），两页互相链接（总览的侧边栏/快速链接指向同主题子页面，子页面的「返回总览」指向同主题总览）。数据路径为 `../web_data/`。
+11 个主题与主模板共享**同一套组件类名、JS 渲染逻辑与数据源**（`web_data/`），差异只在 `<style>` 末尾的「主题覆盖层」——`:root` 令牌重定义 + 组件皮肤覆盖。每个主题**成对生成总览页与子页面**：`0N_主题.html`（总览）+ `0N_主题_sub.html`（子页面），两页互相链接（总览的侧边栏/快速链接指向同主题子页面，子页面的「返回总览」指向同主题总览）。数据路径为 `../web_data/`。
 
-**选用主题（总览 + 子页面同步换肤）**：把对应变体的「主题覆盖层」CSS 块（`/* ═══════ 主题覆盖层 · … ═══════ */` 至 `/* ═══ 主题覆盖层结束 ═══ */`）复制进主模板 `index.html` 的 `</style>` 之前，并**同样复制进子页面模板 `01_example_method/index.html`** 的 `</style>` 之前（子页面的覆盖层放在共享设计系统 CSS 之后、其 3 行子页面变体之上，令牌自动生效）。两页覆盖层内容完全相同，无需调整。
+**选用主题（总览 + 子页面同步换肤）**：把对应变体的「主题覆盖层」CSS 块（`/* ═══════ 主题覆盖层 · … ═══════ */` 至 `/* ═══ 主题覆盖层结束 ═══ */`）复制进主模板 `index.html` 的 `</style>` 之前，并**同样复制进子页面模板 `01_example_method/index.html`** 的 `</style>` 之前（子页面的覆盖层放在共享设计系统 CSS 之后、其 3 行子页面变体之上，令牌自动生效）。两页覆盖层内容完全相同，无需调整。若要让某主题成为**站点默认主题**（取代人大红），按 `index.html` 里 `<style id="baked-theme">` 块的注释操作：该主题 css 同时烘焙进两页基座的 baked-theme 块 + `<body data-default-theme>` 改为该主题 id（双处同步）。
 
-**修改主题**：编辑 `theme-pack.js` 中对应主题的 `css` 字段（唯一数据源），然后 `node themes/_build.mjs` 全量再生成（总览 + 子页面 20 个文件一并更新）。
+**修改主题**：编辑 `theme-pack.js` 中对应主题的 `css` 字段（唯一数据源），然后 `node themes/_build.mjs` 全量再生成（总览 + 子页面 22 个文件一并更新）。⚠️ 若改的是 `11_ruc_beamer`（默认主题），基座两页 `<style id="baked-theme">` 内联块是同一份 CSS 的拷贝，**两处都要改**（烘焙块注释里有同步说明）。构建时变体会自动剥离基座的 baked-theme 块（变体身份 = 自身烘焙主题），并注入 `window.__PREVIEW_THEME__="<主题id>"`。
 
 ## 主题一键切换器
 
-主页（顶导右侧）与子页面（顶导工具链接末尾）各有一个调色板按钮，点开可任选「默认蓝系 + 10 个主题」，一键切换整页皮肤。选择写入 `localStorage`（键 `labmeeting-theme`），**跨页连续**——在子页面切到东方水墨后返回主页，主页自动保持东方水墨；反之亦然。页面刷新后保持最后选择。切换器与 `theme-pack.js` 强绑定：删除主题包脚本（或离线使用）时切换器自动消失、页面退回自身默认主题（`<body data-default-theme>`，主题变体文件中为各自主题 id）。
+主页（顶导右侧）与子页面（顶导工具链接末尾）各有一个调色板按钮，点开可任选「人大红 Beamer（默认）+ 默认蓝系 + 其余主题」，一键切换整页皮肤。选择写入 `localStorage`（键 `labmeeting-theme`），**跨页连续**——在子页面切到东方水墨后返回主页，主页自动保持东方水墨；反之亦然。页面刷新后保持最后选择。切换器与 `theme-pack.js` 强绑定：删除主题包脚本（或离线使用）时切换器自动消失、页面退回自身默认主题（`<body data-default-theme>`，主题变体文件中为各自主题 id）。
+
+**默认主题与 FOUC 消除（M29 回灌）**：站点默认主题为**人大红 Beamer**（`11_ruc_beamer`），其完整 CSS 内联烘焙在两页基座的 `<style id="baked-theme">`（head 末尾）——首帧即人大红，无需等 `theme-pack.js` 加载注入（消除主题闪烁）。运行时切到其他主题时 `applyTheme` 把 baked 块整体 `disabled`（否则其直接规则如 `#header{background:var(--primary)}` 会压过仅改 `:root` 令牌的主题）；选回默认时重启 baked 并清空 overlay。localStorage 恢复只在保存值命中主题包真实主题（或显式的 `default`）时沿用，陈旧值回落新默认。
+
+**变体页身份固定（`__PREVIEW_THEME__`）**：`themes/` 变体由构建脚本注入 `window.__PREVIEW_THEME__="<主题id>"`——预览页**永远打开在自己烘焙的主题上**（不受基座页 localStorage 拉走），且变体内的试切**不写入**全局偏好（`applyTheme` 的 setItem 以 `!window.__PREVIEW_THEME__` 为前提）。变体同时剥离了基座的 baked-theme 块（变体默认主题已内联在共享样式块内，保留 baked 反而会被其直接规则压制）。
 
 ## 页面解剖
 
@@ -74,6 +78,11 @@ python -m http.server 8080
 | 每周时间线 | 数据驱动 | 当前周高亮脉冲、未来周虚线、历史周折叠 |
 | 本周任务 / 待办清单 | 数据驱动 | 单栏流式卡片 |
 | 底部声明栏 | 数据驱动 | `site_meta`：作者 / 机构 / 版本 / 更新时间；logo 用 `<img>` 替换 `.logo-slot` 占位 |
+
+**仪表盘双视图**：`#sec-dashboard` 内置两种互斥展示，右上 `dash-view-toggle` 按钮切换（选择记忆在 localStorage，键 `labmeeting-dashboard-view`）——
+- **转盘视图**（默认，适合卡片少 ≤6 张）：3D 圆环逐张聚焦，正前方卡片详情在下方面板；
+- **网格视图**（适合卡片多）：成品 week_report M29 的分组折叠布局——`<details class="dash-group">` 组头带该组最优 agg1 与张数，组内 `compare-card` 平铺（与转盘卡同数据同色轮）。
+分组由 `report_data.json` 的 `methods[].group` 字段驱动（可选）：Baseline 固定进「基准」组，写了 `group` 的方法按字段聚组（组序按数据出现顺序），未写的进「方法总览」组。转盘隐藏时其 rAF 循环自动跳过样式写入（省电）。
 
 ### 实验卡片解剖（总览页手写区）
 
@@ -187,7 +196,7 @@ python -m http.server 8080
 
 > 总览页与子页面共用同一套 CSS 设计系统，**差异仅两处**（子页面 CSS 中已用「子页面变体」注释标出）：① 子页面 2 行变体——`--sidebar-width: 240px` / `--header-height: 48px`（总览页 260px / 52px）、`.nav-brand` 字号 1rem（总览页 1.1rem）；② 子页面省略「7b. 3D 转盘」小节（子页面无转盘组件）。除此之外不要各自微调——改配色只动 `:root` 令牌。
 
-`card` / `card-header` / `card-title` / `card-body`(`.viz`+`.explain` 两栏) / `fold`(`.fold-head`/`.fold-body`/`.fold-inner`) / `section-h4`(+`c-*`) / `status-tag`(+`status-*`) / `info-box`(+`info/success/warning|warn/danger`) / `source-line` / `code-ref` / `data-table`(`.num`/`.highlight`/`.up`/`.down`/`.warn-cell`) / `metric-grid`+`metric-card` / `compare-grid`+`compare-card`(`.m1/.m2/.m3`) / `carousel` 3D 转盘(`.carousel-viewport`/`.carousel-turn`/`.carousel-item`/`.ci-card`/`.carousel-detail`) / `bar-chart` / `timeline` / `todo-item` / `formula-card` / `arch-diagram` / `figure`+`fig-caption`+`fig-grid` / `img-placeholder`（模板预览用，接入真实图时整块换成 `<img>`） / `quick-links`（含 `.ql-icon` 图标容器，主题覆盖层可改底色/圆角） / `back-to-top` / `empty-state` / `nav-brand`+`nav-links`（顶部导航） / `#footer`（声明栏）+`.logo-slot` / **`ic-*` 图标集**（见下）
+`card` / `card-header` / `card-title` / `card-body`(`.viz`+`.explain` 两栏) / `fold`(`.fold-head`/`.fold-body`/`.fold-inner`) / `section-h4`(+`c-*`) / `status-tag`(+`status-*`) / `info-box`(+`info/success/warning|warn/danger`) / `source-line` / `code-ref` / `data-table`(`.num`/`.highlight`/`.up`/`.down`/`.warn-cell`) / `metric-grid`+`metric-card` / `compare-grid`+`compare-card`(`.m1/.m2/.m3`) / `carousel` 3D 转盘(`.carousel-viewport`/`.carousel-turn`/`.carousel-item`/`.ci-card`/`.carousel-detail`) / **`dash-group` 仪表盘网格视图**(`<details>` 分组折叠 + `.dash-view-toggle` 切换按钮，与转盘共用同一数据源，见「页面解剖 · 总览页」) /  / `bar-chart` / `timeline` / `todo-item` / `formula-card` / `arch-diagram` / `figure`+`fig-caption`+`fig-grid` / **`fig-intro`+`takeaway`（M29 三段式，见口径约定）** / `img-placeholder`（模板预览用，接入真实图时整块换成 `<img>`） / `quick-links`（含 `.ql-icon` 图标容器，主题覆盖层可改底色/圆角） / `back-to-top` / `empty-state` / `nav-brand`+`nav-links`（顶部导航） / `#footer`（声明栏）+`.logo-slot` / **`ic-*` 图标集**（见下）
 
 ### 图标集（`.ic` 系列）
 
@@ -198,6 +207,7 @@ python -m http.server 8080
 - 指标卡：**测试集 (agg1) 大字主值**在前，验证集 (agg0) 小字副值在后
 - Δ 主行为测试集口径，验证集 Δ 附小字括号
 - 表格数值类单元格加 `.num`（等宽字体）
+- **三段式图表单元（M29 内容压缩规范）**：每个图表/公式单元 = 三段——`<p class="fig-intro">`（图表介绍：这个图是什么、看哪里，一两句）→ 图表本身（`figure`/表格原样搬运）→ `<div class="takeaway"><span class="tk-label">结论</span>…</div>`（结论可独立成立，汇报时先给结论）。`takeaway` 有 `warn` / `danger` 色变体（注意事项 / 失败结论）；左侧色条为 inset box-shadow 实现（非 border-left）。子页面「论文详解」卡的 ① 关键公式一有完整占位示例。
 
 ## 约定清单 & 雷区（来自历次更新记录）
 
@@ -213,8 +223,12 @@ python -m http.server 8080
    python -c "from html.parser import HTMLParser; ..."   # 或用任意 HTML 校验器查标签配对
    ```
 8. **浏览器人工点开验证**：无头环境只能查结构与路径，最终渲染必须人工过一遍（图片是否加载、MathJax 是否渲染、侧边栏跳转是否生效）。
-9. **性能优化已内置**：MathJax 渲染器改为按需加载（总览页仅在汇总指标卡公式显示时注入；子页面仅在存在 `.mathjax-process` 元素时注入——纯截图模式页面零 MathJax 开销）；滚动监听已做 rAF 节流 + passive 合并，请勿把滚动处理改回每事件触发 `offsetTop` 读取的写法。
+9. **性能优化已内置**：MathJax 渲染器改为按需加载（总览页仅在汇总指标卡公式显示时注入；子页面仅在存在 `.mathjax-process` 元素时注入——纯截图模式页面零 MathJax 开销）；滚动监听已做 rAF 节流 + passive 合并，请勿把滚动处理改回每事件触发 `offsetTop` 读取的写法；卡片带 `content-visibility:auto`（视口外跳过布局与绘制，打印自动豁免）——**新增页内锚点跳转必须走总览 `scrollToSection` / 子页 `jumpTo`**（先强制渲染目标卡再滚动），直接 `scrollIntoView` 会因估算高度偏移跳不准。
+10. **默认主题双处同步（M29 FOUC 纪律）**：人大红默认主题的 CSS 同时存在于 `theme-pack.js`（`11_ruc_beamer` 条目，唯一数据源）与两页基座的 `<style id="baked-theme">` 内联块——改任何一处必须同步另一处。变体由 `_build.mjs` 自动剥离 baked 块，勿手工往变体里加。
+11. **行尾约定**：模板源文件（基座两页 / theme-pack.js / _build.mjs）全 CRLF；变体由构建脚本行尾归一后产出（JS 字符串字面量按 ECMAScript 规范解析为 LF，注入 CRLF 基座前归一展开）。注入/批量编辑脚本务必二进制读写保持 CRLF。
 
 ## 与线上站点 `week_report/` 的关系
 
 本模板是从 `week_report/` 提炼的通用化版本，**不影响线上站点**。线上站点的日常更新（配置表补齐、卡片增量、任务清单同步）请继续使用 `week-report-html-update` 技能；本模板用于新站点从零搭建或旧站点重构的参照。
+
+**2026-10 M29 回灌**（来源：线上站点 M29 全站重构 `bc58ab8`）：① 默认主题改人大红 Beamer + `<style id="baked-theme">` 内联烘焙（FOUC 消除，切换器 baked 启停 + localStorage 陈旧值校验）；② 卡片 `content-visibility:auto` 性能优化 + 打印豁免 + 锚点跳转强制渲染（总览 `revealForScroll` / 子页 `jumpTo`）；③ 三段式组件（`fig-intro` + `takeaway`，见口径约定）。线上站点的「仪表盘分组折叠（GRP_ORDER）」未回灌——本模板仪表盘已升级为 3D 转盘，无平铺卡片问题。同轮修复存量 bug：子页变体 `data-default-theme` 锚点死代码（从未被替换为变体 id）、变体行尾混行（构建时归一）。

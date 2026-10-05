@@ -32,6 +32,7 @@
   "methods": [
     {
       "name": "方法 1（示例）",
+    "group": "方向一 · 模块改进（示例分组）",
       "status": "completed",
       "best_result": {
         "test_auroc_macro_agg0": 0.812,
@@ -64,6 +65,7 @@
     },
     {
       "name": "方法 2（示例）",
+    "group": "方向一 · 模块改进（示例分组）",
       "status": "completed",
       "best_result": {
         "test_auroc_macro_agg0": 0.811,
@@ -76,6 +78,7 @@
     },
     {
       "name": "方法 3（示例）",
+    "group": "方向二 · 新机制（示例分组）",
       "status": "pending",
       "best_result": null,
       "runs": [],

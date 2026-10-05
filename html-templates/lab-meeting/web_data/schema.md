@@ -60,6 +60,7 @@
 | `best_result` | object? | 最优结果：`test_auroc_macro_agg0`、`test_auroc_macro_agg1`、`run_name`、`notes`（未完成方法为 `null`） |
 | `runs` | array | 各次运行记录（含 `subtype`/`weight` 等筛选字段，供 subgroups 行回查 agg1） |
 | `subgroups` | object | 可选。按分组（如 `variant_a`/`variant_b`）给出：`best_vr`、`best_vr_weight`、`best_agg0`、`best_agg0_weight`、`runs`。仪表盘为每组渲染一行 |
+| `group` | string | 可选。仪表盘网格视图（dash-view-toggle 切换）的分组名：同组方法收进一个 `<details>` 折叠组；缺省时 Baseline 进「基准」组、其余进「方法总览」组 |
 
 ### `weekly_progress[]`（旧→新排列）
 

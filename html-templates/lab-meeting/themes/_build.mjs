@@ -35,20 +35,25 @@ function buildTheme(t) {
 ================================================================================
 -->`;
     let html = base;
-    html = html.replace('<!DOCTYPE html>\n<html', '<!DOCTYPE html>\n' + contract + '<html');
+    html = html.replace('<!DOCTYPE html>\n<html', '<!DOCTYPE html>\r\n' + contract + '<html');
+    // 基座的内联默认主题（人大红 baked-theme）在变体中剥离：变体身份 = 自身烘焙主题，
+    // 且 baked 的直接规则位于 </style> 之后、会压过变体注入的主题覆盖层
+    html = html.replace(/    <style id="baked-theme">[\s\S]*?<\/style>\r\n/, '');
     // 页面默认主题（切换器回退项）+ 主题包路径适配（themes/ 子目录 → ../）
-    html = html.replace('<body data-default-theme="default">', '<body data-default-theme="' + t.id + '">');
-    html = html.replace('<body data-default-theme="default" data-asset-prefix="">', '<body data-default-theme="' + t.id + '" data-asset-prefix="../">');
+    html = html.replace('<body data-default-theme="11_ruc_beamer" data-asset-prefix="">', '<body data-default-theme="' + t.id + '" data-asset-prefix="../">');
     html = html.split('src="theme-pack.js"').join('src="../theme-pack.js"');
+    // 变体身份固定：预览页永远打开在自己烘焙的主题上（切换器经 __PREVIEW_THEME__ 识别），
+    // 变体内的试切不写 localStorage、不污染用户在基座页的全局主题偏好
+    html = html.split('<script src="../theme-pack.js"></script>').join('<script src="../theme-pack.js"></script>\r\n    <script>window.__PREVIEW_THEME__="' + t.id + '";</script>');
     // favicon：变体在 themes/ 子目录，相对路径上移一层
     html = html.split('<link rel="icon" type="image/svg+xml" href="assets/ruc-logo.svg">').join('<link rel="icon" type="image/svg+xml" href="../assets/ruc-logo.svg">');
     // 主题字体：有 webfont 的主题在 head 预置 link（切换器会按需替换）
     if (t.fonts) {
-        html = html.replace('<head>', '<head>\n    <link rel="stylesheet" id="theme-fonts" href="' + t.fonts + '">');
+        html = html.replace('<head>', '<head>\r\n    <link rel="stylesheet" id="theme-fonts" href="' + t.fonts + '">');
     }
     // 主题素材（如 assets/ 下的校徽/背景图）：变体在 themes/ 子目录，url 上移一层
     const css = t.css.split('url(assets/').join('url(../assets/');
-    html = html.replace('</style>', css + '\n        /* ═══ 主题覆盖层结束 ═══ */\n    </style>');
+    html = html.replace('</style>', css + '\r\n        /* ═══ 主题覆盖层结束 ═══ */\r\n    </style>');
     html = html.replace('<title>项目名 实验进度报告 — 总览</title>',
         `<title>项目名 实验进度报告 — 总览 · ${t.name}</title>`);
     // 路径适配：themes/ 子目录 → 数据上移一层；子页面入口指向同主题子页面变体
@@ -56,6 +61,9 @@ function buildTheme(t) {
     html = html.split('href="01_example_method/index.html"').join(`href="${t.id}_sub.html"`);
     // 侧边栏页内导航的 data-target 不受影响；回写提示注释
     html = html.replace('<!-- 方向契约：', '<!-- 方向契约：主题变体 · ' + t.name + '（生成自 themes/_build.mjs） | ');
+    // 行尾归一：JS 字符串字面量（contract/theme css）按 ECMAScript 规范被解析为 LF，
+    // 注入 CRLF 基座前统一展开回 CRLF，保证变体全文行尾一致（diff/验证友好）
+    html = html.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');
     return html;
 }
 
@@ -74,20 +82,28 @@ function buildSubpage(t) {
 ================================================================================
 -->`;
     let html = subBase;
-    html = html.replace('<!DOCTYPE html>\n<html', '<!DOCTYPE html>\n' + contract + '<html');
-    html = html.replace('<body data-default-theme="default">', '<body data-default-theme="' + t.id + '">');
+    html = html.replace('<!DOCTYPE html>\n<html', '<!DOCTYPE html>\r\n' + contract + '<html');
+    // 与总览变体同款：剥离基座 baked-theme（变体身份 = 自身烘焙主题）
+    html = html.replace(/    <style id="baked-theme">[\s\S]*?<\/style>\r\n/, '');
+    // 子页面变体与子页基座同在下一层目录（asset-prefix ../ 保持）；默认主题改写为变体自身 id。
+    // 旧锚 '<body data-default-theme="default">'（无 asset-prefix 后缀）从未匹配过子页基座 —— 存量死代码，
+    // 子页变体的 data-default-theme 一直是 'default'（label 语义错乱），本轮修复。
+    html = html.replace('<body data-default-theme="11_ruc_beamer" data-asset-prefix="../">', '<body data-default-theme="' + t.id + '" data-asset-prefix="../">');
+    // 变体身份固定（同总览变体）：预览页永远打开在自己烘焙的主题上
+    html = html.split('<script src="../theme-pack.js"></script>').join('<script src="../theme-pack.js"></script>\r\n    <script>window.__PREVIEW_THEME__="' + t.id + '";</script>');
     // 子页面基座的 asset-prefix 已是 ../，保持；主题字体：有 webfont 的主题在 head 预置 link
     if (t.fonts) {
-        html = html.replace('<head>', '<head>\n    <link rel="stylesheet" id="theme-fonts" href="' + t.fonts + '">');
+        html = html.replace('<head>', '<head>\r\n    <link rel="stylesheet" id="theme-fonts" href="' + t.fonts + '">');
     }
     // 主题素材（如 assets/ 下的校徽/背景图）：变体在 themes/ 子目录，url 上移一层
     const css = t.css.split('url(assets/').join('url(../assets/');
-    html = html.replace('</style>', css + '\n        /* ═══ 主题覆盖层结束 ═══ */\n    </style>');
+    html = html.replace('</style>', css + '\r\n        /* ═══ 主题覆盖层结束 ═══ */\r\n    </style>');
     html = html.replace('<title>子页面示例 — 方法概览 + 论文详解</title>',
         `<title>子页面示例 — 方法概览 + 论文详解 · ${t.name}</title>`);
     // 返回总览 → 同主题总览变体；兄弟页面占位链接 → 本页自身
     html = html.split('href="../index.html"').join(`href="${t.id}.html"`);
     html = html.split('href="index.html"').join(`href="${t.id}_sub.html"`);
+    html = html.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n');   // 同总览：行尾归一
     return html;
 }
 

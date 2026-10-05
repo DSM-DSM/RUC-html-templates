@@ -634,13 +634,13 @@
         :root {
             --bg:#fdf8f8; --card-bg:#ffffff; --card-radius:8px;
             --line:rgba(151,31,48,0.12);
-            --shadow:0 1px 2px rgba(151,31,48,0.05),0 2px 6px rgba(151,31,48,0.06);
-            --shadow-hover:0 4px 12px rgba(151,31,48,0.10),0 6px 16px rgba(151,31,48,0.08);
+            --shadow:0 1px 2px rgba(0,0,0,0.05),0 2px 6px rgba(0,0,0,0.06);
+            --shadow-hover:0 4px 12px rgba(0,0,0,0.10),0 6px 16px rgba(0,0,0,0.08);
             /* 校徽红 #971f30（RenminUniv.sty tsinghua RGB 151,31,48） */
             --primary:#971f30; --primary-light:#f9eef0; --primary-dark:#6e1623;
             --accent:#b83047; --accent-light:#fdf0f2;
             --success:#1a7f37; --success-bg:#eef7f0;
-            --warning:#9a6700; --warning-bg:#faf4e3;
+            --warning:#7a5200; --warning-bg:#faf4e3;
             --danger:#c8372f; --danger-bg:#fbefee;
             /* LaTeX beamer 衬线感：宋体 + Georgia */
             --font-sans:"Songti SC","STSong","SimSun","Georgia","PingFang SC","Microsoft YaHei",serif;

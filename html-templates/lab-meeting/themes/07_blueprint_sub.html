@@ -233,6 +233,25 @@
         }
 
         .card{background:var(--card-bg);border:1px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:box-shadow var(--transition),border-color var(--transition)}
+        /* M29 性能优化：content-visibility 让视口外的卡片跳过布局与绘制（长页面滚动/锚点跳转的关键优化）；
+           contain-intrinsic-size 提供占位高度避免滚动条抖动；打印时豁免（保证完整输出）
+           注意：页内锚点跳转须走 revealForScroll / jumpTo 先强制渲染目标卡（见 scrollToSection） */
+        .card{content-visibility:auto;contain-intrinsic-size:auto 900px;contain:layout style}
+        @media print{.card{content-visibility:visible;contain:none}}
+
+        /* ═══════ M29 三段式组件（图表介绍 / 结论 takeaway）——图表单元 = 介绍 + 图表 + 结论 ═══════
+           重点前置：fig-intro 让读者带着问题看图；takeaway 的结论可独立成立（汇报时先给结论）。
+           左侧色条用 inset box-shadow 而非 border-left（craft-floor：border-left > 1px 反模式）。 */
+        .fig-intro{font-size:0.875rem;color:var(--gray-600);margin:2px 0 8px;line-height:1.65}
+        .fig-intro strong{color:var(--gray-800)}
+        .takeaway{display:block;margin:10px 0 4px;padding:8px 14px;background:var(--success-bg);
+                  border-top:2px solid var(--success);border-radius:0 0 4px 4px;font-size:0.9rem;line-height:1.7}
+        .takeaway .tk-label{font-weight:700;color:var(--success);margin-right:2px}
+        .takeaway.warn{background:var(--warning-bg);border-top-color:var(--warning)}
+        .takeaway.warn .tk-label{color:var(--warning)}
+        .takeaway.danger{background:var(--danger-bg);border-top-color:var(--danger)}
+        .takeaway.danger .tk-label{color:var(--danger)}
+        .takeaway ul{margin:4px 0 0 18px}
         .card:hover{box-shadow:var(--shadow-hover);border-color:rgba(0,0,0,0.12)}
         .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
         .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
@@ -328,6 +347,35 @@
         .compare-card .big-num{font-size:1.85rem;font-weight:800;font-family:var(--font-mono);margin:6px 0;color:var(--gray-900)}
         .compare-card .delta{font-size:0.76rem}
 
+        /* ═══════ 7c. 仪表盘网格视图（分组折叠，与 7b 转盘二选一，按钮切换） ═══════
+           多卡片时转盘会拥挤：切到网格视图，同族方法收进 <details> 分组折叠，
+           组头显示该组最优 agg1 与张数（移植自线上 week_report M29 分组折叠）。
+           数据驱动：methods[].group 字段可选（见 web_data/schema.md）；
+           Baseline 固定进「基准」组，无 group 字段的方法进「方法总览」组。 */
+        .dash-view-toggle{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.75rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .dash-view-toggle:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .dash-view-toggle:active{transform:scale(0.97)}
+        #dashboard-cards{display:block}   /* 分组容器：还原块级，避免 details 被排成 grid 子项 */
+        .dash-group{margin-bottom:10px;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;background:var(--card-bg)}
+        .dash-group>summary{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--gray-50);cursor:pointer;font-weight:600;font-size:0.875rem;color:var(--gray-700);list-style:none;transition:background .2s ease,color .2s ease;user-select:none}
+        .dash-group>summary::-webkit-details-marker{display:none}
+        .dash-group>summary:hover{background:var(--primary-light);color:var(--primary-dark)}
+        .dash-group>summary::before{content:'▸';color:var(--gray-400);transition:transform .2s ease;font-size:0.8em}
+        .dash-group[open]>summary::before{transform:rotate(90deg)}
+        .dash-group .dg-best{font-family:var(--font-mono);font-size:0.8125rem;color:var(--primary-dark);font-weight:700}
+        .dash-group .dg-count{margin-left:auto;font-size:0.75rem;font-weight:500;color:var(--gray-500)}
+        .dash-group>.compare-grid{padding:12px;margin:0}
+        .dash-group .cc-name{font-weight:700;font-size:0.85rem;color:var(--gray-800)}
+        .dash-group .big-num small{font-size:0.8rem;font-weight:600;color:var(--gray-500)}
+        .dash-group .cc-sub{font-size:0.72rem;color:var(--gray-400);margin-top:3px;min-height:1em}
+        #dashboard-cards .compare-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+        #dashboard-cards .compare-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--primary)}
         /* ═══════ 8. 图表组件 ═══════ */
         .bar-chart{display:flex;align-items:center;gap:8px;margin:4px 0}
         .bar-label{font-size:0.76rem;width:150px;text-align:right;color:var(--gray-600);flex-shrink:0}
@@ -570,8 +618,11 @@
         .timeline-dot{border-radius:0}
         /* ═══ 主题覆盖层结束 ═══ */
     </style>
+
+
+
 </head>
-<body data-default-theme="default" data-asset-prefix="../">
+<body data-default-theme="07_blueprint" data-asset-prefix="../">
 
 <div id="app">
 
@@ -670,6 +721,12 @@
 
     <div class="viz">
     <h4 class="section-h4 c-primary">① 关键公式一（公式名称占位）</h4>
+    <!-- TEMPLATE: 三段式图表单元（M29 内容压缩规范）——每个图表/公式单元 = 三段：
+         ① .fig-intro 图表介绍（这个图是什么、看哪里，一两句）
+         ② 图表本身（figure / table，原样搬运）
+         ③ .takeaway 结论（这个图说明什么、对汇报主线意味着什么；warn / danger 变体用于注意事项与失败结论）
+         重点前置：介绍让读者带着问题看图，结论可独立成立。 -->
+    <p class="fig-intro"><strong>图表介绍：</strong>本公式为模型的核心损失函数（占位示例）。阅读时关注两项：加号连接的两部分分别约束什么；两项的相对权重如何由超参平衡。</p>
     <!-- TEMPLATE: 公式截图占位，把 .img-placeholder 整块替换为：
          <div class="figure"><img src="../literature_output/示例论文/images/eq_1.jpg" alt="Eq. 1"><div class="fig-caption">Eq. 1 · 公式名称（mineru 解析截图）</div></div>
          占位符含义：此位置放 mineru 输出的【关键公式截图】。 -->
@@ -677,6 +734,7 @@
         <div class="img-placeholder"><span class="ph-icon">🧮</span>公式截图占位：mineru 输出 images/ 中的公式图片<br>（如 eq_1.jpg，替换为 <code>&lt;img src="..."&gt;</code>）</div>
         <div class="fig-caption">Eq. 1 · 公式名称（mineru 解析截图，占位图注）</div>
     </div>
+    <div class="takeaway"><span class="tk-label">结论</span>该公式把两项目标统一进一个可微的联合损失（占位示例）：汇报时先给本条结论，细节推导放折叠区。</div>
 
     <!-- 折叠区：公式二（data-fold 与右栏「② 公式说明」配对） -->
     <div class="fold" data-fold="sub-eq2">
@@ -926,6 +984,7 @@
 
 <!-- 主题包（唯一数据源：10 个主题 CSS + 元数据；先于下方切换器加载） -->
 <script src="../theme-pack.js"></script>
+    <script>window.__PREVIEW_THEME__="07_blueprint";</script>
 <script>
 /* ═══════ 主题一键切换器 ═══════
    主题列表来自 theme-pack.js（window.THEME_PACK）；选择写 localStorage，
@@ -967,6 +1026,10 @@
         let el = document.getElementById('theme-overlay');
         if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
         const t = THEME_PACK.find(x => x.id === id);
+        // 内联默认主题（baked-theme）随选择启停：选其他主题时禁用之，否则它的直接规则
+        //（如 #header{background:var(--primary)}）会压过主题包仅改 :root 令牌的覆盖方式
+        const baked = document.getElementById('baked-theme');
+        if (baked) baked.disabled = (id !== defTheme);
         // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
         let css = (t && id !== defTheme) ? t.css : '';
         // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
@@ -974,7 +1037,8 @@
         if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
         el.textContent = css;
         applyFonts(t);
-        try { localStorage.setItem(KEY, id); } catch (e) {}
+        // 变体页（__PREVIEW_THEME__ 存在）不写全局偏好：预览内的试切不污染用户选择
+        if (!window.__PREVIEW_THEME__) { try { localStorage.setItem(KEY, id); } catch (e) {} }
         curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
         panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
     }
@@ -982,7 +1046,10 @@
     // 恢复：localStorage 优先，其次页面默认主题
     let saved = null;
     try { saved = localStorage.getItem(KEY); } catch (e) {}
-    applyTheme(saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+    // 变体页（__PREVIEW_THEME__ 由构建脚本注入）永远打开在自己烘焙的主题上，不读全局偏好；
+    // 基座页按 saved → 页面默认回落（存量旧值仅当命中主题包真实主题或显式的 default 才沿用）
+    const previewTheme = window.__PREVIEW_THEME__ || null;
+    applyTheme(previewTheme || (saved && (saved === 'default' || THEME_PACK.some(t => t.id === saved)) ? saved : defTheme));
 
     // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
     function openPanel() {
@@ -1085,6 +1152,19 @@ function buildInpageNav() {
          ]},
     ];
 
+// M29：页内锚点跳转统一入口 —— 先强制渲染目标卡片（content-visibility:auto 的视口外
+// 卡片按估算高度定位会偏移），下一帧再滚动命中真实位置（与总览页 scrollToSection 同款）；
+// 展开父组后跳转的语义不变，仅替换原先直排的 scrollIntoView。
+window.jumpTo = function jumpTo(targetId) {
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    const card = el.closest('.card') || el;
+    card.style.contentVisibility = 'visible';
+    requestAnimationFrame(() => {
+        el.scrollIntoView({behavior:'smooth',block:'start'});
+        setTimeout(() => { card.style.contentVisibility = ''; }, 800);
+    });
+}
     const container = document.getElementById('children-inpage');
     let html = '';
     groups.forEach((g, gi) => {
@@ -1093,16 +1173,16 @@ function buildInpageNav() {
         if (!el) return;
         if (g.children && g.children.length) {
             const parentId = 'inpage-parent-' + gi;
-            html += `<div class="sidebar-child" onclick="var p=document.getElementById('${parentId}');var a=this.querySelector('.arrow-inpage');var isHidden=p.style.display==='none';p.style.display=isHidden?'block':'none';a.style.transform=isHidden?'rotate(0deg)':'rotate(90deg)';document.getElementById('${targetId}').scrollIntoView({behavior:'smooth',block:'start'});" style="font-weight:600;display:flex;align-items:center;">${g.label}<span class="arrow-inpage" style="font-size:0.55rem;color:var(--gray-400);margin-left:auto;transition:transform 0.2s;">▼</span></div>`;
+            html += `<div class="sidebar-child" onclick="var p=document.getElementById('${parentId}');var a=this.querySelector('.arrow-inpage');var isHidden=p.style.display==='none';p.style.display=isHidden?'block':'none';a.style.transform=isHidden?'rotate(0deg)':'rotate(90deg)';jumpTo('${targetId}');" style="font-weight:600;display:flex;align-items:center;">${g.label}<span class="arrow-inpage" style="font-size:0.55rem;color:var(--gray-400);margin-left:auto;transition:transform 0.2s;">▼</span></div>`;
             html += `<div id="${parentId}" style="display:block;">`;
             g.children.forEach(ch => {
                 if (document.getElementById(ch.h4Id)) {
-                    html += `<div class="sidebar-child" onclick="document.getElementById('${ch.h4Id}').scrollIntoView({behavior:'smooth',block:'start'})" style="padding-left:42px;">${ch.label}</div>`;
+                    html += `<div class="sidebar-child" onclick="jumpTo('${ch.h4Id}')" style="padding-left:42px;">${ch.label}</div>`;
                 }
             });
             html += '</div>';
         } else {
-            html += `<div class="sidebar-child" onclick="document.getElementById('${targetId}').scrollIntoView({behavior:'smooth',block:'start'})" style="font-weight:600;">${g.label}</div>`;
+            html += `<div class="sidebar-child" onclick="jumpTo('${targetId}')" style="font-weight:600;">${g.label}</div>`;
         }
     });
     container.innerHTML = html;
