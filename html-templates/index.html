@@ -1,306 +1,579 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RUC HTML 模板库 · 学术网页模板集</title>
-<meta name="description" content="面向科研汇报场景的纯静态 HTML 模板集：讲演幻灯、组会汇报、商业演示、论文精读与个人学术主页，77 套主题一键切换。">
-<link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
-<style>
-  :root {
-    --bg: #f7f5f2;
-    --card: #fffdfb;
-    --ink: #27211e;
-    --ink-2: #6d625b;
-    --line: #e8e1d8;
-    --line-strong: #d9cfc3;
-    --red: #971f30;
-    --red-hover: #7a1826;
-    --lift: 0 12px 32px rgba(151, 31, 48, .10), 0 3px 8px rgba(39, 33, 30, .06);
-    --serif: Georgia, "Times New Roman", "Songti SC", "STZhongsong", "SimSun", serif;
-    --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>RUC HTML 模板库 · 学术网页模板集</title>
+    <meta content="面向科研汇报场景的纯静态 HTML 模板集：讲演幻灯、组会汇报、商业演示、论文精读与个人学术主页，77 套主题一键切换。"
+          name="description">
+    <link href="ruc-mark.svg" rel="icon" type="image/svg+xml">
+    <style>
+        :root {
+            --bg: #f7f5f2;
+            --card: #fffdfb;
+            --ink: #27211e;
+            --ink-2: #6d625b;
+            --line: #e8e1d8;
+            --line-strong: #d9cfc3;
+            --red: #971f30;
+            --red-hover: #7a1826;
+            --lift: 0 12px 32px rgba(151, 31, 48, .10), 0 3px 8px rgba(39, 33, 30, .06);
+            --serif: Georgia, "Times New Roman", "Songti SC", "STZhongsong", "SimSun", serif;
+            --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB",
             "Microsoft YaHei", "Segoe UI", sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #171112;
-      --card: #221b1c;
-      --ink: rgba(255, 255, 255, .88);
-      --ink-2: rgba(255, 255, 255, .66);
-      --line: #3a3032;
-      --line-strong: #4c4042;
-      --red: #e2738a;
-      --red-hover: #efa0b0;
-      --lift: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .30);
-    }
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: var(--sans);
-    background: var(--bg); color: var(--ink);
-    min-height: 100vh; line-height: 1.65;
-  }
-  /* 右下角校徽水印(仅亮色;素材为官方底纹的加深版) */
-  body::after {
-    content: ""; position: fixed; right: 0; bottom: 0;
-    width: min(24vw, 280px); aspect-ratio: 848 / 1248;
-    background: url(background-1.png) center / contain no-repeat;
-    z-index: -1; pointer-events: none; mix-blend-mode: multiply;
-  }
-  @media (prefers-color-scheme: dark) { body::after { display: none; } }
+        }
 
-  ::selection { background: var(--red); color: #fff; }
-  @media (prefers-color-scheme: dark) { ::selection { color: #1c0b10; } }
-  ::-webkit-scrollbar { width: 11px; height: 11px; }
-  ::-webkit-scrollbar-thumb {
-    background: var(--line-strong); border: 3px solid var(--bg); border-radius: 8px;
-  }
-  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
-  a:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #171112;
+                --card: #221b1c;
+                --ink: rgba(255, 255, 255, .88);
+                --ink-2: rgba(255, 255, 255, .66);
+                --line: #3a3032;
+                --line-strong: #4c4042;
+                --red: #e2738a;
+                --red-hover: #efa0b0;
+                --lift: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .30);
+            }
+        }
 
-  /* 顶部校徽红规线:整页唯一的入场动效 */
-  .topline {
-    height: 3px; background: var(--red);
-    transform-origin: left center;
-    animation: grow .9s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  @keyframes grow { from { transform: scaleX(0); } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  .page { max-width: 1020px; margin: 0 auto; padding: 0 30px 60px; }
+        body {
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            line-height: 1.65;
+        }
 
-  .masthead {
-    display: flex; align-items: center; gap: 20px;
-    padding: 58px 0 0;
-    animation: rise .55s .10s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  .seal {
-    position: relative; flex: none;
-    width: 54px; height: 54px; border-radius: 3px;
-    background: var(--red); color: #fff;
-    font-family: var(--serif); font-size: 20px; font-weight: 600;
-    letter-spacing: .12em; text-indent: .12em;
-    display: grid; place-items: center;
-  }
-  .seal::after {
-    content: ""; position: absolute; inset: 3px;
-    border: 1px solid rgba(255, 255, 255, .45); border-radius: 2px;
-  }
-  h1 {
-    font-family: var(--serif); font-weight: 600;
-    font-size: clamp(26px, 4vw, 34px); letter-spacing: .04em;
-    line-height: 1.3;
-  }
-  .sub { color: var(--ink-2); font-size: 14px; margin-top: 5px; }
+        /* 右下角校徽水印(仅亮色;素材为官方底纹的加深版) */
+        body::after {
+            content: "";
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            width: min(24vw, 280px);
+            aspect-ratio: 848 / 1248;
+            background: url(background-1.png) center / contain no-repeat;
+            z-index: -1;
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
 
-  .stats {
-    margin-top: 30px; padding-top: 14px;
-    border-top: 1px solid var(--line-strong);
-    display: flex; flex-wrap: wrap; gap: 6px 26px;
-    font-size: 13px; color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
-    animation: rise .55s .16s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  .stats b { color: var(--red); font-weight: 600; }
+        @media (prefers-color-scheme: dark) {
+            body::after {
+                display: none;
+            }
+        }
 
-  .grid {
-    display: grid; gap: 18px; margin-top: 34px;
-    grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
-  }
-  .card {
-    position: relative; display: flex; flex-direction: column;
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    padding: 22px 22px 18px; text-decoration: none; color: inherit;
-    transition: transform .16s ease-out, border-color .16s ease-out, box-shadow .16s ease-out;
-    animation: rise .55s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  .card:nth-child(1) { animation-delay: .22s; }
-  .card:nth-child(2) { animation-delay: .27s; }
-  .card:nth-child(3) { animation-delay: .32s; }
-  .card:nth-child(4) { animation-delay: .37s; }
-  .card:nth-child(5) { animation-delay: .42s; }
-  .card:hover, .card:focus-visible {
-    transform: translateY(-3px); border-color: var(--red); box-shadow: var(--lift);
-  }
-  .card-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-  .card h2 { font-size: 17px; font-weight: 600; letter-spacing: .01em; }
-  .card:hover h2 { color: var(--red-hover); }
-  .en {
-    font-family: var(--serif); font-weight: 400; font-size: 12.5px;
-    color: var(--ink-2); margin-left: 8px; letter-spacing: .02em;
-  }
-  .no {
-    font-family: var(--serif); font-size: 26px; line-height: 1;
-    color: var(--red); opacity: .7; font-variant-numeric: tabular-nums;
-  }
-  .card p { font-size: 13.5px; color: var(--ink-2); margin-top: 9px; flex: 1; }
-  .meta {
-    margin-top: 14px; font-size: 12px; color: var(--ink-2);
-    font-variant-numeric: tabular-nums;
-  }
-  .arw {
-    position: absolute; right: 18px; bottom: 15px;
-    width: 13px; height: 13px; color: var(--red);
-    opacity: 0; transform: translateX(-4px);
-    transition: opacity .16s ease-out, transform .16s ease-out;
-  }
-  .card:hover .arw, .card:focus-visible .arw { opacity: 1; transform: none; }
-  .arw path { stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        ::selection {
+            background: var(--red);
+            color: #fff;
+        }
 
-  .road {
-    margin-top: 42px; padding-top: 20px;
-    border-top: 1px solid var(--line-strong);
-    display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
-    animation: rise .55s .48s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  .road-label {
-    font-family: var(--serif); color: var(--red);
-    font-size: 13px; letter-spacing: .08em; margin-right: 4px;
-  }
-  .chip {
-    font-size: 12.5px; color: var(--ink-2);
-    border: 1px dashed var(--line-strong); border-radius: 999px;
-    padding: 5px 14px;
-  }
-  .road-note { margin-left: auto; font-size: 12px; color: var(--ink-2); opacity: .85; }
+        @media (prefers-color-scheme: dark) {
+            ::selection {
+                color: #1c0b10;
+            }
+        }
 
-  footer {
-    margin-top: 56px; padding-top: 26px;
-    border-top: 1px solid var(--line-strong);
-    animation: rise .55s .54s cubic-bezier(.16, 1, .3, 1) both;
-  }
-  .foot-grid {
-    display: flex; flex-wrap: wrap; gap: 26px 40px;
-    justify-content: space-between; align-items: flex-start;
-  }
-  .a-name { font-family: var(--serif); font-size: 18px; font-weight: 600; letter-spacing: .04em; }
-  .a-org { font-size: 13px; color: var(--ink-2); margin-top: 4px; }
-  .mail {
-    display: inline-block; margin-top: 10px;
-    font-size: 13px; color: var(--red); text-decoration: none;
-  }
-  .mail:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .repos { display: flex; flex-wrap: wrap; gap: 8px; }
-  .repo {
-    display: inline-flex; align-items: center; gap: 7px;
-    font-size: 13px; color: var(--ink); text-decoration: none;
-    padding: 7px 14px; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--card);
-    transition: border-color .16s ease-out, color .16s ease-out;
-  }
-  .repo:hover { border-color: var(--red); color: var(--red-hover); }
-  .repo svg { width: 11px; height: 11px; flex: none; }
-  .repo svg path { stroke: currentColor; stroke-width: 1.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .legal { margin-top: 26px; font-size: 12px; color: var(--ink-2); line-height: 1.8; }
+        ::-webkit-scrollbar {
+            width: 11px;
+            height: 11px;
+        }
 
-  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
-  @media (max-width: 560px) {
-    .masthead { padding-top: 42px; }
-    .road-note { margin-left: 0; width: 100%; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .topline, .masthead, .stats, .card, .road, footer { animation: none; }
-    .card, .card:hover { transform: none; }
-  }
-</style>
+        ::-webkit-scrollbar-thumb {
+            background: var(--line-strong);
+            border: 3px solid var(--bg);
+            border-radius: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--red);
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--red);
+            outline-offset: 3px;
+        }
+
+        /* 顶部校徽红规线:整页唯一的入场动效 */
+        .topline {
+            height: 3px;
+            background: var(--red);
+            transform-origin: left center;
+            animation: grow .9s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        @keyframes grow {
+            from {
+                transform: scaleX(0);
+            }
+        }
+
+        .page {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 0 30px 60px;
+        }
+
+        .masthead {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 58px 0 0;
+            animation: rise .55s .10s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .seal {
+            position: relative;
+            flex: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 3px;
+            background: var(--red);
+            color: #fff;
+            font-family: var(--serif);
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-indent: .12em;
+            display: grid;
+            place-items: center;
+        }
+
+        .seal::after {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            border: 1px solid rgba(255, 255, 255, .45);
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: clamp(26px, 4vw, 34px);
+            letter-spacing: .04em;
+            line-height: 1.3;
+        }
+
+        .sub {
+            color: var(--ink-2);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line-strong);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 26px;
+            font-size: 13px;
+            color: var(--ink-2);
+            font-variant-numeric: tabular-nums;
+            animation: rise .55s .16s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .stats b {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        .grid {
+            display: grid;
+            gap: 18px;
+            margin-top: 34px;
+            grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
+        }
+
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 22px 22px 18px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform .16s ease-out, border-color .16s ease-out, box-shadow .16s ease-out;
+            animation: rise .55s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: .22s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: .27s;
+        }
+
+        .card:nth-child(3) {
+            animation-delay: .32s;
+        }
+
+        .card:nth-child(4) {
+            animation-delay: .37s;
+        }
+
+        .card:nth-child(5) {
+            animation-delay: .42s;
+        }
+
+        .card:hover, .card:focus-visible {
+            transform: translateY(-3px);
+            border-color: var(--red);
+            box-shadow: var(--lift);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .card h2 {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: .01em;
+        }
+
+        .card:hover h2 {
+            color: var(--red-hover);
+        }
+
+        .en {
+            font-family: var(--serif);
+            font-weight: 400;
+            font-size: 12.5px;
+            color: var(--ink-2);
+            margin-left: 8px;
+            letter-spacing: .02em;
+        }
+
+        .no {
+            font-family: var(--serif);
+            font-size: 26px;
+            line-height: 1;
+            color: var(--red);
+            opacity: .7;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .card p {
+            font-size: 13.5px;
+            color: var(--ink-2);
+            margin-top: 9px;
+            flex: 1;
+        }
+
+        .meta {
+            margin-top: 14px;
+            font-size: 12px;
+            color: var(--ink-2);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .arw {
+            position: absolute;
+            right: 18px;
+            bottom: 15px;
+            width: 13px;
+            height: 13px;
+            color: var(--red);
+            opacity: 0;
+            transform: translateX(-4px);
+            transition: opacity .16s ease-out, transform .16s ease-out;
+        }
+
+        .card:hover .arw, .card:focus-visible .arw {
+            opacity: 1;
+            transform: none;
+        }
+
+        .arw path {
+            stroke: currentColor;
+            stroke-width: 1.6;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .road {
+            margin-top: 42px;
+            padding-top: 20px;
+            border-top: 1px solid var(--line-strong);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            animation: rise .55s .48s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .road-label {
+            font-family: var(--serif);
+            color: var(--red);
+            font-size: 13px;
+            letter-spacing: .08em;
+            margin-right: 4px;
+        }
+
+        .chip {
+            font-size: 12.5px;
+            color: var(--ink-2);
+            border: 1px dashed var(--line-strong);
+            border-radius: 999px;
+            padding: 5px 14px;
+        }
+
+        .road-note {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--ink-2);
+            opacity: .85;
+        }
+
+        footer {
+            margin-top: 56px;
+            padding-top: 26px;
+            border-top: 1px solid var(--line-strong);
+            animation: rise .55s .54s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .foot-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 26px 40px;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .a-name {
+            font-family: var(--serif);
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: .04em;
+        }
+
+        .a-org {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink-2);
+            margin-top: 4px;
+        }
+
+        .mail {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--red);
+            text-decoration: none;
+        }
+
+        .mail:hover {
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .repos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .repo {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            color: var(--ink);
+            text-decoration: none;
+            padding: 7px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--card);
+            transition: border-color .16s ease-out, color .16s ease-out;
+        }
+
+        .repo:hover {
+            border-color: var(--red);
+            color: var(--red-hover);
+        }
+
+        .repo svg {
+            width: 11px;
+            height: 11px;
+            flex: none;
+        }
+
+        .repo svg path {
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .legal {
+            margin-top: 26px;
+            font-size: 12px;
+            color: var(--ink-2);
+            line-height: 1.8;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .masthead {
+                padding-top: 42px;
+            }
+
+            .road-note {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .topline, .masthead, .stats, .card, .road, footer {
+                animation: none;
+            }
+
+            .card, .card:hover {
+                transform: none;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="topline" aria-hidden="true"></div>
+<div aria-hidden="true" class="topline"></div>
 <div class="page">
 
-  <header class="masthead">
-    <div class="seal" aria-hidden="true">人大</div>
-    <div>
-      <h1>RUC HTML 模板库</h1>
-      <p class="sub">纯静态学术网页模板 · 零构建依赖 · 覆盖科研汇报五类场景</p>
+    <header class="masthead">
+        <div aria-hidden="true" class="seal">人大</div>
+        <div>
+            <h1>RUC HTML 模板库</h1>
+            <p class="sub">纯静态学术网页模板 · 零构建依赖 · 覆盖科研汇报五类场景</p>
+        </div>
+    </header>
+
+    <div class="stats">
+        <span><b>5</b> 套模板</span>
+        <span><b>77</b> 套主题</span>
+        <span><b>3</b> 套双击即用</span>
+        <span>人大红官方视觉</span>
     </div>
-  </header>
 
-  <div class="stats">
-    <span><b>5</b> 套模板</span>
-    <span><b>77</b> 套主题</span>
-    <span><b>3</b> 套双击即用</span>
-    <span>人大红官方视觉</span>
-  </div>
-
-  <main class="grid">
-    <a class="card" href="/lecture/slide_deck_template.html">
-      <div class="card-top">
-        <h2>讲演幻灯<span class="en">Lecture Slides</span></h2>
-        <span class="no" aria-hidden="true">01</span>
-      </div>
-      <p>「幕 + 卡」结构的滚动讲演长页，侧边目录自动生成，支持公式渲染与导出 PDF。</p>
-      <span class="meta">17 套主题 · 双击即用</span>
-      <svg class="arw" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6 2.5 9.5 6 6 9.5"/></svg>
-    </a>
-    <a class="card" href="/lab-meeting/">
-      <div class="card-top">
-        <h2>组会汇报<span class="en">Lab Meeting</span></h2>
-        <span class="no" aria-hidden="true">02</span>
-      </div>
-      <p>总览页 + 子页面小站，进度写在 JSON 里每周更新，含 3D 方法转盘与进度时间线。</p>
-      <span class="meta">11 套主题 · 需本地服务器</span>
-      <svg class="arw" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6 2.5 9.5 6 6 9.5"/></svg>
-    </a>
-    <a class="card" href="/commerical-lecture/">
-      <div class="card-top">
-        <h2>商业演示<span class="en">Commercial Lecture</span></h2>
-        <span class="no" aria-hidden="true">03</span>
-      </div>
-      <p>面向合作方与甲方的能力展示，滚动与翻页混合形态，翻页笔可直接使用。</p>
-      <span class="meta">7 套主题 · 需本地服务器</span>
-      <svg class="arw" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6 2.5 9.5 6 6 9.5"/></svg>
-    </a>
-    <a class="card" href="/paper-explainer/nav/reading_path_template.html">
-      <div class="card-top">
-        <h2>论文精读<span class="en">Paper Explainer</span></h2>
-        <span class="no" aria-hidden="true">04</span>
-      </div>
-      <p>四类页面互联的精读库：阅读路径、逐章详解、背景词典与知识图谱。</p>
-      <span class="meta">8 套主题 · 双击即用</span>
-      <svg class="arw" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6 2.5 9.5 6 6 9.5"/></svg>
-    </a>
-    <a class="card" href="/personal-homepage/">
-      <div class="card-top">
-        <h2>学术主页<span class="en">Personal Homepage</span></h2>
-        <span class="no" aria-hidden="true">05</span>
-      </div>
-      <p>教师与研究生通用的学术主页，16 学科主题配全套示例，中英双语一键切换。</p>
-      <span class="meta">34 套主题 · 双击即用</span>
-      <svg class="arw" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6 2.5 9.5 6 6 9.5"/></svg>
-    </a>
-  </main>
-
-  <section class="road" aria-label="规划中的模板">
-    <span class="road-label">规划中</span>
-    <span class="chip">课程课件</span>
-    <span class="chip">学术海报</span>
-    <span class="chip">更多场景 · 按需扩展</span>
-    <span class="road-note">新模板将陆续加入本页</span>
-  </section>
-
-  <footer>
-    <div class="foot-grid">
-      <div>
-        <p class="a-name">俞锦越</p>
-        <p class="a-org">中国人民大学 统计与大数据研究院</p>
-        <a class="mail" href="mailto:yujinyue@ruc.edu.cn">yujinyue@ruc.edu.cn</a>
-      </div>
-      <div class="repos">
-        <a class="repo" href="https://gitee.com/AiALi7-9-22/ruc-html-templates">
-          Gitee 主仓库
-          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg>
+    <main class="grid">
+        <a class="card" href="/lecture/slide_deck_template.html">
+            <div class="card-top">
+                <h2>讲演幻灯<span class="en">Lecture Slides</span></h2>
+                <span aria-hidden="true" class="no">01</span>
+            </div>
+            <p>「幕 + 卡」结构的滚动讲演长页，侧边目录自动生成，支持公式渲染与导出 PDF。</p>
+            <span class="meta">17 套主题 · 双击即用</span>
+            <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
+                <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
+            </svg>
         </a>
-        <a class="repo" href="https://github.com/DSM-DSM/RUC-html-templates">
-          GitHub
-          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9 9 3M4.5 3H9v4.5"/></svg>
+        <a class="card" href="/lab-meeting/">
+            <div class="card-top">
+                <h2>组会汇报<span class="en">Lab Meeting</span></h2>
+                <span aria-hidden="true" class="no">02</span>
+            </div>
+            <p>总览页 + 子页面小站，进度写在 JSON 里每周更新，含 3D 方法转盘与进度时间线。</p>
+            <span class="meta">11 套主题 · 需本地服务器</span>
+            <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
+                <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
+            </svg>
         </a>
-      </div>
-    </div>
-    <p class="legal">
-      © 2026 RUC-HTML-Templates · 采用非商业署名许可：课程作业、学术汇报等非商业场景可免费使用，请署名并标注出处 ·
-      人大红 #971f30，复刻自学校官方 Beamer 模板 · 原生 HTML / CSS / JS，无任何构建依赖
-    </p>
-  </footer>
+        <a class="card" href="/commerical-lecture/">
+            <div class="card-top">
+                <h2>商业演示<span class="en">Commercial Lecture</span></h2>
+                <span aria-hidden="true" class="no">03</span>
+            </div>
+            <p>面向合作方与甲方的能力展示，滚动与翻页混合形态，翻页笔可直接使用。</p>
+            <span class="meta">7 套主题 · 需本地服务器</span>
+            <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
+                <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
+            </svg>
+        </a>
+        <a class="card" href="/paper-explainer/nav/reading_path_template.html">
+            <div class="card-top">
+                <h2>论文精读<span class="en">Paper Explainer</span></h2>
+                <span aria-hidden="true" class="no">04</span>
+            </div>
+            <p>四类页面互联的精读库：阅读路径、逐章详解、背景词典与知识图谱。</p>
+            <span class="meta">8 套主题 · 双击即用</span>
+            <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
+                <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
+            </svg>
+        </a>
+        <a class="card" href="/personal-homepage/">
+            <div class="card-top">
+                <h2>学术主页<span class="en">Personal Homepage</span></h2>
+                <span aria-hidden="true" class="no">05</span>
+            </div>
+            <p>教师与研究生通用的学术主页，16 学科主题配全套示例，中英双语一键切换。</p>
+            <span class="meta">34 套主题 · 双击即用</span>
+            <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
+                <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
+            </svg>
+        </a>
+    </main>
+
+    <section aria-label="规划中的模板" class="road">
+        <span class="road-label">规划中</span>
+        <span class="chip">课程课件</span>
+        <span class="chip">学术海报</span>
+        <span class="chip">更多场景 · 按需扩展</span>
+        <span class="road-note">新模板将陆续加入本页</span>
+    </section>
+
+    <footer>
+        <div class="foot-grid">
+            <div>
+                <p class="a-name">作者：俞锦越</p>
+                <p class="a-org">机构：中国人民大学-ISBD-统计与大数据研究院</p>
+                <a class="mail" href="mailto:yujinyue@ruc.edu.cn">邮箱：yujinyue@ruc.edu.cn</a>
+            </div>
+            <div class="repos">
+                <a class="repo" href="https://gitee.com/AiALi7-9-22/ruc-html-templates">
+                    Gitee
+                    <svg aria-hidden="true" viewBox="0 0 12 12">
+                        <path d="M3 9 9 3M4.5 3H9v4.5"/>
+                    </svg>
+                </a>
+                <a class="repo" href="https://github.com/DSM-DSM/RUC-html-templates">
+                    GitHub
+                    <svg aria-hidden="true" viewBox="0 0 12 12">
+                        <path d="M3 9 9 3M4.5 3H9v4.5"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <p class="legal">
+            © 2026 RUC-HTML-Templates · 采用非商业署名许可：课程作业、学术汇报等非商业场景可免费使用，请署名并标注出处
+        </p>
+        <p class="legal">
+            人大红 #971f30，复刻自学校官方 Beamer 模板 · 原生 HTML / CSS / JS，无任何构建依赖
+        </p>
+    </footer>
 
 </div>
 </body>
