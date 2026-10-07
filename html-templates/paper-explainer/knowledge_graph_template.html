@@ -38,7 +38,7 @@
   ⚠️ 本文件内所有 {花括号占位符} 都是示例内容，替换为你的真实内容即可。
 ================================================================================
 -->
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="ruc">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -263,7 +263,8 @@ footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-s
   (function () {
     try {
       var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
-      if (!P || !id) return;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
       for (var i = 0; i < P.THEMES.length; i++) {
         var t = P.THEMES[i];
         if (t.id === id) {

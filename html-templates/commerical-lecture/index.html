@@ -681,7 +681,7 @@ svg text { font-family: var(--font-sans); }
 }
 </style>
 </head>
-<body data-default-theme="twilight">
+<body data-default-theme="twilight" data-initial-theme="ruc">
 <!--
 THESIS: 三条叙事线（个人→团队→联结）本身就是能力证据的编排，拒绝平铺罗列工具。
 OWN-WORLD: Linear 暗色基底 #08090a 与半透明白边框；Superhuman twilight 深紫 #1b1938 与薰衣草紫 #cbb7fb 唯一 accent——叙事轴脉冲光点、星云与星座网络即 AI 元素；Stripe 轻字重大数字与蓝调浮影；IBM 结构节奏与 token 体系；暖奶油色 #e9e5dd CTA。
@@ -1478,7 +1478,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
   function initThemeSwitcher() {
     if (!window.THEME_PACK || !window.THEME_PACK.length) return; /* 优雅降级：无包则退回默认主题 */
     var THEME_KEY = "commerical-lecture-theme";
-    var defTheme = document.body.dataset.defaultTheme || "twilight";
+    var defTheme = document.body.dataset.defaultTheme || "twilight"; /* 基座烘焙主题：选回它时清空 overlay */
+    var initTheme = document.body.dataset.initialTheme || defTheme;  /* 无记忆访客的初始主题 */
     var btn = $("#tsBtn");
     var panel = $("#tsPanel");
     if (!btn || !panel) return;
@@ -1545,7 +1546,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
     var valid = saved === defTheme || window.THEME_PACK.some(function (t) { return t.id === saved; });
     renderPanel();
-    applyTheme(valid ? saved : defTheme);
+    applyTheme(valid ? saved : initTheme);
   }
 
   /* ---------- 数据加载 ---------- */
