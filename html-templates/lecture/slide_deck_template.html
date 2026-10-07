@@ -38,10 +38,14 @@
 <head>
     <link rel="stylesheet" id="theme-fonts" href="">
 <script>
-    /* 主题预设：先于正文设置 data-theme（决定装饰元素显隐，避免闪烁） */
+    /* 主题预设：先于正文设置 data-theme（决定装饰元素显隐，避免闪烁）。
+       旧版默认 'default' 无主动选择标记(-set)时视为遗留记忆，按新默认渲染 */
     (function () {
         var t = null;
         try { t = localStorage.getItem('lecture-theme'); } catch (e) {}
+        if (t === 'default') {
+            try { if (!localStorage.getItem('lecture-theme-set')) t = null; } catch (e) { t = null; }
+        }
         if (!/^(default|0[1-9]|1[0-6])$/.test(t || '')) {
             t = document.documentElement.getAttribute('data-default-theme') || 'default';
         }
@@ -813,7 +817,7 @@
                 opts[i].classList.toggle('sel', opts[i].getAttribute('data-id') === id);
             }
             document.dispatchEvent(new CustomEvent('lecture-themechange', { detail: { id: id } }));
-            if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+            if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
         }
         /* 选项：默认主题 + 16 主题 */
         var entries = [{ id: 'default', name: window.LECTURE_THEME_PACK.DEFAULT_THEME.name, swatch: window.LECTURE_THEME_PACK.DEFAULT_THEME.swatch }]
@@ -853,9 +857,13 @@
         document.addEventListener('keydown', function (ev) {
             if (ev.key === 'Escape' && !panel.hasAttribute('hidden')) { setOpen(false); btn.focus(); }
         });
-        /* 恢复顺序：localStorage 优先（校验合法性）→ 页面默认 */
+        /* 恢复顺序：localStorage 优先（校验合法性）→ 页面默认。
+           旧版默认 'default' 无主动选择标记时视为遗留记忆，回落新默认 */
         var saved = null;
         try { saved = localStorage.getItem(KEY); } catch (e) {}
+        if (saved === 'default') {
+            try { if (!localStorage.getItem(KEY + '-set')) saved = null; } catch (e) { saved = null; }
+        }
         if (saved && saved !== 'default' && !findEntry(saved)) saved = null;
         applyTheme(saved || defTheme, false);
     })();

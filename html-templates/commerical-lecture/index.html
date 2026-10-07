@@ -1484,7 +1484,7 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     var panel = $("#tsPanel");
     if (!btn || !panel) return;
 
-    function applyTheme(id) {
+    function applyTheme(id, save) {
       var el = document.getElementById("theme-overlay");
       if (!el) {
         el = document.createElement("style");
@@ -1496,7 +1496,8 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
       /* 选回本页默认 → 清空 overlay（基座自带默认样式，重复注入会叠双份） */
       el.textContent = (t && t.css && id !== defTheme) ? t.css : "";
       document.body.dataset.theme = id;
-      try { localStorage.setItem(THEME_KEY, id); } catch (e) {}
+      /* 仅主动选择时持久化，并写 -set 标记区分"遗留记忆"与"用户选择" */
+      if (save) { try { localStorage.setItem(THEME_KEY, id); localStorage.setItem(THEME_KEY + "-set", "1"); } catch (e) {} }
       Array.prototype.forEach.call(panel.querySelectorAll(".ts-opt"), function (opt) {
         opt.classList.toggle("sel", opt.dataset.themeId === id);
       });
@@ -1537,16 +1538,20 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
     panel.addEventListener("click", function (e) {
       var opt = e.target.closest ? e.target.closest(".ts-opt") : null;
       if (!opt) return;
-      applyTheme(opt.dataset.themeId);
+      applyTheme(opt.dataset.themeId, true);
       closePanel();
     });
 
-    /* 恢复顺序：localStorage 优先 → 页面默认；非法值忽略 */
+    /* 恢复顺序：localStorage 优先 → 页面默认；非法值忽略。
+       旧版初始 apply 会自动写主题值，无主动选择标记(-set)的旧默认视为遗留记忆 */
     var saved = null;
     try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    if (saved === defTheme) {
+      try { if (!localStorage.getItem(THEME_KEY + "-set")) saved = null; } catch (e) { saved = null; }
+    }
     var valid = saved === defTheme || window.THEME_PACK.some(function (t) { return t.id === saved; });
     renderPanel();
-    applyTheme(valid ? saved : initTheme);
+    applyTheme(valid ? saved : initTheme, false);
   }
 
   /* ---------- 数据加载 ---------- */

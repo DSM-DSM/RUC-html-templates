@@ -351,6 +351,10 @@
       var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
       if (!P) return;
       if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
       for (var i = 0; i < P.THEMES.length; i++) {
         var t = P.THEMES[i];
         if (t.id === id) {
@@ -548,7 +552,7 @@
     } else {
       el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
     }
-    if (save) { try { localStorage.setItem(KEY, id); } catch (e) {} }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
     var items = document.querySelectorAll('.ts-item');
     for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
   }
@@ -604,7 +608,12 @@
     tick();
   }
 
-  apply((function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })() || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
 })();
 </script>
 </body>
