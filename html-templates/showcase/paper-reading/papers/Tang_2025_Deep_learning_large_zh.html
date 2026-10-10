@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LyMOI: 深度学习+LLM混合工作流用于组学解读 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="top-nav-bar">
+<span class="current"><span data-zh>← 当前论文</span><span data-en>← Current paper</span></span>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR-CVD</a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>卒中蛋白MR</span><span data-en>Stroke Proteome MR</span></a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>两步MR</span><span data-en>Two-step MR</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">PDF</a>
+</div>
+
+<header>
+<div class="journal">Nature Biomedical Engineering &middot; 2025 &middot; DOI: 10.1038/s41551-025-01576-5</div>
+<h1>LyMOI：深度学习+大语言模型混合工作流用于组学解读</h1>
+<p style="font-style:italic;color:#566573;">A deep learning and large language hybrid workflow for omics interpretation</p>
+<div class="authors"><strong>Dachao Tang</strong>, Chi Zhang, Weizhi Zhang, Funian Lu, Leming Xiao, Xinhe Huang, Jiangyi Shao, Dan Liu, Shanshan Fu, Miaoying Zhao, Luoying Zhang, Da Jia, Han-Ming Shen, Chaoyang Sun, Gang Chen, Bin Liu, <strong>Di Peng</strong>, <strong>Yu Xue</strong> —— 华中科技大学</div>
+<div class="abstract-box"><strong>核心发现：</strong>LyMOI 将图卷积网络（GCN）深度学习与大语言模型（GPT-3.5）推理结合，构建了一个混合工作流用于组学数据解读。在自噬研究中，LyMOI 从1.3TB多组学数据中预测了3,640个条件特异性自噬调控因子（9.7倍扩展），实验验证了4个酵母新调控因子（Gin4/Elm1/Rvs167/Ste50），并发现CTSL和FAM98A是促进抗癌药disulfiram诱导自噬的关键人癌蛋白——DSF与CTSL抑制剂Z-FY-CHO联合使用在小鼠体内强烈抑制肿瘤生长。</div>
+</header>
+
+<nav class="toc">
+<h3>📑 <span data-zh>目录</span><span data-en>Contents</span></h3>
+<ol>
+<li><a href="#sec-0">阅读导引：组学解读+AI的范式融合</a></li>
+<li><a href="#sec-1">研究背景：组学数据解读的瓶颈</a></li>
+<li><a href="#sec-2">LyMOI 架构：GCN + LLM 混合框架</a></li>
+<li><a href="#sec-3">GPT-3.5 合成数据集与零样本提示</a></li>
+<li><a href="#sec-4">大图模型（LGM）预训练与分层微调</a></li>
+<li><a href="#sec-5">实验验证：4种酵母+2种人癌蛋白</a></li>
+<li><a href="#sec-6">跨系统扩展与讨论</a></li>
+<li><a href="#sec-7">要点总结</a></li>
+</ol>
+</nav>
+
+<section id="sec-0">
+<h2>0. 阅读导引：组学解读 + AI 的范式融合</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>假设你测了一组转录组/蛋白质组/磷酸化组数据，里面有成千上万个"变化了的分子"。传统方法能告诉你"哪些分子变了"，但几乎回答不了"<strong>为什么变？怎么变的？哪些是关键调控因子？</strong>"。LyMOI 就像一个"深度学习侦探 + 语言模型百科全书"的组合：先用图神经网络从多组学数据中预测出最可能的调控因子（Molecules of Interest, MOIs），再用 GPT-3.5 的 Chain-of-Thought 推理写出类似生物学家的机制解释。</p>
+</div>
+
+<h3>为什么这篇论文重要？</h3>
+<ul>
+<li><strong>首次混合架构</strong>：将图卷积网络（GCN）的定量预测能力与LLM的定性推理能力融合为一个完整工作流</li>
+<li><strong>规模空前</strong>：1.87亿条蛋白质相互作用、562个物种、1.3TB多组学数据</li>
+<li><strong>实验验证</strong>：不仅预测了3,640个条件特异性自噬调控因子，还实验验证了6个新调控因子</li>
+<li><strong>临床转化价值</strong>：发现DSF+Z-FY-CHO联合治疗在体内抑瘤，直接指向可测试的癌症治疗策略</li>
+</ul>
+
+<div class="crossref">
+<strong>📎 知识链接：</strong>LyMOI的LLM多智能体推理思路与中的Finch/Crow/Falcon多智能体协作有异曲同工之处——两者都将LLM的因果推理能力嵌入科学发现流程。区别在于：ROBIN用LLM驱动文献搜索+假设生成，LyMOI用LLM扩展训练数据+做机制解释。参见<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html">知识图谱</a>。</div>
+</section>
+<section id="sec-1"><h2>1. 研究背景：组学数据解读的瓶颈</h2>
+<div class="intuition"><span class="tag">直观理解</span><p>高通量测序产生了海量组学数据——转录组、蛋白质组、磷酸化组——但解读这些数据的方法（差异表达分析+富集分析）几十年来没有本质变化。这些方法告诉你"哪个基因变了"，但"这意味着什么生物学意义"仍然需要人类专家花大量时间阅读文献来推断。打个比方：传统方法给你一张零件清单，LyMOI给你一本组装说明书。</p></div>
+<h3>前人方法的局限</h3><table><tr><th>方法</th><th>能做</th><th>不能做</th></tr><tr><td>差异表达分析(DEG)</td><td>识别表达量变化的基因</td><td>无法区分因果调控因子 vs 下游效应</td></tr><tr><td>GO/KEGG富集分析</td><td>发现富集通路</td><td>高度依赖数据库完整性，无法做机制推理</td></tr><tr><td>网络建模</td><td>展示分子间关系</td><td>大多忽略进化保守性和上下文特异性</td></tr></table>
+
+<div class="definition">
+<span class="tag">方法详解 · 差异表达分析（DEG）</span>
+<h4>原理与数学模型</h4>
+<p>差异表达分析的核心是用统计模型判断：<strong>一个基因在两种条件（如处理 vs 对照）下的表达量差异是否超出随机波动的范围</strong>。最常用的工具是 <strong>DESeq2</strong> 和 <strong>edgeR</strong>，两者均基于<strong>负二项分布（Negative Binomial）</strong>来建模 RNA-seq 的计数数据：</p>
+
+$$
+K_{ij} \sim \text{NB}(\mu_{ij}, \alpha_i)
+$$
+
+<p>其中 $K_{ij}$ 是基因 $i$ 在样本 $j$ 中的 read count，$\mu_{ij}$ 是期望表达值（受测序深度和条件效应共同决定），$\alpha_i$ 是基因特异性的离散度参数——用来捕捉"同一个基因在同条件下的重复样本间，计数方差远大于泊松分布所预测的方差"这一生物学事实（即<strong>过度离散 overdispersion</strong>）。</p>
+
+<p>DESeq2 的核心步骤：</p>
+<ol>
+  <li><strong>估计离散度</strong>：用极大似然法对每个基因拟合 $\alpha_i$，并利用"基因间离散度-均值趋势线"做 empirical Bayes 收缩——将个别基因的不稳定估计拉向整体趋势，提高低表达基因的可靠性。</li>
+  <li><strong>拟合广义线性模型 (GLM)</strong>：$\log_2(\mu_{ij}) = \beta_{i0} + \beta_{i1} \cdot X_j$，其中 $X_j$ 是条件指示变量。$\beta_{i1}$ 即为 log2 倍数变化（log2 Fold Change, LFC）。</li>
+  <li><strong>Wald 检验</strong>：对每个基因检验 $H_0: \beta_{i1} = 0$（无差异表达），得到 p 值后用 Benjamini-Hochberg 方法校正为 FDR。</li>
+</ol>
+
+<h4>关键局限——为什么 DEG 不能区分因果调控因子 vs 下游效应</h4>
+<p>统计显著性只告诉你"这个基因的表达量发生了超出随机噪声的变化"，但<strong>不提供因果方向信息</strong>。在自噬研究中的具体困境：</p>
+<ul>
+  <li>假设某转录因子 $TF_A$ 在氮饥饿条件下被磷酸化激活，随后激活 $Gene_B$ 和 $Gene_C$ 的转录。DEG 会同时标记 $TF_A$、$Gene_B$ 和 $Gene_C$ 为"显著差异表达"——但 $TF_A$ 是<strong>原因</strong>，而后两者是<strong>结果</strong>。</li>
+  <li>更重要的是，许多真正的关键调控因子<strong>并不需要在 mRNA 水平上显著变化</strong>——它们可能通过磷酸化、泛素化、亚细胞定位等<strong>翻译后修饰</strong>被激活。DEG 对这类调控因子完全"盲"。</li>
+  <li>这就是 LyMOI 引入 GCN + PPI 网络的原因：网络拓扑可以从蛋白质-蛋白质互作的结构中区分"网络中心"（可能的上游调控因子）和"网络边缘"（可能的下游效应器）。</li>
+</ul>
+</div>
+
+<div class="definition">
+<span class="tag">方法详解 · GO/KEGG 富集分析</span>
+<h4>原理与数学模型</h4>
+<p>富集分析回答的问题是：<strong>"在我的差异基因列表中，某些功能类别（如某个 GO term 或 KEGG 通路）的基因是否比随机期望更多？"</strong> 其数学核心是<strong>超几何检验（Hypergeometric Test）</strong>，等价于 Fisher 精确检验：</p>
+
+$$
+P(X \ge k) = 1 - \sum_{i=0}^{k-1}
+\frac{\binom{K}{i} \binom{N-K}{n-i}}{\binom{N}{n}}
+$$
+
+<p>其中：$N$ = 基因组中所有被检测的基因总数，$K$ = 属于该功能类别的基因数，$n$ = 差异基因列表的大小，$k$ = 差异基因中实际属于该类别的基因数。这个公式计算的是：在"差异基因是从全基因组中随机均匀抽取"的零假设下，观察到 $k$ 个或更多该类基因的累积概率。</p>
+
+<p>标准工作流：对每个 GO term / KEGG pathway 计算超几何 p 值 → Benjamini-Hochberg FDR 校正 → 选取 $q \lt 0.05$ 的显著富集条目 → 生成条形图/气泡图。</p>
+
+<h4>关键局限——为什么无法做机制推理</h4>
+<table>
+  <tr><th>局限</th><th>具体表现</th><th>实例</th></tr>
+  <tr><td><strong>数据库依赖性</strong></td><td>GO 和 KEGG 的注释覆盖度有限——许多基因的功能注释不完整或缺失，尤其是在非模式物种中</td><td>酵母中仍有 ~20% 的基因缺乏 GO 生物过程注释；人类中许多 lncRNA 未被 KEGG 收录</td></tr>
+  <tr><td><strong>无方向性</strong></td><td>富集分析告诉你"自噬通路被扰动"，但不告诉你扰动是激活还是抑制——需要人类专家额外判断</td><td>"Autophagy" 通路在两种条件下都显著富集，但一种条件下自噬上调、另一种条件下自噬被阻断</td></tr>
+  <tr><td><strong>无因果链</strong></td><td>富集结果是一条路名单，不是一条因果推理链。它说 mTOR 通路受影响，但不说"什么调控了 mTOR → mTOR 调控了什么 → 最终效应是什么"</td><td>LyMOI 的机器 CoT 正是为了填补这个缺口：从 PPI 网络 + 多组学数据中推导完整的因果叙事</td></tr>
+  <tr><td><strong>忽略上下文特异性</strong></td><td>同一个 KEGG 通路在不同条件/组织/物种中可能有完全不同的功能角色，但富集分析将其一概而论</td><td>mTOR 通路在营养充足时促进生长、在饥饿时被抑制——但 KEGG 只有一个"mTOR signaling pathway"条目</td></tr>
+</table>
+</div>
+
+<div class="definition">
+<span class="tag">方法详解 · 网络建模</span>
+<h4>原理与主流方法</h4>
+<p>网络建模将生物分子抽象为<strong>节点（nodes）</strong>，将它们的相互作用抽象为<strong>边（edges）</strong>。在组学解读中最常使用的三类方法：</p>
+
+<p><strong>1. 蛋白质-蛋白质互作网络（PPI Network）</strong>——从 STRING、BioGRID 等数据库获取实验验证或预测的蛋白互作关系。每个蛋白是一个节点，互作关系是边。分析手段包括：</p>
+<ul>
+  <li><strong>Hub 蛋白识别</strong>：计算每个节点的度（degree centrality）$d_i = \sum_j A_{ij}$，高度节点 $d_i \gg \bar{d}$ 通常对应关键调控因子（如 scaffold 蛋白、hub 激酶）。</li>
+  <li><strong>网络模块检测</strong>：用社区发现算法（如 Louvain、MCL 聚类）识别紧密互连的子网络——每个子网络通常对应一个蛋白质复合体或功能模块。</li>
+  <li><strong>最短路径分析</strong>：计算两个蛋白之间的最短路径长度，判断已知自噬蛋白与候选蛋白的"拓扑距离"。</li>
+</ul>
+
+<p><strong>2. 加权基因共表达网络分析（WGCNA）</strong>——基于表达数据构建共表达网络，将表达模式相似的基因聚类为"模块"，并将模块与表型关联。WGCNA 使用软阈值（soft thresholding）而非硬切割来保留连续信息：</p>
+
+$$
+a_{ij} = |\text{cor}(x_i, x_j)|^{\beta}
+$$
+
+<p>其中 $\text{cor}(x_i, x_j)$ 是基因 $i$ 和 $j$ 的表达谱 Pearson 相关系数，$\beta$ 是软阈值参数——选择使得网络最接近无标度拓扑的值。</p>
+
+<p><strong>3. 图嵌入方法（Node2Vec / DeepWalk）</strong>——将图的节点映射到低维向量空间，使拓扑上相近的节点在向量空间中也相近。Node2Vec 的核心是一个带偏置的随机游走策略：</p>
+
+$$
+P(c_i = x \mid c_{i-1} = v) =
+\begin{cases}
+\frac{\pi_{vx}}{Z} & \text{if } (v, x) \in E \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+<p>其中 $\pi_{vx} = \alpha_{pq}(t, x) \cdot w_{vx}$ 是带偏置的转移概率——参数 $p$ 控制"返回上一节点"的概率（鼓励局部探索 vs 离开），参数 $q$ 控制"向外探索 vs 向内徘徊"（区分 BFS 和 DFS）。生成大量随机游走路径后，用 Skip-gram 模型学习每个节点的向量表示。</p>
+
+<h4>关键局限——为什么传统网络建模不足以替代 LyMOI 的 GCN</h4>
+<table>
+  <tr><th>传统方法</th><th>核心缺陷</th><th>LyMOI 的改进</th></tr>
+  <tr><td>静态 PPI 网络分析</td><td>网络结构固定——STRING 数据库中的互作关系是"所有条件下都可能发生"的通用 PPI，无法反映<strong>条件特异性</strong>（氮饥饿 vs 葡萄糖饥饿下的关键蛋白完全不同）</td><td>GCN 的<strong>分层微调</strong>：教师模型学习通用网络拓扑 → 34 个条件特异性学生模型分别在各自条件的数据上微调，捕获条件特异性调控因子</td></tr>
+  <tr><td>WGCNA 共表达网络</td><td>仅使用转录组数据——忽略了蛋白质层面的互作、翻译后修饰、信号传导等关键信息层</td><td>GCN 的<strong>多组学节点特征</strong>：每个蛋白节点融合了转录组 + 蛋白质组 + 磷酸化组的多层特征维度</td></tr>
+  <tr><td>Node2Vec/DeepWalk 图嵌入</td><td>无监督学习——学到的向量表示反映的是通用拓扑相似性，而非"针对自噬这个特定功能的相关性"。且完全<strong>没有利用节点的组学特征数据</strong></td><td>GCN 的<strong>半监督学习</strong>：用已知的 6,502 个自噬/细胞死亡基因作为正样本标签，以 edge weight 优化和 node weight 优化两步来训练——学到的嵌入直接服务于自噬调控因子的识别任务</td></tr>
+  <tr><td>所有传统方法</td><td><strong>忽略进化保守性</strong>——仅在单一物种内分析，无法利用"如果基因在酵母、小鼠、人中均与自噬相关，则更可能是一个保守的核心调控因子"这一强大先验</td><td>LGM 的<strong>跨物种图</strong>：562 个真核物种 × 1,870 万 PPI，通过直系同源（ortholog）关系将不同物种的同源蛋白连接。GCN 消息传递跨越物种边界——单物种 AUC +4.4-9.5%</td></tr>
+</table>
+</div>
+
+<h3>LLM的机会与挑战</h3><p>ChatGPT/GPT-3.5 训练数据中包含大量生物医学知识，但它面临两个关键挑战：(1) <strong>知识截止到2022年1月</strong>——无法获取最新科学发现；(2) <strong>AI幻觉</strong>——会自信地说出看似合理但实际错误的回答。LyMOI通过精心设计的提示工程和混合架构来应对这些挑战。</p>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-2"><h2>2. LyMOI 架构：GCN + LLM 混合框架</h2>
+<div class="intuition"><span class="tag">直观理解</span><p>LyMOI 的核心理念可以概括为"<strong>定量预测 + 定性推理</strong>"。图卷积网络（GCN）负责定量部分：在多组学数据和蛋白质相互作用网络中"算"出哪些分子最可能是关键调控因子。GPT-3.5 负责定性部分：用自然语言"写"出这些分子如何通过哪个信号通路调控生物过程的机制解释。</p></div>
+<p>原论文 Figure 1 把整个混合框架画成了一张管线总览图，正好与下面"三步工作流"逐一对应：左边是 GPT-3.5 零样本提示合成数据集，中间是大图模型（LGM）的预训练与条件特异性预测，右边是 LLM 对 MOIs 的分子关联推理：</p>
+
+<img src="images/Tang/Tang_Fig1.jpg" alt="原论文Figure 1：LyMOI混合框架工作流总览——LLM合成数据集、跨物种大图模型预测MOIs、LLM CoT机制推理三步管线与多组学数据规模">
+
+<p class="fig-caption"><strong>原论文 Figure 1：LyMOI 混合框架工作流总览。</strong>(a) 三步管线：① <strong>LLM 合成数据集</strong>——GPT-3.5 零样本提示为 4 个真核物种（人/小鼠/大鼠/酵母）的全基因组基因逐个生成"基因/蛋白→功能→过程→置信度(0-9)"的 PGP 表格（共 138,030 个提示）；② <strong>大图模型（LGM）预测</strong>——以含 562 物种、1,093,931 个蛋白、1.87 亿条互作/直系同源边的知识图谱加上 1.3TB 自噬相关多组学数据训练教师模型（自噬调控基因为标签），再微调出 SD-G/SD-N/DSF 等条件特异性学生模型，输出自噬 MOIs（如 CTSL、FAM98A）；③ <strong>LLM CoT 推理</strong>——对 MOIs 及其分子关联做机制解释，并延伸到砷毒性、乳腺癌转移与自闭症谱系障碍的解读。(b) 多组学数据规模：mRNA、蛋白质（Pro.）、磷酸化蛋白（Phos.）及三类差异分子（DEMs/DEPs/DRPs）的数量（log2 计数）。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<div class="algorithm"><span class="tag">核心流程</span><h4>LyMOI 三步工作流</h4><p><strong>Step 1：LLM合成数据集</strong> —— GPT-3.5零样本提示生成56,980个prompt-generation pairs (PGPs)，为每个基因评估其参与自噬的置信度(0-9分)，作为扩展训练标签<br><strong>Step 2：大图模型(LGM)预训练+分层微调</strong> —— 构建含1.87亿PPI/互作关系的跨物种知识图谱 → GCN预训练(教师模型) → 34个条件的独立学生模型微调 → 预测条件特异性MOIs<br><strong>Step 3：LLM Chain-of-Thought推理</strong> —— 对预测的MOIs用GPT-3.5做机制解释，生成"机器CoT"，类似生物学家的因果推理过程</p></div>
+<div class="definition"><span class="tag">正式定义</span><h4>图卷积网络 (GCN)</h4><p>GCN是一种在图上进行深度学习的神经网络。在LGM中，每个节点是一个蛋白质，边是蛋白质-蛋白质相互作用。GCN通过<strong>消息传递(message passing)</strong>机制，让每个节点的特征向量聚合其邻居节点的信息，从而学习到同时反映自身表达水平和网络拓扑的特征表示。LyMOI中的GCN经过两轮预训练：先用6,502个已知自噬/细胞死亡基因做edge weight优化，再用1.3TB多组学数据做node weight优化。</p></div>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-3"><h2>3. GPT-3.5 合成数据集与零样本提示</h2>
+<div class="intuition"><span class="tag">直观理解</span><p>让GPT-3.5判断"基因X是否参与自噬"很容易产生幻觉——当你随便问时它可能说"是"，但当你让它先总结基因功能再判断，它的准确率就大幅提升。LyMOI团队设计了精巧的<strong>零样本提示策略</strong>：让GPT-3.5先列出基因功能，再给出参与自噬的置信度(0-9分)。这种方法使GPT-3.5对"高置信度(>6)基因"的判断准确率达到83%(人类)、85%(小鼠)、77%(大鼠)、82%(酵母)。</p></div>
+<p>上面的"高置信准确率"只是这套评估的一个截面——原论文 Figure 2 用 16 个面板系统展示了 GPT-3.5/GPT-4o 在四个物种上的自噬基因解读能力，从阳性响应率、ROC/混淆矩阵、文献核对准确率到词云与 GO 富集逐一给出证据：</p>
+
+<img src="images/Tang/Tang_Fig2.jpg" alt="原论文Figure 2：用LLM对自噬过程做全基因组解读——零样本提示示意、四物种响应率/维恩图、GPT-3.5/GPT-4o的ROC与混淆矩阵、高置信准确率、词云与GO富集">
+
+<p class="fig-caption"><strong>原论文 Figure 2：用 LLM 对自噬过程做全基因组解读。</strong>(a) 零样本提示策略示意：LLM 先总结基因功能，再判断该基因是否与自噬相关并给出 0-9 分置信度。(b) 四物种中判定为潜在自噬相关（置信度>0）基因的阳性响应率：人 14.4%、大鼠 11.9%、小鼠 11.3%、酵母 11.9%。(c) 四物种直系同源蛋白维恩图（21 个 ATG 基因/自噬调控因子在 4 物种中高度保守）。(d-k) GPT-3.5 与 GPT-4o 在人/小鼠/大鼠/酵母上的性能评估：ROC 曲线与 AUC（d,f,h,j：GPT-3.5 为 0.66/0.73/0.71/0.72，GPT-4o 进一步提升为 0.74/0.74/0.73/0.76）及混淆矩阵（e,g,i,k：灵敏度 45.7%-55.7%，特异度 79.0%-91.6%——低假阳性）。(l) 置信度>6 的 PGP 经文献人工核对后的准确率：人 83.2%、小鼠 84.6%、大鼠 76.7%、酵母 82.4%。(m) 机器 CoT 关键词词云：除 autophagy/autophagosome 外，GPT-3.5 主要指向 mTOR 信号通路与降解机制。(n,o) 人（n）与酵母（o）正样本基因的 GO 富集分析（线粒体自噬、自噬体组装、巨自噬等条目显著富集，双尾超几何检验）。(p) GPT-3.5 对两个经典自噬基因的推理解读示例。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<div class="theorem"><span class="tag">关键结果</span><h4>GPT-3.5 自噬知识解读性能</h4><table><tr><th>物种</th><th>AUC (GPT-3.5)</th><th>AUC (GPT-4o)</th><th>灵敏度</th><th>特异度</th><th>高置信准确率</th></tr><tr><td>人类</td><td>0.66</td><td>0.74</td><td>45.7%</td><td>82.2%</td><td>83.2%</td></tr><tr><td>小鼠</td><td>0.73</td><td>0.74</td><td>57.1%</td><td>79.0%</td><td>84.6%</td></tr><tr><td>大鼠</td><td>0.71</td><td>0.73</td><td>55.3%</td><td>91.6%</td><td>76.7%</td></tr><tr><td>酵母</td><td>0.72</td><td>0.76</td><td>55.7%</td><td>85.1%</td><td>82.4%</td></tr></table><p>低假阳性率(特异度79-92%)是关键——说明GPT-3.5不太会"编造"不存在的自噬关联。</p></div>
+<div class="warning"><span class="tag">幻觉依然存在</span><p>即便如此，机器CoT仍会产生幻觉。例如GPT-3.5描述Atg1磷酸化Atg18的关系——这在文献中没有报道。因此，LyMOI的所有预测都需要实验验证。这也是为什么LyMOI的设计是"AI辅助发现"而非"AI替代实验"。</p></div>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-4"><h2>4. 大图模型（LGM）预训练与分层微调</h2>
+<div class="intuition"><span class="tag">直观理解</span><p>LyMOI的核心假设非常直觉化：如果一个蛋白质(1)与许多已知的自噬调控蛋白有直接相互作用，且(2)在特定条件下的多组学表达模式与已知调控因子相似，那么它很可能也是一个自噬调控因子。这个假设通过一个跨越562个物种的巨型蛋白质互作图谱来实现——大图模型(LGM)就像一张"蛋白质社交网络"，GCN在这个网络上学习"谁和谁是好朋友，谁是关键人物"。</p></div>
+<p>这套 LGM 的完整预训练管线与性能评估浓缩在原论文 Figure 3——从 PPI 构图、两轮预训练、教师-学生微调，到三个条件下与传统机器学习方法的 ROC 对比，正好与本节内容逐一对应：</p>
+
+<img src="images/Tang/Tang_Fig3.jpg" alt="原论文Figure 3：LyMOI框架总览与性能评估——GCN预训练管线、预训练/合成数据消融、教师模型vs传统ML、PCA与三条件学生模型ROC">
+
+<p class="fig-caption"><strong>原论文 Figure 3：LyMOI 框架总览与性能评估。</strong>(a) 框架示意：由 7 个公共 PPI 数据库（BioGRID/iRefIndex/mentha/HINT/IID/InBioMap/PINA）与直系同源关系（Ensembl/NIH protein BLAST）构图 → 随机初始化节点特征做 GCN 预训练（已报道的自噬和/或细胞死亡基因为正样本，训练至损失不再下降）→ 权重迁移到教师模型（融合组学+PPI 特征，以 THANATOS 数据库+GPT-3.5 合成数据为正样本，消息传递聚合特征后接全连接层）→ 再迁移到各条件特异性学生模型（氮饥饿/葡萄糖饥饿/DSF 等）。(b) 消融实验：有/无 GCN 预训练、有/无 GPT-3.5 合成数据集下的 AUC——完整配置（预训练+THANATOS+GPT-3.5）AUC=0.83，无预训练仅 0.77。(c) 教师模型（AUC 0.83）与 LR（0.75）、RF（0.73）、GNB（0.71）、SVM（0.53）的对比。(d) 教师模型的 PCA 图：正、负样本两组分布分离（PC1 61.6%），支持预测可靠性。(e-g) 氮饥饿、葡萄糖饥饿、DSF 处理三条件下 LyMOI（AUC 0.92/0.92/0.94）与仅教师模型、仅学生模型及 LR/DNN/RF/GNB/SVM 的 ROC 对比——完整分层架构优于任一单独模型。(h) 非特异/特异条件下用于扩展数据的正样本基因、扩展数据与合成数据的数量构成（log2 计数）。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<div class="theorem"><span class="tag">关键结果</span><h4>LGM性能指标</h4><ul><li><strong>图规模</strong>：1,093,931个蛋白质 × 187,985,327条互作关系 × 562个真核物种</li><li><strong>教师模型AUC</strong>：0.83 (GCN) vs 0.75 (逻辑回归) vs 0.73 (随机森林)</li><li><strong>学生模型AUC</strong>：氮饥饿0.92 / 葡萄糖饥饿0.92 / DSF处理0.94</li><li><strong>GPT-3.5知识增益</strong>：加入合成数据集使AUC提升7.8% (0.83 vs 0.77)</li><li><strong>跨物种图增益</strong>：使用多物种图比单物种图AUC提升4.4-9.5%</li><li><strong>条件特异性扩展</strong>：已知条件特异性自噬调控因子从374个扩展到3,640个(9.7倍)</li></ul></div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>两阶段预训练：edge weight 优化 → node weight 优化</h4>
+<p>LGM 的预训练分两轮，每轮解决不同的问题：</p>
+
+<p><strong>第一轮：edge weight 优化（学习"网络的骨架"）</strong></p>
+<p>初始 PPI 图来自 STRING 数据库，每条边的权重 $w_{uv}$ 是综合得分（0-1）。但这些权重的校准对象是"任意条件下互作的概率"，而非"在自噬中的功能关联程度"。第一轮预训练用 6,502 个已知自噬/细胞死亡基因作为正样本标签，通过图注意力机制（GAT）重新校准边权重：</p>
+
+$$
+\alpha_{uv} = \frac{\exp(\text{LeakyReLU}(\mathbf{a}^T [\mathbf{W}\mathbf{h}_u \parallel \mathbf{W}\mathbf{h}_v]))}{\sum_{k \in \mathcal{N}(u)} \exp(\text{LeakyReLU}(\mathbf{a}^T [\mathbf{W}\mathbf{h}_u \parallel \mathbf{W}\mathbf{h}_k]))}
+$$
+
+<p>其中 $\mathbf{h}_u, \mathbf{h}_v$ 是节点初始特征（one-hot 物种+蛋白ID），$\mathbf{W}$ 是共享线性变换，$\mathbf{a}$ 是可学习注意力向量，$\parallel$ 表示拼接，$\mathcal{N}(u)$ 是 $u$ 的邻居集。本质：<strong>让 GCN 学会沿"自噬功能相关的边"传递消息，而非在 STRING 所有边上等权传递</strong>。</p>
+
+<p><strong>第二轮：node weight 优化（学习"节点的条件状态"）</strong>——每个节点的特征从 one-hot 升级为从 1.3TB 多组学数据提取的多维向量：</p>
+
+$$
+\mathbf{x}_v^{\text{multi-omics}} = [\text{RNA-seq}_v \parallel \text{proteomics}_v \parallel \text{phosphoproteomics}_v]
+$$
+
+<p>GCN 的消息传递层（堆叠 2-3 层）逐层更新节点表示：</p>
+
+$$
+\mathbf{h}_v^{(l+1)} = \sigma\left( \sum_{u \in \mathcal{N}(v)} \alpha_{vu} \cdot \mathbf{W}^{(l)} \mathbf{h}_u^{(l)} \right)
+$$
+
+<p>$\sigma$ 为 ReLU，$\alpha_{vu}$ 为第一轮学到的注意力权重（此阶段冻结），$\mathbf{W}^{(l)}$ 为第 $l$ 层可学习权重。$L$ 层传播后，最终嵌入 $\mathbf{h}_v^{(L)}$ 融合：① PPI 拓扑位置（邻居聚合）② 自身多组学特征 ③ 跨物种 ortholog 信号。</p>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>教师-学生分层微调：从"通用模式"到"条件特异性"</h4>
+
+<table>
+  <tr><th>阶段</th><th>类比</th><th>LGM 实现</th></tr>
+  <tr><td><strong>教师模型</strong><br>（通用预训练）</td><td>医学院基础课程——学习解剖、生理、病理的通用知识。所有医学生不论未来专科都要上。</td><td>混合 34 个条件的多组学数据 + 跨物种 PPI 图训练一个 GCN。教师模型学习"什么是自噬调控因子的通用模式"——如 PPI 网络中心性、与已知自噬基因的共表达趋势。</td></tr>
+  <tr><td><strong>学生模型</strong><br>（条件特异性微调）</td><td>住院医师专科培训——心内科专门学心脏，神经科专门学脑部。在通识基础上发展专科深度。</td><td>以教师模型权重为初始化，在 <strong>34 个条件特异性数据集</strong>上独立微调 34 个学生模型。氮饥饿学生模型专门学氮饥饿下的自噬模式，DSF 处理学生模型专门学 DSF 诱导的自噬模式。</td></tr>
+</table>
+
+<p><strong>为什么必须分层？</strong>如果每个条件独立冷启动训练 GCN，小样本条件（某些条件仅几十个已知正样本）会严重过拟合。教师预训练提供强力先验——学生模型只需微调"该条件下有何不同"。数值验证：教师 AUC = 0.83，34 个学生微调后平均 AUC 升至 0.88+，其中氮饥饿/葡萄糖饥饿/DSF 三个条件达 0.92-0.94。</p>
+</div>
+
+<div class="example">
+<span class="tag">具体数值示例</span>
+<h4>走查：Gin4 如何被 LGM 判定为自噬调控因子</h4>
+<p>酵母激酶 <strong>Gin4</strong>——此前<strong>从未被报道与自噬相关</strong>——LyMOI 在葡萄糖饥饿条件下将其预测为自噬调控因子，后续敲除实验验证了该预测。</p>
+
+<p><strong>输入层：Gin4 的初始表示</strong></p>
+<ul>
+  <li>节点：酵母 Gin4（UniProt ID），在 562 物种图中是酵母特异节点</li>
+  <li>初始边：与 127 个酵母蛋白有 STRING 互作——其中与 <strong>Snf1</strong>（AMPK 酵母同源物，已知自噬核心调控因子）的得分 = 0.876</li>
+  <li>多组学特征（葡萄糖饥饿）：RNA-seq log2FC = +1.83，磷酸化组学 Ser-380 磷酸化升高 4.2 倍</li>
+</ul>
+
+<p><strong>第一轮 edge weight 优化后：</strong></p>
+<ul>
+  <li>Gin4-Snf1 注意力权重 $\alpha_{\text{Gin4,Snf1}} = 0.73$（远超均值 0.15）——模型学会"与 Snf1 互作"是强烈自噬信号</li>
+  <li>Gin4 与无自噬关联代谢酶的边权重被压至 ≈ 0，在消息传递中几乎不贡献</li>
+</ul>
+
+<p><strong>3 层 GCN 消息传递：</strong></p>
+<p>第 1 层：Gin4 聚合 127 个邻居——Snf1（$\alpha = 0.73$）和 Elm1（$\alpha = 0.58$，另一候选调控因子）贡献最大。</p>
+<p>第 2 层：Gin4 进一步接收"邻居的邻居"——Snf1 的互作伙伴 Atg1、Atg13（核心自噬机器组件）的嵌入间接流入 Gin4。</p>
+<p>第 3 层：Gin4 的最终嵌入融合为：</p>
+
+$$
+\mathbf{h}_{\text{Gin4}}^{(L)} \approx 0.73 \cdot \text{Snf1信号} + 0.58 \cdot \text{Elm1信号} + 0.21 \cdot \text{Atg1信号(间接)} + \text{自身多组学特征}
+$$
+
+<p><strong>预测输出：</strong>最终嵌入送入单层 MLP + sigmoid 分类头：</p>
+
+$$
+P(\text{Gin4 是自噬调控因子} \mid \text{葡萄糖饥饿}) = \sigma(\mathbf{w}^T \mathbf{h}_{\text{Gin4}}^{(L)} + b) = 0.87
+$$
+
+<p>$0.87 \gt 0.5$ → LyMOI 预测 Gin4 为"葡萄糖饥饿条件下的自噬调控因子"，输出排名和置信度。后续酵母 $GIN4$ 敲除实验证实：敲除株在葡萄糖饥饿下自噬活性显著降低。</p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-5"><h2>5. 实验验证：4种酵母 + 2种人癌蛋白</h2>
+<div class="intuition"><span class="tag">直观理解</span><p>这才是论文的"硬核"部分——LyMOI 不仅做出了预测，还通过一系列湿实验验证了预测的正确性。在4个物种中验证了6个全新的自噬调控因子，其中最令人兴奋的是发现了CTSL和FAM98A这两个人癌蛋白在disulfiram诱导自噬中的关键作用——并由此推导出一个可立即测试的癌症联合治疗方案。</p></div>
+<p>酵母部分的全部验证证据汇总在原论文 Figure 4：面板 a-n 围绕葡萄糖饥饿下的 Gin4/Elm1（对应 5.1 节），面板 o-q 对应氮饥饿下的 Rvs167/Ste50（对应 5.2 节），正好与下面两小节逐一呼应：</p>
+
+<img src="images/Tang/Tang_Fig4.jpg" alt="原论文Figure 4：酵母自噬新调控因子的鉴定——LyMOI预测vs差异分子的自噬基因占比、GO富集、Gin4/Elm1/Rvs167/Ste50的免疫印迹/成像/ALP与LLM调控网络">
+
+<p class="fig-caption"><strong>原论文 Figure 4：酵母自噬新调控因子的鉴定。</strong>(a) LyMOI 预测基因与转录组/蛋白质组/磷酸化组差异分子中已报道自噬调控基因的占比对比——LyMOI 预测的前 44 个 MOI 中 14 个（31.8%）已报道，而三类差异分子仅 0.7%-4.0%。(b-e) 前 5 位 GO 富集结果（E. ratio，富集比）：LyMOI 预测基因（b）与转录组 DEMs（c）、蛋白质组 DEPs（d）、磷酸化组差异磷酸化蛋白（e）对比——自噬相关通路只在 LyMOI 预测中高度富集。(f) 葡萄糖饥饿（SD-G）0/1/4/10h 下 WT、elm1、gin4 菌株的免疫印迹结果。(g) 同条件下三菌株的自噬成像表型及定量（标尺 5μm）。(h) 葡萄糖饥饿 0/4h 下 WT、gin4、elm1 菌株的碱性磷酸酶（ALP）活性。(i) LyMOI 推断的关键基因潜在分子关联示意图。(j) 以 ELM1 和 GIN4 为中心、基于 LLM 推理分子关联的调控网络。(k) ELM1 与 ATG20 调控关系的 GI（基因互作）+ LLM 双重推理。(l) elm1 菌株中 ATG20 mRNA 表达。(m) LLM 推理揭示 ELM1/GIN4 在自噬中的关键调控机制。(n) elm1（左）与 gin4（右）菌株中 ATG1 mRNA 表达。(o) 氮饥饿（SD-N）下 LyMOI 预测基因与转录组 DEMs 中自噬基因占比。(p) 以 STE50 和 RVS167 为中心的分子调控网络。(q) rvs167 与 ste50 菌株中 ATG1（左）与 ATG11（右）mRNA 表达。n=3 独立生物学重复，均值±s.d.，非配对双尾 t 检验。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<h3>5.1 酵母验证：葡萄糖饥饿条件下的新调控因子</h3>
+<div class="theorem"><span class="tag">实验验证</span><h4>Gin4 和 Elm1 —— 葡萄糖饥饿条件下自噬新调控因子</h4><p>在葡萄糖饥饿条件下，LyMOI预测了44个候选MOIs，其中14个(31.8%)是已报道的自噬调控因子——远超差异表达分析的0.7%-4.0%。通过酵母敲除库筛选24个候选菌株，<strong>Gin4和Elm1</strong>被验证为新型自噬调控因子。免疫印迹、荧光显微镜和碱性磷酸酶(ALP)活性实验一致证实：敲除GIN4或ELM1显著降低自噬活性。</p><p>更有趣的是，LLM推理揭示Elm1通过调控ATG20和ATG1的转录来调节自噬——qPCR实验证实了这些转录变化，说明机器CoT的推理并非"瞎猜"，而是有生物学依据的。</p></div>
+<h3>5.2 酵母验证：氮饥饿条件下的新调控因子</h3>
+<div class="theorem"><span class="tag">实验验证</span><h4>Rvs167 和 Ste50 —— 氮饥饿条件下自噬新调控因子</h4><p>在氮饥饿条件下，两个新的自噬调控因子被验证：<strong>Rvs167和Ste50</strong>。LLM推理构建了以RVS167和STE50为中心、包含ATG9/ATG11/ATG13等核心自噬机器的分子调控网络。qPCR证实敲除RVS167降低ATG1表达，敲除STE50降低ATG11表达。</p></div>
+<h3>5.3 人类验证：CTSL 和 FAM98A —— DSF 诱导自噬的关键因子</h3>
+<p>CTSL 与 FAM98A 的完整验证证据链见原论文 Figure 5：从 siRNA 沉默后的 LC3-II/SQSTM1 免疫印迹，到 GFP-LC3 点状聚集与 mCherry-GFP-LC3 自噬流成像，再到 LLM 推理出的调控网络——层层递进地证明这两个蛋白是 DSF 诱导自噬的关键因子：</p>
+
+<img src="images/Tang/Tang_Fig5.jpg" alt="原论文Figure 5：FAM98A与CTSL是DSF介导自噬激活的关键因子——免疫印迹、GFP-LC3点状聚集、自噬流检测与LLM推理调控网络">
+
+<p class="fig-caption"><strong>原论文 Figure 5：FAM98A 与 CTSL 是 DSF 介导自噬激活的关键因子。</strong>(a) LyMOI 预测基因、转录组 DEMs、蛋白质组 DEPs 中自噬调控基因占比的对比。(b) LyMOI 预测基因的前 10 位 GO 富集结果。(c,d) 沉默 CTSL（c）或 FAM98A（d）后 LC3-II 与 SQSTM1 蛋白表达的免疫印迹及相对定量——LC3-II 下降、SQSTM1 上升，指示 DSF 诱导的自噬流受阻。(e) DSF 处理 0/24h 后、沉默 CTSL 或 FAM98A 的 HeLa 细胞中 GFP-LC3 点状聚集的共聚焦成像（标尺 10μm，n=30 个细胞）。(f,g) 转染 mCherry-GFP-LC3（f）后经 siRNA 沉默与 DSF 处理，检测自噬体（黄色）与自溶酶体（红色）的形成（g，标尺 20μm）。(h) 全部 LLM 回复中获得的分子调控关系数量。(i) LLM 推理所得调控关系中有/无文献支持的分布。(j) 以 CTSL 和 FAM98A 为中心的自噬分子关联子网络。(k,l) 沉默 CTSL/FAM98A 后 ATG13、RB1CC1、BECN1、NRBF2、ATG16L1 与 RAB7A 的蛋白表达（k）及对应 siRNA（l）。NC 为阴性对照；n=3 独立生物学重复，均值±s.d.，非配对双尾 t 检验。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<div class="theorem"><span class="tag">核心突破</span><h4>CTSL 和 FAM98A 促进 disulfiram 诱导的自噬</h4><p>Disulfiram (DSF) 是一种FDA批准的戒酒药物，近年被发现具有抗癌活性。LyMOI 预测了DSF处理条件下的自噬调控因子，发现<strong>CTSL（组织蛋白酶L）和FAM98A</strong>在其中发挥关键作用：</p><ul><li>在HeLa细胞中沉默CTSL或FAM98A → DSF诱导的自噬减弱 → 癌细胞增殖被抑制</li><li>DSF + Z-FY-CHO（CTSL特异性抑制剂，此前用于预防SARS-CoV-2感染）联合治疗 → <strong>在小鼠体内强烈抑制肿瘤生长</strong></li></ul><p>这一发现的重要性在于：DSF已在临床使用数十年，Z-FY-CHO也已有人体安全性数据——这个联合治疗方案距离临床转化只有"一步之遥"。</p></div>
+<div class="crossref"><strong>📎 知识链接：</strong>CTSL/FAM98A的发现逻辑与<a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. 卒中蛋白质组MR</a>中ALDH2(已有多项临床试验但非卒中)和MMP12(已有针对其他疾病的药但非卒中)的"药物重利用"逻辑如出一辙——都是"已有人体使用经验的药/靶点 + 新的适应症"。也呼应了发现的ripasudil(青光眼药→dAMD)。参见<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html">知识图谱</a>。</div>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-6"><h2>6. 跨系统扩展与讨论</h2>
+<p>在讨论跨系统扩展之前，先把上一节的发现推进一步：既然 CTSL/FAM98A 是 DSF 诱导自噬的关键因子，而 DSF 本身具有抗癌活性，那么这一对蛋白是否也参与癌症存活？原论文 Figure 6 用一条从富集分析、细胞增殖到小鼠荷瘤实验的完整证据链给出了肯定回答：</p>
+
+<img src="images/Tang/Tang_Fig6.jpg" alt="原论文Figure 6：CTSL与FAM98A通过自噬通路促进癌症存活——KEGG富集、CCK-8增殖、LLM调控网络、宫颈癌组织表达与NOG小鼠荷瘤验证">
+
+<p class="fig-caption"><strong>原论文 Figure 6：CTSL 与 FAM98A 通过自噬通路促进癌症存活。</strong>(a) 含 CTSL、FAM98A 及其 36 个互作蛋白的 38 蛋白 KEGG 富集分析（双尾超几何检验）——癌症相关通路显著富集。(b) DSF 处理 5 天后 HeLa 细胞的 CCK-8 增殖检测。(c) ATG5（左）与 ATG7（右）缺陷 HeLa 细胞在 DSF 处理 5 天后的 CCK-8 检测——检验阻断自噬对癌细胞增殖的影响。(d) LLM 全部回复中获得的分子调控关系总数。(e) 全部调控关系中有/无文献支持的比例分布。(f) 以 CTSL 和 FAM98A 为中心的癌症分子关联子网络（LLM 推理构建）。(g) 沉默 CTSL 或 FAM98A 后 TP53（左）与 BRCA1（右）的 mRNA 表达。(h,i) 相应沉默后的蛋白表达（h）与对应 siRNA（i）。(j,k) 宫颈癌患者肿瘤与癌旁正常（NAT）组织中 CTSL（j）与 FAM98A（k）的蛋白表达（标尺 500μm，n=30 对样本）。(l-n) NOG 小鼠皮下接种 HeLa、shCTSL-HeLa 或 shFAM98A-HeLa 细胞，肿瘤长至 100mm³ 后隔日 DSF + 每日 CQ（氯喹）治疗共 4 周：肿瘤体积随时间变化（l）、28 天后肿瘤体积（m）与重量（n，n=6）。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<h3>6.1 跨生物系统的可扩展性</h3><p>LyMOI 不仅适用于自噬，还在6个其他生物系统中进行了评估：砷毒性、乳腺癌转移、自闭症谱系障碍、人类自然杀伤细胞、人类皮层发育细胞、小鼠胚胎组织细胞——覆盖了从毒性到发育到免疫的广泛生物学场景。</p>
+<p>这六个附加系统的评估证据在原论文 Figure 7 下半部分（i-n）逐一面世；而上半部分（a-h）则是 DSF+Z-FY-CHO 联合治疗——即本页优势清单中"临床转化潜力"的出处——从细胞实验到小鼠体内的完整验证链：</p>
+
+<img src="images/Tang/Tang_Fig7.jpg" alt="原论文Figure 7：DSF+Z-FY-CHO联合治疗的体内抑瘤验证（a-h）与LyMOI在砷毒性/乳腺癌转移/自闭症及三类细胞分子关联信息流上的扩展应用（i-n）">
+
+<p class="fig-caption"><strong>原论文 Figure 7：联合治疗与 LyMOI 的扩展应用。</strong>(a) DSF 与 Z-FY-CHO 抑制剂处理 5 天后 HeLa 细胞的 CCK-8 增殖检测（图中标有显著性 P 值）。(b) Z-FY-CHO（CTSL 特异性抑制剂）联合 DSF 给药作为体内肿瘤治疗策略的示意。(c-h) 裸鼠皮下接种 HeLa 细胞，肿瘤长至 100mm³ 后每日给予 DSF 或 Z-FY-CHO、共治疗 4 周：肿瘤体积随时间变化（d）、28 天后肿瘤体积（e）与重量（f）、肿瘤切片 Ki67 染色（g）及 Ki67 阳性细胞比例（h，标尺 100μm）。(i-k) LyMOI 在三个附加系统中的预测性能评估：砷毒性（i，AUC 0.95）、乳腺癌转移（j，AUC 0.91）、自闭症谱系障碍（k，AUC 0.93）——均高于同图对照 DNN（0.70/0.83/0.72）。(l-n) LLM 推理得到的分子关联信息流：自然杀伤细胞（l，CD56dim CD16hi 亚群）、胶质母细胞（m）、小白蛋白篮状中间神经元（n），以正调控/负调控/功能关联三类关系连接各基因。<br>图源：Tang et al., <em>Nature Biomedical Engineering</em> (2025)。</p>
+<h3>6.2 研究优势</h3>
+<div class="summary"><span class="tag">优势清单</span><ol><li><strong>首创混合架构</strong>：GCN定量预测 + LLM定性推理的完整融合</li><li><strong>规模空前</strong>：1.87亿PPI、562物种、1.3TB多组学</li><li><strong>分层微调策略</strong>：教师模型学习通用模式 → 学生模型捕获条件特异性</li><li><strong>LLM扩展训练数据</strong>：GPT-3.5合成数据集使AUC提升3-9%</li><li><strong>完整的干湿实验验证</strong>：从计算预测到酵母KO筛选到小鼠体内实验</li><li><strong>临床转化潜力</strong>：DSF+Z-FY-CHO联合治疗可直接进行临床试验设计</li><li><strong>跨系统泛化</strong>：6个附加生物系统的评估展示通用性</li></ol></div>
+<h3>6.3 局限性</h3>
+<div class="warning"><span class="tag">当前局限</span><table><tr><th>局限</th><th>影响</th></tr><tr><td>LLM幻觉仍存在</td><td>机器CoT需实验验证，不能直接采信</td></tr><tr><td>依赖提示工程</td><td>零样本提示质量直接影响GPT-3.5输出质量</td></tr><tr><td>GPT-3.5知识截止2022.1</td><td>无法利用最新文献发现</td></tr><tr><td>GCN需要正样本训练</td><td>对于完全没有已知调控因子的过程难以应用</td></tr><tr><td>单一生理过程验证</td><td>核心验证集中在自噬，其他系统验证较浅</td></tr></table></div>
+
+<div class="crossref">
+<span class="xref-tag">🔗 交叉引用</span>
+<p>LyMOI 的 GCN 虽然通过注意力权重提供了部分可解释性，但尚未达到碱基分辨率的调控机制解读。<strong><a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) — PISA</a></strong> 提出的二维归因矩阵方法正是解决这一问题的工具：将 sequence-to-function 模型的每个预测映射回输入碱基的贡献，实现从"哪些基因被调控"到"哪些碱基驱动了这种调控"的跨越。LyMOI 的蛋白互作网络推理与 PISA 的顺式调控序列解读，分别从<em>基因网络</em>和<em>DNA 序列</em>两个尺度解码生物学调控逻辑，两者结合可构成完整的多尺度组学解读框架。</p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<section id="sec-7"><h2>7. 要点总结</h2>
+<div class="summary"><span class="tag">全文总结</span><ol>
+<li><strong>LyMOI 混合框架</strong>：首个将图卷积网络(GCN)与大语言模型(GPT-3.5)推理结合为单一工作流的组学解读平台。</li>
+<li><strong>GPT-3.5合成数据集</strong>：通过精心设计的零样本提示生成56,980个PGPs，高置信(>6)答案准确率76.7-84.6%。</li>
+<li><strong>大图模型(LGM)</strong>：1.87亿PPI × 109万蛋白 × 562物种，GCN预训练+分层微调实现条件特异性MOIs预测(AUC 0.92-0.94)。</li>
+<li><strong>9.7倍知识扩展</strong>：已知条件特异性自噬调控因子从374个扩展到3,640个。</li>
+<li><strong>6个实验验证的新调控因子</strong>：酵母Gin4/Elm1/Rvs167/Ste50 + 人CTSL + 人FAM98A。</li>
+<li><strong>临床转化路径</strong>：DSF(已上市戒酒药) + Z-FY-CHO(CTSL抑制剂)联合治疗在小鼠体内抑瘤。</li>
+<li><strong>跨系统通用性</strong>：在6个附加生物系统(砷毒性/乳腺癌/自闭症/免疫/发育)展示可扩展性。</li>
+</ol></div>
+<div class="intuition"><span class="tag">一句话总结</span><p>LyMOI 是一套<strong>"GCN算数 + GPT讲故事"</strong>的混合系统——GCN在分子网络中精准定位关键调控因子，GPT-3.5用生物学家的语言解释它们如何工作。最重要的是，它不仅预测，还通过酵母敲除和小鼠肿瘤模型验证了这些预测，完成了"从计算到实验到潜在疗法"的完整闭环。</p></div>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a></section>
+<footer><div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR-CVD</a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>卒中蛋白MR</span><span data-en>Stroke Proteome MR</span></a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>两步MR</span><span data-en>Two-step MR</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">PDF</a>
+</div>
+<p style="margin-top:16px;"><strong><span data-zh>论文信息：</span><span data-en>Paper info: </span></strong>Tang D, Zhang C, Zhang W, et al. A deep learning and large language hybrid workflow for omics interpretation. <em>Nature Biomedical Engineering</em>. 2025. DOI: 10.1038/s41551-025-01576-5<br><strong><span data-zh>机构：</span><span data-en>Affiliations: </span></strong><span data-zh>华中科技大学</span><span data-en>Huazhong University of Science and Technology</span> &nbsp;|&nbsp; <strong><span data-zh>解读生成日期：</span><span data-en>Generated: </span></strong>2026-08-14</p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1360 @@
+{
+  "generated_at": "2026-09-26",
+  "project": {
+    "name": "MDS-ED Hierarchical Multi-Label Classification",
+    "description": "在MDS-ED多模态心电图基准上，通过层次化标签约束提升医学可解释性和AUROC指标",
+    "core_idea": "在不降低AUROC的前提下，使ICD父标签/子标签的预测概率满足严格层次关系（父 ≥ 子）"
+  },
+  "baseline": {
+    "original": {
+      "run_name": "run__baseline",
+      "test_auroc_macro_agg0": 0.818659,
+      "test_auroc_macro_agg1": 0.826967,
+      "best_val_auroc_macro": 0.81776
+    },
+    "with_nan_mask": {
+      "run_name": "run__baseline_with_nan_mask",
+      "test_auroc_macro_agg0": 0.8264497218671958,
+      "test_auroc_macro_agg1": 0.8355979925946035,
+      "best_val_auroc_macro": 0.82645
+    },
+    "reference_from_paper": 0.82
+  },
+  "methods": [
+    {
+      "name": "HBCE Penalty (连续惩罚, data-driven)",
+      "status": "completed",
+      "best_result": {
+        "test_auroc_macro_agg0": 0.8294,
+        "test_auroc_macro_agg1": 0.8387,
+        "run_name": "run__hbce_squared_10_with_nan_mask",
+        "weight": 10,
+        "penalty_type": "squared",
+        "notes": "VR=0.05%, Best AUROC overall"
+      },
+      "runs": [
+        {
+          "run_name": "run__hbce_linear_0.1_with_nan_mask",
+          "method": "method1",
+          "weight": 0.1,
+          "test_auroc_macro_agg0": 0.8276,
+          "test_auroc_macro_agg1": 0.8361,
+          "date": "2026-07-11",
+          "penalty_type": "linear",
+          "notes": "VR=0.03%"
+        },
+        {
+          "run_name": "run__hbce_linear_0.5_with_nan_mask",
+          "method": "method1",
+          "weight": 0.5,
+          "test_auroc_macro_agg0": 0.8287,
+          "test_auroc_macro_agg1": 0.8383,
+          "date": "2026-07-11",
+          "penalty_type": "linear",
+          "notes": "VR=0.008%, Best AUROC linear"
+        },
+        {
+          "run_name": "run__hbce_linear_1_with_nan_mask",
+          "method": "method1",
+          "weight": 1,
+          "test_auroc_macro_agg0": 0.8271,
+          "test_auroc_macro_agg1": 0.8364,
+          "date": "2026-07-11",
+          "penalty_type": "linear",
+          "notes": "VR=0.008%"
+        },
+        {
+          "run_name": "run__hbce_linear_5_with_nan_mask",
+          "method": "method1",
+          "weight": 5,
+          "test_auroc_macro_agg0": 0.8229,
+          "test_auroc_macro_agg1": 0.8335,
+          "date": "2026-07-12",
+          "penalty_type": "linear",
+          "notes": "VR=0.002%, Best VR"
+        },
+        {
+          "run_name": "run__hbce_linear_10_with_nan_mask",
+          "method": "method1",
+          "weight": 10,
+          "test_auroc_macro_agg0": 0.8191,
+          "test_auroc_macro_agg1": 0.8287,
+          "date": "2026-07-12",
+          "penalty_type": "linear",
+          "notes": "VR=0.003%"
+        },
+        {
+          "run_name": "run__hbce_squared_0.1_with_nan_mask",
+          "method": "method1",
+          "weight": 0.1,
+          "test_auroc_macro_agg0": 0.8289,
+          "test_auroc_macro_agg1": 0.8359,
+          "date": "2026-07-12",
+          "penalty_type": "squared",
+          "notes": "VR=2.27%"
+        },
+        {
+          "run_name": "run__hbce_squared_0.5_with_nan_mask",
+          "method": "method1",
+          "weight": 0.5,
+          "test_auroc_macro_agg0": 0.8260,
+          "test_auroc_macro_agg1": 0.836,
+          "date": "2026-07-12",
+          "penalty_type": "squared",
+          "notes": "VR=1.04%"
+        },
+        {
+          "run_name": "run__hbce_squared_1_with_nan_mask",
+          "method": "method1",
+          "weight": 1,
+          "test_auroc_macro_agg0": 0.8266,
+          "test_auroc_macro_agg1": 0.8353,
+          "date": "2026-07-12",
+          "penalty_type": "squared",
+          "notes": "VR=0.40%"
+        },
+        {
+          "run_name": "run__hbce_squared_5_with_nan_mask",
+          "method": "method1",
+          "weight": 5,
+          "test_auroc_macro_agg0": 0.8273,
+          "test_auroc_macro_agg1": 0.8357,
+          "date": "2026-07-14",
+          "penalty_type": "squared",
+          "notes": "VR=0.08%"
+        },
+        {
+          "run_name": "run__hbce_squared_10_with_nan_mask",
+          "method": "method1",
+          "weight": 10,
+          "test_auroc_macro_agg0": 0.8294,
+          "test_auroc_macro_agg1": 0.8387,
+          "date": "2026-07-14",
+          "penalty_type": "squared",
+          "notes": "VR=0.05%, Best AUROC overall"
+        }
+      ],
+      "subgroups": {
+        "linear": {
+          "runs": [
+            "run__hbce_linear_0.1_with_nan_mask",
+            "run__hbce_linear_0.5_with_nan_mask",
+            "run__hbce_linear_1_with_nan_mask",
+            "run__hbce_linear_5_with_nan_mask",
+            "run__hbce_linear_10_with_nan_mask"
+          ],
+          "best_vr": 0.002,
+          "best_vr_weight": 5,
+          "best_agg0": 0.8287,
+          "best_agg0_weight": 0.5
+        },
+        "squared": {
+          "runs": [
+            "run__hbce_squared_0.1_with_nan_mask",
+            "run__hbce_squared_0.5_with_nan_mask",
+            "run__hbce_squared_1_with_nan_mask",
+            "run__hbce_squared_5_with_nan_mask",
+            "run__hbce_squared_10_with_nan_mask"
+          ],
+          "best_vr": 0.0486,
+          "best_vr_weight": 10,
+          "best_agg0": 0.8294,
+          "best_agg0_weight": 10
+        }
+      }
+    },
+    {
+      "id": 2,
+      "name": "Hierarchical Multi-Label Classification (HLCP + HLUP)",
+      "short_name": "HMLC Two-Stage",
+      "paper": "Deep hierarchical multi-label classification applied to chest X-ray abnormality taxonomies",
+      "paper_file": "literature/Deep hiearchical multi-label classification applied to chest X-ray abnormality taxonomies.pdf",
+      "difficulty": "medium",
+      "status": "fixed",
+      "status_color": "green",
+      "implementation": {
+        "config": "src/clinical_ts/config.py (HLCPLossConfig, HLUPLossConfig)",
+        "loss": "src/clinical_ts/loss/supervised.py (HLCPLoss, HLUPLoss)",
+        "script": "src/run_hmlc_two_stage.sh",
+        "note": "⚠️ AI生成代码，未经人工校验"
+      },
+      "loss_formulas": {
+        "hlcp": "\\mathcal{L}_{\\text{HLCP}} = \\sum_{m} \\text{CE}(z_m, \\hat{z}_m) \\cdot \\mathbb{1}\\{z_{a(m)} = 1\\}",
+        "hlup_chain": "\\hat{p}_m = \\prod_{m' \\in A(m)} \\sigma(y_{m'})",
+        "hlup_full": "\\mathcal{L}_{\\text{HLUP}} = \\sum_{m' \\in A(m)} \\text{CE}(z_m, \\sigma(y_{m'})) + \\gamma"
+      },
+      "runs_summary": {
+        "total_runs": 2,
+        "stages": [
+          "HLCP (Stage 1)",
+          "HLUP (Stage 2)"
+        ]
+      },
+      "runs": [
+        {
+          "run_name": "run__method2_stage1",
+          "method": "method2_stage1",
+          "weight": null,
+          "date": "2026-05-18",
+          "test_auroc_macro_agg0": 0.7543202880536143,
+          "test_auroc_macro_agg1": 0.7610124000049027,
+          "test_auroc_macro_agg0_log": 0.7543202880536143,
+          "test_auroc_macro_agg1_log": 0.7610124000049027,
+          "best_val_auroc_macro": 0.75432,
+          "log_file": "hmlc_stage1_hlcp.log",
+          "epoch_history": [
+            {
+              "epoch": 0,
+              "val_auroc_macro": 0.75432,
+              "best_val_auroc_macro": 0.75432
+            },
+            {
+              "epoch": 1,
+              "val_auroc_macro": 0.7340685246348182,
+              "best_val_auroc_macro": 0.7340685246348182
+            },
+            {
+              "epoch": 2,
+              "val_auroc_macro": 0.7236863204663442,
+              "best_val_auroc_macro": 0.7236863204663442
+            },
+            {
+              "epoch": 3,
+              "val_auroc_macro": 0.7178200920209563,
+              "best_val_auroc_macro": 0.7178200920209563
+            },
+            {
+              "epoch": 4,
+              "val_auroc_macro": 0.7125924326977029,
+              "best_val_auroc_macro": 0.7125924326977029
+            },
+            {
+              "epoch": 5,
+              "val_auroc_macro": 0.7096859267927235,
+              "best_val_auroc_macro": 0.7096859267927235
+            },
+            {
+              "epoch": 6,
+              "val_auroc_macro": 0.6990068525767437,
+              "best_val_auroc_macro": 0.6990068525767437
+            },
+            {
+              "epoch": 7,
+              "val_auroc_macro": 0.6965880196566634,
+              "best_val_auroc_macro": 0.6965880196566634
+            },
+            {
+              "epoch": 8,
+              "val_auroc_macro": 0.6949321423516229,
+              "best_val_auroc_macro": 0.6949321423516229
+            },
+            {
+              "epoch": 9,
+              "val_auroc_macro": 0.6933788901930265,
+              "best_val_auroc_macro": 0.6933788901930265
+            },
+            {
+              "epoch": 10,
+              "val_auroc_macro": 0.6925782956810324,
+              "best_val_auroc_macro": 0.6925782956810324
+            },
+            {
+              "epoch": 11,
+              "val_auroc_macro": 0.6909096841707849,
+              "best_val_auroc_macro": 0.6909096841707849
+            },
+            {
+              "epoch": 12,
+              "val_auroc_macro": 0.6900480871036079,
+              "best_val_auroc_macro": 0.6900480871036079
+            },
+            {
+              "epoch": 13,
+              "val_auroc_macro": 0.6883399318979768,
+              "best_val_auroc_macro": 0.6883399318979768
+            },
+            {
+              "epoch": 14,
+              "val_auroc_macro": 0.6876691333533467,
+              "best_val_auroc_macro": 0.6876691333533467
+            },
+            {
+              "epoch": 15,
+              "val_auroc_macro": 0.6873939377503747,
+              "best_val_auroc_macro": 0.6873939377503747
+            },
+            {
+              "epoch": 16,
+              "val_auroc_macro": 0.6866731139452614,
+              "best_val_auroc_macro": 0.6866731139452614
+            },
+            {
+              "epoch": 17,
+              "val_auroc_macro": 0.6843627798053674,
+              "best_val_auroc_macro": 0.6843627798053674
+            },
+            {
+              "epoch": 18,
+              "val_auroc_macro": 0.6846376427595802,
+              "best_val_auroc_macro": 0.6846376427595802
+            },
+            {
+              "epoch": 19,
+              "val_auroc_macro": null,
+              "best_val_auroc_macro": null
+            }
+          ],
+          "num_targets": null
+        },
+        {
+          "run_name": "run__method2_stage2",
+          "method": "method2_stage2",
+          "weight": null,
+          "date": "2026-05-19",
+          "test_auroc_macro_agg0": 0.7543202880536143,
+          "test_auroc_macro_agg1": 0.7610124000049027,
+          "test_auroc_macro_agg0_log": 0.7543202880536143,
+          "test_auroc_macro_agg1_log": 0.7610124000049027,
+          "best_val_auroc_macro": 0.74987,
+          "log_file": "hmlc_stage2_hlup.log",
+          "epoch_history": [
+            {
+              "epoch": 0,
+              "val_auroc_macro": 0.74987,
+              "best_val_auroc_macro": 0.74987
+            },
+            {
+              "epoch": 1,
+              "val_auroc_macro": 0.7453008885169347,
+              "best_val_auroc_macro": 0.7453008885169347
+            },
+            {
+              "epoch": 2,
+              "val_auroc_macro": 0.739609979333136,
+              "best_val_auroc_macro": 0.739609979333136
+            },
+            {
+              "epoch": 3,
+              "val_auroc_macro": 0.7352201597832941,
+              "best_val_auroc_macro": 0.7352201597832941
+            },
+            {
+              "epoch": 4,
+              "val_auroc_macro": 0.7307673557002248,
+              "best_val_auroc_macro": 0.7307673557002248
+            },
+            {
+              "epoch": 5,
+              "val_auroc_macro": 0.7284987147574724,
+              "best_val_auroc_macro": 0.7284987147574724
+            },
+            {
+              "epoch": 6,
+              "val_auroc_macro": 0.7257260819217479,
+              "best_val_auroc_macro": 0.7257260819217479
+            },
+            {
+              "epoch": 7,
+              "val_auroc_macro": 0.7224336512773210,
+              "best_val_auroc_macro": 0.7224336512773210
+            },
+            {
+              "epoch": 8,
+              "val_auroc_macro": 0.7199332868896646,
+              "best_val_auroc_macro": 0.7199332868896646
+            },
+            {
+              "epoch": 9,
+              "val_auroc_macro": 0.7186300298657906,
+              "best_val_auroc_macro": 0.7186300298657906
+            },
+            {
+              "epoch": 10,
+              "val_auroc_macro": 0.717173976097278,
+              "best_val_auroc_macro": 0.717173976097278
+            },
+            {
+              "epoch": 11,
+              "val_auroc_macro": 0.7167937872767037,
+              "best_val_auroc_macro": 0.7167937872767037
+            },
+            {
+              "epoch": 12,
+              "val_auroc_macro": 0.7151110033117816,
+              "best_val_auroc_macro": 0.7151110033117816
+            },
+            {
+              "epoch": 13,
+              "val_auroc_macro": 0.7125648420433748,
+              "best_val_auroc_macro": 0.7125648420433748
+            }
+          ],
+          "num_targets": null
+        }
+      ],
+      "best_result": {
+        "test_auroc_macro_agg0": 0.827,
+        "test_auroc_macro_agg1": 0.8355,
+        "run_name": "0721-modify-config stage2 HLUP (v3)",
+        "weight": null,
+        "best_val_auroc_macro": 0.8355,
+        "notes": "v3 Exp-A修改后追平baseline (+0.0004), 深层标签Δ从-0.098修复至+0.0004"
+      },
+      "hierarchy_checked": true,
+      "issues": [
+        "✅ v3 Exp-A已修复：stage2追平baseline (0.8268 vs 0.8264, +0.0004)",
+        "✅ 深层标签损伤从−0.098修复至+0.0004（移除head.linear继承 + 降lr + 冻结encoder）",
+        "代码为AI生成，HLCPLoss和HLUPLoss未经过逐行校验（功能已通过v3实验验证）",
+        "HLUPLoss中powerset预计算存在O(2^k)复杂度风险（当前未触发）",
+        "HMLC方法通过链式法则天然保证层次一致性，无需VR统计"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Hierarchical Multi-Label Classification Networks",
+      "short_name": "HMCN",
+      "paper": "Hierarchical Multi-Label Classification Networks",
+      "paper_file": "literature/Hierarchical Multi-Label Classification Networks.pdf",
+      "difficulty": "hard",
+      "status": "not_started",
+      "status_color": "gray",
+      "implementation": {
+        "config": "待创建",
+        "loss": "待实现",
+        "script": "待创建"
+      },
+      "loss_formulas": {},
+      "runs_summary": {
+        "total_runs": 0
+      },
+      "runs": [],
+      "best_result": {},
+      "hierarchy_checked": false,
+      "issues": [
+        "尚未开始实现"
+      ],
+      "planned_steps": [
+        "使用mineru解析论文PDF，提取模型结构、损失函数公式",
+        "撰写论文精读笔记",
+        "设计在MDS-ED框架下的实现方案",
+        "评估实现难度和工作量，制定时间表"
+      ]
+    }
+  ],
+  "weekly_progress": [
+    {
+      "week_start": "2026-04-05",
+      "saturday": "2026-04-05",
+      "summary": "MDS-ED基准实验启动",
+      "completed": [
+        "完成环境配置（ISBD RTX4090D）",
+        "跑通MDS-ED原始代码",
+        "确认数据加载和预处理流程正常"
+      ],
+      "issues": [
+        "原始仓库文档不完善，需要摸索配置"
+      ],
+      "next_steps": [
+        "运行baseline实验获取基线AUROC",
+        "调研层次化多标签分类相关论文"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-04-06",
+      "saturday": "2026-04-12",
+      "summary": "Baseline实验完成 + 方法1论文精读",
+      "completed": [
+        "Baseline实验完成：val macro-AUROC (agg0) = 0.8178",
+        "精读方法1论文（Penalty-Based Loss）",
+        "确定方法1的代码实现方案"
+      ],
+      "issues": [],
+      "next_steps": [
+        "在MDS-ED框架中实现HBCE+data-driven penalty loss",
+        "设计不同惩罚权重的对比实验"
+      ],
+      "key_metrics": {
+        "baseline_test_auroc_macro_agg0": 0.81
+      }
+    },
+    {
+      "week_start": "2026-04-13",
+      "saturday": "2026-04-19",
+      "summary": "方法1代码实现与调试",
+      "completed": [
+        "实现HierarchyBinaryCrossEntropyFocalLoss",
+        "实现data-driven penalty计算逻辑",
+        "在template_model.py中集成hierarchy loss",
+        "完成chunkify数据预处理"
+      ],
+      "issues": [
+        "Data-driven penalty的scale factor需要调参"
+      ],
+      "next_steps": [
+        "运行不同惩罚权重的完整实验",
+        "权重候选: 0.3, 0.7, 1, 1.5, 2, 5, 10, 50, 100, 500, 1000, 5000, 10000"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-04-20",
+      "saturday": "2026-04-26",
+      "summary": "方法1大规模实验运行 + 方法2论文精读",
+      "completed": [
+        "启动13个不同惩罚权重的实验（0.3~10000）",
+        "精读方法2论文（HLCP/HLUP）",
+        "使用AI辅助生成方法2的代码实现（HLCPLoss, HLUPLoss）",
+        "编写run_main_all.sh批量运行脚本"
+      ],
+      "issues": [
+        "方法1的AUROC普遍低于baseline（~0.819 vs 0.818）",
+        "惩罚权重过大（5000+）时AUROC大幅下降"
+      ],
+      "next_steps": [
+        "收集方法1全部实验结果",
+        "启动方法2实验"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-04-27",
+      "saturday": "2026-05-03",
+      "summary": "方法1结果汇总 + 方法2实验调试",
+      "completed": [
+        "收集方法1全部13个权重的实验结果",
+        "方法1最优 val macro-AUROC (agg0) = 0.8195 (weight=0.3)",
+        "方法2代码初步跑通但结果异常",
+        "编写run_hmlc_two_stage.sh两阶段训练脚本"
+      ],
+      "issues": [
+        "方法1所有权重AUROC均略低于baseline",
+        "方法1尚未评估层次一致性问题",
+        "方法2（HLCP→HLUP）两阶段训练后AUROC大幅下降至0.7543"
+      ],
+      "next_steps": [
+        "分析方法1AUROC未提升的原因",
+        "调试方法2代码（AI生成，未校验）",
+        "精读方法3论文"
+      ],
+      "key_metrics": {
+        "method1_best_test_auroc_macro_agg0": 0.8195,
+        "method2_test_auroc_macro_agg0": 0.7543
+      }
+    },
+    {
+      "week_start": "2026-05-04",
+      "saturday": "2026-05-10",
+      "summary": "快速测试 + Nan Mask基线实验",
+      "completed": [
+        "运行quick_test代码验证基础流程",
+        "发现baseline需要处理NaN mask问题",
+        "设计baseline_with_nan_mask实验方案"
+      ],
+      "issues": [
+        "quick_test报错，需要修复数据路径",
+        "方法2的loss函数可能存在bug需要逐行校验"
+      ],
+      "next_steps": [
+        "修复quick_test问题",
+        "运行baseline_with_nan_mask实验",
+        "逐行校验HLCPLoss和HLUPLoss代码"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-05-11",
+      "saturday": "2026-05-17",
+      "summary": "方法2完整实验 + 结果分析",
+      "completed": [
+        "完成方法2两阶段完整实验",
+        "HMLC Stage1 (HLCP): val macro-AUROC (agg0) = 0.7543",
+        "HMLC Stage2 (HLUP): val macro-AUROC (agg0) = 0.7499",
+        "确认预训练→微调导致AUROC大幅下降"
+      ],
+      "issues": [
+        "方法2 AUROC远低于baseline（0.7543 vs 0.8264）",
+        "方法2 loss不降反升",
+        "方法2代码正确性存疑（AI生成）",
+        "方法1和方法2均未做层次一致性检查"
+      ],
+      "next_steps": [
+        "运行baseline_with_nan_mask实验获取更公平的基线",
+        "设计层次一致性评估指标和统计脚本",
+        "精读方法3论文"
+      ],
+      "key_metrics": {
+        "method2_stage1_test_auroc_macro_agg0": 0.7543,
+        "method2_stage2_test_auroc_macro_agg0": 0.7499
+      }
+    },
+    {
+      "week_start": "2026-05-18",
+      "saturday": "2026-05-24",
+      "summary": "Baseline With NaN Mask实验运行中 + 代码审查",
+      "completed": [
+        "启动baseline_with_nan_mask实验",
+        "开始审查方法2的HLCPLoss代码实现"
+      ],
+      "issues": [
+        "baseline_with_nan_mask训练时间较长",
+        "HLCPLoss中ancestor_map的初始化逻辑需要验证"
+      ],
+      "next_steps": [
+        "等待baseline_with_nan_mask实验完成",
+        "继续方法2代码审查"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-05-25",
+      "saturday": "2026-05-31",
+      "summary": "Baseline With NaN Mask实验继续 + 方法3论文精读",
+      "completed": [
+        "baseline_with_nan_mask训练中（epoch 15+）",
+        "方法3论文精读中",
+        "方法2代码初步审查发现潜在问题"
+      ],
+      "issues": [
+        "方法2HLUPLoss中powerset预计算的复杂度分析需要进一步研究",
+        "实验时间紧张"
+      ],
+      "next_steps": [
+        "完成baseline_with_nan_mask实验",
+        "撰写层次一致性统计脚本"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-06-01",
+      "saturday": "2026-06-07",
+      "summary": "数据整理 + 组会准备",
+      "completed": [
+        "整理所有实验结果数据",
+        "汇总方法1和方法2的指标对比",
+        "撰写组会汇报PPT大纲"
+      ],
+      "issues": [
+        "层次一致性统计尚未完成",
+        "方法2代码校验尚未完成"
+      ],
+      "next_steps": [
+        "完成baseline_with_nan_mask实验",
+        "准备组会汇报材料"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-06-08",
+      "saturday": "2026-06-14",
+      "summary": "Baseline With NaN Mask实验收尾",
+      "completed": [
+        "baseline_with_nan_mask训练接近完成",
+        "整理Git仓库，添加论文PDF和注释"
+      ],
+      "issues": [
+        "实验服务器资源紧张"
+      ],
+      "next_steps": [
+        "完成baseline_with_nan_mask最终评估",
+        "开始构建实验报告HTML"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-06-15",
+      "saturday": "2026-06-21",
+      "summary": "Baseline With NaN Mask完成 + 实验报告HTML构建",
+      "completed": [
+        "Baseline With NaN Mask实验完成: val macro-AUROC (agg0) = 0.8264, test (agg1) = 0.8356",
+        "确认introduce_nan_columns=True对AUROC有显著提升（+0.0077 vs False）",
+        "发现introduce_nan_columns=False时input_channels_cont=463, True时=926",
+        "新增两篇论文到文献库",
+        "开始构建week_report.html实验进度展示系统"
+      ],
+      "issues": [
+        "方法1相对于nan_mask baseline的AUROC差距变大（0.8196 vs 0.8264, Δ=−0.0068）",
+        "此前所有方法1&2实验均在introduce_nan_columns=False下运行，需要重新实验",
+        "尚未统计层次一致性违反率"
+      ],
+      "next_steps": [
+        "完成week_report.html构建",
+        "统计所有实验的ICD层次一致性违反率",
+        "将方法1&2在introduce_nan_columns=True下重新运行",
+        "设计方法3的实现方案"
+      ],
+      "key_metrics": {
+        "baseline_nanmask_test_auroc_macro_agg0": 0.8264,
+        "baseline_nanmask_test_auroc_macro_agg1": 0.8356,
+        "baseline_orig_test_auroc_macro_agg0": 0.8187
+      }
+    },
+    {
+      "week_start": "2026-06-22",
+      "saturday": "2026-06-27",
+      "summary": "HBCE失效根因 + 连续惩罚实验 + 真实标签验证 + 组会汇报",
+      "completed": [
+        "HBCE 失效根因：硬阈值门控(parent<0.5 & child>0.5)因模型输出 100.30%>0.5 而永不触发",
+        "发现 data-driven 权重 w=P(child=1|¬parent)≡0（ICD 前缀闭包致训练数据无违反模式）",
+        "实现连续惩罚方案：ReLU(child−parent)，支持 squared/linear 两模式，代码已同步远程",
+        "远程运行 20 个 HBCE 连续惩罚实验（Linear×DD 6 + Linear×Fixed 7 + Squared×Fixed 7）",
+        "修复 3 个 bug：ConcatFusionHead 512→1428 维度不匹配、WORK_DIR 共享覆盖、HLUP pos_weight 过早.mean()",
+        "修正违反率计算：scores_test.pkl key 排序规则 → 真实 VR≈63%（非之前误算的 ~11%）",
+        "真实标签全量验证：mds_ed.csv 129,057 样本 × 978 对 = 0 违反（前缀闭包预处理）",
+        "week_report.html 全面更新：三块独立布局(A/B/C)、密度估计图(KDE SVG)、分点结论、标签验证卡片、数据集行",
+        "组会汇报：最佳 Linear+Fixed λ=5 达 VR=10.72%(−1.02pp)，但 42-45 对仍>50%，Loss 层已达上限"
+      ],
+      "issues": [
+        "🔴 致命 Bug：loss.use_diagnosis_prefix_hierarchy=False 导致 HBCE 惩罚从未被执行，全部 20 个连续惩罚实验等价于 baseline——惨遭第二次列错位 bug 后的重大发现（2026-07-09，代码已修正）",
+        "VR 改善微弱：尽管实验无效（惩罚未启用），观察到的 VR 依然 ~11-12%——这本身就是 random seed 方差，真实惩罚效果仍需实验",
+        "λ=100 不足：导师指出需先找 VR→0 的上界——下一批实验需启用惩罚后重新验证（纪要第88-92行）",
+        "Loss 尺度失衡：惩罚项梯度与 BCE 相差数个数量级，配置修正后 train_loss_hier 将出现在 tfevents，可真实测量（纪要第69-70行）",
+        "方法二预训练-微调此前效果不佳，失败原因待诊断，与方法一组合方案待探索（纪要第96-97行）"
+      ],
+      "next_steps": [
+        "补充实验：增大 λ（>100）至 VR→0 的上界 → 逆向 λ 递减 → 绘制 AUROC-VR Trade-off 曲线，确定最佳方案",
+        "方法二复盘：与 AI 协作诊断预训练-微调此前失败原因，探索与方法一（HBCE）的组合使用",
+        "基线整理：在 Missing Mask=True 下重跑 Roll-up/Roll-down，作为方法一对比基线",
+        "全量标签实验继续：对各标签难易度建立初步认知，为后续子集筛选提供方向性参考",
+        "update week_report.html：补充 Roll-up/Roll-down 结果表 + 会议讨论要点（会上临时未找到）"
+      ],
+      "key_metrics": {
+        "baseline_agg0_nanmask": 0.8264,
+        "baseline_agg1_nanmask": 0.8356,
+        "baseline_vr": 11.74,
+        "best_hbce_vr": 10.72,
+        "best_hbce_config": "Linear+Fixed λ=5",
+        "ground_truth_violations": 0
+      }
+    },
+    {
+      "week_start": "2026-06-28",
+      "saturday": "2026-07-11",
+      "summary": "HBCE λ Trade-off 实验 + 方法二复盘 + Roll-up/Roll-down 基线",
+      "completed": [
+        "补充 λ 实验：表A/B/C 均扩展至 λ=500/1000/2000/5000/10000（共 36 runs），AUROC 全程稳定（0.825–0.828），VR 维持 10.72–12.40%，全局最优仍为表B λ=5（VR=10.72%）；推翻此前\"λ≥5000 AUROC崩溃、VR反升\"的误报"
+      ],
+      "issues": [
+        "表A λ=10 原缺失（preds_test.npz/scores_test.pkl 不存在），重跑后已补齐；agg1 数据源改为 scores_val.pkl 比日志文本更可靠"
+      ],
+      "next_steps": [
+        "🔴 紧急：配置已修正（use_diagnosis_prefix_hierarchy=True），重新运行 HBCE 连续惩罚实验（linear+squared × data-driven+fixed × 多 λ），验证真实惩罚效果",
+        "重新分析 per-step loss decomposition（train_loss_hier 现在会出现在 tfevents）",
+        "方法二复盘：与 AI 协作诊断预训练-微调此前失败原因，探索与方法一（HBCE）的组合使用",
+        "Roll-up/Roll-down 基线：在 Missing Mask=True 下重跑，作为方法一对比基线",
+        "全量标签实验继续：对各标签建立难易度认知"
+      ],
+      "key_metrics": {
+        "hbc_linear_vr_0.1": 0.03,
+        "hbc_linear_vr_0.5": 0.008,
+        "hbc_linear_vr_1": 0.008,
+        "hbc_linear_vr_5": 0.002,
+        "hbc_linear_vr_10": null,
+        "hbc_linear_best_agg0": 0.8287,
+        "hbc_linear_best_agg0_delta": "+0.0023",
+        "hbc_squared_vr_0.1": 2.27,
+        "hbc_squared_vr_0.5": 1.04,
+        "hbc_squared_vr_1": 0.4,
+        "hbc_squared_vr_5": 0.08,
+        "hbc_squared_vr_10": 0.05,
+        "hbc_squared_best_agg0": 0.8294,
+        "hbc_squared_best_agg0_delta": "+0.0030",
+        "hbc_baseline_vr": 11.74,
+        "hbc_baseline_agg0": 0.8264,
+        "hbc_linear10_deleted": "needs re-run (hier dim error)",
+        "hbc_note": "linear consistently outperforms squared in VR reduction (0.002-0.03% vs 0.05-2.27%), squared lambda=10 has best AUROC (+0.003)"
+      }
+    },
+    {
+      "week_start": "2026-07-12",
+      "saturday": "2026-07-18",
+      "summary": "远程VR分析 + 网页全面更新 + Linear vs Squared对比完成",
+      "completed": [
+        "远程服务器运行 hierarchy_consistency_analysis.py：10个新实验VR计算完成（Linear 0.002%–0.03%, Squared 0.05%–2.27%）",
+        "更新 hierarchy_consistency_results.json：清除Bug期间无效数据，保留16个有效run",
+        "更新 report_data.json：Method1新增10个run + linear/squared subgroups",
+        "index.html 仪表盘重新设计：横向柱状图→对比表格（AUROC/Δ/VR/Best λ）",
+        "index.html 时间线添加折叠功能：过去周默认收起，本周完整展开",
+        "02_hbce_penalty + 03_hlcp_hlup 添加页内导航：自动扫描h4生成侧边栏锚点",
+        "VR汇总表更新：从新JSON渲染，确认HBCE Linear VR下降100.29%"
+      ],
+      "issues": [
+        "Squared VR压制远弱于Linear（2.27% vs 0.03% at λ=0.1），差约2个数量级",
+        "Squared AUROC最优(0.8294, λ=10)但VR仅0.05%，需权衡AUROC vs VR",
+        "部署指标差距（F1/Precision/Recall）尚未解决"
+      ],
+      "next_steps": [
+        "方法2 HLCP/HLUP Bug修复 + nan_mask配置重跑",
+        "分析100%结构性违反对特征 + 调研架构层方案",
+        "Per-class阈值校准实验（已验证可提升Macro-F1 +64%）"
+      ],
+      "key_metrics": {
+        "linear_best_vr": 0.002,
+        "squared_best_agg0": 0.8294,
+        "baseline_auroc": 0.8264,
+        "vr_reduction": "100.29%"
+      }
+    },
+    {
+      "week_start": "2026-07-19",
+      "saturday": "2026-07-25",
+      "summary": "HMLC v3 Exp-A修复验证 + 网页全面更新",
+      "completed": [
+        "HMLC v3实验完成：0718-naive vs 0721-modify-config 对比分析（tfevents+pkl）",
+        "0721 stage2 AUROC追平baseline（0.8268 vs 0.8264, +0.0004）",
+        "深层标签损伤从−0.098完全修复至+0.0004（移除head.linear继承 + 降lr + 冻结encoder）",
+        "验证修改意见P0（移除head.linear）是最大单一杠杆——判断正确",
+        "更新03_hlcp_hlup页面：5个实验对比卡片 + 3张图 + 6个表格 + 页内导航（HBCE风格）",
+        "更新index.html仪表盘：方法2状态从'Bug修复中'→v3数据 + 方法2卡片/表格/颜色更新",
+        "修复3个页面侧边栏max-height:300px裁剪问题（01/03/04 → max-height:none）",
+        "ICD层级一致性验证卡片从HBCE页迁移至导览页+新增方向二Gap分析（5.6%）",
+        "HBCE Phase1实验+改进方法+执行情况三卡片上线"
+      ],
+      "issues": [
+        "report_data.json + hierarchy_consistency_results.json 路径已修正（web_data/目录）"
+      ],
+      "next_steps": [
+        "P2软掩码（α=0.05残差）优化stage1根标签Δ略降问题",
+        "P3 early stopping / 缩短stage2尝试",
+        "P1/P2条件掩码样本效率优化以超越baseline",
+        "M1 roll-up/roll-down/MC loss/tree min loss 实验完成并上线"
+      ],
+      "key_metrics": {
+        "hmlc_v3_stage2_agg0": 0.827,
+        "hmlc_v3_stage2_agg1": 0.8355,
+        "hmlc_v3_delta_agg0": "+0.0004",
+        "hmlc_v3_deep_label_delta": "+0.0004",
+        "hmlc_v3_root_label_delta": "+0.0003"
+      }
+    },
+    {
+      "week_start": "2026-07-26",
+      "saturday": "2026-08-01",
+      "summary": "M1/M4 分析完成 + HMLC v4 三种初始化对比 + HBCE Phase1 + 网页全面重构",
+      "completed": [
+        "M1实验完成：roll-up/roll-down/MC loss/tree min loss 四种层级约束方法对比 + 网页上线",
+        "HBCE+rolldown 最优：test AUROC 0.8370（vs baseline 0.8338, +0.0032），post-processing 实现 VR=0",
+        "MC loss VR 恶化至 20.94%（训练时 -inf mask 问题）；tree_min_loss VR 降至 1.2% 但 AUROC 低于 baseline",
+        "HMLC 三种初始化策略对比（0718 全权重继承 / 0721 encoder迁移 / 0726 M1 全随机）→ 0721 追平 baseline (0.8268)",
+        "M1 全随机初始化验证 encoder 预训练价值（0721−0726=+0.0071）→ 网页 v3→v4 更新",
+        "M4 求和约束分析完成：理论（3定理）+ 数据（Metric A-E）+ 结论（当前不添加约束）+ 网页独立章节",
+        "M4 关键发现：HLCP 模型严重低估条件概率（Sum_model 0.04 vs Sum_emp 0.89，差 20 倍）",
+        "HBCE Phase1: 24组 margin×pos_weight grid search 完成 + 改进方法/执行情况卡片上线",
+        "ICD 层级一致性验证迁移至导览页 + 方向二 Gap 分析（父→子 5.6%）",
+        "8月1号组会取消（顺延一周），本周工作归档"
+      ],
+      "issues": [
+        "HBCE Phase1: 所有24组AUROC均低于baseline → loss 层超参已达上限，需转向模型表达能力层面",
+        "HMLC 条件概率严重低估（M4 Metric E）：Sum_model=0.04 vs Sum_emp=0.89，差 20 倍 → 优先排查",
+        "MC loss训练时 -inf mask导致VR恶化而非改善",
+        "flat_rollup/flat_rolldown训练时虽VR=0但AUROC下降显著",
+        "M4 发现 13.5% 父标签 Sum(P)>1（max 1.5），但由宽父标签驱动，暂不添加求和约束"
+      ],
+      "next_steps": [
+        "🔴 排查 HLCP 条件概率严重低估根因（preds.npz 内容/训练收敛/BCE mask）",
+        "Phase2: LR Schedule (warmup+cosine) + Per-label logit bias 实验",
+        "M1 后续：roll-up/roll-down 作为所有方法通用后处理验证",
+        "HMLC 优化：软掩码/early stopping 叠加到 0721 最优配置",
+        "HMCN 在 nan_mask 下实现/重跑"
+      ],
+      "key_metrics": {
+        "m1_best_auroc": 0.8370,
+        "m1_best_method": "hbce_rolldown",
+        "hmlc_v4_stage2_agg0": 0.827,
+        "hmlc_v4_m1_agg0": 0.8197,
+        "hmlc_encoder_pretrain_value": "+0.0071",
+        "m4_sum_model_vs_emp": "0.04 vs 0.89",
+        "m4_conclusion": "当前不添加求和约束"
+      }
+    },
+    {
+      "week_start": "2026-08-02",
+      "saturday": "2026-08-08",
+      "summary": "HMLC 条件概率低估排查 + Phase2 优化实验启动（8月1号组会顺延，下周汇报）",
+      "completed": [
+        "M6 Step 1 完成：LabelAttention +0.54pp（唯一通过门槛），MLP +0.28pp，ResNet -0.20pp",
+        "M6 消融分析：Spearman rho(depth,Delta)=0.0052 (p=0.84) -- 增益来自 per-label 投影增强，非层级利用",
+        "M6 D1/D2 完成：Tree-Masked +0.08pp，Ancestor-Bias -0.003pp -> 树结构 attention 方向全面证伪，放弃 D3/D4",
+        "08-06 合作导师会议：ICD编码核查 6 项全部查实（心梗OK/手术NO/低EF OK/ECG 100%关联/编码管线重现一致）",
+        "08-08 组会：M8-M12 五个新方向定义（心梗预测/导联拓扑/预测头优化/知识蒸馏/集成）",
+        "M7 Roll-up/Roll-down 正式独立编号：后处理 + 训练时约束对比实验定位为 M1-M6 基线"
+      ],
+      "issues": [
+        "M6 LabelAttention 仅 +0.54pp（未达 >1pp 预期），属中间地带 0.5~1pp"
+      ],
+      "next_steps": [
+        "🔴 排查 HLCP 条件概率严重低估根因（M4 Metric E：Sum_model 0.04 vs Sum_emp 0.89）",
+        "Phase2: LR Schedule (warmup+cosine) + Per-label logit bias 实验设计与运行",
+        "M1 后续：roll-up/roll-down 作为所有方法通用后处理，验证对 HMLC 的适用性",
+        "HMLC 优化：P2 软掩码（α=0.05）/ P3 early stopping 叠加到 0721 最优配置",
+        "HMCN 在 nan_mask 下实现/重跑，对比 VR+F1",
+        "部署指标：Per-class 阈值校准 + Focal/class-balanced 缓解 sigmoid 压缩"
+      ],
+      "key_metrics": {
+        "m6_labelattention_auroc": 0.8319,
+        "m6_labelattention_delta": "+0.54pp",
+        "m6_d1_tree_masked_delta": "+0.08pp",
+        "m6_d2_ancestor_bias_delta": "-0.003pp",
+        "m6_conclusion": "树结构 attention 方向放弃；增益 = per-label projection enhancement"
+      }
+    },
+    {
+      "week_start": "2026-08-09",
+      "saturday": "2026-08-15",
+      "summary": "M2 Linear Prob 分析完成 + 网页全面更新（M2/M6/M7/ICD核查）+ 8月15号组会汇报准备",
+      "completed": [
+        "M2 Linear Prob 分析完成：S0->S1->S2 三阶段，S2 test 0.8282（超越 0721 +0.0014 / vs baseline +0.0018）",
+        "M2 假设A验证通过：S1 首 val 0.8220（vs 0721 0.6833，+0.058），epoch0 退化消除",
+        "M2 per-label & VR：改善 829/恶化 587（vs 0721 795/621），VR=0（HLUP 天然保证）",
+        "网页全面更新：03_hlcp_hlup 补齐 0726 配置列 + M2 结果；index.html M1->M7 重命名 + M6 D1/D2 更新 + ICD核查卡片",
+        "日期文字统一：网页中 7-25/7-26 混淆统一为 7-26（物理路径保留）",
+        "M7 独立定位：后处理 + 训练时约束对比 = M1-M6 所有方法的统一对比基线"
+      ],
+      "issues": [
+        "M2 假设B（收敛更快）未获明确支持：M2_S1 argmax@ep14 与 0721 打平（0721 tf-logs 疑受污染待复核）"
+      ],
+      "next_steps": [
+        "M6 LabelAttention n_layers=2 重跑（per-label 投影增强方向）",
+        "M2 + M6 叠加：LabelAttention Head + Linear Prob 三阶段初始化",
+        "Phase 2: LabelAttention + HBCE 组合验证",
+        "Label embedding parent-child cosine similarity 分析",
+        "01_mdsed_paper 页面：Method/Experiment 文字章节 + 架构图",
+        "Agg0/Agg1 val/test 划分核查（M10 Q1, P0：影响 M6 及所有跨 run 对比可信度）",
+        "8月15号组会汇报：M2/M6/M7 完整实验矩阵 + ICD核查结论"
+      ],
+      "key_metrics": {
+        "m2_s2_val_agg0": 0.8282,
+        "m2_s2_test_agg1": 0.8372,
+        "m2_s2_val_agg0_vs_baseline": "+0.0018",
+        "m2_s2_vs_0721": "+0.0014",
+        "m2_s1_first_val": 0.8220,
+        "m2_per_label_improved": 829,
+        "m2_per_label_worsened": 587
+      }
+    },
+    {
+      "week_start": "2026-08-16",
+      "saturday": "2026-08-22",
+      "summary": "M13 换骨收口 + 三模态消融收口 + 08-22 组会（M14-M17 方向定义）",
+      "completed": [
+        "M13 Phase A 收口（08-20）：三方案换骨全部关闭——A full+causal 0.8128（−1.29pp）/ B encoder+bidir 0.8079（−1.78pp）/ C=baseline，权重域失配（240Hz→100Hz）实锤",
+        "三模态消融收口（08-21）：signal-only ep100 完成——表格是主承载（tabular 344K 追平 multimodal）、ECG 单独弱（−5.9pp）但拥心血管独特信息（144 标签）、融合是双刃剑",
+        "三模态消融 labelattn 变体：tabular-only×LA / signal-only×LA 完成（Q2 裁决：LA 增益依赖输入模态）",
+        "08-22 组会（合作导师 主持）：M14-M17 方向定义——多模态互补融合机制 / MoE 动态加权 / LA 提升机理归因 / 方法迁移外部验证",
+        "M15 MoE 研究计划 + 代码落地（两专家塔 gating + 样本级/标签级）"
+      ],
+      "issues": [
+        "M13 换骨全失败：ECG-CPC 预训练权重本身有害（240Hz→100Hz 域失配），BN 重置/lr/下采样三维度全部排除"
+      ],
+      "next_steps": [
+        "F0-F2 融合变体实验（masked/emb）",
+        "M15 MoE 两臂（label/sample）跑实验",
+        "M16 五臂掩码阶梯设计"
+      ],
+      "key_metrics": {
+        "m13_a_val": 0.813,
+        "m13_b_val": 0.8079,
+        "signal_only_val": 0.7664,
+        "tabular_only_val": 0.8257
+      }
+    },
+    {
+      "week_start": "2026-08-23",
+      "saturday": "2026-08-29",
+      "summary": "M14 F0-F5 六实验 + M16 五臂裁决 + M15 gatefix + 08-29 组会（M18-M20 方向定义）",
+      "completed": [
+        "F0-F2 融合变体完成（08-23）：F1 masked/F2 emb 单次运行方向性微负（−0.11/−0.22pp）待 3 种子复现",
+        "F3-skip/F4-attn/F5-decoupled 三档实现+实验完成（08-25）：F3 点估计最高（+0.12/+0.10pp）、F4 agg1 超 F0、F5 在 ECG 优势组唯一正向",
+        "F0-F5 六实验完整分析（08-26）：VR 权衡发现——F3/F4 AUROC 最高但 VR 也最高（15.32%/15.23%），\"注意力灵活分配以层级一致性为代价\"",
+        "M16 五臂掩码阶梯实现+裁决（08-27/28）：H1 容量成立（M1 Self-only 零交互 ≥ M0）、H2/H3/H4 全排除——LA +0.54pp 判别增益 100% 来自 per-label 容量",
+        "M15 gatefix 四臂裁决（08-27）：A1/A2 gating 修复 + 分析",
+        "M15 MoE 二轮扩展：MLP tabular 塔回退 + 两塔 logits dump（oracle 上限）",
+        "组会网页大更新：M14 F0-F5 卡片 + 仪表盘全卡片 VR rate 大字展示 + 四实验 VR 补算",
+        "08-29 组会（导师主持）：M18-M20 方向定义——分层训练与方差校准 / 心梗 Benchmark / tabular 内部机制；俞锦越地铁口述汇报，F 系列/M16 五臂获口述确认"
+      ],
+      "issues": [
+        "D1/D2 对照不构成严格控制变量（08-27 用户复审裁决）：\"性能持平→未学到层级\"推论不严谨，证据链已由五臂阶梯重建",
+        "服务器中断两次：租卡平台 余额耗尽自动关机（08-31 收支明细实锤）；服务器B PRO 6000 实例被释放、4 个 squared 原版结果永久丢失（重训版在 服务器A）"
+      ],
+      "next_steps": [
+        "F6 收官：squared 6 变体 + HMLC 2 臂三方法裁决",
+        "F0-F5 多种子复现（F3/F0 优先）",
+        "M16 Q2 per-label 疾病归因"
+      ],
+      "key_metrics": {
+        "f3_skip_val": 0.83283,
+        "f6_hbce_vr": 0.0035,
+        "m16_m1_val": 0.8333,
+        "m16_m1_vr": 12.89
+      }
+    },
+    {
+      "week_start": "2026-08-30",
+      "saturday": "2026-09-06",
+      "summary": "F6 收官三方法裁决（HBCE-squared 主推）+ 组会网页全面同步 + 09-06 组会汇报准备",
+      "completed": [
+        "M20 Phase 1 五臂裁决（09-04）：Q2 值信息≫缺失模式（4.76pp vs 0.86pp）、填充器 v1 未见增益（P3 −0.31/P4 −0.25pp）、mask 形态不敏感",
+        "F6 收官（09-02）：squared 6 变体 + HMLC 2 臂同机裁决——HBCE-squared（skip λ∈{5,10}，agg0 0.83411/agg1 0.84284）以 AUROC 不低于 + VR 实质为零 + 成本 1/4 战胜 HMLC 三阶段链",
+        "F6-HMLC 两阶段臂（无 S0）崩至 0.82042（−1.12pp）——S0 linear prob 是 HMLC 链必需品（M2 教训第二次实证）",
+        "M15 原始两臂实验产物归档（label/sample MoE 100ep）+ M16 掩码阶梯三臂结果归档 + 五臂示意图 drawio",
+        "组会网页全面同步：M14 F0-F6 收口卡片 + HBCE 页 F6 λ 网格 + M16 五臂裁决入 M6 卡片（纠正 D1/D2 过强表述）+ 仪表盘按 test agg1 降序重构 + F6-HMLC 迁移 03 页",
+        "8 月劳务归档（109h）"
+      ],
+      "issues": [
+        "F6 全部单次运行：AUROC 差异 +0.20pp 在种子方差 ±2pp 内，多种子复现后方可作显著性表述"
+      ],
+      "next_steps": [
+        "09-06 组会汇报：F6 三方法裁决 + M16 五臂机理 + VR 权衡主线",
+        "M20 改进轮：λ 剂量网格 {0.5,2.0} → median init+残差（等 服务器B 空闲；任何正结论 3 种子）",
+        "F6 最优配置多种子复现（skip+squared λ10 × 3 种子，导师拍板）",
+        "M16 Q2 per-label 疾病归因分层表（论文 Discussion 素材）",
+        "M15 MoE：A1 先验初始化 + A2 冻结塔（sample 模式优先）",
+        "M18 分层训练与方差校准：输出分布审计（零成本前置）+ 方案一逐层训练"
+      ],
+      "key_metrics": {
+        "f6_sq_skip10_val": 0.83411,
+        "f6_sq_skip5_test": 0.84284,
+        "f6_hmlc_s4_val": 0.83216,
+        "f6_hmlc_s2_val": 0.82042
+      }
+    },
+    {
+      "week_start": "2026-09-07",
+      "saturday": "2026-09-12",
+      "summary": "M18/M22/M17 三方向全部收口（s1c 终态 / M22 全链终结 / 二阶段 40 臂）+ M20 五臂裁决 + 网页大改版（05/06 页+瘦身）+ 09-12 组会 M23 立项",
+      "completed": [
+        "M18 全链收口：13 训练臂+5 零训练全部裁决——最终形态 s1c（逐层课程×HBCE λ5 sq，agg1 0.84415 全家族最高 + VR 0.0076%）；s1ci 假设臂证伪（invpref 增益在 HBCE 下消失，机制同通道不叠加）",
+        "M22 全链终结：P1/P2 止损 → 路径 B 子集 LA 探针否决（组内提升 0/3、拼回 −1.20pp）→ OTH 大兜底证伪（223 标签 −1.26pp）→ 四条证据链全否，方向彻底关闭",
+        "M17 第二阶段 40 臂收口：A 3 种子（方差<0.3pp）/ B 微调矩阵（warm-baseline −4.6pp 有害）/ C2+C3 档 0 八臂——P3 曲线非单调（适用域修正为「中等标签空间+宽输入」）、P5 HBCE λ 必须按标签数缩放",
+        "M20 Phase 1 五臂裁决回填 + 注意力填充器 v1 未见增益（P3/P4 配对 P<0.007 但效应 −0.3pp 在种子方差内）",
+        "组会网页大改版：新增 05 外部验证页（M17 收口+三库对比表）与 06 Tricks 页（7 卡移植）；总览页瘦身 −76KB；仪表盘 33 项配对 P 值全量覆盖；M16 快速访问标签",
+        "09-12 组会：M23 多 ECG 跨就诊序列建模立项（ECG-Founder→ResNet-1D、HEdb 1TB 物理硬盘、A800 训练）"
+      ],
+      "issues": [
+        "M18/M17 全部结论单种子（±2pp），论文显著表述须 3 种子（s1c 3 种子 lean 跑、共享机 0 元）",
+        "M17 C 批半塌缩臂种子敏感（s42/s7 差 2.6pp），第 3 种子 lean 补",
+        "M22 路径 A（共享权重消融）唯一未实验入口——lean 不做（四条证据链全否）"
+      ],
+      "next_steps": [
+        "M17：外部数据集 HBCE 超参调优（验证性能下降是否参数不匹配）+ 构造 MDS-ED No-Tabular 子集公平对比（排除 tabular 缺失影响）",
+        "M23：HEdb 物理硬盘交接 + 数据筛选（子集 I0006）+ ResNet-1D 特征提取器替换 + 多 ECG 数据构建逻辑修正（最后一次 ECG 为准）",
+        "沿袭：M18 s1c/s1ci 3 种子复现、M20 改进轮 λ 网格（等 服务器B）、F6 最优配置多种子"
+      ],
+      "key_metrics": {
+        "m22_p1_chapter_ep20_test_agg1": 0.8430,
+        "m22_p2_grouped_ep20_test_agg1": 0.8330
+      }
+    },
+    {
+      "week_start": "2026-09-13",
+      "saturday": "2026-09-19",
+      "summary": "M23 多 ECG 跨就诊序列建模启动（HEdb 数据接入 + ResNet-1D 替换）+ M17 外部 HBCE 调优与 No-Tabular 公平对比",
+      "completed": [],
+      "issues": [
+        "HEdb ~1TB 依赖物理硬盘交接与机房有线传输，进度受协调影响"
+      ],
+      "next_steps": [
+        "M17：外部数据集（PTB-XL/Liu）HBCE 超参调优——λ 按标签数缩放定律的跨库验证",
+        "M17：构造 MDS-ED 的 No-Tabular 子集，与外部库公平对比，排除 tabular 缺失对 LA/HBCE 结论的影响",
+        "M23：与蔡梓怡完成 HEdb 硬盘交接 → 子集 I0006 筛选（剔除缺失严重样本）→ A800 训练方案",
+        "M23：多 ECG 数据构建逻辑修正——不再强制历史 ECG 与当前标签一致，采用「最后一次 ECG 结果为准」模拟真实临床",
+        "M23：ECG 特征提取器从 ECG-Founder 替换为 ResNet-1D（提升原创性，融合框架作核心贡献）",
+        "Emory 数据集（哈佛 2026-02）访问权限申请推进",
+        "蔡梓怡：Benchmark 模型对比结果整理（下周统一讨论）"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-09-20",
+      "saturday": "2026-09-26",
+      "summary": "M26 全方向收官（Q1 终审 ❌ / 全 27 臂总表 / E3 独立 static 修复）+ M26+ 零成本探针闭环（三判据全过 + 尺度封顶不立项）+ §5 方差缩减机理核验 + NC 手稿 MoE 入稿与图文去重 + 09-26 组会（M28/M29/M30 三新方向立项 + MoE 收官裁决）",
+      "completed": [
+        "M26 收官（09-23）：Q1 终审 ❌——修复底座上 19 个门控臂无一超越均匀集成（P1d2 −0.204 / P1b2 −0.208 / P2label2 +0.004 打平 / P2d2 −0.564pp），三个可学习门控训练中自发收敛到均匀；§3.9 全 27 臂总表 + 三条发文论点定稿；E3 每塔独立 static encoder 修复（恒等锚点 0.8533001 逐位命中）",
+        "M26+ 零成本探针闭环（09-24）：三判据全过（C1 21/21 稳健章支配、C2 24/24 对显著且 CI 下界 ≥+0.60pp、C3 roll-up 后 VR 严格 0）+ P4 尺度证伪 + O1/O2 互补审计（val-select −0.619pp、误差相关 r=1.0000、oracle 上界仅 +0.727pp）⇒ 裁决不立项，精力转回论文",
+        "M26+ §5 方差缩减机理核验（09-25）：精确分解恒等式（平方误差下改善 ≡ 成员方差，机器精度）+ K 标度律（全子集累积曲线）+ 噪声等价校准（σ*≈0.12 logit 精确复现 AUROC 缺口）",
+        "NC 手稿线：MoE 零训练集成小节入稿 + 图文去重（Fig 2 改三面板、Table 1 删除）+ routing/boundary 图 CI 补全 + Source Data workbook（数值零手抄）",
+        "组会网页：07 MoE 页两轮注入（M26 收官终审 + 速查表/术语卡 → M26+ 探针 4 节 8 表 + 机理核验节）",
+        "09-26 组会：MoE 收口汇报（集成 0.8502 vs 单最优 0.8356 / VR 严格归零 / 章级无代价 / encoder 必须独立 / 方差归因）；会上确立三条论文严谨性修正并当轮完成待办①②——选池口径改 val（K*=6）、baseline roll up/down 实测零代价（+0.0090 / −0.0002pp）"
+      ],
+      "issues": [
+        "NAS 数据搬迁（本地硬盘爆）挤占本周工时",
+        "baseline roll up/down 实测为零代价，与会上「~0.834 更差」的估算相反 ⇒ 论文「层级优势」论证角度须调整（待裁决）"
+      ],
+      "next_steps": [
+        "M30 A 组：MDS-ED signal-only 参考实验收口（09-26 已零成本预跑，S3 集成 test 0.78633）——补齐文档与判读，为 B/C 组铺路",
+        "M29：组会网页内容压缩推广（07 页试点已完成，首屏可见 −56%）→ 其余 6 页",
+        "M28：ICD 编码级科学发现挖掘——框架先行（跨研究可预测性交叉验证设计；参照清单 AnyECG 待 Ya 提供）",
+        "论文线：baseline roll 结论裁决 → 「层级优势」论证角度调整 + M26+ 三条修正回填手稿",
+        "M26+ 待办④⑤：切模态/数据集须重训超参（规则已确立）→ 落地到外部验证流程文档"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-09-27",
+      "saturday": "2026-10-03",
+      "summary": "国庆假期周（无组会）：M30 A 组收口 + M29 网页压缩推广 + M28 框架设计",
+      "completed": [],
+      "issues": [],
+      "next_steps": [
+        "M30 A 组：signal-only 参考实验文档化（含 S0/S1 盘点与 S3 集成 0.78633 的判读）",
+        "M29：网页压缩推广到 01-06 页（按 07 页试点规格：图表三段式 + 三级取舍边界 + 主题层接入 + 性能优化）",
+        "M28：跨研究可预测性交叉验证框架设计（对方判不可预测 × 我方判可预测 ⇒ 反向发现）",
+        "论文线：baseline roll 零代价结论的论证角度调整方案"
+      ],
+      "key_metrics": {}
+    },
+    {
+      "week_start": "2026-10-04",
+      "saturday": "2026-10-10",
+      "summary": "下次组会（10-10，国庆后首个周六）：M30 单模态验证进展 + M28 框架初稿 + M29 压缩推广完成度 + 论文线修正回填",
+      "completed": [],
+      "issues": [],
+      "next_steps": [
+        "M30 B 组：外部库（PTB-XL / Liu 2022）单模态验证——解锁 M17 外部验证通路",
+        "M30 C 组：同数据两模态→单模态对照（导师建议：切模态须重训超参，初始值作起点）",
+        "M28：框架落地后启动首轮分析（ICD 编码级可预测性图谱）",
+        "M29：网页压缩全站完成度验收（7 页 + 总览页）",
+        "论文线：M26+ 三条严谨性修正全部回填手稿 + 层级论证角度定稿"
+      ],
+      "key_metrics": {}
+    }
+  ],
+  "todo_list": [
+    {
+      "category": "📌 下周优先（09-12 组会后）",
+      "items": [
+        {
+          "text": "M17：外部数据集 HBCE 超参调优（λ 缩放定律跨库验证；验证性能下降是否参数不匹配）",
+          "done": false,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "M17：构造 MDS-ED No-Tabular 子集，与外部库公平对比（排除 tabular 缺失影响）",
+          "done": false,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "M23：HEdb 硬盘交接（蔡梓怡→俞锦越）+ 子集 I0006 筛选 + A800 训练方案",
+          "done": false,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "M23：多 ECG 数据构建逻辑修正（最后一次 ECG 为准）+ ResNet-1D 替换 ECG-Founder",
+          "done": false,
+          "in_progress": false
+        },
+        {
+          "text": "M18 s1c/s1ci 3 种子复现（共享机 0 元，论文显著表述前提）",
+          "done": false,
+          "in_progress": false
+        },
+        {
+          "text": "M20 改进轮：λ 剂量网格 {0.5,2.0}（等 服务器B 空闲）",
+          "done": false,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "✅ 上周已完成（09-07 → 09-12）",
+      "items": [
+        {
+          "text": "09-12 组会：M23 多 ECG 跨就诊序列建模立项",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M22 三探针收口：Q1 不成立（判别无损 ✓ / VR 不降反升 ✗）+ Q2 证伪（组内 21 章 0 升 15 降）→ 方向止损，P3 不启动",
+          "done": true,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "M22 反哺 M16：切交互对 VR 的影响由掩码结构决定（树对保留=降 / 章内全开块状=不降）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M22 路径 B（章级专家塔）降本探针方案成文（22 组 + 随机对照臂 + 三条预注册判据）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M17 第二阶段 A/D 26 臂 + B 微调矩阵 6 臂完成；C2 档 0 六臂 RUC 运行中",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "组会网页：新增 05 外部数据集验证页 + 总览页 M22 卡片（终止裁决全量入档）",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "✅ 前周已完成（08-30 → 09-06）",
+      "items": [
+        {
+          "text": "F6 收官三方法裁决（HBCE-squared 主推，HMLC 作 VR=0 备选）",
+          "done": true,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "M15/M16 实验产物归档 + 五臂示意图",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "组会网页全面同步（F0-F6 + 仪表盘重构 + VR 大字）",
+          "done": true,
+          "urgent": true,
+          "in_progress": false
+        },
+        {
+          "text": "8 月劳务归档",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M20 Phase 1 五臂裁决（Q2 值信息≫缺失模式 4.76pp；填充器判据未达标）",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "✅ 更早完成（08-23 → 08-29）",
+      "items": [
+        {
+          "text": "M14 F0-F5 六实验 + VR 权衡分析",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M16 五臂掩码阶梯裁决（H1 容量成立）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M15 gatefix 四臂 + MoE 二轮扩展",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "08-29 组会 M18-M20 方向定义",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "方法1 — HBCE Penalty",
+      "items": [
+        {
+          "text": "HBCE 惩罚叠加注意力底座（F6）：VR 骤降 4 个量级 + AUROC 全正，主推 skip+squared λ∈{5,10}",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "HBCE+rolldown 最优：test 0.8370 / VR=0%",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "方法2 — HMLC Two-Stage",
+      "items": [
+        {
+          "text": "M2 Linear Prob 三阶段：0.8282 超越 0721",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "m2-LA S2 三 trick 叠加：0.83319/0.84034（⚠️跨机）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "F6-HMLC 三阶段臂 0.83216/0.84213；两阶段臂（无 S0）崩 −1.12pp = S0 必需品",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "HMLC 定位：VR 严格=0 硬约束场景备选",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    },
+    {
+      "category": "M14/M15/M16 — 多模态融合与归因",
+      "items": [
+        {
+          "text": "M14 F0-F6 收口：静态融合主线（F3 skip 点估计最高）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M14 F6 三方法裁决：HBCE 惩罚路线主推（层级一致性方案）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M15 MoE：两臂已跑（100ep），A1/A2 待执行",
+          "done": false,
+          "in_progress": true
+        },
+        {
+          "text": "M16 Q1/Q3 五臂裁决完成；Q2 per-label 归因待做",
+          "done": false,
+          "in_progress": true
+        }
+      ]
+    },
+    {
+      "category": "M13/M18-M22 — 其他方向",
+      "items": [
+        {
+          "text": "M13 换骨三方案全部关闭（SDS 涨点勿再碰换骨）",
+          "done": true,
+          "in_progress": false
+        },
+        {
+          "text": "M18 分层训练与方差校准（导师裁决先试方案一）",
+          "done": false,
+          "in_progress": false
+        },
+        {
+          "text": "M19 心梗 Benchmark（蔡梓怡主线，YJY 贡献生理年龄注入建议）",
+          "done": false,
+          "in_progress": false
+        },
+        {
+          "text": "M20 tabular 填充阶梯 Phase 1 五臂已裁决（填充器 v1 未见增益，改进轮 λ 网格 → median init）",
+          "done": false,
+          "in_progress": true
+        },
+        {
+          "text": "M22 按疾病分组的标签专家：方向止损（Q1/Q2 双否）——复活后手 = 共享权重消融 / 章级专家塔（路径 B 待审批）",
+          "done": true,
+          "in_progress": false
+        }
+      ]
+    }
+  ],
+  "icd_hierarchy_info": {
+    "description": "ICD编码具有前缀层次结构：父标签(如 a047)包含多个子标签(如 a0472)。层次一致性要求：P(parent=1) ≥ P(child=1) ∀ child ∈ children(parent)。在MDS-ED中，父标签通过最长严格前缀（长度≥3）在lbl_itos中查找确定。",
+    "total_codes": "1428 (在predictions中) / 1430 (在metrics中，含macro/micro)",
+    "hierarchy_depth": "基于ICD编码字符串长度确定（min_prefix_len=3）",
+    "parent_child_pairs": "978对 (经build_prefix_parent_indices确定)",
+    "consistency_definition": "\\text{Consistency}(p,c) = \\begin{cases}1 & \\text{if } \\sigma(\\hat{y}_p) \\geq \\sigma(\\hat{y}_c) \\\\ 0 & \\text{otherwise}\\end{cases}",
+    "violation_rate": "\\text{VR} = \\frac{1}{|\\mathcal{H}| \\cdot N}\\sum_{(p,c)\\in\\mathcal{H}}\\sum_{i=1}^{N} \\mathbb{1}\\{\\sigma(\\hat{y}_p^{(i)}) < \\sigma(\\hat{y}_c^{(i)})\\}",
+    "key_finding": "Baseline (no constraints): 11.74% VR. After code fix (use_diagnosis_prefix_hierarchy=True): linear penalty VR=0.002-0.03%(best λ=5, 0.002%), AUROC best at λ=0.5(+0.0023). Squared penalty VR=0.05-2.27%(best λ=10, 0.05%), AUROC best at λ=10(+0.0030). Linear vastly superior for VR reduction; squared keeps some AUROC edge at high λ. Linear λ=10 deleted (hier dim error, needs re-run).",
+    "key_finding_zh": "核心发现（代码Bug修复后）：Linear惩罚VR降至0.002-0.03%（最佳λ=5达0.002%，几乎清零），AUROC最佳λ=0.5(+0.0023)。Squared惩罚VR=0.05-2.27%（最佳λ=10达0.05%），AUROC最佳λ=10(+0.0030)。结论：Linear在VR压制上远优于Squared（2-3个数量级），Squared在极高λ时AUROC略好。Linear λ=10需重跑。"
+  }
+}

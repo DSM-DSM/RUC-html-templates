@@ -44,6 +44,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{项目主题} 知识图谱 · {项目名}</title>
 <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+<script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
 <script src="theme-pack.js"></script>
 <style>
 /* ====================================================================
@@ -288,55 +291,55 @@ footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-s
 <!-- ============ TOP NAV ============ -->
 <!-- 说明：current=知识图谱；依次列出所有论文详解 + 阅读路径等导航页 -->
 <div class="top-nav-bar">
-  <span class="current">← 知识图谱</span>
+  <span class="current"><span data-zh>← 知识图谱</span><span data-en>← Knowledge Graph</span></span>
   <span class="sep">|</span>
   <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
-  <a href="papers/paper_explainer_page_template.html">{论文1简称}</a>
-  <a href="papers/paper_explainer_page_template.html">{论文2简称}</a>
-  <a href="papers/paper_explainer_page_template.html">{论文3简称}</a>
+  <a href="papers/paper_explainer_page_template.html"><span data-zh>{论文1简称}</span><span data-en>{Paper 1 short name}</span></a>
+  <a href="papers/paper_explainer_page_template.html"><span data-zh>{论文2简称}</span><span data-en>{Paper 2 short name}</span></a>
+  <a href="papers/paper_explainer_page_template.html"><span data-zh>{论文3简称}</span><span data-en>{Paper 3 short name}</span></a>
   <span class="sep">|</span>
-  <a href="nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>阅读路径</a>
-  <a href="nav/knowledge_supplement_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.2a2.4 2.4 0 0 1 4.7.8c0 1.6-2.3 1.9-2.3 3.2M12 16.8v.4"/></svg>补充知识</a>
+  <a href="nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+  <a href="nav/knowledge_supplement_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.6 9.2a2.4 2.4 0 0 1 4.7.8c0 1.6-2.3 1.9-2.3 3.2M12 16.8v.4"/></svg><span data-zh>补充知识</span><span data-en>Background Knowledge</span></a>
 </div>
 
 <!-- ============ HEADER ============ -->
 <div class="kg-header">
-  <h1>{项目主题}研究知识图谱</h1>
-  <div class="kg-sub">项目：{项目名} · 最后更新：{YYYY-MM-DD}</div>
+  <h1><span data-zh>{项目主题}研究知识图谱</span><span data-en>{Project Topic} Knowledge Graph</span></h1>
+  <div class="kg-sub"><span data-zh>项目：{项目名} · 最后更新：{YYYY-MM-DD}</span><span data-en>Project: {Project Name} · Last updated: {YYYY-MM-DD}</span></div>
   <div class="kg-stats">
-    <div class="kg-stat"><b>{N}</b><span>论文数</span></div>
-    <div class="kg-stat"><b>{N+}</b><span>核心概念</span></div>
-    <div class="kg-stat"><b>{N+}</b><span>交叉关系</span></div>
+    <div class="kg-stat"><b>{N}</b><span><span data-zh>论文数</span><span data-en>Papers</span></span></div>
+    <div class="kg-stat"><b>{N+}</b><span><span data-zh>核心概念</span><span data-en>Core concepts</span></span></div>
+    <div class="kg-stat"><b>{N+}</b><span><span data-zh>交叉关系</span><span data-en>Cross-links</span></span></div>
   </div>
 </div>
 
 <!-- ============ 板块 1：概念关联图谱 ============ -->
-<h2>1. 概念关联图谱</h2>
+<h2><span data-zh>1. 概念关联图谱</span><span data-en>1. Concept Association Map</span></h2>
 <div class="network-grid">
 
   <!-- 一个 paper-node = 一篇论文。三组 concept-tags 分别放：
        独有/新概念 (.tag.unique/.tag.new) → 共享基础 (.tag.shared) → 桥梁 (.tag.bridge) -->
   <div class="paper-node">
-    <div class="node-title">{论文1 简称}</div>
-    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
-    <div class="concept-tags"><span class="tag unique">{独有概念1}</span> <span class="tag unique">{独有概念2}</span></div>
-    <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
-    <div class="concept-tags"><span class="tag bridge">{桥梁概念1}</span></div>
+    <div class="node-title"><span data-zh>{论文1 简称}</span><span data-en>{Paper 1 short name}</span></div>
+    <div class="node-meta"><span data-zh>{期刊} {年份} · {作者 et al.}</span><span data-en>{Journal} {Year} · {Author} et al.</span></div>
+    <div class="concept-tags"><span class="tag unique"><span data-zh>{独有概念1}</span><span data-en>{Unique concept 1}</span></span> <span class="tag unique"><span data-zh>{独有概念2}</span><span data-en>{Unique concept 2}</span></span></div>
+    <div class="concept-tags"><span class="tag shared"><span data-zh>{共享概念1}</span><span data-en>{Shared concept 1}</span></span> <span class="tag shared"><span data-zh>{共享概念2}</span><span data-en>{Shared concept 2}</span></span></div>
+    <div class="concept-tags"><span class="tag bridge"><span data-zh>{桥梁概念1}</span><span data-en>{Bridge concept 1}</span></span></div>
   </div>
 
   <div class="paper-node">
-    <div class="node-title">{论文2 简称}</div>
-    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
-    <div class="concept-tags"><span class="tag new">{新概念1}</span> <span class="tag new">{新概念2}</span></div>
-    <div class="concept-tags"><span class="tag shared">{共享概念1}</span> <span class="tag shared">{共享概念2}</span></div>
-    <div class="concept-tags"><span class="tag bridge">{桥梁概念1}（&#x2194;{论文1简称}）</span></div>
+    <div class="node-title"><span data-zh>{论文2 简称}</span><span data-en>{Paper 2 short name}</span></div>
+    <div class="node-meta"><span data-zh>{期刊} {年份} · {作者 et al.}</span><span data-en>{Journal} {Year} · {Author} et al.</span></div>
+    <div class="concept-tags"><span class="tag new"><span data-zh>{新概念1}</span><span data-en>{New concept 1}</span></span> <span class="tag new"><span data-zh>{新概念2}</span><span data-en>{New concept 2}</span></span></div>
+    <div class="concept-tags"><span class="tag shared"><span data-zh>{共享概念1}</span><span data-en>{Shared concept 1}</span></span> <span class="tag shared"><span data-zh>{共享概念2}</span><span data-en>{Shared concept 2}</span></span></div>
+    <div class="concept-tags"><span class="tag bridge"><span data-zh>{桥梁概念1}（&#x2194;{论文1简称}）</span><span data-en>{Bridge concept 1} (&#x2194;{Paper 1 short name})</span></span></div>
   </div>
 
   <!-- 若某论文概念较多、需占满整行，加 style="grid-column: 1 / -1;" -->
   <!--
   <div class="paper-node" style="grid-column: 1 / -1;">
     <div class="node-title">{论文3 简称}</div>
-    <div class="node-meta">{期刊} {年份} · {作者 et al.}</div>
+    <div class="node-meta"><span data-zh>{期刊} {年份} · {作者 et al.}</span><span data-en>{Journal} {Year} · {Author} et al.</span></div>
     <div class="concept-tags"><span class="tag new">{...}</span></div>
     <div class="concept-tags"><span class="tag shared">{...}</span></div>
     <div class="concept-tags"><span class="tag bridge">{...}</span></div>
@@ -347,53 +350,53 @@ footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-s
 <!-- ============ 板块 2：概念-论文对照矩阵 ============ -->
 <!-- 说明：每新增一篇论文 → 表头加一列；每新增一个概念 → 加一行。
      单元格：checkmark(核心/覆盖) / partial(提及) / cross(未涉及) -->
-<h2>2. 概念-论文对照矩阵</h2>
+<h2><span data-zh>2. 概念-论文对照矩阵</span><span data-en>2. Concept–Paper Matrix</span></h2>
 <table class="matrix">
-  <tr><th>核心概念</th><th>{论文1简称}</th><th>{论文2简称}</th><th>{论文3简称}</th></tr>
-  <tr><td>{概念 A}</td><td class="checkmark">核心</td><td class="partial">提及</td><td class="cross">未涉及</td></tr>
-  <tr><td>{概念 B}</td><td class="checkmark">详细</td><td class="checkmark">应用</td><td class="partial">提及</td></tr>
-  <tr><td>{概念 C（新增论文独有）}</td><td class="cross">未涉及</td><td class="cross">未涉及</td><td class="checkmark">核心输出</td></tr>
+  <tr><th><span data-zh>核心概念</span><span data-en>Core concepts</span></th><th><span data-zh>{论文1简称}</span><span data-en>{Paper 1 short name}</span></th><th><span data-zh>{论文2简称}</span><span data-en>{Paper 2 short name}</span></th><th><span data-zh>{论文3简称}</span><span data-en>{Paper 3 short name}</span></th></tr>
+  <tr><td><span data-zh>{概念 A}</span><span data-en>{Concept A}</span></td><td class="checkmark"><span data-zh>核心</span><span data-en>Core</span></td><td class="partial"><span data-zh>提及</span><span data-en>Mentioned</span></td><td class="cross"><span data-zh>未涉及</span><span data-en>Not covered</span></td></tr>
+  <tr><td><span data-zh>{概念 B}</span><span data-en>{Concept B}</span></td><td class="checkmark"><span data-zh>详细</span><span data-en>Detailed</span></td><td class="checkmark"><span data-zh>应用</span><span data-en>Applied</span></td><td class="partial"><span data-zh>提及</span><span data-en>Mentioned</span></td></tr>
+  <tr><td><span data-zh>{概念 C（新增论文独有）}</span><span data-en>{Concept C (unique to the new paper)}</span></td><td class="cross"><span data-zh>未涉及</span><span data-en>Not covered</span></td><td class="cross"><span data-zh>未涉及</span><span data-en>Not covered</span></td><td class="checkmark"><span data-zh>核心输出</span><span data-en>Core output</span></td></tr>
 </table>
 
 <!-- ============ 板块 3：论文间关系卡片 ============ -->
 <!-- 说明：每新增一篇论文 → 为新论文与每篇已有论文各加一张 .rel-card。
      rel-type 三选一：rel-shares(共享基础) / rel-complements(互补) / rel-generalizes(推广升级) -->
-<h2>3. 论文间关系卡片</h2>
+<h2><span data-zh>3. 论文间关系卡片</span><span data-en>3. Inter-paper Relation Cards</span></h2>
 
 <div class="rel-card">
-  <h3><span class="rel-type rel-shares">共享基础</span> {论文1简称} / {论文2简称}</h3>
-  <p>{两篇论文的具体关系描述：共享了什么、在哪个维度互补/推广，禁止泛泛而谈「两者相关」。}</p>
+  <h3><span class="rel-type rel-shares"><span data-zh>共享基础</span><span data-en>Shared basis</span></span><span data-zh>{论文1简称} / {论文2简称}</span><span data-en>{Paper 1 short name} / {Paper 2 short name}</span></h3>
+  <p><span data-zh>{两篇论文的具体关系描述：共享了什么、在哪个维度互补/推广，禁止泛泛而谈「两者相关」。}</span><span data-en>{Concrete description of how the two papers relate: what they share, on which dimension they complement / generalize each other — no vague “they are related” allowed.}</span></p>
 </div>
 
 <div class="rel-card">
-  <h3><span class="rel-type rel-complements">互补</span> {论文2简称} / {论文3简称}</h3>
-  <p>{具体关系描述。}</p>
+  <h3><span class="rel-type rel-complements"><span data-zh>互补</span><span data-en>Complementary</span></span><span data-zh>{论文2简称} / {论文3简称}</span><span data-en>{Paper 2 short name} / {Paper 3 short name}</span></h3>
+  <p><span data-zh>{具体关系描述。}</span><span data-en>{Concrete relation description.}</span></p>
 </div>
 
 <div class="rel-card">
-  <h3><span class="rel-type rel-generalizes">推广升级</span> {论文1简称} / {论文3简称}</h3>
-  <p>{具体关系描述。}</p>
+  <h3><span class="rel-type rel-generalizes"><span data-zh>推广升级</span><span data-en>Generalization</span></span><span data-zh>{论文1简称} / {论文3简称}</span><span data-en>{Paper 1 short name} / {Paper 3 short name}</span></h3>
+  <p><span data-zh>{具体关系描述。}</span><span data-en>{Concrete relation description.}</span></p>
 </div>
 
 <!-- ============ 板块 4：推荐阅读路径 ============ -->
-<h2>4. 推荐阅读路径</h2>
+<h2><span data-zh>4. 推荐阅读路径</span><span data-en>4. Recommended Reading Path</span></h2>
 <ol class="roadmap-steps">
-  <li><strong>入门：{第一步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
-  <li><strong>深入：{第二步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
-  <li><strong>应用：{第三步主题}</strong><p><a href="papers/paper_explainer_page_template.html">{论文简称} 详解</a> · {这一步学什么}。</p></li>
+  <li><strong><span data-zh>入门：{第一步主题}</span><span data-en>Start: {Step 1 topic}</span></strong><p><a href="papers/paper_explainer_page_template.html"><span data-zh>{论文简称} 详解</span><span data-en>{Paper short name} Walkthrough</span></a><span data-zh>· {这一步学什么}。</span><span data-en>· {what to learn at this step}.</span></p></li>
+  <li><strong><span data-zh>深入：{第二步主题}</span><span data-en>Go deeper: {Step 2 topic}</span></strong><p><a href="papers/paper_explainer_page_template.html"><span data-zh>{论文简称} 详解</span><span data-en>{Paper short name} Walkthrough</span></a><span data-zh>· {这一步学什么}。</span><span data-en>· {what to learn at this step}.</span></p></li>
+  <li><strong><span data-zh>应用：{第三步主题}</span><span data-en>Apply: {Step 3 topic}</span></strong><p><a href="papers/paper_explainer_page_template.html"><span data-zh>{论文简称} 详解</span><span data-en>{Paper short name} Walkthrough</span></a><span data-zh>· {这一步学什么}。</span><span data-en>· {what to learn at this step}.</span></p></li>
 </ol>
 
 <!-- ============ 板块 5：论文索引 ============ -->
-<h2>5. 论文索引</h2>
+<h2><span data-zh>5. 论文索引</span><span data-en>5. Paper Index</span></h2>
 <div class="paper-links">
-  <a href="papers/paper_explainer_page_template.html"><strong>{论文1简称} ({期刊} {年份})</strong></a>
-  <a href="papers/paper_explainer_page_template.html"><strong>{论文2简称} ({期刊} {年份})</strong></a>
-  <a href="papers/paper_explainer_page_template.html"><strong>{论文3简称} ({期刊} {年份})</strong></a>
+  <a href="papers/paper_explainer_page_template.html"><strong><span data-zh>{论文1简称} ({期刊} {年份})</span><span data-en>{Paper 1 short name} ({Journal} {Year})</span></strong></a>
+  <a href="papers/paper_explainer_page_template.html"><strong><span data-zh>{论文2简称} ({期刊} {年份})</span><span data-en>{Paper 2 short name} ({Journal} {Year})</span></strong></a>
+  <a href="papers/paper_explainer_page_template.html"><strong><span data-zh>{论文3简称} ({期刊} {年份})</span><span data-en>{Paper 3 short name} ({Journal} {Year})</span></strong></a>
 </div>
 
 <footer>
-  <p><strong>知识图谱说明：</strong>本图谱随项目论文数量的增加而动态更新。</p>
-  <p style="font-size:.85em;color:var(--ink-3);">{项目名} 项目 · 最后更新：{YYYY-MM-DD} · 论文数：{N}</p>
+  <p><strong><span data-zh>知识图谱说明：</span><span data-en>About this graph:</span></strong><span data-zh>本图谱随项目论文数量的增加而动态更新。</span><span data-en>This graph is updated dynamically as the project adds papers.</span></p>
+  <p style="font-size:.85em;color:var(--ink-3);"><span data-zh>{项目名} 项目 · 最后更新：{YYYY-MM-DD} · 论文数：{N}</span><span data-en>{Project Name} Project · Last updated: {YYYY-MM-DD} · Papers: {N}</span></p>
 </footer>
 
 <!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
@@ -430,8 +433,8 @@ footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-s
     var t = PACK.THEMES[i];
     html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
       + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
-      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
-      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+      + '<span class="ts-name"><span data-zh>' + t.name + '<span class="ts-en"> ' + t.en + '</span></span><span data-en>' + t.en + '</span></span>'
+      + '<span class="ts-mode"><span data-zh>' + (t.mode === 'dark' ? '暗' : '明') + '</span><span data-en>' + (t.mode === 'dark' ? 'Dark' : 'Light') + '</span></span></button>';
   }
   panel.innerHTML = html;
   document.body.appendChild(btn); document.body.appendChild(panel);

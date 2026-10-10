@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROBIN: 多智能体系统自动化科学发现 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="top-nav-bar">
+<span class="current"><span data-zh>← 当前论文</span><span data-en>← Current paper</span></span>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR-CVD</a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>两步MR</span><span data-en>Two-step MR</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索"><span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<header>
+<div class="journal">arXiv:2505.13400 &middot; May 2025 &middot; FutureHouse</div>
+<h1>ROBIN：多智能体系统自动化科学发现</h1>
+<p style="font-style:italic;color:#566573;">ROBIN: A Multi-Agent System for Automating Scientific Discovery</p>
+<div class="authors"><strong>Ali Essam Ghareeb*</strong>, Benjamin Chang*, Ludovico Mitchener, Angela Yiu, Caralyn J. Szostkiewicz, Jon M. Laurent, Muhammed T. Razzak, Andrew D. White, Michaela M. Hinks, <strong>Samuel G. Rodriques</strong> —— FutureHouse, San Francisco &amp; University of Oxford</div>
+<div class="abstract-box"><strong>核心发现：</strong>ROBIN是首个能将科学发现全流程——包括背景研究、假设生成、实验设计、数据分析、以及根据实验结果迭代优化假设——完全自动化的多智能体系统。在干性年龄相关性黄斑变性（dAMD）的应用中，ROBIN提出了增强视网膜色素上皮细胞吞噬功能作为治疗策略，鉴定出ripasudil（已获批的青光眼药物）作为潜在候选。所有正文中的假设、实验方案、数据分析和图表均由AI生成。</div>
+</header>
+
+<nav class="toc">
+<h3>📑 <span data-zh>目录</span><span data-en>Contents</span></h3>
+<ol>
+<li><a href="#sec-0">阅读导引：AI驱动科学发现的背景</a></li>
+<li><a href="#sec-1">研究背景与动机</a></li>
+<li><a href="#sec-2">ROBIN 系统架构</a>
+<ol><li><a href="#sec-2-1">三智能体协作框架</a></li>
+<li><a href="#sec-2-2">假设生成流程</a></li>
+<li><a href="#sec-2-3">实验数据分析流程</a></li></ol>
+</li>
+<li><a href="#sec-3">核心结果：dAMD药物重利用</a>
+<ol><li><a href="#sec-3-1">ROCK抑制剂增强RPE吞噬功能</a></li>
+<li><a href="#sec-3-2">RNA-seq揭示ABCA1上调</a></li>
+<li><a href="#sec-3-3">Ripasudil：从青光眼到黄斑变性</a></li></ol>
+</li>
+<li><a href="#sec-4">LLM评委与假设排序系统</a></li>
+<li><a href="#sec-5">讨论与展望</a></li>
+<li><a href="#sec-6">要点总结</a></li>
+</ol>
+</nav>
+<section id="sec-0">
+<h2>0. 阅读导引：AI 驱动科学发现的背景</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>想象一位科学家的工作流程：阅读文献找灵感 → 提出假设 → 设计实验 → 做实验 → 分析数据 → 根据结果修改假设 → 再做实验……ROBIN 是第一个将<strong>所有这些智力步骤全部自动化</strong>的 AI 系统。它就像一个不知疲倦的科研助手——读完几百篇论文、提出治疗候选药物、分析实验数据、并根据实验结果给出下一轮建议。</p>
+</div>
+
+<h3>为什么这篇论文重要？</h3>
+<p>过去几年，AI 在科学发现的<strong>单个环节</strong>（如文献检索、假设生成、数据分析）都取得了进展，但<strong>没有人将所有这些环节连接成一个闭环系统</strong>。ROBIN 首次实现了：</p>
+<ol>
+<li><strong>闭环迭代</strong>：假设 → 实验 → 数据分析 → 新假设 → 新实验</li>
+<li><strong>端到端自动化</strong>：从输入一个疾病名称开始，到输出经验证的治疗候选药物，无需人工干预关键智力步骤</li>
+<li><strong>实际验证</strong>：在 dAMD 上发现了 ripasudil——一种已上市的青光眼药物，此前从未被提出用于治疗 dAMD</li>
+</ol>
+
+<div class="crossref">
+<strong>📎 知识链接：</strong>ROBIN 的药物重利用理念与 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025) 卒中蛋白质组MR</a> 中的药物靶点发现和重利用思路异曲同工——两者都试图从已有知识中系统性地发现新的治疗机会。区别在于 Yao 使用孟德尔随机化（基因因果推断），ROBIN 使用 LLM 智能体（文献综合推理）。参见<a href="../knowledge_graph.html">知识图谱 → 蛋白靶点互补</a>。</div>
+
+<h3>核心术语</h3>
+<table>
+<tr><th>术语</th><th>全称</th><th>说明</th></tr>
+<tr><td>ROBIN</td><td>—</td><td>本文提出的多智能体科学发现系统</td></tr>
+<tr><td>dAMD</td><td>dry Age-related Macular Degeneration</td><td>干性年龄相关性黄斑变性，发达国家主要致盲原因</td></tr>
+<tr><td>RPE</td><td>Retinal Pigment Epithelium</td><td>视网膜色素上皮细胞，dAMD的关键病变细胞类型</td></tr>
+<tr><td>ROCK</td><td>Rho-associated Kinase</td><td>Rho相关激酶，ROCK抑制剂（如Y-27632、ripasudil）通过调节细胞骨架影响吞噬功能</td></tr>
+<tr><td>Crow</td><td>—</td><td>ROBIN的文献检索智能体（基于PaperQA2），执行简洁文献综述</td></tr>
+<tr><td>Falcon</td><td>—</td><td>ROBIN的深度文献检索智能体（基于PaperQA2），生成候选药物详细评估报告</td></tr>
+<tr><td>Finch</td><td>—</td><td>ROBIN的数据分析智能体（基于Aviary框架），自主执行流式细胞术和RNA-seq分析</td></tr>
+<tr><td>BTL</td><td>Bradley-Terry-Luce Model</td><td>用于从成对比较中估计实力参数的统计模型</td></tr>
+<tr><td>LLM Judge</td><td>Large Language Model Judge</td><td>用LLM对假设进行成对比较并排名的"评委"</td></tr>
+</table>
+</section>
+<section id="sec-1">
+<h2>1. 研究背景与动机</h2>
+
+<h3>1.1 科学知识爆炸 vs 知识综合瓶颈</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>衡量、干扰和建模生物系统的能力在过去几十年飞速增长，导致了科学知识的"爆炸"。但<strong>理解、综合和从这些知识中提炼新假设的能力</strong>却远远落后。打个比方：我们有了一个不断膨胀的巨型图书馆，但却没有足够多的图书馆员来帮你找到不同书架上的书之间隐藏的联系。</p>
+</div>
+
+<h3>1.2 药物重利用中的"时间滞后"问题</h3>
+<p>论文以几个经典案例展示了"知识就在文献中、却迟迟未能转化为治疗"的困境：</p>
+
+<table>
+<tr><th>药物</th><th>核心机制已知时间</th><th>新用途发现时间</th><th>滞后</th></tr>
+<tr><td>Dabrafenib（BRAF抑制剂）</td><td>2010年</td><td>2020年（防听力损失）</td><td>~10年</td></tr>
+<tr><td>Ketamine（氯胺酮）</td><td>~1978年</td><td>2000年（抗抑郁）</td><td>~22年</td></tr>
+<tr><td>Leucovorin（亚叶酸）</td><td>2008年</td><td>2013年（自闭症）</td><td>~5年</td></tr>
+</table>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>药物重利用（Drug Repurposing）</h4>
+<p>将已获批或已进入临床试验的药物用于新的治疗适应症。优势在于：(1) 安全性已有数据；(2) 可大幅缩短开发周期和降低失败风险。ROBIN 的核心应用场景正是药物重利用——从已有知识中发现"隐藏的"药物-疾病关联。</p>
+</div>
+
+<h3>1.3 已有 AI 系统的局限</h3>
+<p>目前已有多款 AI 系统用于科学发现的不同环节：SciMon（假设验证）、Coscientist（化学实验）、The AI Scientist（论文生成）、AI Co-scientist（假设生成）等。但<strong>没有一个系统能够覆盖完整的科学发现闭环</strong>：</p>
+<ul>
+<li>❌ 大多数系统仅自动化单一任务（假设生成 或 数据分析）</li>
+<li>❌ 没有系统将实验结果反馈回假设生成，形成迭代循环</li>
+<li>❌ 生成的假设未经实验验证</li>
+</ul>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<p>ROBIN 的创新在于：首次将<strong>文献检索假设生成 + 实验数据分析 + 结果驱动的假设迭代</strong>整合为一个连续的自动化工作流，并通过真实实验室实验验证了其发现。</p>
+</div>
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<section id="sec-2">
+<h2>2. ROBIN 系统架构</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>可以把 ROBIN 想象成一个<strong>由三位专家组成的虚拟科研团队</strong>：一位"图书管理员"（Crow）快速查阅文献回答问题，一位"深度研究员"（Falcon）撰写详尽的候选药物评估报告，一位"数据分析师"（Finch）在 Jupyter Notebook 里写代码分析实验数据。ROBIN 作为"项目经理"，协调这三位专家的工作，并把结果反馈给下一轮假设生成。</p>
+</div>
+
+<h3 id="sec-2-1">2.1 三智能体协作框架</h3>
+
+<p>下面的原论文图 1 给出了 ROBIN 的总体架构：从输入疾病名称到输出治疗候选药物的完整工作流，以及三个智能体在其中的分工。</p>
+
+<img src="images/Ghareeb/Ghareeb_Fig1.jpg" alt="原论文Figure 1：ROBIN系统的架构与工作流">
+
+<p class="fig-caption"><strong>原论文 Figure 1：ROBIN 系统的架构与工作流。</strong>(a) 系统总览：科学家只需提供目标疾病名称，ROBIN 生成假设并筛选出最优治疗候选递交实验室测试，再自主分析原始实验数据、综合科学洞见并更新下一轮治疗假设。(b) 内部工作流：假设生成（由 Crow 做文献综述、提出实验方案并经 ROBIN 选定）→ 治疗候选生成（基于 Falcon 的深度文献科学综合，可选结合已有实验结果）→ 实验室实验 → 实验数据分析（调用 Finch 从原始数据做完整生信分析与可视化）→ 结果解读（用实验洞见指导下一轮假设与后续实验）。(c) 三个智能体的职责分工：Crow 做简明文献综述以确定实验策略与候选药物；Falcon 做深度文献检索、为每个候选生成评估报告；Finch 自主分析实验数据，为下一轮假设生成提供洞见。<br>图源：Ghareeb et al., arXiv preprint (2025)。</p>
+
+<table>
+<tr><th>智能体</th><th>技术基础</th><th>核心能力</th><th>论文中的使用规模</th></tr>
+<tr><td><strong>Crow</strong></td><td>PaperQA2</td><td>简洁文献综述、回答特定科学问题</td><td>检索约400篇论文</td></tr>
+<tr><td><strong>Falcon</strong></td><td>PaperQA2</td><td>深度文献搜索、生成候选药物详细评估报告</td><td>为每个候选药物生成评估报告</td></tr>
+<tr><td><strong>Finch</strong></td><td>Aviary + ReAct</td><td>自主生物信息学分析（流式细胞术、RNA-seq）</td><td>10条独立分析轨迹</td></tr>
+</table>
+
+<div class="crossref">
+<strong>📎 知识链接：</strong>ROBIN的多智能体架构与本研究项目中<a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. 卒中蛋白质组MR</a>的"多重下游验证"策略在结构上有相似之处——两者都使用多个独立模块协同工作（文献检索→假设→验证→迭代）。区别在于ROBIN用LLM智能体替代了统计分析流水线。</div>
+
+<h3 id="sec-2-2">2.2 假设生成流程</h3>
+
+<p>原论文图 2 以 dAMD 为例，把"假设生成"（本节）与"实验数据分析"（2.3 节）连成一条完整证据链——从实验方案枚举、候选药物生成，一直到 Finch 对第一轮流式数据的分步门控分析。</p>
+
+<img src="images/Ghareeb/Ghareeb_Fig2.jpg" alt="原论文Figure 2：ROBIN为dAMD生成治疗候选假设并分析体外实验数据">
+
+<p class="fig-caption"><strong>原论文 Figure 2：ROBIN 为干性 AMD 生成治疗候选假设并分析体外实验数据。</strong>(a) ROBIN 假设生成的产物节选：先枚举多个候选体外实验方案（图中列出吞噬增强、氧化应激抵抗、线粒体膜电位、玻璃膜疣样沉积形成、RPE 屏障 TEER 测量 5 种），经 LLM 评委排序选定 RPE 吞噬增强实验；随后把策略综合为总体目标（筛选能增强 RPE 吞噬的小分子），并生成候选药物清单（图中节选 Exendin-4、Fingolimod、AICAR+TUDCA、Y-27632、MFGE8、Danicopan 等，全文共 30 个）。(b) 吞噬实验示意图：RPE 细胞先与药物孵育 1 小时，加入 pHrodo 微珠后再共孵育 3 小时，最后用流式细胞术定量吞噬活性。(c–f) Finch 一条流式分析轨迹的示例图（由人类整理排版以利阅读）：(c) FSC-A/SSC-A 散点图圈门排除细胞碎片；(d) FSC-H/FSC-A 图圈选单细胞；(e) 根据 DAPI 荧光排除死细胞；(f) 对候选药物与 DMSO 对照做统计检验，柱状图显示各组平均荧光强度（MFI），星号标注与对照的显著差异。<br>图源：Ghareeb et al., arXiv preprint (2025)。</p>
+
+<div class="algorithm">
+<span class="tag">算法流程</span>
+<h4>ROBIN 治疗假设生成流水线</h4>
+<p>
+<strong>Step 1：疾病机制枚举</strong> —— ROBIN 生成10个疾病因果机制假设，Crow 对每个机制做文献综述<br>
+<strong>Step 2：实验策略选择</strong> —— 生成候选体外实验方案，LLM评委两两比较排序，选出最佳方案<br>
+<strong>Step 3：候选药物生成</strong> —— 基于选定实验策略，从~400篇文献中提出30个候选药物<br>
+<strong>Step 4：Falcon 深度评估</strong> —— 为每个候选药物生成详细报告（机制、证据、局限）<br>
+<strong>Step 5：LLM 评委排序</strong> —— 两两比较（Bradley-Terry模型），产生最终排名<br>
+<strong>Step 6：人类科学家审核</strong> —— 选择前N个候选药物进入实验室测试
+</p>
+</div>
+
+<h3 id="sec-2-3">2.3 实验数据分析流程</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>Finch 共识分析机制</h4>
+<p>Finch 的核心创新在于<strong>多轨迹共识策略</strong>。由于生物数据分析本身具有歧义性（例如流式细胞术的圈门策略），Finch 对同一数据集启动 <strong>10条独立分析轨迹</strong>，每条轨迹独立执行 Jupyter Notebook 分析。最终通过<b>元分析（meta-analysis）</b>综合所有轨迹结果，得出共识驱动的结论——仅将超过50%轨迹一致认为显著的基因纳入最终结果。这种方法既探索了分析多样性，又保证了结论的稳健性。</p>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>Finch 流式细胞术分析过程</h4>
+<p>给定压缩的 .fcs 文件和元数据表，Finch 自主：(1) 使用 fcsparser 解析原始数据；(2) 通过 FSC-A/SSC-A 散点图排除细胞碎片；(3) 基于 FSC-H/FSC-A 选出单个细胞；(4) 排除 DAPI 阳性死细胞；(5) 统计各药物处理组的 Alexa Fluor 647 平均荧光强度；(6) 使用 Dunnett 检验比较各处理组与 DMSO 对照；(7) 生成带显著性标记的柱状图。</p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+<section id="sec-3">
+<h2>3. 核心结果：dAMD 治疗候选药物发现</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>论文以<strong>干性年龄相关性黄斑变性（dAMD）</strong>——发达国家不可逆性失明的主要原因——为概念验证案例。ROBIN 从零开始（仅给定疾病名称），自主完成了从理解疾病机制、选择实验策略、提出候选药物、分析实验数据、到根据结果提出新一轮候选药物的完整科学发现循环。整个过程宛如一个不知疲倦的博士后，只不过它是由三个AI智能体组成的系统。</p>
+</div>
+
+<h3 id="sec-3-1">3.1 ROCK 抑制剂增强 RPE 吞噬功能</h3>
+
+<p>ROBIN 首先检索并综述了<strong>151篇论文</strong>，提出了10种 dAMD 疾病机制及对应的体外实验方案。经过 LLM 评委排序，RPE细胞吞噬功能增强实验被选为最优策略。</p>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>RPE 吞噬实验原理</h4>
+<p>视网膜色素上皮（RPE）细胞的一个重要功能是<strong>吞噬并降解光感受器外节</strong>——这是维持视网膜健康的日常"清洁工作"。在 dAMD 患者中，RPE 吞噬功能下降被认为是关键病理机制之一。实验使用<b>pHrodo 荧光微珠</b>替代光感受器外节：微珠在溶酶体的低pH环境中被激活发出荧光，通过流式细胞术检测单个细胞的荧光信号来定量吞噬活性。</p>
+</div>
+
+<p>ROBIN 随后部署 Crow 进行了约<strong>400篇论文</strong>的文献综述，综合后提出30个候选药物。经过 Falcon 深度评估和 LLM 评委锦标赛，前5名候选药物进入实验室测试：Exendin-4、Fingolimod、MFGE8、Y-27632、AICAR+TUDCA。</p>
+
+<div class="theorem">
+<span class="tag">关键发现</span>
+<h4>Y-27632 增强 RPE 吞噬功能</h4>
+<p>在体外 RPE 吞噬实验中，ROCK 抑制剂 Y-27632 显著增强了 RPE 细胞的吞噬能力。这一发现与已有文献一致——此前有研究表明 Y-27632 可恢复"低吞噬"RPE细胞的吞噬效率。但值得注意的是，<strong>ROBIN 是第一个将 ROCK 抑制与 dAMD 治疗的吞噬增强策略联系起来的系统</strong>——它从文献中合成了这个新颖的关联，而非简单地复述已有知识。</p>
+</div>
+
+<p>确认 Y-27632 的吞噬增强效应后，ROBIN 解读了第一轮实验结果，并<strong>自主提议</strong>对 Y-27632 处理的 RPE 细胞做 RNA-seq——这正是 3.2 节转录组机制探究的起点。原论文图 3 完整记录了从结果解读、后续实验提议到分析产出的全过程。</p>
+
+<img src="images/Ghareeb/Ghareeb_Fig3.jpg" alt="原论文Figure 3：Y-27632处理ARPE-19细胞的RNA-seq分析">
+
+<p class="fig-caption"><strong>原论文 Figure 3：ROCK 抑制剂 Y-27632 处理 ARPE-19 细胞的 RNA-seq 分析。</strong>(a) ROBIN 对第一轮实验结果解读的节选：从吞噬实验数据中提炼机制洞见（ROCK 抑制可能通过肌动蛋白细胞骨架重塑发挥作用），提出待答问题（吞噬增强背后的分子机制是什么），并自主提议后续实验——对 Y-27632 和 Exendin-4 单独及联合处理的 RPE 细胞进行 RNA-seq。(b) Finch 绘制的火山图：比较 Y-27632 处理组与对照细胞在吞噬后的差异表达基因，横轴 log2 倍数变化、纵轴 −log10(p 值)，红色=上调、蓝色=下调、灰色=不显著；右上角的 ABCA1 正是正文所述上调 3 倍、校正 p 值 2.13×10<sup>-83</sup> 的关键基因。(c) 8 条独立分析轨迹的共识结果：按"多少比例的轨迹一致鉴定该基因为上/下调"（100%、50–100%、0–50% 三档）统计基因分布，只有超过半数轨迹一致显著的基因才被纳入最终结论。(d) 差异表达基因的 GO 功能富集气泡图：横轴基因比率、点大小代表基因数、颜色代表校正 p 值——肌动蛋白纤维组织、核糖体生物合成、巨自噬调控等通路显著富集，与 ROCK 抑制的细胞骨架机制一致。<br>图源：Ghareeb et al., arXiv preprint (2025)。</p>
+
+<h3 id="sec-3-2">3.2 RNA-seq 揭示 ABCA1 上调</h3>
+
+<p>在分析第一轮实验结果后，ROBIN 主动<strong>提议进行 RNA-seq 实验</strong>来探究 Y-27632 增强吞噬功能的转录组机制——这不是人类预先设计的，而是由 AI 根据实验洞察自主提出的。</p>
+
+<div class="theorem">
+<span class="tag">关键发现</span>
+<h4>ABCA1 的 3 倍上调</h4>
+<p>Finch 的差异基因表达分析发现，Y-27632 处理导致 <strong>ABCA1 基因上调3倍</strong>（调整后 p=2.13×10<sup>-83</sup>）。ABCA1 是一个关键的脂质外排泵，对于健康的RPE功能至关紧要——它负责将胆固醇和磷脂从质膜主动转运至受体蛋白后被排出细胞。值得注意的是，ABCA1 与已知的黄斑变性治疗靶点 ABCA4 属于<strong>同一转运蛋白家族</strong>。</p>
+</div>
+
+<p>作为 Finch 自主分析的"人类对照"，论文作者以人工方式对同一 RNA-seq 数据集独立完成了差异表达与富集分析（补充图 S15），用于交叉核对 AI 分析结论的可靠性。</p>
+
+<img src="images/Ghareeb/Ghareeb_SuppFigS15.jpg" alt="原论文Supplementary Figure S15：人类分析的RNA-seq差异表达火山图与GO富集">
+
+<p class="fig-caption"><strong>原论文 Supplementary Figure S15：人类分析的 RNA-seq 差异表达与 GO 富集。</strong>(a) 火山图：比较 Y-27632 处理与 DMSO 对照的 ARPE-19 细胞，横轴为 log2 倍数变化（正值上调、负值下调），纵轴为 −log10(p 值)；越过显著性阈值（|log2FC| > 1，p < 0.05）的基因以红色（上调）/蓝色（下调）着色，不显著者为灰色。图中可见大量基因显著变化，其中 ABCA1 即正文 3.2 节所述上调 3 倍的核心靶基因。(b) 基因本体（GO）生物学过程富集分析（ReactomePA 软件包）：横轴为基因比率（富集到的输入基因数/总输入基因数），点大小代表基因数，颜色深浅代表校正 p 值——肌动蛋白纤维组织、核糖体生物合成、巨自噬调控、细胞对外部刺激的反应等条目显著富集，与 ROCK 抑制重塑细胞骨架的机制解读一致。<br>图源：Ghareeb et al., arXiv preprint (2025), Supplementary Information。</p>
+
+<div class="warning">
+<span class="tag">需要确认的问题</span>
+<p>ABCA1 的上调是否为 Y-27632 处理的特异性反应，还是任何显著增强吞噬能力的干预都会引起的普遍性转录变化？这需要进一步实验来区分。</p>
+</div>
+
+<h3 id="sec-3-3">3.3 Ripasudil：从青光眼到黄斑变性的"跨界"</h3>
+
+<p>基于第一轮实验结果，ROBIN 进行了<strong>第二轮候选药物生成</strong>，并测试了10种新药物。Finch 的分析显示：</p>
+
+<div class="theorem">
+<span class="tag">核心突破</span>
+<h4>Ripasudil——7.5倍吞噬增强</h4>
+<table>
+<tr><th>药物</th><th>类型</th><th>吞噬增强倍数</th><th>现状</th></tr>
+<tr><td>Ripasudil</td><td>ROCK抑制剂</td><td>7.5倍（vs DMSO）</td><td>已在日本获批用于青光眼</td></tr>
+<tr><td>Y-27632</td><td>ROCK抑制剂（研究用）</td><td>显著增强</td><td>研究工具化合物</td></tr>
+</table>
+<p>Ripasudil 的表现优于 Y-27632，且具有更好的选择性和药代动力学特性。<strong>最令人兴奋的是</strong>：Ripasudil 已在日本获批用于青光眼（眼部给药），其安全性已得到验证——这对 dAMD 治疗而言意味着可以大大加速临床转化路径。</p>
+</div>
+
+<p>原论文图 4 直接呈现了第二轮发现的证据：左侧是 ROBIN 为 ripasudil 撰写的候选提案节选，右侧是 Finch 对第二轮流式数据的分组统计结果。</p>
+
+<img src="images/Ghareeb/Ghareeb_Fig4.jpg" alt="原论文Figure 4：Ripasudil显著增强RPE吞噬功能">
+
+<p class="fig-caption"><strong>原论文 Figure 4：Ripasudil 显著增强 RPE 吞噬。</strong>(a) ROBIN 第二轮假设生成的提案节选：基于第一轮实验的洞见，ROBIN 认为 ripasudil 相比传统 ROCK 抑制剂（如 Y-27632）具有更好的选择性和药代动力学特性，通过促进细胞骨架松弛可增强膜灵活性与吞噬杯形成，故提出将其作为 dAMD 治疗候选。(b) Finch 对第二轮实验流式数据的分析柱状图：纵轴为平均荧光强度（MFI，反映 pHrodo 微珠吞噬量），柱体按与 DMSO 对照的显著性着色（Sig. increased: TRUE/FALSE）；ripasudil 组 MFI 最高——达 DMSO 对照的 7.5 倍，且超过 Y-27632，是已测化合物中效果最强的吞噬增强剂。<br>图源：Ghareeb et al., arXiv preprint (2025)。</p>
+
+<div class="crossref">
+<strong>📎 知识链接：</strong>Ripasudil 的发现体现了"从已有药物中发现新用途"的重利用策略，这与 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. 卒中蛋白质组MR</a> 中 ALDH2 和 MMP12 作为"可重新利用靶点"的分类思路一致——ALDH2 已有>30项临床试验但<strong>非卒中</strong>，正如 ripasudil 已有临床使用但<strong>非dAMD</strong>。参见<a href="../knowledge_graph.html">知识图谱 → 药物重利用关联</a>。</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<section id="sec-4">
+<h2>4. LLM 评委与假设排序系统</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>假设你有30个候选药物，怎么选出最好的5个去实验室测试？ROBIN 的答案是：让 AI 扮演"评审委员会"，对每对候选药物进行<strong>两两PK</strong>，就像网球锦标赛一样——赢的晋级、输的淘汰。最终通过统计模型（Bradley-Terry）计算出每个候选药物的"实力分数"，排出名次。</p>
+</div>
+
+<h3>4.1 Bradley-Terry-Luce 模型</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<p>BTL模型假设每个候选药物 i 有一个隐藏的"实力参数" $\beta_i$，则候选 i 在成对比较中胜过候选 j 的概率为：</p>
+<p>$$P(i > j) = \frac{e^{\beta_i}}{e^{\beta_i} + e^{\beta_j}}$$</p>
+<p>通过所有成对比较的结果，使用最大似然估计可以得到每个候选药物的实力参数，进而给出排序。</p>
+</div>
+
+<div class="example">
+<span class="tag">具体数值示例</span>
+<h4>三药物微型锦标赛：如何从 PK 结果反推实力排名？</h4>
+<p>假设 ROBIN 对 3 个候选药物（A = Y-27632, B = Ripasudil, C = 对照化合物）进行了 LLM 评委的两两比较，得到以下胜负记录：</p>
+
+<table>
+  <tr><th>对阵</th><th>胜者</th><th>结果</th></tr>
+  <tr><td>A vs B</td><td>B 胜</td><td>Ripasudil 的机制证据更直接（已有临床安全性数据）</td></tr>
+  <tr><td>A vs C</td><td>A 胜</td><td>Y-27632 有 RPE 吞噬实验的预数据支撑</td></tr>
+  <tr><td>B vs C</td><td>B 胜</td><td>同上，Ripasudil 综合评分更高</td></tr>
+</table>
+
+<p><strong>第一步：写出似然函数。</strong>BTL 模型中，每对比较的胜负概率完全由 $\beta_A, \beta_B, \beta_C$ 三个实力参数决定。给定上述结果（B 胜 A、A 胜 C、B 胜 C），总似然为：</p>
+
+$$
+L = P(B \gt A) \times P(A \gt C) \times P(B \gt C)
+   = \frac{e^{\beta_B}}{e^{\beta_B} + e^{\beta_A}} \times
+     \frac{e^{\beta_A}}{e^{\beta_A} + e^{\beta_C}} \times
+     \frac{e^{\beta_B}}{e^{\beta_B} + e^{\beta_C}}
+$$
+
+<p><strong>第二步：最大似然估计。</strong>取对数后求偏导并令其为零（通常用迭代算法如 Newton-Raphson 或 MM 算法求解），得到估计值。为便于理解，这里展示一种<strong>近似直觉</strong>——BTL 模型中 $\beta_i$ 近似于第 $i$ 个候选的"对数胜率"：</p>
+
+<ul>
+  <li>A 赢 1 场（胜 C）、输 1 场（负于 B）→ $\beta_A$ 居中</li>
+  <li>B 赢 2 场（胜 A、胜 C）、输 0 场 → $\beta_B$ 最高</li>
+  <li>C 赢 0 场（负于 A、负于 B）→ $\beta_C$ 最低</li>
+</ul>
+
+<table>
+  <tr><th>候选药物</th><th>估计的 $\beta_i$</th><th>排名</th><th>解释</th></tr>
+  <tr style="background:#d5f5e3;"><td><strong>B（Ripasudil）</strong></td><td>1.10</td><td>🥇 #1</td><td>全胜——实力参数最高，进入实验室测试</td></tr>
+  <tr><td><strong>A（Y-27632）</strong></td><td>0.00（参照基线）</td><td>🥈 #2</td><td>一胜一负——实力居中，备选</td></tr>
+  <tr style="background:#fadbd8;"><td><strong>C（对照化合物）</strong></td><td>-1.10</td><td>🥉 #3</td><td>全败——实力参数最低，暂不进入测试</td></tr>
+</table>
+
+<p><strong>第三步：从"实力参数"到"胜率预测"。</strong>将 $\beta$ 值带回 BTL 公式，可以预测任意对阵的理论胜率：</p>
+
+$$
+P(\text{Ripasudil} \gt \text{Y-27632}) = \frac{e^{1.10}}{e^{1.10} + e^{0.00}}
+   = \frac{3.00}{3.00 + 1.00} = \mathbf{75\%}
+$$
+
+<p>即模型预测：如果再次让 LLM 评委比较这两个药物，Ripasudil 有 75% 的概率胜出。这比简单的"B 赢了 A 一次"给出了更丰富的信息——它量化了<strong>优势大小</strong>。</p>
+
+<p><strong>与 ROBIN 实际流程的对应：</strong>论文中，30 个候选药物并非仅比较 3 对，而是进行了<strong>完整的锦标赛（所有可能的成对组合）</strong>，并由 LLM 评委对每一对给出胜负判断。BTL 模型从这些海量 PK 结果中统一估计出 30 个 $\beta$ 值并排名，最终人工选择前 N 名（论文中为前 5 名）进入实验室验证。模型的优势在于：</p>
+<ul>
+  <li><strong>信息整合</strong>：即使某些候选之间从未直接比较过，BTL 模型也能通过它们在与其他候选的胜负链（A 胜 C、B 胜 C → B 实力应高于 A）中<strong>间接推断</strong>它们的相对实力。</li>
+  <li><strong>不确定性量化</strong>：每个 $\beta_i$ 都有置信区间——排名相邻的候选如果置信区间大量重叠，说明差异不显著，不应过度解读排名上的细微差距。</li>
+</ul>
+</div>
+
+<h3>4.2 LLM 评委性能</h3>
+<ul>
+<li><strong>与人类专家的一致性</strong>：LLM评委的Top-10中有平均7.25个与人类专家的Top-10重合（是随机选择的2倍以上）</li>
+<li><strong>自评一致性</strong>：对相同题目的两次判断，LLM评委选择同一假设的比例为88%，而人类专家仅为61%</li>
+<li>LLM 评委使用了 Anthropic Claude 3.7 Sonnet，评委提示词由领域专家评价+Google Gemini 2.5 Pro Preview 生成</li>
+</ul>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<p>LLM 评委的高自评一致性（88%）既是优势也是潜在风险——它可能反映了对某些措辞或呈现方式的系统性偏好，而非真正甄别科学质量。这一倾向可能限制了真正的"创新性"假设被选中的概率。</p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+<section id="sec-5">
+<h2>5. 讨论与展望</h2>
+
+<h3>5.1 研究优势</h3>
+
+<div class="summary">
+<span class="tag">优势清单</span>
+<ol>
+<li><strong>首个闭环系统</strong>：第一个将假设生成和实验数据分析整合为连续自动化工作流的AI系统</li>
+<li><strong>真实实验验证</strong>：所有发现均经过体外实验验证，非纯计算预测</li>
+<li><strong>新颖发现</strong>：首次提出 ROCK 抑制增强吞噬功能作为 dAMD 治疗策略</li>
+<li><strong>可转化性</strong>：Ripasudil 的眼部安全性已获批，大幅降低临床转化门槛</li>
+<li><strong>通用性</strong>：对10种附加疾病生成假设（补充材料 Figure S16-S25），展示了跨疾病适用性</li>
+<li><strong>多轨迹共识</strong>：Finch 的10条独立分析+元分析策略确保数据分析结论的稳健性</li>
+</ol>
+</div>
+
+<h3>5.2 局限性与未来方向</h3>
+
+<div class="warning">
+<span class="tag">当前局限</span>
+<table>
+<tr><th>局限</th><th>具体影响</th></tr>
+<tr><td>未生成精确可执行实验方案</td><td>仍需人类科学家将ROBIN的建议翻译为详细实验步骤</td></tr>
+<tr><td>Finch依赖领域专家提示工程</td><td>数据分析质量受初始提示设计影响较大</td></tr>
+<tr><td>工作流实际已趋于确定性</td><td>虽然设计为智能体架构，但实际调用序列几乎固定，最终被翻译为确定性Jupyter Notebook</td></tr>
+<tr><td>LLM评委可能偏好包装精美的假设</td><td>提示文案质量可能影响排序，而非纯科学依据</td></tr>
+<tr><td>单疾病验证</td><td>dAMD只是概念验证，跨疾病泛化能力仍需更多验证</td></tr>
+</table>
+</div>
+
+<div class="crossref">
+<span class="xref-tag">🔗 交叉引用</span>
+<p>ROBIN 展示了 AI 驱动的<strong>假设生成与实验迭代</strong>闭环，但其知识来源限于文献和数据库中的已有信息——无法从原始序列数据中<em>de novo</em>发现新的调控机制。<strong><a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) — PISA</a></strong> 从互补方向填补了这一空缺：通过深度学习模型直接从 DNA 序列中解读顺式调控密码，以碱基分辨率可视化转录因子 motif 的影响范围、发现此前被隐藏的调控序列、并利用遗传算法设计可实验验证的序列突变。ROBIN 的"知识驱动发现"与 PISA 的"数据驱动机制解读"代表了 AI 辅助科学发现的两个正交维度——将两者整合，有望实现从原始基因组序列到候选药物靶点的全自动管道。</p>
+</div>
+
+<h3>5.3 未来方向</h3>
+<ul>
+<li><strong>生成完整可执行方案</strong>：从实验策略描述升级为精确到移液步骤的实验方案</li>
+<li><strong>Finch自主提示适应</strong>：让Finch根据数据类型自动生成或调整分析提示</li>
+<li><strong>人类科学判断对齐</strong>：改进假设生成和评估与人类科学家的偏好对齐</li>
+<li><strong>扩展到更多疾病和实验类型</strong>：从体外实验扩展到动物模型验证</li>
+<li><strong>多轮迭代</strong>：将Ripasudil的发现作为新一轮假设生成的起点</li>
+</ul>
+
+<h3>5.4 FDA审批背景</h3>
+<div class="intuition">
+<span class="tag">宏观背景</span>
+<p>过去十年，FDA每年批准约50种新药，这一数字停滞不前。而全球有超过10,000种已知疾病——按这个速度，需要200年才能覆盖所有疾病。ROBIN 代表的 AI 驱动药物重利用方法，有潜力大幅加速这个过程：不是从头发现新分子，而是从已有药物中发现新用途——将历史数据中的隐藏关联转化为可测试的假设。</p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<section id="sec-6">
+<h2>6. 要点总结</h2>
+
+<div class="summary">
+<span class="tag">全文总结</span>
+<ol>
+<li><strong>ROBIN系统</strong>：首个整合文献检索（Crow/Falcon）、假设生成、实验数据分析和结果迭代的多智能体科学发现系统。</li>
+<li><strong>三智能体协作</strong>：Crow（简洁文献综述）→ Falcon（深度评估）→ Finch（数据分析+共识）构成完整闭环。</li>
+<li><strong>实际发现</strong>：针对dAMD，ROBIN 自主提出"增强RPE吞噬功能"策略，鉴定出 ripasudil 作为7.5倍吞噬增强的治疗候选。</li>
+<li><strong>机制洞察</strong>：通过自主提议的RNA-seq实验，发现 ROCK 抑制导致 ABCA1 脂质外排泵上调3倍——揭示了潜在的分子机制和新靶点。</li>
+<li><strong>LLM评委系统</strong>：基于BTL模型的成对比较排序，与人类专家一致性远超随机水平，且自评一致性(88%)高于人类(61%)。</li>
+<li><strong>药物重利用范式</strong>：Ripasudil（已在日本获批的青光眼药物）→ dAMD治疗候选——展示了AI如何从已有知识中发现"隐藏的"药物-疾病关联。</li>
+<li><strong>10种疾病扩展</strong>：ROBIN已对10+种疾病生成假设，展示其跨疾病适用性潜力。</li>
+</ol>
+</div>
+
+<div class="intuition">
+<span class="tag">一句话总结</span>
+<p>ROBIN 是世界上第一个<strong>"从论文中读到灵感，提出假设，分析实验数据，并根据结果改进假设"</strong>的全自动AI科学家——虽然它还不完美，但它代表了科学发现自动化的重要一步。<strong>最令人震撼的不是它发现了什么，而是它如何发现的：通过阅读文献、推理机制、比较候选方案，最终到达了一个人类专家可能多年后才能到达的结论。</strong></p>
+</div>
+
+<a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<footer>
+<div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR-CVD</a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>两步MR</span><span data-en>Two-step MR</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA (Nat Commun 2026)</a>
+<a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索"><span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+<a href="https://arxiv.org/abs/2505.13400" target="_blank"><span data-zh>arXiv原文</span><span data-en>arXiv Paper</span></a>
+</div>
+<p style="margin-top:16px;">
+<strong><span data-zh>论文信息：</span><span data-en>Paper info: </span></strong>Ghareeb AE*, Chang B*, Mitchener L, et al. ROBIN: A Multi-Agent System for Automating Scientific Discovery. <em>arXiv:2505.13400</em>. May 2025.<br>
+<strong><span data-zh>机构：</span><span data-en>Affiliations: </span></strong>FutureHouse, San Francisco &amp; University of Oxford &nbsp;|&nbsp;
+<strong><span data-zh>代码：</span><span data-en>Code: </span></strong>github.com/Future-House/robin<br>
+<strong><span data-zh>解读生成日期：</span><span data-en>Generated: </span></strong>2026-08-14 &nbsp;|&nbsp; <span data-zh>本文为AI辅助生成的中文学术解读。</span><span data-en>This is an AI-assisted Chinese academic interpretation.</span></p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

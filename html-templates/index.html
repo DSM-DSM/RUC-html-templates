@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>RUC HTML 模板库 · 学术网页模板集</title>
-    <meta content="面向科研汇报场景的纯静态 HTML 模板集：讲演幻灯、组会汇报、商业演示、论文精读与个人学术主页，77 套主题一键切换。"
+    <title>ai-agent4research-isbd-ruc · AI Agent 技能 × 学术网页模板</title>
+    <meta content="以 AI Agent 技能为核心、HTML 模板为补充：论文精读与知识图谱、组会周报站、AI 技能汇报等真实成品，配五类科研汇报模板与 77 套主题，人大红官方视觉，纯静态零构建。"
           name="description">
     <link href="ruc-mark.svg" rel="icon" type="image/svg+xml">
     <style>
@@ -23,9 +23,8 @@
             "Microsoft YaHei", "Segoe UI", sans-serif;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #171112;
+        html[data-mode="dark"] {
+            --bg: #171112;
                 --card: #221b1c;
                 --ink: rgba(255, 255, 255, .88);
                 --ink-2: rgba(255, 255, 255, .66);
@@ -33,8 +32,7 @@
                 --line-strong: #4c4042;
                 --red: #e2738a;
                 --red-hover: #efa0b0;
-                --lift: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .30);
-            }
+            --lift: 0 12px 32px rgba(0, 0, 0, .45), 0 3px 8px rgba(0, 0, 0, .30);
         }
 
         * {
@@ -65,10 +63,8 @@
             mix-blend-mode: multiply;
         }
 
-        @media (prefers-color-scheme: dark) {
-            body::after {
-                display: none;
-            }
+        html[data-mode="dark"] body::after {
+            display: none;
         }
 
         ::selection {
@@ -76,10 +72,8 @@
             color: #fff;
         }
 
-        @media (prefers-color-scheme: dark) {
-            ::selection {
-                color: #1c0b10;
-            }
+        html[data-mode="dark"] ::selection {
+            color: #1c0b10;
         }
 
         ::-webkit-scrollbar {
@@ -185,6 +179,167 @@
         .stats b {
             color: var(--red);
             font-weight: 600;
+        }
+
+        h1 .h1-suffix {
+            font-size: .58em;
+            color: var(--ink-2);
+            letter-spacing: .02em;
+        }
+
+        /* —— 分区标题（技能 / 模板） —— */
+        .sec-head {
+            margin-top: 46px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            animation: rise .55s .20s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .sec-kicker {
+            font-family: var(--serif);
+            color: var(--red);
+            font-size: 12px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .sec-title {
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 21px;
+            letter-spacing: .04em;
+        }
+
+        .sec-sub {
+            width: 100%;
+            font-size: 13px;
+            color: var(--ink-2);
+            margin-top: 2px;
+        }
+
+        .tpl-head {
+            animation-delay: .34s;
+        }
+
+        .grid-repos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* —— AI Agent 技能板块 —— */
+        .skill-grid {
+            display: grid;
+            gap: 18px;
+            margin-top: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        }
+
+        .skill {
+            display: flex;
+            flex-direction: column;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-top: 2px solid var(--red);
+            border-radius: 10px;
+            padding: 22px 22px 18px;
+            transition: transform .16s ease-out, border-color .16s ease-out, box-shadow .16s ease-out;
+            animation: rise .55s cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .skill:nth-child(1) {
+            animation-delay: .26s;
+        }
+
+        .skill:nth-child(2) {
+            animation-delay: .31s;
+        }
+
+        .skill:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--lift);
+        }
+
+        .skill:hover h2 {
+            color: var(--red-hover);
+        }
+
+        .sk-tagline {
+            font-size: 13.5px;
+            color: var(--ink-2);
+            margin-top: 9px;
+        }
+
+        .sk-facts {
+            margin-top: 12px;
+            border-top: 1px dashed var(--line-strong);
+        }
+
+        .sk-facts > div {
+            display: flex;
+            gap: 12px;
+            padding: 9px 0;
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .sk-facts dt {
+            flex: none;
+            width: 64px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--red);
+            letter-spacing: .06em;
+            padding-top: 1px;
+        }
+
+        .sk-facts dd {
+            flex: 1;
+            font-size: 13px;
+            color: var(--ink-2);
+            line-height: 1.6;
+        }
+
+        .sk-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .sk-label {
+            font-size: 12px;
+            color: var(--ink-2);
+            margin-right: 2px;
+        }
+
+        .sk-links a {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--red);
+            text-decoration: none;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            padding: 6px 13px;
+            background: var(--bg);
+            transition: border-color .16s ease-out, background .16s ease-out;
+        }
+
+        .sk-links a:hover, .sk-links a:focus-visible {
+            border-color: var(--red);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .skill-note {
+            margin-top: 14px;
+            font-size: 12.5px;
+            color: var(--ink-2);
+            opacity: .85;
+            animation: rise .55s .36s cubic-bezier(.16, 1, .3, 1) both;
         }
 
         .grid {
@@ -371,6 +526,36 @@
             margin-top: 4px;
         }
 
+        /* —— 作者卡：头像 + 姓名 + 机构 + 简介（新增作者时复制一个 .author 块即可） —— */
+        .authors {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .author {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            max-width: 460px;
+        }
+
+        .author img.avatar {
+            flex: none;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 1px solid var(--line-strong);
+            object-fit: cover;
+        }
+
+        .a-bio {
+            font-size: 12.5px;
+            color: var(--ink-2);
+            line-height: 1.7;
+            margin-top: 6px;
+        }
+
         .mail {
             display: inline-block;
             margin-top: 10px;
@@ -443,14 +628,66 @@
                 padding-top: 42px;
             }
 
+            .grid-repos {
+                justify-content: flex-start;
+            }
+
             .road-note {
                 margin-left: 0;
                 width: 100%;
             }
         }
 
+        /* —— 全站偏好：语言显隐 + 顶部切换钮 —— */
+        html[data-lang="en"] [data-zh] { display: none !important; }
+        html[data-lang="zh"] [data-en] { display: none !important; }
+
+        .pref-bar {
+            position: fixed;
+            top: 14px;
+            right: 16px;
+            z-index: 1200;
+            display: flex;
+            gap: 8px;
+        }
+
+        .pref-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
+            padding: 0 13px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--ink-2);
+            font: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color .16s ease-out, color .16s ease-out;
+        }
+
+        .pref-btn:hover {
+            border-color: var(--red);
+            color: var(--red-hover);
+        }
+
+        .pref-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        html[data-mode="dark"] .pref-btn .ic-sun { display: none; }
+        html:not([data-mode="dark"]) .pref-btn .ic-moon { display: none; }
+
         @media (prefers-reduced-motion: reduce) {
-            .topline, .masthead, .stats, .card, .road, footer {
+            .topline, .masthead, .stats, .sec-head, .skill, .skill-note, .card, .road, footer {
                 animation: none;
             }
 
@@ -459,122 +696,225 @@
             }
         }
     </style>
+<script>
+(function () {
+  try {
+    var m = localStorage.getItem('a4r-mode') || 'light', l = localStorage.getItem('a4r-lang') || 'zh';
+    var d = document.documentElement;
+    d.setAttribute('data-mode', m); d.setAttribute('data-lang', l);
+    d.setAttribute('lang', l === 'en' ? 'en' : 'zh-CN');
+    window.__A4R_TITLES = {
+      zh: 'ai-agent4research-isbd-ruc · AI Agent 技能 × 学术网页模板',
+      en: 'ai-agent4research-isbd-ruc · AI Agent Skills × Academic Web Templates'
+    };
+    document.title = window.__A4R_TITLES[l];
+  } catch (e) {}
+})();
+</script>
 </head>
 <body>
 <div aria-hidden="true" class="topline"></div>
+<div class="pref-bar">
+    <button class="pref-btn" id="pref-lang" type="button" aria-label="切换语言 / Switch language"><span data-zh>EN</span><span data-en>中文</span></button>
+    <button class="pref-btn" id="pref-mode" type="button" aria-label="切换明暗 / Toggle light & dark">
+        <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+        <svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></svg>
+    </button>
+</div>
 <div class="page">
 
     <header class="masthead">
         <div aria-hidden="true" class="seal">人大</div>
         <div>
-            <h1>RUC HTML 模板库</h1>
-            <p class="sub">纯静态学术网页模板 · 零构建依赖 · 覆盖科研汇报五类场景</p>
+            <h1>ai-agent4research<span class="h1-suffix">-isbd-ruc</span></h1>
+            <p class="sub"><span data-zh>AI Agent 科研技能 × 学术网页模板 · 中国人民大学统计与大数据研究院（ISBD）</span><span data-en>AI Agent research skills × academic web templates · Institute of Statistics and Big Data (ISBD), Renmin University of China</span></p>
         </div>
     </header>
 
     <div class="stats">
-        <span><b>5</b> 套模板</span>
-        <span><b>77</b> 套主题</span>
-        <span><b>3</b> 套双击即用</span>
-        <span>人大红官方视觉</span>
+        <span><b>2</b><span data-zh> 项 AI Agent 技能</span><span data-en> AI Agent skills</span></span>
+        <span><b>3</b><span data-zh> 组真实成品</span><span data-en> real-world showcases</span></span>
+        <span><b>5</b><span data-zh> 套模板</span><span data-en> templates</span></span>
+        <span><b>77</b><span data-zh> 套主题</span><span data-en> themes</span></span>
+        <span><span data-zh>人大红官方视觉</span><span data-en>Official RUC-red identity</span></span>
+    </div>
+
+    <section aria-label="AI Agent 技能" class="skills">
+        <div class="sec-head">
+            <span class="sec-kicker">Skills</span>
+            <h2 class="sec-title"><span data-zh>AI Agent 技能</span><span data-en>AI Agent Skills</span></h2>
+            <p class="sec-sub"><span data-zh>模板由技能驱动——先看技能，再看模板。每项技能附可打开核验的真实成品。</span><span data-en>Templates are skill-driven — skills first, templates second. Each skill links to verifiable real-world output.</span></p>
+        </div>
+        <div class="skill-grid">
+            <article class="skill">
+                <div class="card-top">
+                    <h2><span data-zh>论文精读引擎</span><span data-en>Paper Reading Engine</span><span class="en">paper-explainer</span></h2>
+                    <span aria-hidden="true" class="no">01</span>
+                </div>
+                <p class="sk-tagline"><span data-zh>把陌生领域的论文 PDF 批量转为深入浅出的中文详解网页，并维护跨论文知识图谱。</span><span data-en>Turn PDFs in an unfamiliar field into accessible annotated pages, with a cross-paper knowledge graph kept in sync.</span></p>
+                <dl class="sk-facts">
+                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>科研新手、跨方向合作者、需要快速吃透陌生领域的研究生</span><span data-en>Research newcomers, cross-field collaborators, and graduate students entering an unfamiliar area</span></dd></div>
+                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>批量精读 PDF、组会文献分享、新领域入门与知识体系梳理</span><span data-en>Batch PDF reading, lab-meeting literature sharing, and structured onboarding to a new field</span></dd></div>
+                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>每篇一份中文详解网页 + 跨论文知识图谱 + 阅读路径页</span><span data-en>One annotated page per paper + a cross-paper knowledge graph + a reading-path hub</span></dd></div>
+                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>10 篇 MR×AI 论文互联成库：公式先直觉后形式，原文图表逐面板中文解读</span><span data-en>A library of 10 interconnected MR×AI papers: intuition before formulas, panel-by-panel figure walkthroughs</span></dd></div>
+                </dl>
+                <div class="sk-links">
+                    <span class="sk-label"><span data-zh>真实成品</span><span data-en>Live demos</span></span>
+                    <a href="showcase/paper-reading/nav/reading_path.html"><span data-zh>阅读路径页</span><span data-en>Reading Path</span></a>
+                    <a href="showcase/paper-reading/knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+                </div>
+            </article>
+            <article class="skill">
+                <div class="card-top">
+                    <h2><span data-zh>网页设计引擎</span><span data-en>Web Design Engine</span><span class="en">html-beautify</span></h2>
+                    <span aria-hidden="true" class="no">02</span>
+                </div>
+                <p class="sk-tagline"><span data-zh>从设计系统与素材库出发，从零构建或打磨任何网页——本站即其作品。</span><span data-en>Builds or polishes any page from design systems and asset libraries — this very site is its work.</span></p>
+                <dl class="sk-facts">
+                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>想要高级感页面但不懂前端的科研人、需向合作方展示成果的团队</span><span data-en>Researchers who want polished pages without frontend skills; teams presenting results to partners</span></dd></div>
+                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>从零构建学术网页、美化已有页面、校准去「AI 味」的设计</span><span data-en>Building academic pages from scratch, refining existing ones, de-defaulting AI-flavored design</span></dd></div>
+                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>本站 5 套模板与 77 套主题、组会周报站、AI 技能汇报页</span><span data-en>This site (5 templates, 77 themes), the weekly lab-report site, and the skills briefing page</span></dd></div>
+                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>两组对外成品可直接打开核验：真实实验周报站与四线叙事技能汇报</span><span data-en>Two public outputs you can open and verify: a real lab-report site and a four-thread skills briefing</span></dd></div>
+                </dl>
+                <div class="sk-links">
+                    <span class="sk-label"><span data-zh>真实成品</span><span data-en>Live demos</span></span>
+                    <a href="showcase/weekly-report/index.html"><span data-zh>组会周报站</span><span data-en>Weekly Lab Report</span></a>
+                    <a href="showcase/skills-briefing/index.html"><span data-zh>AI 技能汇报页</span><span data-en>Skills Briefing</span></a>
+                </div>
+            </article>
+        </div>
+        <p class="skill-note"><span data-zh>技能持续蒸馏沉淀 · 预留合作者扩展位——欢迎带着你的场景来共建下一个技能</span><span data-en>Skills keep distilling · contributor slots reserved — bring your scenario and co-build the next one</span></p>
+    </section>
+
+    <div class="sec-head tpl-head">
+        <span class="sec-kicker">Templates</span>
+        <h2 class="sec-title"><span data-zh>HTML 模板库</span><span data-en>HTML Template Library</span></h2>
+        <p class="sec-sub"><span data-zh>五类科研汇报场景 · 主题一键切换 · 双击即用</span><span data-en>Five research-presentation scenarios · one-click theming · works straight from a double-click</span></p>
     </div>
 
     <main class="grid">
         <a class="card" href="lecture/slide_deck_template.html">
             <div class="card-top">
-                <h2>讲演幻灯<span class="en">Lecture Slides</span></h2>
+                <h2><span data-zh>讲演幻灯</span><span data-en>Lecture Slides</span><span class="en">Lecture Slides</span></h2>
                 <span aria-hidden="true" class="no">01</span>
             </div>
-            <p>「幕 + 卡」结构的滚动讲演长页，侧边目录自动生成，支持公式渲染与导出 PDF。</p>
-            <span class="meta">17 套主题 · 双击即用</span>
+            <p><span data-zh>「幕 + 卡」结构的滚动讲演长页，侧边目录自动生成，支持公式渲染与导出 PDF。</span><span data-en>A scrolling act-and-slide lecture page with auto-generated side TOC, formula rendering, and PDF export.</span></p>
+            <span class="meta"><span data-zh>17 套主题 · 双击即用</span><span data-en>17 themes · double-click ready</span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
         </a>
         <a class="card" href="lab-meeting/index.html">
             <div class="card-top">
-                <h2>组会汇报<span class="en">Lab Meeting</span></h2>
+                <h2><span data-zh>组会汇报</span><span data-en>Lab Meeting</span><span class="en">Lab Meeting</span></h2>
                 <span aria-hidden="true" class="no">02</span>
             </div>
-            <p>总览页 + 子页面小站，进度写在 JSON 里每周更新，含 3D 方法转盘与进度时间线。</p>
-            <span class="meta">11 套主题 · 需本地服务器</span>
+            <p><span data-zh>总览页 + 子页面小站，进度写在 JSON 里每周更新，含 3D 方法转盘与进度时间线。</span><span data-en>Overview hub + sub-page mini-site; weekly progress in JSON, with a 3D method carousel and progress timeline.</span></p>
+            <span class="meta"><span data-zh>11 套主题 · 需本地服务器</span><span data-en>11 themes · needs a local server</span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
         </a>
         <a class="card" href="commerical-lecture/index.html">
             <div class="card-top">
-                <h2>商业演示<span class="en">Commercial Lecture</span></h2>
+                <h2><span data-zh>商业演示</span><span data-en>Commercial Lecture</span><span class="en">Commercial Lecture</span></h2>
                 <span aria-hidden="true" class="no">03</span>
             </div>
-            <p>面向合作方与甲方的能力展示，滚动与翻页混合形态，翻页笔可直接使用。</p>
-            <span class="meta">7 套主题 · 需本地服务器</span>
+            <p><span data-zh>面向合作方与甲方的能力展示，滚动与翻页混合形态，翻页笔可直接使用。</span><span data-en>Capability showcase for partners: a scroll-and-slide hybrid that works with a presentation clicker.</span></p>
+            <span class="meta"><span data-zh>7 套主题 · 需本地服务器</span><span data-en>7 themes · needs a local server</span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
         </a>
         <a class="card" href="paper-explainer/nav/reading_path_template.html">
             <div class="card-top">
-                <h2>论文精读<span class="en">Paper Explainer</span></h2>
+                <h2><span data-zh>论文精读</span><span data-en>Paper Explainer</span><span class="en">Paper Explainer</span></h2>
                 <span aria-hidden="true" class="no">04</span>
             </div>
-            <p>四类页面互联的精读库：阅读路径、逐章详解、背景词典与知识图谱。</p>
-            <span class="meta">8 套主题 · 双击即用</span>
+            <p><span data-zh>四类页面互联的精读库：阅读路径、逐章详解、背景词典与知识图谱。</span><span data-en>Four interlinked page types: reading path, chapter-by-chapter deep dives, background glossary, and knowledge graph.</span></p>
+            <span class="meta"><span data-zh>8 套主题 · 双击即用</span><span data-en>8 themes · double-click ready</span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
         </a>
         <a class="card" href="personal-homepage/index.html">
             <div class="card-top">
-                <h2>学术主页<span class="en">Personal Homepage</span></h2>
+                <h2><span data-zh>学术主页</span><span data-en>Personal Homepage</span><span class="en">Personal Homepage</span></h2>
                 <span aria-hidden="true" class="no">05</span>
             </div>
-            <p>教师与研究生通用的学术主页，16 学科主题配全套示例，中英双语一键切换。</p>
-            <span class="meta">34 套主题 · 双击即用</span>
+            <p><span data-zh>教师与研究生通用的学术主页，16 学科主题配全套示例，中英双语一键切换。</span><span data-en>Academic homepage for faculty and students: 16 discipline themes with full samples and built-in bilingual toggle.</span></p>
+            <span class="meta"><span data-zh>34 套主题 · 双击即用</span><span data-en>34 themes · double-click ready</span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
         </a>
     </main>
 
+    <div class="grid-repos">
+        <a class="repo" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc">
+            Gitee
+            <svg aria-hidden="true" viewBox="0 0 12 12">
+                <path d="M3 9 9 3M4.5 3H9v4.5"/>
+            </svg>
+        </a>
+        <a class="repo" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc">
+            GitHub
+            <svg aria-hidden="true" viewBox="0 0 12 12">
+                <path d="M3 9 9 3M4.5 3H9v4.5"/>
+            </svg>
+        </a>
+    </div>
+
     <section aria-label="规划中的模板" class="road">
-        <span class="road-label">规划中</span>
-        <span class="chip">课程课件</span>
-        <span class="chip">学术海报</span>
-        <span class="chip">更多场景 · 按需扩展</span>
-        <span class="road-note">新模板将陆续加入本页</span>
+        <span class="road-label"><span data-zh>规划中</span><span data-en>Planned</span></span>
+        <span class="chip"><span data-zh>课程课件</span><span data-en>Courseware</span></span>
+        <span class="chip"><span data-zh>学术海报</span><span data-en>Academic Poster</span></span>
+        <span class="chip"><span data-zh>更多场景 · 按需扩展</span><span data-en>More scenarios · on demand</span></span>
+        <span class="road-note"><span data-zh>新模板将陆续加入本页</span><span data-en>New templates will land here</span></span>
     </section>
 
     <footer>
         <div class="foot-grid">
-            <div>
-                <p class="a-name">作者：俞锦越</p>
-                <p class="a-org">机构：中国人民大学-ISBD-统计与大数据研究院</p>
-                <a class="mail" href="mailto:yujinyue@ruc.edu.cn">邮箱：yujinyue@ruc.edu.cn</a>
-            </div>
-            <div class="repos">
-                <a class="repo" href="https://gitee.com/AiALi7-9-22/ruc-html-templates">
-                    Gitee
-                    <svg aria-hidden="true" viewBox="0 0 12 12">
-                        <path d="M3 9 9 3M4.5 3H9v4.5"/>
-                    </svg>
-                </a>
-                <a class="repo" href="https://github.com/DSM-DSM/RUC-html-templates">
-                    GitHub
-                    <svg aria-hidden="true" viewBox="0 0 12 12">
-                        <path d="M3 9 9 3M4.5 3H9v4.5"/>
-                    </svg>
-                </a>
+            <div class="authors">
+                <!-- 新增作者：复制一个 .author 块；头像照片放 authors/ 目录并把 src 指向它 -->
+                <div class="author">
+                    <img alt="俞锦越" class="avatar" src="authors/yujinyue.svg">
+                    <div>
+                        <p class="a-name">俞锦越</p>
+                        <p class="a-org"><span data-zh>中国人民大学 · 统计与大数据研究院（ISBD）</span><span data-en>Renmin University of China · Institute of Statistics and Big Data (ISBD)</span></p>
+                        <p class="a-bio"><span data-zh>AI Agent 科研技能与学术网页模板的作者，paper-explainer 与 html-beautify 两项技能的构建者。</span><span data-en>Author of the AI Agent research skills and academic web templates; builder of paper-explainer and html-beautify.</span></p>
+                        <a class="mail" href="mailto:yujinyue@ruc.edu.cn"><span data-zh>邮箱：</span><span data-en>Email: </span>yujinyue@ruc.edu.cn</a>
+                    </div>
+                </div>
             </div>
         </div>
         <p class="legal">
-            © 2026 RUC-HTML-Templates · 采用非商业署名许可：课程作业、学术汇报等非商业场景可免费使用，请署名并标注出处
+            <span data-zh>© 2026 ai-agent4research-isbd-ruc · 采用非商业署名许可：课程作业、学术汇报等非商业场景可免费使用，请署名并标注出处</span><span data-en>© 2026 ai-agent4research-isbd-ruc · Non-commercial attribution license: free for coursework and academic reporting with attribution</span>
         </p>
         <p class="legal">
-            人大红 #971f30，复刻自学校官方 Beamer 模板 · 原生 HTML / CSS / JS，无任何构建依赖
+            <span data-zh>人大红 #971f30，复刻自学校官方 Beamer 模板 · 原生 HTML / CSS / JS，无任何构建依赖</span><span data-en>RUC red #971f30, after the official Beamer template · vanilla HTML / CSS / JS, zero build dependencies</span>
         </p>
     </footer>
 
 </div>
+<script>
+(function () {
+  var d = document.documentElement;
+  function syncTitle() { try { document.title = window.__A4R_TITLES[d.getAttribute('data-lang') === 'en' ? 'en' : 'zh']; } catch (e) {} }
+  var bl = document.getElementById('pref-lang');
+  if (bl) bl.addEventListener('click', function () {
+    var l = d.getAttribute('data-lang') === 'en' ? 'zh' : 'en';
+    d.setAttribute('data-lang', l); d.setAttribute('lang', l === 'en' ? 'en' : 'zh-CN');
+    try { localStorage.setItem('a4r-lang', l); } catch (e) {}
+    syncTitle();
+  });
+  var bm = document.getElementById('pref-mode');
+  if (bm) bm.addEventListener('click', function () {
+    var m = d.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+    d.setAttribute('data-mode', m);
+    try { localStorage.setItem('a4r-mode', m); } catch (e) {}
+  });
+})();
+</script>
 </body>
 </html>

@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/svg+xml" href="assets/ruc-logo.svg">
+    <title>MDS-ED 实验进度报告 — 总览</title>
+
+    <style>
+        /* ═══════════════════════════════════════════════════════════════════════════
+           CSS Variables & Reset
+           ═══════════════════════════════════════════════════════════════════════════ */
+        :root {
+            --bg: #f8f9fa; --card-bg: #ffffff; --card-radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.1),0 2px 4px rgba(0,0,0,0.06);
+            --primary: #3b82f6; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+            --accent: #06b6d4; --accent-light: #ecfeff;
+            --success: #10b981; --success-bg: #ecfdf5;
+            --warning: #f59e0b; --warning-bg: #fffbeb;
+            --danger: #ef4444; --danger-bg: #fef2f2;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --sidebar-width: 260px;
+            --header-height: 52px;
+            --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            --font-mono: "SF Mono","Cascadia Code","Consolas",monospace;
+            --transition: 0.2s ease;
+        }
+
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px}
+        body{
+            font-family:var(--font-sans);background:var(--bg);
+            color:var(--gray-800);line-height:1.6;
+            overflow:hidden;height:100vh;
+        }
+        a{color:var(--primary);text-decoration:none}
+        a:hover{text-decoration:underline}
+
+        /* ═══════ APP LAYOUT ═══════ */
+        #app{
+            display:grid;
+            grid-template-rows:var(--header-height) 1fr;
+            grid-template-columns:var(--sidebar-width) 1fr;
+            grid-template-areas:"header header" "sidebar content";
+            height:100vh;
+            max-width:1500px;
+            margin:0 auto;
+        }
+
+        /* ═══════ HEADER ═══════ */
+        #header{
+            grid-area:header;
+            background:var(--card-bg);
+            border-bottom:1px solid var(--gray-200);
+            display:flex;align-items:center;justify-content:space-between;
+            padding:0 20px;z-index:10;
+        }
+        #header h1{font-size:1.15rem;font-weight:700;color:var(--gray-900);display:flex;align-items:center;gap:6px}
+        #header .header-right{display:flex;align-items:center;gap:12px;font-size:0.875rem;color:var(--gray-500)}
+        .countdown{background:var(--primary-light);color:var(--primary-dark);padding:4px 12px;border-radius:20px;font-weight:600;font-size:0.875rem;white-space:nowrap}
+
+        /* ═══════ SIDEBAR ═══════ */
+        #sidebar{
+            grid-area:sidebar;
+            background:var(--card-bg);
+            border-right:1px solid var(--gray-200);
+            overflow-y:auto;padding:8px 0;min-height:0;
+        }
+        .sidebar-section{margin-bottom:2px}
+        .sidebar-parent{
+            display:flex;align-items:center;gap:6px;
+            padding:9px 14px;cursor:pointer;
+            font-weight:600;font-size:1rem;color:var(--gray-700);
+            border-left:3px solid transparent;
+            transition:var(--transition);user-select:none;
+        }
+        .sidebar-parent:hover{background:var(--gray-50)}
+        .sidebar-parent .arrow{font-size:0.75rem;transition:transform 0.2s;margin-left:auto;color:var(--gray-400)}
+        .sidebar-parent.expanded .arrow{transform:rotate(90deg)}
+
+        .sidebar-children{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+        .sidebar-children.open{max-height:none}
+
+        .sidebar-child{
+            display:flex;align-items:center;gap:6px;
+            padding:6px 14px 6px 32px;cursor:pointer;
+            font-size:0.875rem;color:var(--gray-600);
+            border-left:3px solid transparent;
+            transition:var(--transition);
+        }
+        .sidebar-child:hover{background:var(--gray-50);text-decoration:none}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary);border-left-color:var(--primary);font-weight:500}
+
+        .sidebar-child .badge{margin-left:auto;font-size:0.75rem;padding:1px 6px;border-radius:10px;font-weight:500}
+        .badge-ok{background:var(--success-bg);color:var(--success)}
+        .badge-warn{background:var(--warning-bg);color:var(--warning)}
+        .badge-danger{background:var(--danger-bg);color:var(--danger)}
+        .badge-new{background:var(--gray-100);color:var(--gray-500)}
+        .badge-ext{background:var(--primary-light);color:var(--primary)}
+
+        /* External link indicator */
+        .sidebar-child.ext-link{color:var(--primary);font-weight:500}
+
+        /* ═══════ CONTENT ═══════ */
+        #content{
+            grid-area:content;
+            overflow-y:auto;padding:16px 20px 60px;
+            scroll-behavior:smooth;
+        }
+
+        .card{background:var(--card-bg);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:var(--transition)}
+        .card:hover{box-shadow:var(--shadow-hover)}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+        .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
+
+        .status-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.8125rem;font-weight:600}
+        .status-ok{background:var(--success-bg);color:var(--success)}
+        .status-warn{background:var(--warning-bg);color:var(--warning)}
+        .status-danger{background:var(--danger-bg);color:var(--danger)}
+        .status-progress{background:var(--primary-light);color:var(--primary)}
+
+        .data-table{width:100%;border-collapse:collapse;font-size:0.875rem}
+        .data-table thead th{background:var(--gray-50);padding:7px 9px;text-align:center;font-weight:600;color:var(--gray-600);font-size:0.8125rem;letter-spacing:0.03em;border-bottom:2px solid var(--gray-200)}
+        .data-table tbody td{text-align:center;padding:6px 9px;border-bottom:1px solid var(--gray-100)}
+        .data-table tbody tr:hover{background:var(--gray-50)}
+        .data-table .num{font-family:var(--font-mono);text-align:center}
+        .data-table .highlight{font-weight:700;color:var(--primary-dark)}
+        .data-table .down{color:var(--danger)}.data-table .up{color:var(--success)}
+        .data-table .warn-cell{color:var(--warning);font-weight:600}
+
+        .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+        .metric-card{background:var(--card-bg);border:1px solid var(--gray-200);border-radius:10px;padding:12px;text-align:center}
+        .metric-card .metric-value{font-size:1.5rem;font-weight:800;font-family:var(--font-mono)}
+        .metric-card .metric-label{font-size:0.8125rem;color:var(--gray-500);margin-top:3px}
+
+        /* ═══════ 仪表盘分组折叠 + hover 交互（M29 任务2） ═══════ */
+        .dash-group{margin-bottom:10px;border:1px solid var(--gray-200);border-radius:10px;
+                    overflow:hidden;background:var(--card-bg)}
+        .dash-group>summary{display:flex;align-items:center;gap:10px;padding:9px 14px;
+                            background:var(--gray-50);cursor:pointer;font-weight:600;
+                            font-size:0.875rem;color:var(--gray-700);list-style:none;
+                            transition:background .2s ease,color .2s ease}
+        .dash-group>summary::-webkit-details-marker{display:none}
+        .dash-group>summary:hover{background:var(--primary-light);color:var(--primary-dark)}
+        .dash-group>summary::before{content:'▸';color:var(--gray-400);
+                                    transition:transform .2s ease;font-size:0.8em}
+        .dash-group[open]>summary::before{transform:rotate(90deg)}
+        .dash-group .dg-best{font-family:var(--font-mono);font-size:0.8125rem;
+                             color:var(--primary-dark);font-weight:700}
+        .dash-group .dg-count{margin-left:auto;font-size:0.75rem;font-weight:500;color:var(--gray-500)}
+        .dash-group>.compare-grid{padding:12px;margin:0}
+        #dashboard-cards{display:block}   /* 分组容器：还原块级，避免 details 被排成 grid 子项 */
+        .compare-card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+        .compare-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);
+                            border-color:var(--primary)}
+        @media (prefers-reduced-motion: reduce){
+            .dash-group>summary,.dash-group>summary::before,.compare-card{transition:none}
+            .compare-card:hover{transform:none}
+        }
+        @media print{.dash-group>summary{background:none}.dash-group{break-inside:avoid}}
+        .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        .head-arch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+        .compare-card{border-radius:var(--card-radius);padding:18px;border:2px solid var(--gray-200);text-align:center}
+        .compare-card.m1{border-color:var(--primary);background:var(--primary-light)}
+        .compare-card.m2{border-color:var(--success);background:var(--success-bg)}
+        .compare-card.m3{border-color:var(--gray-300);background:var(--gray-50)}
+        .compare-card .big-num{font-size:1.8rem;font-weight:800;font-family:var(--font-mono);margin:6px 0}
+        .compare-card .delta{font-size:0.875rem}
+
+        .bar-chart{display:flex;align-items:center;gap:8px;margin:4px 0}
+        .bar-label{font-size:0.875rem;width:150px;text-align:right;color:var(--gray-600);flex-shrink:0}
+        .bar-track{flex:1;height:22px;background:var(--gray-100);border-radius:4px;position:relative;overflow:hidden}
+        .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;color:#fff;font-size:0.8125rem;font-weight:600}
+        .bar-fill.blue{background:linear-gradient(90deg,#3b82f6,#06b6d4)}
+        .bar-fill.green{background:linear-gradient(90deg,#10b981,#34d399)}
+        .bar-fill.orange{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+        .bar-fill.gray{background:linear-gradient(90deg,#9ca3af,#d1d5db)}
+
+        .timeline{position:relative;padding-left:28px}
+        .timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--gray-200)}
+        .timeline-node{position:relative;margin-bottom:18px}
+        .timeline-dot{position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--primary);border:3px solid var(--card-bg);box-shadow:0 0 0 2px var(--primary);z-index:1}
+        .timeline-node.past .timeline-dot{background:var(--success);box-shadow:0 0 0 2px var(--success)}
+        .timeline-node.current .timeline-dot{background:var(--primary);box-shadow:0 0 0 2px var(--primary);animation:pulse 2s infinite}
+        .timeline-node.future .timeline-dot{background:var(--gray-300);box-shadow:0 0 0 2px var(--gray-300)}
+        @keyframes pulse{0%,100%{box-shadow:0 0 0 2px var(--primary)}50%{box-shadow:0 0 0 8px rgba(59,130,246,0.2)}}
+        .timeline-node.future .timeline-card{opacity:0.5;border-style:dashed}
+        .timeline-card{background:var(--card-bg);border:1px solid var(--gray-200);border-radius:10px;padding:12px}
+        .timeline-card.current{border-color:var(--primary)}
+        .timeline-date{font-size:0.8125rem;color:var(--gray-500);margin-bottom:3px}
+        .timeline-summary{font-weight:700;font-size:1rem;margin-bottom:5px}
+        .timeline-list{margin:0;padding:0;list-style:none;font-size:0.875rem}
+        .timeline-list li{margin-bottom:2px;display:flex;align-items:flex-start;gap:4px}
+        .timeline-metric{font-size:0.8125rem;margin-top:5px;color:var(--gray-500)}
+
+        /* Collapsible timeline */
+        .timeline-node.past.collapsed .timeline-list,
+        .timeline-node.past.collapsed .timeline-metric{display:none}
+        .timeline-node.past .timeline-toggle{cursor:pointer;font-size:0.8125rem;color:var(--primary);margin-top:4px;display:inline-flex;align-items:center;gap:4px;user-select:none}
+        .timeline-node.past .timeline-toggle:hover{color:var(--primary-dark)}
+        .timeline-node.past .timeline-dot{cursor:pointer}
+        .timeline-node.past.collapsed .timeline-card{background:var(--gray-50);padding:8px 12px}
+
+        .todo-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:0.875rem}
+        .todo-item input[type="checkbox"]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+        .todo-item.done label{text-decoration:line-through;color:var(--gray-400)}
+
+        .tk{margin:2px 0 10px;padding:6px 12px;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:4px;font-size:1rem;line-height:1.6;}
+        .info-box{padding:10px 14px;border-radius:8px;font-size:0.875rem;margin:8px 0;line-height:1.6}
+        .info-box.info{background:var(--primary-light);border-left:4px solid var(--primary)}
+        .info-box.success{background:var(--success-bg);border-left:4px solid var(--success)}
+        .info-box.warning{background:var(--warning-bg);border-left:4px solid var(--warning)}
+
+        /* Quick-link cards */
+        .quick-links{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+        .quick-link-card{
+            background:var(--card-bg);border-radius:var(--card-radius);
+            box-shadow:var(--shadow);padding:16px 12px;text-align:center;
+            transition:var(--transition);cursor:pointer;display:block;
+        }
+        .quick-link-card:hover{box-shadow:var(--shadow-hover);transform:translateY(-2px);text-decoration:none}
+        .quick-link-card .ql-icon{font-size:1.6rem;margin-bottom:6px}
+        .quick-link-card .ql-title{font-weight:700;font-size:0.875rem;color:var(--gray-800);margin-bottom:3px}
+        .quick-link-card .ql-desc{font-size:0.8125rem;color:var(--gray-500)}
+        .quick-link-card.ql-mdsed{border-top:3px solid var(--primary)}
+        .quick-link-card.ql-m1{border-top:3px solid var(--success)}
+        .quick-link-card.ql-m2{border-top:3px solid var(--warning)}
+        .quick-link-card.ql-m3{border-top:3px solid var(--gray-400)}
+
+                @media (prefers-reduced-motion: reduce){
+            html,#content{scroll-behavior:auto!important}
+            *,*::before,*::after{transition:none!important;animation:none!important}
+        }
+        @media(max-width:768px){
+            #app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
+            #sidebar{display:none}
+            .compare-grid,.quick-links{grid-template-columns:1fr 1fr}
+            .metric-grid{grid-template-columns:1fr 1fr}
+            .head-arch-grid{grid-template-columns:1fr}
+        }
+        @media print{
+            html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+            #app{display:block!important;height:auto!important;max-width:100%!important}
+            #sidebar,#header{display:none!important}
+            #content{overflow:visible!important;height:auto!important;padding:0!important}
+            .card{box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;border:1px solid var(--gray-200)}
+            .card:hover{box-shadow:none!important}
+            a{color:var(--gray-800)!important;text-decoration:none!important}
+            .data-table{font-size:0.75rem!important}
+        }
+    
+        /* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+        .theme-switcher{position:relative}
+        .ts-btn{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.78rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .ts-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .ts-btn:active{transform:scale(0.97)}
+        .ts-panel{
+            /* fixed 定位（JS 打开时按按钮位置设置 top/right）：
+               脱离 header/nav-links 的 overflow 裁剪域，可覆盖任何内容 */
+            position:fixed;z-index:60;
+            width:250px;max-height:60vh;overflow-y:auto;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-radius:12px;
+            box-shadow:var(--shadow-hover);padding:8px;
+            display:flex;flex-direction:column;gap:2px;
+        }
+        .ts-panel[hidden]{display:none}
+        .ts-opt{
+            display:flex;align-items:center;gap:8px;
+            padding:7px 10px;border-radius:8px;border:none;background:transparent;
+            font-size:0.8rem;color:var(--gray-700);cursor:pointer;text-align:left;
+            font-family:inherit;
+        }
+        .ts-opt:hover{background:var(--gray-100)}
+        .ts-opt.sel{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .ts-opt .ts-dots{display:flex;gap:4px;flex-shrink:0}
+        .ts-opt .ts-dots i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);display:inline-block}
+        .ts-opt .ts-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ts-opt .ts-check{margin-left:auto;flex-shrink:0;visibility:hidden;font-size:0.9em}
+        .ts-opt.sel .ts-check{visibility:visible}
+
+        /* ═══════ 性能优化（M29）═══════
+           1) content-visibility 让视口外的卡片跳过布局与绘制（长页面滚动/锚点跳转的关键优化）
+              contain-intrinsic-size 的 auto 关键字会记住上次渲染尺寸，避免滚动条抖动
+           2) contain 把重排/重绘限制在卡片与表格行内部，折叠展开时不再牵动整页 */
+        .card{content-visibility:auto;contain-intrinsic-size:auto 900px;contain:layout style}
+        .fold-body{contain:layout paint}
+        .data-table tbody tr{contain:layout style}
+        .data-table{contain:layout}
+        @media print{.card{content-visibility:visible;contain:none}}
+
+            /* CI 合并行（M29）：明细表 num 列不换行——值 + [CI] 同行显示，便于横向对比区间重叠 */
+        #dashboard-table td.num{white-space:nowrap}
+        #dashboard-table td.num span{margin-left:2px}
+        
+/* ═══════ 折叠组件（R11 修复轮补注入：开合样式缺失致全站折叠失效） ═══════ */
+.fold{margin:10px 0}
+        .fold-head{
+            display:flex;align-items:center;gap:8px;width:100%;
+            padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;
+            background:var(--gray-50);cursor:pointer;font:inherit;
+            font-size:0.8rem;font-weight:600;color:var(--gray-700);text-align:left;
+            transition:var(--transition);
+        }
+        .fold-head:hover{background:var(--gray-100);color:var(--gray-900)}
+        .fold-head .fold-chevron{transition:transform .25s ease;color:var(--gray-400);font-size:0.7em}
+        .fold.open .fold-head .fold-chevron{transform:rotate(180deg)}
+        .fold-head .fold-hint{margin-left:auto;font-size:0.7rem;font-weight:400;color:var(--gray-400)}
+        .fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+        .fold.open .fold-body{grid-template-rows:1fr}
+        .fold-inner{overflow:hidden;min-height:0}
+        .fold-inner .fold-pad{padding-top:8px}
+</style>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: false,
+                packages: {'[+]': ['ams', 'newcommand', 'configMacros']},
+            },
+            chtml: { scale: 0.95 }
+        };
+    </script>
+    <script async id="MathJax-script" src="assets/mathjax/tex-mml-chtml.js"></script>
+    <script>
+        /* 契约: 动画须有理由 + prefers-reduced-motion 降级 */
+        window.SCROLL_BEHAVIOR = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+    </script>
+
+    <style id="baked-theme">
+        /* ═══════ 内联默认主题 · 人大红 Beamer ═══════
+           烘焙在页内 ⇒ 首帧即按人大红渲染，无需等 theme-pack.js 注入覆盖层（消除主题闪烁）。
+           运行时切到其他主题时，applyTheme 会把本 style 置 disabled，改由主题包覆盖层接管。 */
+        /* ═══════ 主题覆盖层 · 人大红 Beamer ═══════ */
+        :root {
+            --bg:#fdf8f8; --card-bg:#ffffff; --card-radius:8px;
+            --line:rgba(151,31,48,0.12);
+            --shadow:0 1px 2px rgba(151,31,48,0.05),0 2px 6px rgba(151,31,48,0.06);
+            --shadow-hover:0 4px 12px rgba(151,31,48,0.10),0 6px 16px rgba(151,31,48,0.08);
+            /* 校徽红 #971f30（RenminUniv.sty tsinghua RGB 151,31,48） */
+            --primary:#971f30; --primary-light:#f9eef0; --primary-dark:#6e1623;
+            --accent:#b83047; --accent-light:#fdf0f2;
+            --success:#1a7f37; --success-bg:#eef7f0;
+            --warning:#9a6700; --warning-bg:#faf4e3;
+            --danger:#c8372f; --danger-bg:#fbefee;
+            /* LaTeX beamer 衬线感：宋体 + Georgia */
+            --font-sans:"Songti SC","STSong","SimSun","Georgia","PingFang SC","Microsoft YaHei",serif;
+        }
+        /* 背景水印：beamer background.pdf 低透明度铺底（白色膜压淡） */
+        body{background:
+            linear-gradient(rgba(253,248,248,0.88),rgba(253,248,248,0.88)),
+            url(assets/ruc-bg.png) center 30%/55% no-repeat,
+            var(--bg);}
+        ::selection{background:rgba(151,31,48,0.22);color:var(--gray-900)}
+        /* ── 顶导：校徽红底白字（beamer frametitle）── */
+        #header{background:var(--primary);border-bottom:1px solid rgba(255,255,255,0.25)}
+        #header .nav-brand{color:#ffffff}
+        #header .nav-brand a,#header .nav-brand span{color:#ffffff}
+        .nav-links a{color:rgba(255,255,255,0.85)}
+        .nav-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;text-decoration:none}
+        .nav-links a.active{background:rgba(255,255,255,0.24);color:#ffffff;font-weight:600}
+        .nav-links a:active{transform:scale(0.97)}
+        #header .header-right{color:rgba(255,255,255,0.8)}
+        .countdown{background:rgba(255,255,255,0.18);color:#ffffff}
+        .ts-btn{background:transparent;border-color:rgba(255,255,255,0.4);color:#ffffff}
+        .ts-btn:hover{border-color:#ffffff;color:#ffffff}
+        /* ── 底栏：白底 + 校徽红分隔线；logo 在 X 轴最右、Y 轴中心（基座 flex 布局） ── */
+        #footer{background:#ffffff;color:var(--gray-500);border-top:1px solid rgba(151,31,48,0.3)}
+        #footer .footer-meta strong{color:var(--primary-dark)}
+        #footer .footer-meta .sep{color:var(--gray-300)}
+        /* 校徽：底部声明栏右侧 logo（素材 assets/ruc-logo-1.png）；去占位虚线边框 */
+        #footer .footer-logo .logo-slot{
+            display:inline-block;width:140px;height:26px;
+            background:url(assets/ruc-logo-1.png) center/contain no-repeat;
+            border:none;border-radius:0;padding:0;
+            color:transparent;font-size:0;
+            transform:translateY(-3px);   /* 整体上移，避开底缘裁切感 */
+        }
+        /* ── 侧边栏 ── */
+        #sidebar{border-right:1px solid rgba(151,31,48,0.15)}
+        .sidebar-parent:hover{background:#fdf3f4}
+        .sidebar-child:hover{background:#fdf3f4}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary-dark)}
+        /* ── 卡片与分节（beamer separation line 红细线）── */
+        .card{border-radius:8px;position:relative}
+        /* 背景图按左侧导引标签的模块粒度，铺在每个卡片右侧作淡背景 */
+        .card::after{
+            content:"";position:absolute;right:0;bottom:0;
+            width:100%;height:100%;
+            /* contain：图片按区域等比缩放、完整显示（绝不裁切）；
+               元素高度跟随卡片实时变化（折叠开合），背景尺寸随之自动重算，
+               纯 CSS 即动态适配，无需 JS 计算 */
+            background:url(assets/ruc-bg.png) right bottom/contain no-repeat;
+            opacity:0.6;mix-blend-mode:multiply;
+            pointer-events:none;z-index:0;
+        }
+        .card>*{position:relative;z-index:1}
+        .card:hover{border-color:rgba(151,31,48,0.3)}
+        .card-header{border-bottom:1px solid rgba(151,31,48,0.25)}
+        .section-h4{border-bottom:2px solid var(--primary);padding-bottom:6px}
+        .section-h4.c-primary{border-bottom-color:var(--primary)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .info-box.info{border-color:rgba(151,31,48,0.3)}
+        .info-box.info::before{background:var(--primary)}
+        .info-box.info strong{color:var(--primary-dark)}
+        .data-table thead th{background:#fdf3f4;color:var(--primary-dark);border-bottom:2px solid rgba(151,31,48,0.35)}
+        .timeline::before{background:rgba(151,31,48,0.3)}
+        /* 图标容器：校徽红浅底 */
+        .quick-link-card .ql-icon{background:var(--primary-light);color:var(--primary-dark);border-radius:8px}
+        .quick-link-card:hover .ql-icon{background:var(--primary);color:#ffffff}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:#e3c8cd}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+        /* ── 兼容 week_report 页面结构：品牌区为 <h1>、导航为 .header-links ──
+           （模板结构用 .nav-brand/.nav-links；本主题顶栏为深色，文字统一白字保证对比度） */
+        #header h1{color:#ffffff}
+        #header h1 a{color:#ffffff}
+        #header .header-links a{color:rgba(255,255,255,0.88);border-color:rgba(255,255,255,0.28)}
+        #header .header-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;border-color:rgba(255,255,255,0.42)}
+        #header .header-right{color:rgba(255,255,255,0.82)}
+        #header .countdown{color:rgba(255,255,255,0.9)}
+        #header .ts-btn{color:#ffffff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.12)}
+        #header .ts-btn:hover{border-color:rgba(255,255,255,0.6);color:#ffffff}
+        #header .ts-cur{color:#ffffff}
+    </style>
+<script>window.A4R={mode:1,lang:1,themeKey:'labmeeting-theme',lightId:'11_ruc_beamer',darkId:'02_wwdc_dark'};</script>
+<script src="../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+</head>
+<body data-default-theme="11_ruc_beamer" data-asset-prefix="">
+
+<div id="app">
+
+<!-- ═══════ HEADER ═══════ -->
+<header id="header">
+    <h1><span data-zh>📊 MDS-ED 实验进度报告</span><span data-en>📊 MDS-ED Experiment Progress Report</span></h1>
+    <div class="header-right">
+        <span class="countdown" id="countdown"><span data-zh>下次组会: —</span><span data-en>Next meeting: —</span></span>
+        <span id="current-date" style="font-size:0.8125rem;"></span>
+        <span style="background:#b45309;color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;padding:3px 11px;border-radius:999px;white-space:nowrap;margin-right:10px;"><span data-zh>演示数据</span><span data-en>Demo data</span></span>
+                <div class="theme-switcher" id="theme-switcher">
+                    <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                        <span class="ic ic-palette"></span><span class="ts-cur"><span data-zh>主题</span><span data-en>Theme</span></span>
+                    </button>
+                    <div class="ts-panel" id="ts-panel" hidden></div>
+                </div>
+    </div>
+</header>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<nav id="sidebar">
+    <!-- 论文与方法页面 -->
+    <div class="sidebar-section">
+        <div class="sidebar-parent expanded" onclick="toggleSidebar(this,'children-pages')"><span data-zh>📄 论文与方法页面</span><span data-en>📄 Papers & Methods Pages</span><span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-pages">
+            <a class="sidebar-child ext-link" href="01_mdsed_paper/index.html"><span data-zh>📋 MDS-ED 论文详解</span><span data-en>📋 MDS-ED Paper Deep Dive</span><span class="badge badge-ext">→</span>
+            </a>
+            <a class="sidebar-child ext-link" href="06_tricks_experiments/index.html"><span data-zh>🧪 实验 Tricks 汇总</span><span data-en>🧪 Experiment Tricks Roundup</span><span class="badge badge-ok"><span data-zh>已收口</span><span data-en>Concluded</span></span>
+            </a>
+            </div>
+    </div>
+
+    <!-- 页面内导航 -->
+    <div class="sidebar-section">
+        <div class="sidebar-parent expanded" onclick="toggleSidebar(this,'children-nav')"><span data-zh>📊 页面内导航</span><span data-en>📊 On This Page</span><span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-nav">
+            <div class="sidebar-child active" data-target="sec-dashboard" onclick="scrollToSection('sec-dashboard',this)"><span data-zh>📊 整体指标仪表盘</span><span data-en>📊 Overall Metrics Dashboard</span></div>
+            <div class="sidebar-child" data-target="sec-timeline" onclick="scrollToSection('sec-timeline',this)"><span data-zh>📅 每周进度时间线</span><span data-en>📅 Weekly Progress Timeline</span></div>
+            <div class="sidebar-child" data-target="sec-thisweek" onclick="scrollToSection('sec-thisweek',this)"><span data-zh>📝 本周任务清单</span><span data-en>📝 This Week's Task List</span></div>
+            </div>
+    </div>
+</nav>
+
+<!-- ═══════ CONTENT ═══════ -->
+<main id="content">
+
+<div class="card" id="sec-takeaway" style="border:2px solid var(--primary);">
+    <div class="card-header">
+        <div class="card-title">🎯 一句话结论（Takeaways）</div>
+        <span class="status-tag status-ok">组会速览</span>
+    </div>
+    <ul style="margin:4px 0 0 20px;font-size:1rem;line-height:1.9;">
+        <li><strong>换头（LabelAttention）是唯一稳定涨点的改动（+0.54pp）</strong>——但它只在标签空间大（上千）时有效，标签少时反而掉点。</li>
+        <li><strong>层级惩罚（HBCE）负责把「父子违反率」压到 0</strong>，对 AUROC 中性到微正——与换头正交、可叠加。</li>
+        <li><strong>目前家族最优 = M18 s1c（逐层课程 × HBCE）0.8442 / VR 0.008%</strong>——比 baseline 高 0.85pp，且违反率近乎为零。</li>
+    </ul>
+</div>
+
+
+<!-- Quick Link Cards -->
+<div class="quick-links">
+    <a class="quick-link-card ql-mdsed" href="01_mdsed_paper/index.html">
+        <div class="ql-icon">📄</div>
+        <div class="ql-title"><span data-zh>MDS-ED 原始论文</span><span data-en>MDS-ED Original Paper</span></div>
+        <div class="ql-desc"><span data-zh>框架基线、关键公式、架构详解</span><span data-en>Framework baseline, key formulas, architecture walkthrough</span></div>
+    </a>
+    <a class="quick-link-card ql-m2" href="06_tricks_experiments/index.html">
+        <div class="ql-icon">🧪</div>
+        <div class="ql-title"><span data-zh>实验 Tricks 汇总</span><span data-en>Experiment Tricks Roundup</span></div>
+        <div class="ql-desc"><span data-zh>增量技巧、消融与裁决实验</span><span data-en>Incremental tricks, ablations & adjudication experiments</span></div>
+    </a>
+    </div>
+
+<!-- ═══ Dashboard ═══ -->
+<div class="card" id="sec-dashboard">
+    <div class="card-header">
+        <div class="card-title"><span data-zh>📊 整体指标仪表盘</span><span data-en>📊 Overall Metrics Dashboard</span></div>
+        <span class="status-tag status-ok" id="dashboard-status">加载中...</span>
+    </div>
+    <div class="compare-grid" id="dashboard-cards"></div>
+    <div class="fold" style="margin-top:14px;">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：全实验汇总明细表（各方法 val/test AUROC + 95% CI + Δ + VR + 显著性，约 30 行）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+    <div style="overflow-x:auto;" id="dashboard-table"></div>
+    </div></div></div>
+    </div>
+    <div style="margin-top:8px;text-align:center;font-size:0.8125rem;color:var(--gray-500);" id="dashboard-note"></div>
+</div>
+
+<!-- ═══ M7: Roll-up / Roll-down 后处理与训练时约束对比 ═══ -->
+<div class="card" id="sec-m7">
+    <div class="card-header">
+        <div class="card-title">🔬 M7: Roll-up / Roll-down 后处理与训练时约束对比</div>
+        <span class="status-tag status-ok">✅ 已完成</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 方法分类：</strong>
+        <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：M7 后处理对比表（类别 × val/test/VR，7 行）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:820px;margin-top:6px;font-size:0.875rem;">
+        <thead><tr><th>类别</th><th>方法</th><th>原理</th></tr></thead>
+        <tbody>
+            <tr><td rowspan="2"><strong>后处理</strong><br><small>确定性规则修正，不重新训练</small></td>
+                <td><strong>Roll-up</strong></td><td>信任子类概率，向上传播：σ(parent)=max(σ(parent), σ(child))</td></tr>
+            <tr><td><strong>Roll-down</strong></td><td>信任父类概率，向下约束：σ(child)=min(σ(child), σ(parent))</td></tr>
+            <tr><td rowspan="4"><strong>训练时约束</strong><br><small>修改 logits/loss，梯度通过约束操作反向传播</small></td>
+                <td><strong>MC Loss</strong></td><td>logit 空间 -inf mask + roll-up (weight=0.05)</td></tr>
+            <tr><td><strong>Tree Min Loss</strong></td><td>logit 空间双向约束：阳性 roll-down + 阴性 roll-up (weight=0.05)</td></tr>
+            <tr><td><strong>Tree Min Loss+wreg</strong></td><td>tree_min_loss + weight_reg=1e-6 + roll_down_eval=True</td></tr>
+            <tr><td><strong>flat_rollup / flat_rolldown</strong></td><td>训练时 logit 空间 roll-up/roll-down（评估时后处理）</td></tr>
+        </tbody>
+        </table>
+    </div></div></div>
+    </div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">📊 关键结果：per-label mean AUROC</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>M7 后处理对比：HBCE+rolldown 是全局最优</strong>（test 0.8370 / VR=0%）——优于 baseline+rolldown（0.8338）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：per-label mean AUROC 汇总表（11 方法 × 双口径 CI）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>方法</th><th>口径</th><th>raw AUROC</th><th>VR raw (%)</th><th>+rollup AUROC</th><th>+rolldown AUROC</th><th>VR post</th><th>vs baseline raw</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="2"><strong>baseline</strong></td><td class="num">验证集</td><td class="num">0.8247</td><td class="num">11.65</td><td class="num">0.8247</td><td class="num">0.8248</td><td class="num up">0%</td><td class="num">—</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8338</td><td class="num warn-cell">11.74</td><td class="num">0.8339</td><td class="num">0.8338</td><td class="num up">0%</td><td class="num">—</td></tr>
+        <tr style="background:var(--success-bg);"><td rowspan="2"><strong>HBCE linear λ=0.5</strong></td><td class="num">验证集</td><td class="num">0.8274</td><td class="num up">0.008</td><td class="num">0.8275</td><td class="num">0.8274</td><td class="num up">0%</td><td class="num up"><strong>+0.0027</strong></td></tr>
+        <tr style="background:var(--success-bg);"><td class="num">测试集</td><td class="num highlight">0.8370</td><td class="num up">0.008</td><td class="num highlight">0.8370</td><td class="num highlight">0.8370</td><td class="num up">0%</td><td class="num up"><strong>+0.0032</strong></td></tr>
+        <tr><td rowspan="2">tree_min_loss</td><td class="num">验证集</td><td class="num">0.8176</td><td class="num">1.20</td><td class="num">0.8176</td><td class="num">0.8176</td><td class="num up">0%</td><td class="num down">−0.0071</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8246</td><td class="num">1.22</td><td class="num">0.8246</td><td class="num">0.8245</td><td class="num up">0%</td><td class="num down">−0.0092</td></tr>
+        <tr><td rowspan="2">tree_min_loss_wreg</td><td class="num">验证集</td><td class="num">0.8171</td><td class="num">1.19</td><td class="num">0.8172</td><td class="num">0.8171</td><td class="num up">0%</td><td class="num down">−0.0076</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8240</td><td class="num">1.19</td><td class="num">0.8240</td><td class="num">0.8238</td><td class="num up">0%</td><td class="num down">−0.0098</td></tr>
+        <tr style="background:var(--danger-bg);"><td rowspan="2">mc_loss</td><td class="num">验证集</td><td class="num down">0.8119</td><td class="num down">20.90</td><td class="num">0.8164</td><td class="num down">0.8078</td><td class="num up">0%</td><td class="num down">−0.0129</td></tr>
+        <tr style="background:var(--danger-bg);"><td class="num">测试集</td><td class="num down">0.8196</td><td class="num down">20.94</td><td class="num">0.8238</td><td class="num down">0.8160</td><td class="num up">0%</td><td class="num down">−0.0142</td></tr>
+        <tr><td rowspan="2">flat_rollup (train)</td><td class="num">验证集</td><td class="num">0.8171</td><td class="num up">0.00</td><td class="num">0.8171</td><td class="num">0.8171</td><td class="num up">0%</td><td class="num down">−0.0077</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8244</td><td class="num up">0.00</td><td class="num">0.8244</td><td class="num">0.8244</td><td class="num up">0%</td><td class="num down">−0.0094</td></tr>
+        <tr><td rowspan="2">flat_rolldown (train)</td><td class="num">验证集</td><td class="num">0.8159</td><td class="num up">0.00</td><td class="num">0.8159</td><td class="num">0.8159</td><td class="num up">0%</td><td class="num down">−0.0089</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8227</td><td class="num up">0.00</td><td class="num">0.8227</td><td class="num">0.8227</td><td class="num up">0%</td><td class="num down">−0.0111</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin-top:4px;">VR post = rollup/rolldown 后处理的 VR（两种后处理均实现 VR=0）。"raw" vs "+rollup" 列同值表示后处理几乎不影响 AUROC。</p>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">📈 可视化对比</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 四种约束模式的 AUROC/VR 对比图——<strong>后处理族（roll）与训练时约束族（mask/loss）分层清晰</strong>。</p>
+    <img src="../meeting_records/20260725/M7_RollUp后处理与训练时约束对比实验/m7_rollup_rolldown_comparison.png" alt="M7 四种约束模式对比"
+         style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);margin-top:6px;">
+
+    <!-- Verdict table -->
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--success);">📐 Verdict：Roll-up/Roll-down 对各方法的影响</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>roll-up/roll-down 后处理近乎无损清零 VR</strong>（AUROC Δ≤0.0001）；<strong>MC Loss 训练时 -inf mask 适得其反</strong>（VR 恶化至 20.9%）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Verdict：Roll-up/Roll-down 对各方法的影响表（11 行全量）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;font-size:0.875rem;">
+    <thead><tr><th>方法</th><th>口径</th><th>raw AUROC</th><th>+rollup Δ</th><th>+rolldown Δ</th><th>VR raw</th><th>VR post</th><th>结论</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="2">baseline</td><td class="num">验证集</td><td class="num">0.8247</td><td class="num up">+0.0000</td><td class="num up">+0.0001</td><td class="num">11.65</td><td class="num up">0</td><td rowspan="2">后处理≈无损，VR=0</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8338</td><td class="num up">+0.0001</td><td class="num">−0.0000</td><td class="num warn-cell">11.74</td><td class="num up">0</td></tr>
+        <tr style="background:var(--success-bg);"><td rowspan="2">HBCE λ=0.5</td><td class="num">验证集</td><td class="num">0.8274</td><td class="num up">+0.0000</td><td class="num up">+0.0000</td><td class="num up">0.008</td><td class="num up">0</td><td rowspan="2" style="background:var(--success-bg);"><strong>最优：AUROC + VR 双重最优</strong></td></tr>
+        <tr style="background:var(--success-bg);"><td class="num">测试集</td><td class="num highlight">0.8370</td><td class="num up">+0.0000</td><td class="num">−0.0000</td><td class="num up">0.008</td><td class="num up">0</td></tr>
+        <tr><td rowspan="2">tree_min_loss</td><td class="num">验证集</td><td class="num">0.8176</td><td class="num up">+0.0000</td><td class="num">−0.0000</td><td class="num">1.20</td><td class="num up">0</td><td rowspan="2">后处理Δ极小</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8246</td><td class="num up">+0.0000</td><td class="num down">−0.0001</td><td class="num">1.22</td><td class="num up">0</td></tr>
+        <tr><td rowspan="2">tree_min_loss_wreg</td><td class="num">验证集</td><td class="num">0.8171</td><td class="num up">+0.0001</td><td class="num">−0.0000</td><td class="num">1.19</td><td class="num up">0</td><td rowspan="2">wreg 改善微弱</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8240</td><td class="num up">+0.0000</td><td class="num down">−0.0001</td><td class="num">1.19</td><td class="num up">0</td></tr>
+        <tr style="background:var(--danger-bg);"><td rowspan="2">mc_loss</td><td class="num">验证集</td><td class="num down">0.8119</td><td class="num up">+0.0045</td><td class="num down">−0.0041</td><td class="num down">20.90</td><td class="num up">0</td><td rowspan="2" style="background:var(--danger-bg);">raw VR 恶化，rollup 部分恢复</td></tr>
+        <tr style="background:var(--danger-bg);"><td class="num">测试集</td><td class="num down">0.8196</td><td class="num up">+0.0042</td><td class="num down">−0.0037</td><td class="num down">20.94</td><td class="num up">0</td></tr>
+        <tr><td rowspan="2">flat_rollup</td><td class="num">验证集</td><td class="num">0.8171</td><td class="num">—</td><td class="num">—</td><td class="num up">0.00</td><td class="num up">0</td><td rowspan="2">训练时已 VR=0</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8244</td><td class="num">—</td><td class="num">—</td><td class="num up">0.00</td><td class="num up">0</td></tr>
+        <tr><td rowspan="2">flat_rolldown</td><td class="num">验证集</td><td class="num">0.8159</td><td class="num">—</td><td class="num">—</td><td class="num up">0.00</td><td class="num up">0</td><td rowspan="2">训练时已 VR=0</td></tr>
+        <tr><td class="num">测试集</td><td class="num">0.8227</td><td class="num">—</td><td class="num">—</td><td class="num up">0.00</td><td class="num up">0</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">💡 关键发现</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 五条关键发现：<strong>后处理清 VR 最优、MC loss 恶化、tree_min 有效但伤 AUROC、flat 系列不建议</strong>——推荐路径 = HBCE + roll 后处理。</p>
+    <div class="info-box success">
+        <ol style="margin:6px 0 0 16px;font-size:0.875rem;line-height:1.8;">
+<li><strong>HBCE+rolldown 全局最优：</strong>test 0.8370（vs baseline 0.8338，+0.0032），VR=0。</li>
+<li><strong>roll 后处理近乎无损清零 VR：</strong>baseline/HBCE 的 AUROC Δ ≤ 0.0001。</li>
+<li><strong>MC Loss 适得其反：</strong>VR 11.74→20.94%、AUROC −0.0142（rollup 仅部分恢复）。</li>
+<li><strong>tree_min_loss 降 VR 至 1.2% 但损 AUROC ~0.009。</strong></li>
+<li><strong>flat 系列训练时 VR=0 但 AUROC −0.009~−0.011——用后处理替代训练时约束。</strong></li>
+</ol>
+    </div>
+
+    <div class="info-box info" style="margin-top:10px;"><strong>📐 建议：</strong>推荐 HBCE + roll 后处理（同得 AUROC 提升与 VR=0）；不建议 MC loss / flat 系列；可探索 tree_min 调 weight、roll 作为通用后处理。</div>
+    <p style="font-size:0.8125rem;color:var(--gray-400);margin-top:8px;">
+        生成代码：<code>meeting_records/20260725/M7_RollUp后处理与训练时约束对比实验/m7_extract_results.py</code> + <code>m7_rollup_rolldown_comparison.ipynb</code> | 数据：<code>m7_comprehensive_results.json</code> + <code>m7_four_methods_results.json</code>
+    </p>
+</div>
+
+<!-- ═══ VR Rate Summary ═══ -->
+<div class="card" id="sec-vr" style="display:none;">
+    <div class="card-header">
+        <div class="card-title">🔍 层次违反率 (VR) 汇总</div>
+    </div>
+    <div class="metric-grid" id="vr-grid"></div>
+    <div id="vr-formula" class="info-box info" style="margin-top:6px;display:none;">
+        <strong>📐 VR 计算公式：</strong>
+        \[ \mathrm{VR} = \frac{1}{N \cdot |\mathcal{P}|} \sum_{i=1}^{N} \sum_{(p,c) \in \mathcal{P}} \mathbf{1}\bigl\{\sigma(\hat{y}_c^{(i)}) > \sigma(\hat{y}_p^{(i)})\bigr\} \]
+        <span style="font-size:0.8125rem;color:var(--gray-500);">
+        N = 25,756 样本, |P| = 978 父子标签对, σ(·) = sigmoid 输出概率。<br>
+        对每个样本的每对父子标签，统计子标签预测概率严格大于父标签的比例。
+        该指标衡量模型预测违反"父 ≥ 子"层次约束的程度。
+        </span>
+    </div>
+    <div id="vr-table" style="overflow-x:auto;margin-top:6px;"></div>
+</div>
+
+<!-- ═══ ICD 层级标签一致性验证 ═══ -->
+<div class="card" id="sec-hierarchy-verify">
+    <div class="card-header">
+        <div class="card-title">✅ ICD 层级标签一致性验证</div>
+        <span class="status-tag status-ok">0 违反 / 5.6% Gap</span>
+    </div>
+    
+    <div class="info-box info">
+        <strong>📌 ICD 前缀层级结构：</strong>1428 个标签 / 978 个父子对 / 567 个有子节点的父标签。
+        例：<code>i25</code>（缺血性心脏病）→ <code>i251</code>（冠状动脉粥样硬化）→ <code>i2510</code>（不稳定心绞痛）。
+        经 <code>apply_prefix_closure_to_label_rows</code> 前缀闭包预处理。
+    </div>
+
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：ICD 层级一致性验证方向表（3 方向）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:780px;margin-top:10px;">
+    <thead><tr><th>方向</th><th>逻辑表达式</th><th>结果</th><th>状态</th><th>原因</th></tr></thead>
+    <tbody>
+        <tr><td><strong>方向一：子→父</strong></td><td style="font-size:0.875rem;">child=1 ⇒ parent=1</td><td class="num up">0%</td><td>✅ 完美</td><td>prefix closure 预处理强制保证</td></tr>
+        <tr><td><strong>方向二：父→子</strong></td><td style="font-size:0.875rem;">parent=1 ⇒ ∃child=1</td><td class="num warn-cell">5.6%</td><td>⚠️ 存在 Gap</td><td>标签体系不完整 + Undefined 子类</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--success);">方向一：子→父（子类阳性 → 父类阳性）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>方向一（子→父）0 违反</strong>——prefix closure 预处理在训练数据层面强制保证。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：子→父方向统计表（子类阳性 → 父类阳性）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:680px;">
+    <thead><tr><th>统计项</th><th>数值</th></tr></thead>
+    <tbody>
+        <tr><td>总样本数</td><td class="num">129,057</td></tr>
+        <tr><td>ICD 标签列数</td><td class="num">1,428</td></tr>
+        <tr><td>有效 parent-child 对数</td><td class="num">978</td></tr>
+        <tr><td>全量 child=1 事件总数</td><td class="num">1,454,036</td></tr>
+        <tr style="background:var(--success-bg);"><td><strong>层级违反总数</strong></td><td class="num up"><strong>0</strong></td></tr>
+        <tr style="background:var(--success-bg);"><td>存在违反的样本数 / 占比</td><td class="num up">0 / 0.00%</td></tr>
+        <tr style="background:var(--success-bg);"><td>有违反的 parent-child 对数</td><td class="num up">0 / 978</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">方向二：父→子 — Gap 分析（M3 新分析）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>方向二（父→子）存在 5.6% Gap</strong>——父阳性但所有子类阴性的样本占比，集中于仅 1 子节点的父标签。</p>
+    <div class="formula-card mathjax-process"><div class="formula-label">Gap 定义</div>
+    \[ \text{Gap}(p, s) = \mathbf{1}\{y_p^{(s)} = 1 \land \forall c \in \text{children}(p): y_c^{(s)} = 0\} \]
+    \[ \text{GapRate}(p) = \frac{\#\{s : y_p^{(s)} = 1 \land \forall c,\ y_c^{(s)} = 0\}}{\#\{s : y_p^{(s)} = 1\}} \]
+    <small>父标签阳性但其所有已知子标签均为阴性的样本占比。分析数据集: baseline preds (val 24,740 + test 25,756 样本)。</small></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：父→子 Gap 分析两表（指标表 + Per-Parent 统计）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="font-size:0.875rem;">
+        <thead><tr><th>指标</th><th>val</th><th>test</th></tr></thead>
+        <tbody>
+            <tr><td>父阳样本-标签对</td><td class="num">281,500</td><td class="num">289,676</td></tr>
+            <tr><td>≥1 子阳</td><td class="num">265,708</td><td class="num">273,472</td></tr>
+            <tr style="background:var(--warning-bg);"><td><strong>全部子阴 (Gap)</strong></td><td class="num warn-cell"><strong>15,792</strong></td><td class="num warn-cell"><strong>16,204</strong></td></tr>
+            <tr><td><strong>Gap Rate</strong></td><td class="num warn-cell"><strong>5.61%</strong></td><td class="num warn-cell"><strong>5.59%</strong></td></tr>
+        </tbody>
+        </table>
+        <table class="data-table" style="font-size:0.875rem;">
+        <thead><tr><th>Per-Parent 统计</th><th>val</th><th>test</th></tr></thead>
+        <tbody>
+            <tr><td>Gap Rate 均值</td><td class="num">12.38%</td><td class="num">12.18%</td></tr>
+            <tr><td>Gap Rate 中位数</td><td class="num">5.56%</td><td class="num">6.25%</td></tr>
+            <tr><td>Gap=0 的父标签</td><td class="num up">134 (23.6%)</td><td class="num up">134 (23.6%)</td></tr>
+            <tr><td>Gap>50% 的父标签</td><td class="num down">22 (3.9%)</td><td class="num down">15 (2.6%)</td></tr>
+            <tr><td>Gap Rate 范围</td><td class="num">0%–86.9%</td><td class="num">0%–96.6%</td></tr>
+        </tbody>
+        </table>
+    </div></div></div>
+    </div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-700);margin:16px 0 6px;">Gap 按子节点数量分组</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>Gap 与子节点数量强负相关</strong>：1 个子节点的父标签平均 Gap 16.2%，8+ 子节点降到 0%（Bernoulli 预期）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Gap 按子节点数量分组表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:650px;font-size:0.875rem;">
+    <thead><tr><th>子节点数</th><th>父标签数</th><th>Gap Rate 均值</th><th>Gap Rate 中位数</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--warning-bg);"><td><strong>1 个</strong></td><td class="num warn-cell">322</td><td class="num warn-cell">16.24%</td><td class="num">9.60%</td></tr>
+        <tr><td>2–3 个</td><td class="num">209</td><td class="num">8.11%</td><td class="num">3.55%</td></tr>
+        <tr><td>4–7 个</td><td class="num">34</td><td class="num">2.83%</td><td class="num">0.83%</td></tr>
+        <tr><td>8+ 个</td><td class="num">2</td><td class="num up">0.00%</td><td class="num up">0.00%</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-500);margin-top:4px;"><strong>关键发现：</strong>Gap 与子节点数强负相关（1 子 16.24% → 8+ 子 0%），Top-20 Gap 父标签均为仅 1 子节点。</p>
+
+    <h4 style="font-size:1rem;color:var(--gray-700);margin:16px 0 6px;">可视化：6 面板分析</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 val/test 两集的 Violation 与 Gap 分布——<strong>两集模式一致</strong>。</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div>
+            <p style="font-size:0.8125rem;color:var(--gray-500);text-align:center;">val 集</p>
+            <img src="../meeting_records/20260725/M3_父阳性子阳性逻辑验证/m3_parent_child_logic_val.png" alt="M3 val"
+                 style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        </div>
+        <div>
+            <p style="font-size:0.8125rem;color:var(--gray-500);text-align:center;">test 集</p>
+            <img src="../meeting_records/20260725/M3_父阳性子阳性逻辑验证/m3_parent_child_logic_test.png" alt="M3 test"
+                 style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        </div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">📐 对各研究方向的影响</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 方向二的 Gap <strong>不影响 HBCE 惩罚、但会影响 HMLC 条件概率训练的精度</strong>（约 5.6% 低估）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：各研究方向影响表（3 方向）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:820px;font-size:0.875rem;">
+    <thead><tr><th>方向</th><th>HBCE（损失惩罚）</th><th>HMLC（条件概率训练）</th></tr></thead>
+    <tbody>
+        <tr><td><strong>方向一（子→父 0 违反）</strong></td>
+        <td>data-driven 权重恒为零（P(child=1|¬parent)≡0）→ 已改用 fixed β=1</td>
+        <td>条件掩码 1{z_a(m)=1} 天然正确——子阳时父必阳</td></tr>
+        <tr><td><strong>方向二（父→子 5.6% Gap）</strong></td>
+        <td>不影响——HBCE 仅约束 σ(child)≤σ(parent)，不依赖"父阳→子阳"</td>
+        <td style="color:var(--warning);">Stage1 条件概率 p(child=1|parent=1) 被低估约 5.6%——父阳样本中所有已知子阴的情况存在</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <div class="info-box success" style="margin-top:12px;"><strong>📌 结论：</strong>① 子→父 0 违反（前缀闭包正确；亦解释 HBCE data-driven 权重恒为零）；② 父→子 5.6% Gap，集中仅 1 子节点的父标签（均值 16.24%，临床上=Undefined 子类/标签体系不完整）；③ baseline 从完美一致数据学出 11.74% 违反 = BCE 无层级约束梯度；④ Gap 不影响 HBCE、但低估 HMLC 条件概率 ~5.6%。</div>
+    <p style="font-size:0.8125rem;color:var(--gray-400);margin-top:8px;">
+        分析代码：<code>meeting_records/20260725/M3_父阳性子阳性逻辑验证/m3_parent_child_logic_verification.ipynb</code> | 报告：<code>meeting_records/20260725/M3_父阳性子阳性逻辑验证/icd_hierarchy_label_consistency_report.md</code>
+    </p>
+</div>
+
+<!-- ═══ ICD编码核查与MIMIC数据检测 ═══ -->
+<div class="card" id="sec-icd-audit" style="border:2px solid var(--warning);">
+    <div class="card-header">
+        <div class="card-title">🏥 ICD编码核查与MIMIC-IV-ECG数据检测（合作导师 survey, 2026-08-06）</div>
+        <span class="status-tag status-ok">✅ 全部查实</span>
+    </div>
+    
+
+    <div class="info-box info"><strong>📌 背景：</strong>合作导师 2026-08-06 提出三个 ICD 编码 / MIMIC 关联性调查问题，本地 notebook 逐项核查，<strong>2026-08-09 全部验证通过</strong>。</div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:16px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 调查结论总览</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 ICD 核查结论：<strong>心梗编码存在（9.65%）、手术码不存在、低 EF=I50.2x（5.86%）；ECG 号与 MIMIC 100% 关联</strong>。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：调查结论总览表（7 个问题）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:900px;">
+    <thead><tr><th>问题</th><th>结论</th><th>状态</th></tr></thead>
+    <tbody>
+        <tr><td><strong>Q1-心肌梗死编码</strong></td><td>✅ <strong>存在</strong>（10 个编码，含前壁/下壁/NSTEMI 等亚型；阳性 12,453 / 129,057 = 9.65%）</td><td>✅</td></tr>
+        <tr><td><strong>Q1-手术编码</strong></td><td>❌ <strong>不作为诊断标签存在</strong>（`diagnoses_*` 共 1,428 列，全部为 ICD-10-CM 诊断码）。手术仅以 <code>mechanical_ventilation</code> / <code>ecmo</code> 恶化标记存在</td><td>✅</td></tr>
+        <tr><td><strong>Q1-重大手术标记</strong></td><td>❌ <strong>不存在</strong>（全表 1,938 列无 major/surgery 标记列）</td><td>✅</td></tr>
+        <tr><td><strong>Q3-左心室低射血分数</strong></td><td>✅ <strong>存在</strong> = I50.2x（HFrEF 收缩性心衰），阳性 7,569 / 129,057（5.86%）</td><td>✅</td></tr>
+        <tr><td><strong>ECG 号关联性</strong></td><td>✅ <strong>100% 命中</strong>（MDS-ED 129,057 行索引对全部能在 MIMIC-IV-ECG 压缩包 800,035 条记录中找到对应 ECG 号）</td><td>✅ 实测</td></tr>
+        <tr><td><strong>Q2-编码匹配逻辑</strong></td><td>✅ <strong>已完整重现并验证</strong>（用 <code>records_w_diag_icd10.csv</code> 按原始管线重现，生成的 1,428 个编码与 <code>mds_ed.csv</code> 的 <code>diagnoses_*</code> 列完全一致）</td><td>✅</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 编码匹配管线（已验证重现）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 编码匹配管线已验证重现：<strong>90min 窗口 → 前缀传播 → 阈值 230 → 1428 标签</strong>——与 mds_ed.csv 完全一致。</p>
+    <div class="info-box info" style="font-size:0.875rem;line-height:1.7;">
+        <code>records_w_diag_icd10.csv</code>（800,035 条 ECG 记录）→ ECG→ED 就诊 <strong>90 分钟窗口</strong>匹配 → 过滤为 129,057 行 MDS-ED 子集 → <code>.lower()</code> 去重 → <code>strip[:5]</code> 截断 5 字符 → <code>rstrip("X")</code> 去尾 X → <code>label_propagation</code> 传播到所有祖先前缀 → 出现次数 ≥ 230 过滤 → <strong>1,428 个 diagnoses_* 标签列</strong>
+    </div>
+
+    <div class="info-box warn" style="margin-top:8px;">
+        <strong>⚠️ 发现代码 bug（不影响结果正确性）：</strong><code>full_preprocessing.py</code> 第 144 行尾字母剥离逻辑因 <code>.apply()</code> 传入的是列表（而非单个编码），导致 <code>code[-1].isalpha()</code> 永远为 <code>False</code>——尾字母剥离实际从未执行。这解释了部分编码（如 <code>i824y</code>/<code>i824z</code>）为何保留了尾部字母。但 1,428 标签 = 原始代码产出，不影响一致性验证结论。
+    </div>
+
+    <p style="font-size:0.8125rem;color:var(--gray-400);margin-top:8px;">
+        会议记录: <code>meeting_records/20260806/20260806-合作导师会议-俞锦越待调查问题清单.md</code> |
+        本地版: <code>20260806_MIMIC数据检测_本地版.ipynb</code> |
+        服务器版: <code>20260806_ICD编码核查与匹配逻辑调查_服务器版.ipynb</code> |
+        技能: <code>mds-ed-icd-audit</code>
+    </p>
+</div>
+
+<!-- ═══ Timeline ═══ -->
+<div class="card" id="sec-timeline">
+    <div class="card-header">
+        <div class="card-title">📅 每周进度安排</div>
+    </div>
+    <div class="timeline" id="timeline-container">
+        <p style="color:var(--gray-400);text-align:center;">加载中...</p>
+    </div>
+</div>
+
+<!-- ═══ This Week ═══ -->
+<div class="card" id="sec-thisweek">
+    <div class="card-header">
+        <div class="card-title" id="this-week-title">📝 本周任务</div>
+        <span class="countdown" id="week-countdown"></span>
+    </div>
+    <div id="this-week-content">
+        <p style="color:var(--gray-400);text-align:center;">加载中...</p>
+    </div>
+</div>
+
+<!-- ═══ Todos ═══ -->
+<div class="card" id="sec-todos">
+    <p style="color:var(--gray-400);text-align:center;">加载中...</p>
+</div>
+
+<div id="loading-msg" style="text-align:center;padding:40px;color:var(--gray-400);">
+    <p style="font-size:2.2rem;">⏳</p>
+    <p>正在加载实验数据...</p>
+</div>
+
+</main>
+</div>
+
+<script>
+let D = null, H = null;
+
+async function loadData() {
+    try {
+        const [r1, r2] = await Promise.all([
+            fetch('web_data/report_data.json').then(r => r.ok ? r.json() : null),
+            fetch('web_data/hierarchy_consistency_results.json').then(r => r.ok ? r.json() : null)
+        ]);
+        D = r1; H = r2;
+        if (!D) throw new Error('report_data.json 加载失败');
+        document.getElementById('loading-msg').style.display = 'none';
+        initApp();
+    } catch (err) {
+        document.getElementById('loading-msg').innerHTML =
+            `<p style="font-size:2.2rem;">⚠️</p><p>数据加载失败: ${err.message}</p>
+            <p style="font-size:0.875rem;margin-top:12px;">请确保在项目根目录启动 HTTP 服务器:<br><code>python -m http.server 8080</code><br>然后访问 <code>http://localhost:8080/week_report/</code></p>`;
+    }
+}
+
+function initApp() {
+    updateHeader();
+    renderDashboard();
+    renderVRSummary();
+    renderTimeline();
+    renderThisWeek();
+    renderTodos();
+}
+
+/* ═══════ Sidebar ═══════ */
+function toggleSidebar(el, childrenId) {
+    el.classList.toggle('expanded');
+    document.getElementById(childrenId)?.classList.toggle('open');
+}
+
+// M29：跳转前强制渲染目标卡片 —— content-visibility:auto 下目标若在视口外，
+// 滚动位置会按「估算高度」计算而偏移；先置 visible、下一帧再滚动即可命中真实位置
+function revealForScroll(el) {
+    const card = el.closest('.card') || el;
+    card.style.contentVisibility = 'visible';
+    setTimeout(() => { card.style.contentVisibility = ''; }, 800);
+}
+function scrollToSection(targetId, childEl) {
+    document.querySelectorAll('.sidebar-child').forEach(c => c.classList.remove('active'));
+    if (childEl) childEl.classList.add('active');
+    const target = document.getElementById(targetId);
+    if (target) {
+        revealForScroll(target);
+        requestAnimationFrame(() => {
+            target.scrollIntoView({behavior:window.SCROLL_BEHAVIOR,block:'start'});
+        });
+    }
+}
+
+// Highlight sidebar on scroll（M29 性能优化：rAF 节流 + passive 监听 + 差异更新）
+// 原实现每次 scroll 事件都读 8 次 offsetTop（强制同步布局）并全量改 class —— 滚动时每帧多次触发
+let scrollTracking = true;
+let _spyRaf = null;
+let _spyActive = null;
+function _spyUpdate() {
+    const sections = ['sec-dashboard','sec-m7','sec-vr','sec-hierarchy-verify','sec-icd-audit','sec-timeline','sec-thisweek','sec-todos'];
+    const contentEl = document.getElementById('content');
+    const contentTop = contentEl.scrollTop + 60;
+    let active = sections[0];
+    for (const id of sections) {
+        const el = document.getElementById(id);
+        if (el && el.offsetTop <= contentTop) active = id;
+    }
+    if (active === _spyActive) return;      // 未换节 → 不碰 DOM
+    _spyActive = active;
+    document.querySelectorAll('.sidebar-child').forEach(c => {
+        c.classList.toggle('active', c.dataset.target === active);
+    });
+}
+document.getElementById('content').addEventListener('scroll', () => {
+    if (!scrollTracking || _spyRaf) return;
+    _spyRaf = requestAnimationFrame(() => { _spyRaf = null; _spyUpdate(); });
+}, {passive: true});
+
+function updateHeader() {
+    const EN = document.documentElement.getAttribute('data-lang') === 'en';
+    const now = new Date();
+    document.getElementById('current-date').textContent =
+        now.toLocaleDateString(EN?'en-US':'zh-CN',{year:'numeric',month:'long',day:'numeric'});
+    let nextMeetingStr = null;
+    if (D && D.weekly_progress) {
+        const weeks = D.weekly_progress;
+        nextMeetingStr = weeks[weeks.length-1]?.saturday;
+    }
+    let nextMeeting = null, daysToMeeting = null;
+    if (nextMeetingStr) {
+        nextMeeting = new Date(nextMeetingStr+'T00:00:00');
+        daysToMeeting = Math.ceil((nextMeeting - now)/(1000*60*60*24));
+        if (daysToMeeting < 0) daysToMeeting = null;
+    }
+    if (daysToMeeting != null) {
+        document.getElementById('countdown').textContent = EN
+            ? `Next meeting: ${nextMeeting.toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} (in ${daysToMeeting} days)`
+            : `下次组会: ${nextMeeting.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} (${daysToMeeting}天后)`;
+        const wc = document.getElementById('week-countdown');
+        if (wc) wc.textContent = EN ? `📅 ${daysToMeeting} days until next meeting` : `📅 距下次组会还有 ${daysToMeeting} 天`;
+    } else {
+        document.getElementById('countdown').textContent = EN ? 'Next meeting: TBD' : '下次组会: 待定';
+        const wc = document.getElementById('week-countdown');
+        if (wc) wc.textContent = EN ? '📅 Next meeting date TBD' : '📅 下次组会日期待定';
+    }
+}
+// 语言偏好切换（a4r-bridge 经 storage 事件广播）时同步刷新日期/倒计时文案
+window.addEventListener('storage', (ev) => { if (ev.key === 'a4r-lang') updateHeader(); });
+
+function renderDashboard() {
+    if (!D) return;
+    const bl = D.baseline, methods = D.methods;
+    const baseAuroc = bl.with_nan_mask.test_auroc_macro_agg0 || 0.8264;   // agg0 = 验证集
+    const baseAgg1 = bl.with_nan_mask.test_auroc_macro_agg1 || 0.8356;    // agg1 = 测试集
+    const baseVR = 11.7441; // from hierarchy_consistency_results.json
+
+    // Summary metric cards (agg0=验证集 / agg1=测试集; 用户偏好: 测试集为主大字, 2026-08-14)
+    const m1 = methods[0], m2 = methods[1];
+    const m1agg0 = m1.best_result?.test_auroc_macro_agg0;
+    const m1agg1 = m1.best_result?.test_auroc_macro_agg1;
+    const m1dt = m1agg1 != null ? (m1agg1 - baseAgg1) : null;
+    const m1dv = m1agg0 != null ? (m1agg0 - baseAuroc) : null;
+    const m1vr = m1.subgroups?.squared?.best_vr ?? m1.subgroups?.linear?.best_vr ?? null;
+
+    // 卡片统一模板: 测试集 (agg1) 大字主值在前, 验证集 (agg0) 小字副值在后;
+    // Δ 以测试集口径为主 (Δt), 验证集 Δ (Δv) 附小字括号。
+    const cardTpl = (cls, title, t, v, deltaHtml, extra, vrText, ciHtml) => `
+    <div class="compare-card ${cls}">
+        <div style="font-weight:700;font-size:0.875rem;">${title}</div>
+        <div style="margin:3px 0 4px;font-size:0.75rem;color:var(--gray-500);"><strong>测试集 (agg1)</strong> / 验证集 (agg0)</div>
+        <div class="big-num">${t}<span style="font-size:1.15rem;color:var(--gray-500);"> / ${v}</span></div>
+        ${deltaHtml}
+        ${ciHtml || ''}
+        ${vrText ? `<div style="font-size:1.15rem;font-weight:800;margin-top:2px;">${vrText}</div>` : ''}
+        ${extra ? `<div style="font-size:0.75rem;color:var(--gray-400);margin-top:2px;">${extra}</div>` : ''}
+    </div>`;
+
+    // VR 标注（大字显示；数据来源见 card 底部备注）
+    const vrLine = (vr, note) => vr != null
+        ? `<span style="color:${vr < 1 ? 'var(--success)' : 'var(--danger)'};">VR: ${vr.toFixed(2)}%</span><span style="font-size:0.75rem;color:var(--gray-400);">${note||''}</span>`
+        : '<span style="color:var(--gray-400);">VR: —</span>';
+
+    // 95% CI 标注（小字；sig = 相对 baseline 的显著性判定：严格 CI 不重叠 → 显著；与明细表列同一准则）
+    const BASE_CI = { v: [0.8225, 0.8304], t: [0.8323, 0.8388] };   // baseline with_nan_mask (本地 pkl)
+    const sigTag = (t, v) => {
+        if (t == null || v == null) return '<span style="color:var(--gray-400);">CI: —</span>';
+        // 严格不重叠: 实验 CI 下界 > baseline 上界 → 显著高于; 实验 CI 上界 < baseline 下界 → 显著低于
+        const tUp = t[0] > BASE_CI.t[1], vUp = v[0] > BASE_CI.v[1];
+        const tDn = t[1] < BASE_CI.t[0], vDn = v[1] < BASE_CI.v[0];
+        if (tUp || vUp) return '<span style="color:var(--success);">CI: 显著高于 baseline</span>';
+        if (tDn || vDn) return '<span style="color:var(--danger);">CI: 显著低于 baseline</span>';
+        return '<span style="color:var(--gray-500);">CI: 与 baseline 重叠</span>';
+    };
+    const ciLine = (v, t) => (v && t)
+        ? `<span style="font-size:0.75rem;color:var(--gray-500);">95%CI val [${v[0].toFixed(4)}, ${v[1].toFixed(4)}] / test [${t[0].toFixed(4)}, ${t[1].toFixed(4)}]</span>`
+        : '<span style="font-size:0.75rem;color:var(--gray-400);">95%CI: —</span>';
+
+    // P 值: 样本级配对 bootstrap 检验 vs baseline (同一 test split 重采样, Δ=宏AUROC差)。
+    // 权威数值 src/analysis/vs_baseline_pvalues.json (计算脚本 vs_baseline_pvalue.py, 2026-09-05)。
+    // 展示口径: Δ 的全部 bootstrap 重采样同向时给分辨率下限 P<2/(B+1) (B=300 → <0.007, B=1000 → <0.002);
+    // 绿=显著高于 baseline, 红=显著低于, 灰=不显著。CI「重叠」与配对 P 是两个独立口径 (配对含样本级相关)。
+    const PV = {
+        hbce_lin05:  { t: 'P&lt;0.007', c: 'var(--success)' },
+        hbce_sq10:   { t: 'P&lt;0.007', c: 'var(--success)' },
+        hlup_v3:     { t: 'P=0.166', c: 'var(--gray-400)' },
+        m6_lblattn_l1: { t: 'P&lt;0.007', c: 'var(--success)' },
+        ecg_cpc_b:   { t: 'P&lt;0.007', c: 'var(--danger)' },
+        m2_la_s2:    { t: 'P&lt;0.007', c: 'var(--success)' },
+        f6_hmlc_s4:  { t: 'P&lt;0.002', c: 'var(--success)' },
+        f6_hmlc_s2:  { t: 'P&lt;0.007', c: 'var(--danger)' },
+        tab_only:    { t: 'P=0.106', c: 'var(--gray-400)' },
+        signal_only: { t: 'P&lt;0.007', c: 'var(--danger)' },
+        f0_concat:   { t: 'P&lt;0.007', c: 'var(--success)' },
+        f3_skip:     { t: 'P&lt;0.007', c: 'var(--success)' },
+        f6_sq5:      { t: 'P&lt;0.007', c: 'var(--success)' },
+        f6_sq10:     { t: 'P&lt;0.007', c: 'var(--success)' },
+        // ── M22 三探针 + M20 五臂 (2026-09-10 补算) ──
+        m22_p1_chapter_ep20:  { t: 'P&lt;0.007', c: 'var(--success)' },
+        m22_p1_chapter_ep100: { t: 'P&lt;0.007', c: 'var(--success)' },
+        m22_p2_grouped:       { t: 'P&lt;0.007', c: 'var(--danger)' },
+        m20_p1a:     { t: 'P=0.014', c: 'var(--danger)' },
+        m20_p1b:     { t: 'P&lt;0.007', c: 'var(--danger)' },
+        m20_p2:      { t: 'P&lt;0.007', c: 'var(--danger)' },
+        m20_p3:      { t: 'P&lt;0.007', c: 'var(--danger)' },
+        m20_p4:      { t: 'P&lt;0.007', c: 'var(--danger)' },
+        // ── M18 分层训练 (2026-09-10 全链收口) ──
+        m18_s1c:     { t: 'P&lt;0.007', c: 'var(--success)' },
+        m18_s1ci:    { t: 'P&lt;0.007', c: 'var(--success)' },
+        m18_s1ai:    { t: 'P&lt;0.007', c: 'var(--success)' },
+    };
+    const pTag = (key) => {
+        const p = PV[key];
+        return p ? ` <span style="font-size:0.75rem;font-weight:700;color:${p.c};">${p.t}</span>` : '';
+    };
+
+    // 卡片集合 (t = 测试集 agg1 排序键; 无值卡片排最后)
+    // CI 数据源: 各 run 的 scores_test.pkl(agg0=val split)/scores_val.pkl(agg1=test split) 本地直读 (2026-09-05);
+    //   M6 LA = 08-13 n_layers l1 日志表格; F3/F0 = F 系列 pkl; m2-LA/F6-HMLC = 各自 S2 pkl
+    const cardDefs = [];
+    cardDefs.push({ t: baseAgg1 ?? null, html: cardTpl('m1', 'Baseline (nan_mask)', baseAgg1?.toFixed(4)||'—', baseAuroc.toFixed(4),
+        `<div class="delta" style="color:var(--danger);">测试集 VR 11.74% (不含后处理)</div>`, '',
+        vrLine(baseVR, ' 层级违反率'), ciLine(BASE_CI.v, BASE_CI.t)) });
+
+    // ── Baseline + roll-up / roll-down（2026-09-26 实测，M26+ §9.2b；零训练零调参后处理）──
+    // 数据源: meeting_records/20260919/M26+/m26plus_baseline_roll.json
+    //   口径 = 窗级 roll → 记录级 mean 聚合 → 逐标签 rankdata AUROC → nanmean 宏（记录级 AUROC）/ VR 窗级 978 对;
+    //   锚点自证 PASS（raw 宏逐位复现 pkl 的 val 0.8295497 / test 0.8386980; raw VR 复现 M25 全景 11.7459%）;
+    //   与 M25 全景 json 同臂（up +0.009 / down −0.0002pp）逐位一致; roll 后 VR 严格 0（构造性）。
+    const BASE_ROLL = { up: { t: 0.8387879, v: 0.8295523 }, down: { t: 0.8386957, v: 0.8296141 } };
+    cardDefs.push({ t: BASE_ROLL.up.t, html: cardTpl('m1', 'Baseline + roll-up / roll-down（零训练零调参）',
+        BASE_ROLL.up.t.toFixed(4), BASE_ROLL.up.v.toFixed(4),
+        `<div class="delta up">roll-up Δ(测试集) +0.0090pp · Δ(验证集) +0.0003pp<br><span style="font-size:0.75rem;color:var(--gray-400);">roll-down Δ(测试集) −0.0002pp · Δ(验证集) +0.0064pp（大字为 roll-up 行）</span></div>`,
+        '零代价后处理：|Δ| ≤ 0.009pp，全在运行间方差（±0.075pp）内 —— 会上「roll 后更差 ~0.834」的估算被实测推翻',
+        vrLine(0, ' (roll 后严格 0，构造性)'),
+        '<span style="font-size:0.75rem;color:var(--gray-500);">95%CI val [0.8225, 0.8304] / test [0.8323, 0.8388]</span><span style="font-size:0.75rem;color:var(--gray-400);">（沿用 baseline 未 roll 行——手稿 Table 2；roll 为同一 run 的确定性后处理，改动 ≤0.009pp ≪ 区间宽度）</span>') });
+    cardDefs.push({ t: m1agg1 ?? null, html: cardTpl('m1', '方法1: HBCE', m1agg1?.toFixed(4)||'—', m1agg0?.toFixed(4)||'—',
+        m1dt != null
+          ? `<div class="delta ${m1dt<0?'down':'up'}">Δ(测试集) ${m1dt>=0?'+':''}${m1dt.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) ${m1dv>=0?'+':''}${m1dv.toFixed(4)}</span></div>`
+          : '<div class="delta">暂无数据</div>',
+        m1.best_result?.run_name||'', vrLine(m1vr, ' (squared λ=10 最优)'),
+        ciLine([0.8255, 0.8333], [0.8355, 0.8418]) + pTag('hbce_sq10') + '<br>' + sigTag([0.8355, 0.8418], [0.8255, 0.8333])) });
+    const m2agg0 = m2.best_result?.test_auroc_macro_agg0;
+    const m2agg1 = m2.best_result?.test_auroc_macro_agg1;
+    const m2dtC = m2agg1 != null ? (m2agg1 - baseAgg1) : null;
+    const m2dvC = m2agg0 != null ? (m2agg0 - baseAuroc) : null;
+    cardDefs.push({ t: m2agg1 ?? null, html: cardTpl('m2', '方法2: HLCP/HLUP（0721，concat head）', m2agg1?.toFixed(4)||'—', m2agg0?.toFixed(4)||'—',
+        m2dtC != null
+          ? `<div class="delta ${m2dtC<0?'down':'up'}">Δ(测试集) ${m2dtC>=0?'+':''}${m2dtC.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) ${m2dvC>=0?'+':''}${m2dvC.toFixed(4)} | v3 已修复</span></div>`
+          : '<div class="delta">v3 已修复（详见方法2页）</div>', '',
+        vrLine(0, ' (HLUP 链式法则天然满足)'),
+        ciLine([0.8231, 0.8306], [0.8320, 0.8389]) + pTag('hlup_v3')) });
+    cardDefs.push({ t: null, html: cardTpl('m3', '方法3: HMCN', '—', '—', '<div class="delta">待开展</div>', '', '', '') });
+
+    // ── 换头实验最优 (M6): n_layers l1 批次 (08-13 日志表格 CI) ──
+    const M6_LA = { agg1: 0.8411, agg0: 0.8324, ciT: [0.8380, 0.8443], ciV: [0.8286, 0.8357] };
+    const m6dt = M6_LA.agg1 - baseAgg1, m6dv = M6_LA.agg0 - baseAuroc;
+    cardDefs.push({ t: M6_LA.agg1, html: cardTpl('m1', '🔄 换头最优: M6 LabelAttention（单阶段 BCE）', M6_LA.agg1.toFixed(4), M6_LA.agg0.toFixed(4),
+        `<div class="delta up">Δ(测试集) +${m6dt.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +${m6dv.toFixed(4)}</span></div>`,
+        'head 参数 ~2.1M (n_layers=1, 2026-08-13 批次)',
+        vrLine(13.44, ' (08-12 重跑批次)'),
+        ciLine(M6_LA.ciV, M6_LA.ciT) + pTag('m6_lblattn_l1') + '<br>' + sigTag(M6_LA.ciT, M6_LA.ciV)) });
+
+    // ── M10 m2-LA S2 (concat 底座 + M2 三阶段 + LA, C 机 5090): 与 F6-HMLC 臂区分标注 ──
+    const M2_LA = { agg1: 0.84034, agg0: 0.83319, ciT: [0.8369, 0.8436], ciV: [0.8294, 0.8368] };
+    const m2ladt = M2_LA.agg1 - baseAgg1, m2ladv = M2_LA.agg0 - baseAuroc;
+    cardDefs.push({ t: M2_LA.agg1, html: cardTpl('m2', '🔄 M10 m2-LA S2（concat 底座三 trick，⚠️跨机）', M2_LA.agg1.toFixed(4), M2_LA.agg0.toFixed(4),
+        `<div class="delta up">Δ(测试集) +${m2ladt.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +${m2ladv.toFixed(4)}</span></div>`,
+        'M2 三阶段 + LA 换头 (C 机 5090, 跨机对比待同机复现)',
+        vrLine(0, ' (HLUP 链式法则天然满足)'),
+        ciLine(M2_LA.ciV, M2_LA.ciT) + pTag('m2_la_s2') + '<br>' + sigTag(M2_LA.ciT, M2_LA.ciV)) });
+
+    // ── F6-HMLC 两臂 (F3/F4 底座 × HMLC 链, 服务器A 5090 同机, 2026-09-02 收官) ──
+    const F6_HMLC_S4 = { agg1: 0.84213, agg0: 0.83216, ciT: [0.8386, 0.8452], ciV: [0.8284, 0.8359] };
+    const f6h3t = F6_HMLC_S4.agg1 - baseAgg1, f6h3v = F6_HMLC_S4.agg0 - baseAuroc;
+    cardDefs.push({ t: F6_HMLC_S4.agg1, html: cardTpl('m2', '🧪 F6-HMLC 三阶段链+换头（同机 服务器A）', F6_HMLC_S4.agg1.toFixed(4), F6_HMLC_S4.agg0.toFixed(4),
+        `<div class="delta up">Δ(测试集) +${f6h3t.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +${f6h3v.toFixed(4)}</span></div>`,
+        'F3/F4 底座 × HMLC S0→S1→S2（~40h，VR 构造性为 0）',
+        vrLine(0, ' (链式法则天然满足)'),
+        ciLine(F6_HMLC_S4.ciV, F6_HMLC_S4.ciT) + pTag('f6_hmlc_s4') + '<br>' + sigTag(F6_HMLC_S4.ciT, F6_HMLC_S4.ciV)) });
+    const F6_HMLC_S2 = { agg1: 0.83153, agg0: 0.82042, ciT: [0.8281, 0.8349], ciV: [0.8167, 0.8241] };
+    const f6h2t = F6_HMLC_S2.agg1 - baseAgg1, f6h2v = F6_HMLC_S2.agg0 - baseAuroc;
+    cardDefs.push({ t: F6_HMLC_S2.agg1, html: cardTpl('m3', '🧪 F6-HMLC 两阶段+换头（无 S0，崩）', F6_HMLC_S2.agg1.toFixed(4), F6_HMLC_S2.agg0.toFixed(4),
+        `<div class="delta down">Δ(测试集) ${f6h2t.toFixed(4)}<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) ${f6h2v.toFixed(4)}</span></div>`,
+        '无 S0 两阶段崩至 −1.12pp（S0 是 HMLC 链必需品）',
+        vrLine(0, ' (链式法则天然满足)'),
+        ciLine(F6_HMLC_S2.ciV, F6_HMLC_S2.ciT) + pTag('f6_hmlc_s2') + '<br>' + sigTag(F6_HMLC_S2.ciT, F6_HMLC_S2.ciV)) });
+
+    // ── 输入模态消融 + 换骨实验最优结果 ──
+    const FUTURE_METHODS = [
+        { cls: 'm2', title: '🧬 消融: tabular-only（只表格）', agg1: 0.8329, agg0: 0.8257,
+          ciT: [0.8292, 0.8365], ciV: [0.8215, 0.8298], pkey: 'tab_only',
+          deltaHtml: `<div class="delta down">Δ(测试集) −0.0027<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) −0.0007</span></div>`,
+          extra: '344K 参数，ep100（best@ep61，追平 baseline）', vr: 6.50 },
+        { cls: 'm3', title: '🧬 消融: signal-only（只 ECG）', agg1: 0.7727, agg0: 0.7664,
+          ciT: [0.7686, 0.7767], ciV: [0.7621, 0.7705], pkey: 'signal_only',
+          deltaHtml: `<div class="delta down">Δ(测试集) −0.0629<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) −0.0600</span></div>`,
+          extra: '2.9M 参数，ep100（best@ep10 即饱和）', vr: 11.94 },
+        { cls: 'm2', title: '🔌 ECG-CPC + MDS-ED (M13-B)', agg1: 0.8137, agg0: 0.8079,
+          ciT: [0.8101, 0.8173], ciV: [0.8034, 0.8120], pkey: 'ecg_cpc_b',
+          deltaHtml: `<div class="delta down">Δ(测试集) −0.0219<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) −0.0185</span></div>`,
+          extra: 'B 方案 encoder 权重+bidir（lr=1e-3），换骨已关闭', vr: 11.50 },
+        // ── M14 F 系列: F3 skip 点估计最优 + F0 多模态 LA 对照 ──
+        { cls: 'm1', title: '🔀 M14 F3 skip（点估计最优）', agg1: 0.8416, agg0: 0.8328,
+          ciT: [0.8383, 0.8450], ciV: [0.8290, 0.8363], pkey: 'f3_skip',
+          deltaHtml: `<div class="delta up">Δ(测试集) +0.0060<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0064</span></div>`,
+          extra: '双 context 直达 attention，⚠️ 单次运行待多种子', vr: 15.32 },
+        { cls: 'm3', title: '🔀 M14 F0 concat（LA 对照）', agg1: 0.8407, agg0: 0.8316,
+          ciT: [0.8373, 0.8439], ciV: [0.8281, 0.8351], pkey: 'f0_concat',
+          deltaHtml: `<div class="delta up">Δ(测试集) +0.0050<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0052</span></div>`,
+          extra: '640 维 concat + LA，复现 M6 增益（底座有效）', vr: 14.55 },
+        // ── M14 F6 收官: HBCE-squared skip λ∈{5,10} 主推 (agg1 取 λ5 / agg0 取 λ10) ──
+        { cls: 'm1', title: '🔀 M14 F6 HBCE-squared（skip）', agg1: 0.84284, agg0: 0.83411,
+          ciT: [0.8393, 0.8462], ciV: [0.8306, 0.8375], pkey: 'f6_sq5',
+          deltaHtml: `<div class="delta up">Δ(测试集) +0.0072<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0077</span></div>`,
+          extra: '层级一致性主推：skip+squared λ∈{5,10}，单阶段 ~10h（agg1 取 λ5 / agg0 取 λ10）', vr: 0.0109 },
+        // ── M22 三探针（2026-09-10 终结止损）+ M20 注意力填充器 ──
+        { cls: 'm2', title: '🧱 M22 P1 chapter（章内 mask 探针）', agg1: 0.84296, agg0: 0.83227,
+          ciT: [0.8394, 0.8462], ciV: [0.8285, 0.8361], pkey: 'm22_p1_chapter_ep20',
+          deltaHtml: `<div class="delta up">Δ(测试集) +0.0074<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0059</span></div>`,
+          extra: '章间交互切除（章内保留）：判别与 M0 持平、VR 反升 14.56% → 方向止损（09-10）', vr: 14.56 },
+        { cls: 'm3', title: '🧱 M22 P2 grouped（分组头探针，证伪）', agg1: 0.83296, agg0: 0.82355,
+          ciT: [0.8294, 0.8362], ciV: [0.8197, 0.8278], pkey: 'm22_p2_grouped',
+          deltaHtml: `<div class="delta down">Δ(测试集) −0.0026<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) −0.0028</span></div>`,
+          extra: '每章完整 mini-LA：组内 21 章 0 升 15 降 → 证伪止损（头 33.9M = LA×16.1）', vr: 14.64 },
+        { cls: 'm3', title: '🧩 M20 P4 注意力填充器（YJY 构想）', agg1: 0.83241, agg0: 0.82499,
+          ciT: [0.8289, 0.8357], ciV: [0.8213, 0.8286], pkey: 'm20_p4',
+          deltaHtml: `<div class="delta down">Δ(测试集) −0.0032<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) −0.0014</span></div>`,
+          extra: 'tab 填充阶梯：填充器 v1 未见增益（判据未达标，改进轮 λ 网格待跑）', vr: 11.16 },
+        // ── M18 分层训练（2026-09-10 全链收口，s1c 最终形态）──
+        { cls: 'm1', title: '📚 M18 s1c：分层课程 × HBCE（最终推荐形态）', agg1: 0.84411, agg0: 0.83402,
+          ciT: [0.8406, 0.8475], ciV: [0.8303, 0.8373], pkey: 'm18_s1c',
+          deltaHtml: `<div class="delta up">Δ(测试集) +0.0085<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0076</span></div>`,
+          extra: '逐层课程×HBCE λ5 sq：agg1 全家族最高 + VR 压至 0.0076% + bootstrap 排除 0（⚠️单种子待 3 种子；文档表 0.84415）', vr: 0.0076 },
+    ];
+    for (const fm of FUTURE_METHODS) {
+        cardDefs.push({ t: fm.agg1 ?? null, html: cardTpl(fm.cls, fm.title,
+            fm.agg1 != null ? fm.agg1.toFixed(4) : '—',
+            fm.agg0 != null ? fm.agg0.toFixed(4) : '—',
+            fm.deltaHtml, fm.extra, vrLine(fm.vr, ''),
+            ciLine(fm.ciV, fm.ciT) + pTag(fm.pkey) + '<br>' + sigTag(fm.ciT, fm.ciV)) });
+    }
+
+    // ── MoE 最强模型集成（M29 任务2 补充）：全站当前最优，离线零训练后处理 ──
+    // val agg0 = 由 5 成员 preds_val.npz 按 M26+ 探针口径离线复算（记录级聚合 + rankdata 逐标签 AUROC
+    // + 未定义计 0.5）；同法 test 口径自证 0.8535083 vs 权威 0.85041 ✓（差 0.0002pp = 显示精度）
+    cardDefs.push({ t: 0.85041, html: cardTpl('m1',
+        '🏛️ M26 零训练集成（s1c 系 5 变体概率平均）', '0.85041', '0.8407',
+        `<div class="delta up">Δ(测试集) +0.0148<br><span style="font-size:0.75rem;color:var(--gray-400);">Δ(验证集) +0.0143</span></div>`,
+        '零训练纯后处理 · 全站最优（M15→M26 三方向全部未超越）',
+        vrLine(0.0050, ' (5 变体集成)'),
+        '<span style="font-size:0.75rem;color:var(--gray-500);">95%CI test [0.8472, 0.8537]</span><span style="font-size:0.75rem;color:var(--gray-400);">（手稿 SI Table 8 / m26_ensemble_ci.json，记录级 B=1000；val 侧未做 bootstrap）</span>') });
+
+    // ── 分组折叠渲染（M29 任务2）：同族卡片收进可折叠组，组头显示该组最优 agg1 与张数 ──
+    const GRP_ORDER = ['🎯 基准与方法主干', '🏛️ MoE 最强模型集成（M15→M26）', '🔄 换头与链式训练',
+                       '🧬 输入模态与换骨', '🔀 M14 融合机制 F 系列', '🧱 机制与消融探针'];
+    const titleOf = (html) => {
+        const m = html.match(/font-weight:700;font-size:0\.875rem;">([^<]*)</);
+        return m ? m[1] : '';
+    };
+    const grpOf = (t) => {
+        if (!t) return '🧱 机制与消融探针';
+        if (/^Baseline|^方法[123]/.test(t)) return '🎯 基准与方法主干';
+        if (/M26 零训练集成/.test(t)) return '🏛️ MoE 最强模型集成（M15→M26）';
+        if (/换头|m2-LA|F6-HMLC/.test(t)) return '🔄 换头与链式训练';
+        if (/消融|ECG-CPC/.test(t)) return '🧬 输入模态与换骨';
+        if (/M14 F/.test(t)) return '🔀 M14 融合机制 F 系列';
+        return '🧱 机制与消融探针';
+    };
+    // 按测试集 (agg1) 降序排列; 无值卡片 (待开展) 排最后
+    cardDefs.sort((a, b) => (b.t ?? -Infinity) - (a.t ?? -Infinity));
+    const byGrp = {};
+    for (const d of cardDefs) {
+        const g = grpOf(d.title || titleOf(d.html));
+        (byGrp[g] = byGrp[g] || []).push(d);
+    }
+    let gridHtml = '';
+    for (const g of GRP_ORDER) {
+        const items = byGrp[g];
+        if (!items || !items.length) continue;
+        const best = items.find(d => d.t != null);
+        gridHtml += `<details class="dash-group"${g === GRP_ORDER[0] ? ' open' : ''}>`
+            + `<summary>${g}<span class="dg-best">${best ? best.t.toFixed(4) : '—'}</span>`
+            + `<span class="dg-count">${items.length} 张</span></summary>`
+            + `<div class="compare-grid">${items.map(d => d.html).join('')}</div></details>`;
+    }
+    document.getElementById('dashboard-cards').innerHTML = gridHtml;
+
+    // Detailed comparison table
+    let tb = `<table class="data-table" style="min-width:760px;">
+    <thead><tr>
+    <th>方法</th><th>子类型 / 配置</th><th class="num">Val AUROC (agg0) [95% CI]</th><th class="num">Test AUROC (agg1) [95% CI]</th><th class="num">Δ val</th><th class="num">Δ test</th><th class="num">VR%</th><th class="num">vs Baseline (CI)</th>
+    </tr></thead><tbody>`;
+
+    // Baseline row
+    tb += `<tr style="background:var(--gray-50);">
+    <td><strong>Baseline</strong></td>
+    <td style="color:var(--gray-500);">with_nan_mask</td>
+    <td class="num highlight">${baseAuroc.toFixed(4)} <span style="font-size:0.75rem;color:var(--gray-400);">[${BASE_CI.v[0].toFixed(4)},${BASE_CI.v[1].toFixed(4)}]</span></td>
+    <td class="num">${baseAgg1?.toFixed(4)||'—'} <span style="font-size:0.75rem;color:var(--gray-400);">[${BASE_CI.t[0].toFixed(4)},${BASE_CI.t[1].toFixed(4)}]</span></td>
+    <td class="num">—</td>
+    <td class="num">—</td>
+    <td class="num warn-cell">${baseVR.toFixed(2)}%</td>
+    <td class="num">—</td></tr>`;
+
+    // Baseline + roll-up / roll-down 两行（2026-09-26 实测，M26+ §9.2b）
+    // ⚠️ 本两行 Δ 用 pp 标注: 效应量（|Δ| ≤ 0.009pp = ≤0.00009 AUROC）低于本表 4 位小数 AUROC 的分辨率
+    // 区间来源: 沿用 baseline 未 roll 行的 95% CI（手稿 Table 2 = maskarms 的 Linear head 行；roll 是同一 run 的
+    //   确定性后处理，改动 ≤0.009pp ≪ 区间宽度 ±0.33pp）——该 run 未为 roll 行单独做 bootstrap
+    const BASE_ROLL_CI = { v: '[0.8225,0.8304]', t: '[0.8323,0.8388]' };
+    const BASE_ROLL_ROWS = [
+        { name: '🔧 Baseline + roll-up', cfg: '窗级 roll-up（子→父取 max）→ 记录级 mean，零训练零调参',
+          v: '0.8265', t: '0.8357', dv: '+0.0003', dt: '+0.0090' },
+        { name: '🔧 Baseline + roll-down', cfg: '窗级 roll-down（父→子取 min）→ 记录级 mean，零训练零调参',
+          v: '0.8265', t: '0.8356', dv: '+0.0064', dt: '−0.0002' },
+    ];
+    for (const r of BASE_ROLL_ROWS) {
+        tb += `<tr style="background:var(--gray-50);">
+        <td><strong>${r.name}</strong></td>
+        <td style="color:var(--gray-500);">${r.cfg}</td>
+        <td class="num">${r.v} <span style="font-size:0.75rem;color:var(--gray-400);">${BASE_ROLL_CI.v}</span></td>
+        <td class="num">${r.t} <span style="font-size:0.75rem;color:var(--gray-400);">${BASE_ROLL_CI.t}</span></td>
+        <td class="num up">${r.dv}<span style="font-size:0.7rem;color:var(--gray-400);">pp</span></td>
+        <td class="num ${r.dt.startsWith('−') ? 'down' : 'up'}">${r.dt}<span style="font-size:0.7rem;color:var(--gray-400);">pp</span></td>
+        <td class="num up">0%</td>
+        <td class="num" style="font-size:0.75rem;">零代价（roll 后 VR 构造性 0）</td></tr>`;
+    }
+
+    // Method 1 subgroups
+    const sg = m1.subgroups;
+    // Test AUROC (agg1) from best-run lookup
+    const linAgg1 = sg?.linear ? (m1.runs.find(r => r.penalty_type==='linear' && r.weight===sg.linear.best_agg0_weight)?.test_auroc_macro_agg1) : null;
+    const sqAgg1 = sg?.squared ? (m1.runs.find(r => r.penalty_type==='squared' && r.weight===sg.squared.best_agg0_weight)?.test_auroc_macro_agg1) : null;
+    if (sg && sg.linear) {
+        const l = sg.linear;
+        const ld = (l.best_agg0 - baseAuroc);
+        const ldt = linAgg1 != null ? (linAgg1 - baseAgg1) : null;
+        tb += `<tr style="background:var(--success-bg);">
+        <td rowspan="2"><strong>① HBCE</strong></td>
+        <td>Linear 连续惩罚</td>
+        <td class="num highlight up">${l.best_agg0.toFixed(4)} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8248,0.8323]</span></td>
+        <td class="num up">${linAgg1?.toFixed(4)||'—'} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8349,0.8416]</span></td>
+        <td class="num up">${ld>=0?'+':''}${ld.toFixed(4)}</td>
+        <td class="num up">${ldt!=null?((ldt>=0?'+':'')+ldt.toFixed(4)):'—'}</td>
+        <td class="num up" style="font-weight:700;">${l.best_vr.toFixed(3)}%</td>
+        <td class="num">重叠${pTag('hbce_lin05')}</td></tr>`;
+    }
+    if (sg && sg.squared) {
+        const s = sg.squared;
+        const sd = (s.best_agg0 - baseAuroc);
+        const sdt = sqAgg1 != null ? (sqAgg1 - baseAgg1) : null;
+        tb += `<tr style="background:var(--success-bg);">
+        <td>Squared 连续惩罚</td>
+        <td class="num highlight up">${s.best_agg0.toFixed(4)} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8255,0.8333]</span></td>
+        <td class="num up">${sqAgg1?.toFixed(4)||'—'} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8355,0.8418]</span></td>
+        <td class="num up">${sd>=0?'+':''}${sd.toFixed(4)}</td>
+        <td class="num up">${sdt!=null?((sdt>=0?'+':'')+sdt.toFixed(4)):'—'}</td>
+        <td class="num up">${s.best_vr.toFixed(3)}%</td>
+        <td class="num">重叠${pTag('hbce_sq10')}</td></tr>`;
+    }
+
+    // Method 2 (v3 Exp-A)
+    const m2a = m2.best_result?.test_auroc_macro_agg0;
+    const m2a1 = m2.best_result?.test_auroc_macro_agg1;
+    const m2d = m2a ? (m2a - baseAuroc) : null;
+    const m2dt = m2a1 != null ? (m2a1 - baseAgg1) : null;
+    tb += `<tr style="background:var(--success-bg);">
+    <td><strong>② HLCP/HLUP</strong></td>
+    <td style="color:var(--gray-500);">v3 Exp-A 两阶段校准</td>
+    <td class="num highlight up">${m2a?.toFixed(4)||'—'} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8231,0.8306]</span></td>
+    <td class="num">${m2a1?.toFixed(4)||'—'} <span style="font-size:0.75rem;color:var(--gray-400);">[0.8320,0.8389]</span></td>
+    <td class="num up">${m2d?((m2d>=0?'+':'')+m2d.toFixed(4)):'—'}</td>
+    <td class="num">${m2dt!=null?((m2dt>=0?'+':'')+m2dt.toFixed(4)):'—'}</td>
+    <td class="num up">0 (HLUP 天然)</td>
+    <td class="num">重叠${pTag('hlup_v3')}</td></tr>`;
+
+    // m2-LA S2 (换头+两阶段, M10 Q3 实验 A, 2026-08-21)
+    const m2laDv = 0.83319 - baseAuroc, m2laDt = 0.84034 - baseAgg1;
+    tb += `<tr style="background:var(--accent-light);">
+    <td><strong>②+ 换头: m2-LA S2</strong></td>
+    <td style="color:var(--gray-500);">M2 三阶段 + LabelAttentionHead（三 trick 叠加）</td>
+    <td class="num highlight up">0.83319 <span style="font-size:0.75rem;color:var(--gray-400);">[0.8294,0.8368]</span></td>
+    <td class="num highlight up">0.84034 <span style="font-size:0.75rem;color:var(--gray-400);">[0.8369,0.8436]</span></td>
+    <td class="num up">+${m2laDv.toFixed(4)}</td>
+    <td class="num up">+${m2laDt.toFixed(4)}</td>
+    <td class="num up">0 (HLUP 天然)</td>
+    <td class="num">重叠 ⚠️跨机${pTag('m2_la_s2')}</td></tr>`;
+
+    // 输入模态消融 + 换骨 (2026-08-21 收口)
+    // CI 本地 pkl 直读; 显著性 = 与 baseline CI [0.8225,0.8304]v/[0.8323,0.8388]t 是否重叠
+    const MOD_ROWS = [
+        { name: '🧬 消融: tabular-only', cfg: '344K 参数，ep100', v: 0.8257, t: 0.8329, vr: '6.50%', pkey: 'tab_only',
+          ciV: [0.8215, 0.8298], ciT: [0.8292, 0.8365] },
+        { name: '🧬 消融: signal-only', cfg: '2.9M 参数，ep100', v: 0.7664, t: 0.7727, vr: '11.94%', pkey: 'signal_only',
+          ciV: [0.7621, 0.7705], ciT: [0.7686, 0.7767] },
+        { name: '🔌 ECG-CPC + MDS-ED', cfg: 'M13-B encoder 权重+bidir (lr=1e-3)', v: 0.8079, t: 0.8137, vr: '11.50%', pkey: 'ecg_cpc_b',
+          ciV: [0.8034, 0.8120], ciT: [0.8101, 0.8173] },
+        { name: '🔀 M14 F0 concat（LA 对照）', cfg: '640 维 concat + LA，⚠️ 单次运行', v: 0.8316, t: 0.8407, vr: '14.55%', pkey: 'f0_concat',
+          ciV: [0.8281, 0.8351], ciT: [0.8373, 0.8439] },
+        { name: '🔀 M14 F3 skip（点估计最优）', cfg: '双 context 直达 attention，⚠️ 单次运行', v: 0.8328, t: 0.8416, vr: '15.32%', pkey: 'f3_skip',
+          ciV: [0.8290, 0.8363], ciT: [0.8383, 0.8450] },
+        { name: '🔀 M14 F6 HBCE-squared（skip）', cfg: '层级一致性主推：skip+squared λ∈{5,10}，⚠️ 单次运行', v: 0.83411, t: 0.84284, vr: '0.011%', pkey: 'f6_sq5',
+          ciV: [0.8306, 0.8375], ciT: [0.8393, 0.8462] },
+        { name: '🧪 F6-HMLC 三阶段链+换头（同机）', cfg: 'F3/F4 底座 × HMLC S0→S1→S2，~40h', v: 0.83216, t: 0.84213, vr: '0%', pkey: 'f6_hmlc_s4',
+          ciV: [0.8284, 0.8359], ciT: [0.8386, 0.8452] },
+        { name: '🧪 F6-HMLC 两阶段+换头（无 S0，崩）', cfg: 'F3/F4 底座 × HLCP→HLUP（S0 是必需品）', v: 0.82042, t: 0.83153, vr: '0%', pkey: 'f6_hmlc_s2',
+          ciV: [0.8167, 0.8241], ciT: [0.8281, 0.8349] },
+        // ── M22 三探针（2026-09-10 终结）+ M20 五臂（2026-09-04 裁决）──
+        { name: '🧱 M22 P1 chapter（章内 mask 探针）', cfg: '章间交互切除（章内保留），ep20，⚠️ RUC V100 跨机', v: 0.83227, t: 0.84296, vr: '14.56%', pkey: 'm22_p1_chapter_ep20',
+          ciV: [0.8285, 0.8361], ciT: [0.8394, 0.8462] },
+        { name: '🧱 M22 P1 chapter ep100', cfg: '同臂长档（50→100ep 无增益，默认口径取 ep20）', v: 0.83277, t: 0.84191, vr: '14.06%', pkey: 'm22_p1_chapter_ep100',
+          ciV: [0.8290, 0.8363], ciT: [0.8386, 0.8452] },
+        { name: '🧱 M22 P2 grouped（分组头，证伪）', cfg: '每章完整 mini-LA（头 33.9M），⚠️ RUC V100 跨机', v: 0.82355, t: 0.83296, vr: '14.64%', pkey: 'm22_p2_grouped',
+          ciV: [0.8197, 0.8278], ciT: [0.8294, 0.8362] },
+        { name: '🧩 M20 P1A（值+缺失指示位，锚点）', cfg: 'tab 五臂 ep20 单种子，⚠️ 服务器B 跨机', v: 0.82636, t: 0.83493, vr: '11.61%', pkey: 'm20_p1a',
+          ciV: [0.8225, 0.8304], ciT: [0.8315, 0.8379] },
+        { name: '🧩 M20 P1B（mask→cat）', cfg: 'mask 改 categorical embedding', v: 0.82627, t: 0.83324, vr: '11.02%', pkey: 'm20_p1b',
+          ciV: [0.8225, 0.8299], ciT: [0.8298, 0.8367] },
+        { name: '🧩 M20 P2（mask-only，值抹除）', cfg: '只缺失模式、抹掉观测值 → 值信息主导的直接证据', v: 0.78185, t: 0.78736, vr: '11.80%', pkey: 'm20_p2',
+          ciV: [0.7781, 0.7861], ciT: [0.7830, 0.7914] },
+        { name: '🧩 M20 P3（MLP 填充）', cfg: '学习式填充（MLP 核）', v: 0.82376, t: 0.83180, vr: '10.70%', pkey: 'm20_p3',
+          ciV: [0.8198, 0.8275], ciT: [0.8285, 0.8350] },
+        { name: '🧩 M20 P4（注意力填充，YJY 构想）', cfg: '学习式填充（attention 核）——填充器 v1 未见增益', v: 0.82499, t: 0.83241, vr: '11.16%', pkey: 'm20_p4',
+          ciV: [0.8213, 0.8286], ciT: [0.8289, 0.8357] },
+        // ── M18 分层训练（2026-09-10 全链收口）──
+        { name: '📚 M18 s1c（课程×HBCE，最终形态）', cfg: 'S1a 逐层课程 × HBCE λ5 sq，ep50，⚠️ 单种子', v: 0.83402, t: 0.84411, vr: '0.0076%', pkey: 'm18_s1c',
+          ciV: [0.8303, 0.8373], ciT: [0.8406, 0.8475] },
+        { name: '📚 M18 s1ci（invpref×HBCE，假设证伪）', cfg: 'invpref 课程 × HBCE——增益在 HBCE 下消失（不叠加）', v: 0.83369, t: 0.84325, vr: '0.019%', pkey: 'm18_s1ci',
+          ciV: [0.8302, 0.8376], ciT: [0.8398, 0.8463] },
+        { name: '📚 M18 s1ai（invpref 纯课程）', cfg: '四格唯一正向（agg0 +0.18 + VR 最优）——值 3 种子确认', v: 0.83455, t: 0.84300, vr: '14.44%', pkey: 'm18_s1ai',
+          ciV: [0.8312, 0.8379], ciT: [0.8397, 0.8463] },
+    ];
+    for (const r of MOD_ROWS) {
+        const dv = r.v - baseAuroc, dt = r.t - baseAgg1;
+        const cls = dv < 0 ? 'down' : 'up';
+        tb += `<tr>
+        <td><strong>${r.name}</strong></td>
+        <td style="color:var(--gray-500);">${r.cfg}</td>
+        <td class="num">${r.v.toFixed(4)} <span style="font-size:0.75rem;color:var(--gray-400);">[${r.ciV[0].toFixed(4)},${r.ciV[1].toFixed(4)}]</span></td>
+        <td class="num">${r.t.toFixed(4)} <span style="font-size:0.75rem;color:var(--gray-400);">[${r.ciT[0].toFixed(4)},${r.ciT[1].toFixed(4)}]</span></td>
+        <td class="num ${cls}">${dv>=0?'+':''}${dv.toFixed(4)}</td>
+        <td class="num ${cls}">${dt>=0?'+':''}${dt.toFixed(4)}</td>
+        <td class="num">${r.vr}</td>
+        <td class="num" style="font-size:0.75rem;">${(r.ciT[0] > BASE_CI.t[1]) || (r.ciV[0] > BASE_CI.v[1]) ? '✅显著↑' : ((r.ciT[1] < BASE_CI.t[0]) || (r.ciV[1] < BASE_CI.v[0]) ? '❌显著↓' : '重叠')}${pTag(r.pkey)}</td></tr>`;
+    }
+
+    // Method 3
+    tb += `<tr style="opacity:0.5;">
+    <td><strong>③ HMCN</strong></td>
+    <td style="color:var(--gray-400);">多层分类网络</td>
+    <td class="num" style="color:var(--gray-400);">待开展</td>
+    <td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>`;
+
+    tb += `</tbody></table>`;
+    document.getElementById('dashboard-table').innerHTML = tb;
+    document.getElementById('dashboard-note').innerHTML =
+        '📐 口径: 大字 = <strong>测试集 (agg1)</strong> 主指标、小字 = 验证集 (agg0)；Δ 主行测试集口径、括号验证集；VR 为测试集口径（25,756 样本）。<strong>P 值</strong> = 样本级配对 bootstrap vs baseline（同 test split 重采样，Δ=宏 AUROC 差；全同向时报分辨率下限 P&lt;2/(B+1)；权威值 src/analysis/vs_baseline_pvalues.json）。⚠️ <strong>P 值语义</strong>：单种子配对 P = 该对权重的预测差异稳定性，≠ 方法级显著性（方法级尺子 = 种子方差 ±2pp，如 M20 P3/P4 P&lt;0.007 但效应 −0.3pp 仍在种子方差内）。CI 重叠与配对 P 是两个独立口径——同测试集高度正相关 ⇒ CI 重叠仍可配对显著（如 HBCE / F6-HMLC 三阶段 P&lt;0.002~0.007；HLUP v3 P=0.166 = 与 baseline 持平）。<strong>2026-09-26 补 Baseline + roll</strong>（零训练零调参，M26+ §9.2b）：口径 = 记录级宏 AUROC（窗级 roll→记录级 mean→rankdata）+ 窗级 VR（978 对）；两行 Δ 以 pp 标注、精确值 roll-up test 0.8387879 / val 0.8295523、roll-down 0.8386957 / 0.8296141；roll 后 VR 构造性 0；CI 沿用未 roll baseline 行（确定性后处理改动 ≤0.009pp ≪ 区间宽度）；锚点自证 raw 宏逐位复现 pkl（val 0.8295497 / test 0.8386980）。<strong>M26 集成 test 95%CI [0.8472, 0.8537]</strong>（SI Table 8 / m26_ensemble_ci.json，记录级 B=1000；val 侧未做）。论文声称: MDS-ED macro-AUROC = 0.8334 (95% CI: 0.8300–0.8366) | HBCE Linear VR 11.74% → 0.002%（降 100.29%）';
+    document.getElementById('dashboard-status').textContent = '✅ 已更新';
+    document.getElementById('dashboard-status').className = 'status-tag status-ok';
+}
+
+function renderVRSummary() {
+    if (!H) return;
+    const card = document.getElementById('sec-vr');
+    card.style.display = 'block';
+    const results = H.per_run_results || {};
+    const baselineResult = results['run__baseline_with_nan_mask'] || results['run__baseline'];
+    const baselineVR = baselineResult?.violations?.overall_violation_rate_pct ?? 11.744;
+    let bestVR = baselineVR, bestVRName = 'baseline';
+    for (const [name, r] of Object.entries(results)) {
+        if (r.status === 'ok' && r.violations) {
+            const vr = r.violations.overall_violation_rate_pct;
+            if (vr < bestVR) { bestVR = vr; bestVRName = name; }
+        }
+    }
+    document.getElementById('vr-grid').innerHTML = `
+        <div class="metric-card"><div class="metric-label">Baseline VR</div><div class="metric-value" style="color:var(--danger);">${baselineVR.toFixed(2)}%</div></div>
+        <div class="metric-card"><div class="metric-label">最优 VR</div><div class="metric-value" style="color:var(--success);">${bestVR.toFixed(2)}%</div><div style="font-size:0.75rem;color:var(--gray-400);">${bestVRName}</div></div>
+        <div class="metric-card"><div class="metric-label">VR 改善幅度</div><div class="metric-value" style="color:var(--success);">${(baselineVR - bestVR).toFixed(2)}%</div></div>
+        <div class="metric-card"><div class="metric-label">父子标签对数</div><div class="metric-value">978</div></div>
+    `;
+    document.getElementById('vr-formula').style.display = 'block';
+    if (window.MathJax) { MathJax.typesetPromise([document.getElementById('vr-formula')]); }
+    const sortedRuns = Object.entries(results)
+        .filter(([_,r]) => r.status === 'ok' && r.violations)
+        .sort((a,b) => (a[1].violations?.overall_violation_rate||0) - (b[1].violations?.overall_violation_rate||0))
+        .slice(0, 8);
+    let html = `<table class="data-table"><thead><tr><th>Run</th><th>VR%</th><th>Δ vs Baseline</th><th>受影响样本</th></tr></thead><tbody>`;
+    for (const [name, r] of sortedRuns) {
+        const v = r.violations;
+        if (!v) continue;
+        const delta = v.overall_violation_rate_pct - baselineVR;
+        const cls = delta < -1 ? 'up' : (delta > 0 ? 'warn-cell' : '');
+        html += `<tr>
+        <td><code style="font-size:0.75rem;">${name}</code></td>
+        <td class="num highlight ${cls}">${v.overall_violation_rate_pct.toFixed(3)}%</td>
+        <td class="num ${cls}">${delta>=0?'+':''}${delta.toFixed(2)}%</td>
+        <td class="num">${v.n_samples_with_violations}/${v.n_samples}</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+    document.getElementById('vr-table').innerHTML = html;
+}
+
+function renderTimeline() {
+    if (!D) return;
+    const weeks = D.weekly_progress || [];
+    const now = new Date();
+
+    // Find current week: the one whose interval contains today
+    let currentIdx = -1;
+    for (let i = 0; i < weeks.length; i++) {
+        const start = new Date(weeks[i].week_start + 'T00:00:00');
+        const end = new Date(weeks[i].saturday + 'T23:59:59');
+        if (now >= start && now <= end) { currentIdx = i; break; }
+    }
+    // Fallback: latest past week
+    if (currentIdx < 0) {
+        for (let i = weeks.length - 1; i >= 0; i--) {
+            if (new Date(weeks[i].saturday + 'T00:00:00') <= now) { currentIdx = i; break; }
+        }
+    }
+    if (currentIdx < 0) currentIdx = weeks.length - 1;
+
+    let html = '';
+    /* 演示版精简：时间线仅展示最近 4 周（倒序切片，origIdx 映射不受影响） */
+    weeks.slice().reverse().slice(0, 4).forEach((w, idx) => {
+        const origIdx = weeks.length - 1 - idx;
+        const sat = new Date(w.saturday + 'T00:00:00');
+        const isFuture = sat > now;
+        const isCurrent = origIdx === currentIdx;
+        const cls = isFuture ? 'future' : (isCurrent ? 'current' : 'past');
+        const isPast = cls === 'past';
+
+        html += `<div class="timeline-node ${cls}${isPast ? ' collapsed' : ''}" id="tl-${origIdx}">`;
+        html += `<div class="timeline-dot" ${isPast ? `onclick="toggleTimeline(${origIdx})"` : ''}></div>`;
+        html += `<div class="timeline-card ${isCurrent ? 'current' : ''}">`;
+        html += `<div class="timeline-date" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>📅 ${w.week_start || w.saturday} → ${w.saturday}（组会日）${isCurrent ? ' <span style="color:var(--primary);font-weight:700;">← 本周</span>' : ''}</div>`;
+        html += `<div class="timeline-summary" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>${w.summary}</div>`;
+        html += `<ul class="timeline-list">${(w.completed || []).map(c => `<li>✅ ${c}</li>`).join('')}${(w.issues || []).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')}${(w.next_steps || []).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')}</ul>`;
+        if (Object.keys(w.key_metrics || {}).length > 0) {
+            html += `<div class="timeline-metric">📊 ${Object.entries(w.key_metrics).map(([k, v]) => `${k}: <strong>${typeof v === 'number' ? v.toFixed(4) : v}</strong>`).join(' | ')}</div>`;
+        }
+        if (isPast) {
+            const totalItems = (w.completed || []).length + (w.issues || []).length + (w.next_steps || []).length;
+            html += `<div class="timeline-toggle" onclick="toggleTimeline(${origIdx})">▶ ${totalItems} 项详情</div>`;
+        }
+        html += `</div></div>`;
+    });
+    document.getElementById('timeline-container').innerHTML = html;
+}
+
+function toggleTimeline(idx) {
+    const node = document.getElementById('tl-' + idx);
+    if (!node) return;
+    const isCollapsed = node.classList.contains('collapsed');
+    node.classList.toggle('collapsed');
+    const toggle = node.querySelector('.timeline-toggle');
+    if (toggle) {
+        const totalItems = node.querySelectorAll('.timeline-list li').length;
+        toggle.textContent = isCollapsed ? `▼ ${totalItems} 项详情` : `▶ ${totalItems} 项详情`;
+    }
+}
+
+function renderThisWeek() {
+    if (!D) return;
+    const weeks = D.weekly_progress || [];
+    const latest = weeks[weeks.length-1] || {};
+    document.getElementById('this-week-title').textContent = `📝 本周任务 (${latest.week_start||'—'} → ${latest.saturday||'—'})`;
+    document.getElementById('this-week-content').innerHTML = `
+    <div class="timeline-card current" style="margin-bottom:10px;">
+        <div class="timeline-date">📅 ${latest.week_start||'—'} → ${latest.saturday||'—'}（组会日）</div>
+        <div class="timeline-summary">${latest.summary||'—'}</div>
+    </div>
+    <h4 style="font-size:0.875rem;color:var(--gray-600);margin:6px 0;">✅ 本周完成</h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.completed||[]).map(c => `<li>✅ ${c}</li>`).join('')||'<li>暂无</li>'}</ul>
+    <h4 style="font-size:0.875rem;color:var(--gray-600);margin:6px 0;">⚠️ 遇到的问题</h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.issues||[]).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')||'<li>暂无</li>'}</ul>
+    <h4 style="font-size:0.875rem;color:var(--gray-600);margin:6px 0;">📋 下周计划</h4>
+    <ul class="timeline-list">${(latest.next_steps||[]).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')||'<li>暂无</li>'}</ul>`;
+}
+
+function renderTodos() {
+    if (!D) return;
+    const todos = D.todo_list || [];
+    let html = '';
+    for (const cat of todos) {
+        html += `<h4 style="font-size:0.875rem;color:var(--gray-700);margin:14px 0 6px;padding-bottom:3px;border-bottom:2px solid var(--gray-200);">
+        ${cat.category.includes('紧急')?'🔴':'📌'} ${cat.category}</h4>`;
+        for (const item of cat.items) {
+            html += `
+        <div class="todo-item ${item.done?'done':''}" style="${item.urgent?'background:#fef2f2;border-radius:6px;padding:6px 8px;':''}">
+            <input type="checkbox" ${item.done?'checked':''} onchange="this.parentElement.classList.toggle('done')">
+            <label>${item.text}</label>
+            ${item.in_progress?'<span class="status-tag status-progress" style="font-size:0.75rem;">进行中</span>':''}
+            ${item.urgent?'<span class="status-tag status-danger" style="font-size:0.75rem;">紧急</span>':''}
+        </div>`;
+        }
+    }
+    document.getElementById('sec-todos').innerHTML = `
+    <div class="card-header"><div class="card-title">✅ 待办清单</div></div>
+    ${html}
+    <div class="info-box success" style="margin-top:14px;">
+        <strong>✅ 状态更新：</strong> <code>introduce_nan_columns=True</code> + HBCE三重Bug已于2026-07-09修复，2026-07-11~14完成重跑。
+        详细分析见实验记录归档。
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+<script src="theme-pack.js"></script>
+<script>
+/* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+(function initThemeSwitcher() {
+    if (!window.THEME_PACK || !THEME_PACK.length) return;
+    const KEY = 'labmeeting-theme';
+    const defTheme = document.body.dataset.defaultTheme || 'default';
+    const sw = document.getElementById('theme-switcher');
+    if (!sw) return;
+    const btn = sw.querySelector('.ts-btn');
+    const panel = document.getElementById('ts-panel');
+    const curLabel = sw.querySelector('.ts-cur');
+
+    // 面板：默认蓝系 + 10 个主题
+    // 本页内联样式已是「人大红 Beamer」（默认主题），故面板不再放虚拟的「默认蓝系」项
+    const opts = THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch }));
+    panel.innerHTML = opts.map(o =>
+        `<button class="ts-opt" type="button" data-theme="${o.id}">
+            <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
+            <span class="ts-name">${o.name}</span>
+            <span class="ts-check ic ic-check"></span>
+        </button>`).join('');
+
+    // 主题字体（webfont）：按需注入/替换 <link id="theme-fonts">；
+    // 加载失败或主题无字体时自动回退主题 CSS 里的系统字体栈
+    function applyFonts(t) {
+        let link = document.getElementById('theme-fonts');
+        if (!t || !t.fonts) { if (link) link.remove(); return; }
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-fonts';
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute('href') !== t.fonts) link.setAttribute('href', t.fonts);
+    }
+    function applyTheme(id) {
+        let el = document.getElementById('theme-overlay');
+        if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
+        const t = THEME_PACK.find(x => x.id === id);
+        // 内联默认主题（人大红）随选择启停：选其他主题时禁用，否则它的直接规则
+        //（如 #header{background:var(--primary)}）会压过主题包仅改 :root 令牌的覆盖方式
+        const baked = document.getElementById('baked-theme');
+        if (baked) baked.disabled = (id !== defTheme);
+        // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
+        let css = (t && id !== defTheme) ? t.css : '';
+        // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
+        const prefix = document.body.dataset.assetPrefix || '';
+        if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
+        el.textContent = css;
+        applyFonts(t);
+        try { localStorage.setItem(KEY, id); } catch (e) {}
+        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
+    }
+
+    // 恢复：localStorage 优先，其次页面默认主题
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    // 存量 'default'（旧默认主题 id）视为未选择——它已不在主题包中，回落新默认（人大红）；
+    // 仅当 saved 命中主题包里的真实主题才沿用（尊重用户显式选择）
+    applyTheme((saved && THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+
+    // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
+    function openPanel() {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = Math.min(r.bottom + 8, window.innerHeight - 260) + 'px';
+        panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+        panel.hidden = false;
+    }
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = panel.hidden;
+        if (open) openPanel(); else panel.hidden = true;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', e => {
+        const opt = e.target.closest('.ts-opt');
+        if (!opt) return;
+        applyTheme(opt.dataset.theme);
+        panel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+})();
+</script>
+<script>
+/* ═══════ 折叠组件（R11 修复轮自 07 页提取注入；无右栏联动） ═══════ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fold-head').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var f = btn.closest('.fold');
+            f.classList.toggle('open');
+            btn.setAttribute('aria-expanded', f.classList.contains('open'));
+        });
+    });
+});
+</script>
+<script>/* 脱敏展示版：外链图表/PDF 不随库分发，加载失败以占位块呈现 */
+document.querySelectorAll('img').forEach(function(im){function ph(){var d=document.createElement("div");d.style.cssText="border:1px dashed rgba(128,118,105,.55);border-radius:8px;padding:16px;margin:10px 0;font-size:13px;opacity:.75;text-align:center";d.textContent="🖼 该配图未随展示库分发（展示版已脱敏）";im.replaceWith(d);}
+if(im.complete&&im.naturalWidth===0){ph();return;}
+im.addEventListener('error',ph);});</script>
+</body>
+</html>

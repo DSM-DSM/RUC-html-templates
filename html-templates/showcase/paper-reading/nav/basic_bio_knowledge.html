@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>基础生物学概念 - AI4Research</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.4em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--ink); font-weight: 600; margin: 1.4em 0 0.6em; }
+    p { margin: 10px 0; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header {
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 28px 4px 22px; margin-bottom: 30px;
+    }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+    }
+    header .sub { font-size: .96em; color: var(--ink-2); margin-top: 6px; }
+
+    /* ====================================================================
+       概念卡片 (.concept) —— 一个卡片 = 一个背景概念
+       ==================================================================== */
+    .concept {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+    }
+    .concept:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .concept h2 { margin: 0 0 8px; font-size: 1.15em; font-family: var(--font-body); border: none; padding: 0; }
+    .concept h2::after { display: none; }
+    .concept .papers { font-size: .9em; color: var(--ink-2); margin-top: 10px; }
+    .concept .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept .links a {
+      padding: 5px 13px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .concept .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    /* ====================================================================
+       定义框 (.def-box) —— 承载概念的简明白话解释
+       ==================================================================== */
+    .def-box {
+      background: var(--c-def-bg); border: 1px solid var(--c-def-bd);
+      border-radius: var(--radius-s); padding: 12px 16px; margin: 12px 0;
+    }
+    .def-box strong { color: var(--c-def-fg); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .9em; color: var(--ink-2); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
+    .rb a {
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<header><h1><span data-zh>基础生物学概念速查</span><span data-en>Basic Biology Quick Reference</span></h1>
+    <div class="sub"><span data-zh>从DNA分子到MR应用——7层递进的生物学知识体系</span><span data-en>From DNA molecules to MR applications — a 7-level progressive biology knowledge system</span></div>
+</header>
+<div class="rb" style="justify-content:center;margin-bottom:20px;"><a href="mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a> <a href="reading_path.html"><span data-zh>阅读路径主页</span><span data-en>Reading Path Home</span></a> <a
+        href="knowledge_supplement.html"><span data-zh>补充知识点</span><span data-en>Background Notes</span></a> <a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a></div>
+<h2>0. 基础生物学概念（按层级组织）</h2>
+
+<div class="intuition" style="margin:16px 0;">
+    <span class="tag">导航说明</span>
+    <p>以下概念从<strong>分子底层到遗传变异到群体遗传到基因调控到应用遗传学</strong>逐级递进。每个层级的知识是理解上一层级的前提。如果你在阅读论文时遇到不熟悉的术语，可以从最底层开始向上查。右侧标注了每一层回答的核心问题。
+    </p>
+</div>
+
+<figure style="text-align:center; margin:32px 0;">
+    <svg style="max-width:700px; font-family:'PingFang SC','Microsoft YaHei',sans-serif;" viewBox="0 0 720 560"
+         width="100%"
+         xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <marker id="hArrow" markerHeight="6" markerWidth="8" orient="auto" refX="8" refY="3">
+                <polygon fill="#7f8c8d" points="0 0, 8 3, 0 6"/>
+            </marker>
+        </defs>
+        <rect fill="#fafbfc" height="560" rx="12" stroke="#d5dbdb" stroke-width="1.5" width="720"/>
+        <text fill="#1a5276" font-size="17" font-weight="700" text-anchor="middle" x="360" y="28">基础生物学概念层级图
+        </text>
+        <rect fill="#1a5276" height="48" opacity="0.9" rx="8" width="360" x="180" y="50"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="72">L1 分子基础</text>
+        <text fill="#d4e6f1" font-size="11" text-anchor="middle" x="360" y="90">DNA | 基因 | 基因组 | 染色体</text>
+        <rect fill="#2471a3" height="48" opacity="0.85" rx="8" width="360" x="180" y="118"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="140">L2 基因结构</text>
+        <text fill="#aed6f1" font-size="11" text-anchor="middle" x="360" y="158">编码区(外显子) | 非编码区(内含子) | 启动子
+            | 增强子
+        </text>
+        <rect fill="#2980b9" height="48" opacity="0.8" rx="8" width="360" x="180" y="186"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="208">L3 遗传变异</text>
+        <text fill="#d4e6f1" font-size="11" text-anchor="middle" x="360" y="226">遗传变异 | SNP | 等位基因 | 基因型 | 位点
+            | 突变
+        </text>
+        <rect fill="#27ae60" height="48" opacity="0.8" rx="8" width="360" x="180" y="254"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="276">L4 群体遗传学</text>
+        <text fill="#d5f5e3" font-size="11" text-anchor="middle" x="360" y="294">连锁不平衡(LD) | 单倍型 | 遗传重组 |
+            野生型
+        </text>
+        <rect fill="#8e44ad" height="48" opacity="0.8" rx="8" width="360" x="180" y="322"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="344">L5 基因表达</text>
+        <text fill="#e8daef" font-size="11" text-anchor="middle" x="360" y="362">RNA(mRNA) | 转录因子 | 基因表达 |
+            蛋白质
+        </text>
+        <rect fill="#e67e22" height="48" opacity="0.8" rx="8" width="360" x="180" y="390"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="412">L6 表观遗传调控</text>
+        <text fill="#fdebd0" font-size="11" text-anchor="middle" x="360" y="430">染色质 | 组蛋白修饰(H3K4me3/H3K27ac) |
+            ATAC-seq | ChIP-seq
+        </text>
+        <rect fill="#e74c3c" height="48" opacity="0.8" rx="8" width="360" x="180" y="458"/>
+        <text fill="#fff" font-size="14" font-weight="700" text-anchor="middle" x="360" y="480">L7 应用遗传学 (MR
+            的底层工具)
+        </text>
+        <text fill="#fadbd8" font-size="11" text-anchor="middle" x="360" y="498">GWAS | pQTL(cis/trans) | GTEx | 多效性 | PheWAS | KO敲除
+            | 多基因评分
+        </text>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="98" y2="116"/>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="166" y2="184"/>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="234" y2="252"/>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="302" y2="320"/>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="370" y2="388"/>
+        <line marker-end="url(#hArrow)" stroke="#7f8c8d" stroke-width="1.5" x1="360" x2="360" y1="438" y2="456"/>
+        <text fill="#7f8c8d" font-size="10" x="565" y="74">遗传信息如何存储?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="142">基因由哪些部分组成?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="210">个体之间有何差异?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="278">变异如何从一代传到下一代?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="346">基因如何产生功能产物?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="414">什么控制基因的开关?</text>
+        <text fill="#7f8c8d" font-size="10" x="565" y="482">遗传学如何应用于MR研究?</text>
+    </svg>
+    <figcaption style="font-size:0.85em;color:#7f8c8d;margin-top:6px;">图：生物学概念层级图 --
+        从DNA分子到MR应用，7层递进。右侧标注了每一层回答的核心问题。
+    </figcaption>
+</figure>
+
+<h3>L1：分子基础</h3>
+
+<div class="concept">
+    <h3>DNA（脱氧核糖核酸）</h3>
+    <div class="def-box"><p>DNA 是携带遗传信息的双链分子，由四种碱基（A/T/C/G）排列而成。可以把 DNA
+        想象成一本用四字母写成的"生命说明书"——每个人的说明书约 30 亿个字母长，99.9% 相同，但那个 0.1% 的差异（~300
+        万个字母差异）决定了个体之间的遗传差异。</p></div>
+</div>
+
+<div class="concept">
+    <h3>基因（Gene）</h3>
+    <div class="def-box"><p>基因是 DNA 上的一段特定序列，包含制造一个功能性产物（通常是蛋白质）所需的信息。人类约有
+        20,000-25,000 个基因。类比：DNA = 整本说明书，基因 = 其中的一章。在 MR 中，药物靶点通常是蛋白质的编码基因——例如 <em>PCSK9</em>
+        基因编码 PCSK9 蛋白（LDL-C 调控的关键酶）。</p></div>
+</div>
+
+<div class="concept">
+    <h3>基因组（Genome）</h3>
+    <div class="def-box"><p>基因组是一个生物体的<strong>完整 DNA 序列</strong>——包括所有基因以及基因之间的非编码区域。人类基因组约
+        3.2 Gb，分布在 23 对染色体上。GWAS 是对整个基因组进行扫描，因此称为"全基因组"关联研究。在 LyMOI 论文中，大图模型(LGM)整合了
+        562 个真核物种的基因组数据。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> <a href="../papers/Tang_2025_Deep_learning_large_zh.html">Tang (LyMOI)</a></div>
+</div>
+
+<h3>L2：基因结构</h3>
+
+<div class="concept">
+    <h3>编码区 / 外显子（Coding Region / Exon）</h3>
+    <div class="def-box"><p>基因中<strong>最终翻译为蛋白质氨基酸序列</strong>的部分。外显子只占人类基因组的约
+        1-2%，但包含了绝大多数已知致病突变。MR 研究中，选择编码区内的 SNP（如乙醛脱氢酶 ALDH2 的失活突变
+        rs671）通常意味着多效性风险更低——因为该变异的功能角色更容易从生物学上理解。</p></div>
+</div>
+
+<div class="concept">
+    <h3>非编码区 / 内含子 / 调控元件</h3>
+    <div class="def-box"><p>基因中不翻译为蛋白质的部分——包括内含子（被剪接掉）和调控元件（启动子/增强子）。绝大多数 GWAS
+        显著位点落在非编码区，这使得"从 GWAS 到因果基因"的推断变得困难。这也正是为什么需要 coloc 共定位和表观基因组学分析（如
+        Yoshiji 论文中的 ATAC-seq/ChIP-seq）。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+        (两步MR)</a></div>
+</div>
+
+<div class="concept">
+    <h3>启动子（Promoter）与增强子（Enhancer）</h3>
+    <div class="def-box"><p><strong>启动子</strong>是基因转录起始位点附近的 DNA 序列，RNA
+        聚合酶在此结合并开始转录。<strong>增强子</strong>是远端调控元件，可以被转录因子结合来"增强"基因转录速率。一个基因可以有多个增强子，在不同组织中被不同转录因子激活——这解释了为什么同一个基因在肝脏和大脑中的表达水平可能完全不同。组蛋白修饰
+        H3K4me3 标记活性启动子，H3K27ac 标记活性增强子。</p></div>
+</div>
+
+<h3>L3：遗传变异</h3>
+
+<div class="concept">
+    <h3>遗传变异（Genetic Variant）</h3>
+    <div class="def-box"><p>个体之间 DNA 序列的任何差异。范围从单个碱基的替换（SNP）到数千个碱基的插入/缺失（indel）到整个染色体片段的拷贝数变异（CNV）。MR
+        中最常用的是 SNP 作为工具变量。</p></div>
+</div>
+
+<div class="concept">
+    <h3>SNP（单核苷酸多态性）</h3>
+    <div class="def-box"><p>SNP 是单个碱基位置上的 DNA 序列差异——例如，在基因组某个位置，大多数人携带 C，少数人携带
+        T。人类基因组中有约 1 亿个已知 SNP，但 GWAS 通常只关注<strong>常见 SNP</strong>（次要等位基因频率 MAF > 1%）。一个
+        SNP 改变蛋白质编码（非同义突变）时可能直接影响功能；落在非编码区时可能通过调控元件间接影响基因表达。</p></div>
+</div>
+
+<div class="concept">
+    <h3>等位基因（Allele）与基因型（Genotype）</h3>
+    <div class="def-box"><p><strong>等位基因</strong>是基因或 SNP 的某一特定版本（如 rs671 的 G 等位基因 vs A
+        等位基因）。<strong>基因型</strong>是个体携带的两个等位基因的组合——来自母亲和父亲各一个。对于双等位基因
+        SNP，三种可能基因型为：AA、AG、GG。在 MR 中，基因型被编码为 0/1/2（效应等位基因的剂量），作为连续工具变量使用。</p></div>
+</div>
+
+<div class="concept">
+    <h3>位点（Locus）与突变（Mutation）</h3>
+    <div class="def-box"><p><strong>位点</strong>是染色体上某个物理位置。MR 中常提到"GWAS 位点"——包含多个彼此处于 LD 的
+        SNP 的基因组区域。<strong>突变</strong>通常指罕见且常为致病性的 DNA 序列变化；在频率和效应大小上，突变通常比 SNP
+        更罕见但效应更大。ALDH2 rs671 在中国人群中被视为 SNP（MAF ~20-30%），但它实际上是一个功能缺失突变。</p></div>
+</div>
+
+<h3>L4：群体遗传学</h3>
+
+<div class="concept">
+    <h3>连锁不平衡（Linkage Disequilibrium, LD）</h3>
+    <div class="def-box">
+        <p>LD 指的是群体中两个遗传变异<strong>不是独立遗传</strong>的现象——它们以高于随机期望的频率共同出现。这通常因为它们在染色体上物理位置接近，不太可能被重组事件分开。LD
+            是 MR 中最核心的底层概念之一。</p>
+
+        <div style="margin:14px 0; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div style="background:#d5f5e3; border-radius:8px; padding:14px;">
+                <strong style="color:#1e8449; font-size:1.05em;">[积极面] LD 使 GWAS 成为可能</strong>
+                <p style="margin:6px 0 0 0;">人类基因组约 30 亿碱基对，理论上应该逐一检测每个碱基。但 LD 意味着相邻的 SNP
+                    倾向于"组团行动"——如果你测了团里一个 SNP（标签
+                    SNP），就相当于"看到"了整个团的基因型信息。这就好比不必逐一询问一栋楼里的每个居民，只要敲开一个房间门就能大致了解这栋楼的人口构成。这就是<strong>为何
+                        GWAS 芯片只需 50 万-200 万个 SNP 就能覆盖约 80% 的常见变异</strong>——LD 充当了"天然的信息压缩器"。
+                </p>
+                <p style="margin:6px 0 0 0;"><strong>在 MR 中的价值</strong>：LD 允许你用少数强工具变量代表整个基因区域的遗传效应，大大提高了统计功效。如果没有
+                    LD，每个基因区域都需要数百个独立 SNP 才能覆盖。</p>
+            </div>
+            <div style="background:#fadbd8; border-radius:8px; padding:14px;">
+                <strong style="color:#c0392b; font-size:1.05em;">[消极面] LD 是 coloc 的"罪魁祸首"</strong>
+                <p style="margin:6px 0 0 0;">因为 LD 导致 SNP A 和 SNP B 总是一起出现，当你在 GWAS 中发现"某个基因区域与疾病相关"时，你<strong>无法仅从统计信号区分两种完全不同的生物学场景</strong>：
+                </p>
+                <ul style="margin:4px 0; padding-left:16px;">
+                    <li><strong>H4（因果）</strong>：同一个 SNP 既调控蛋白又影响疾病 → 蛋白是病因 → 值得追踪</li>
+                    <li><strong>H3（非因果）</strong>：两个独立的 SNP 分别在调控蛋白和影响疾病，只是碰巧在 LD 中一起出现 →
+                        蛋白不是病因 → 开发药物会失败
+                    </li>
+                </ul>
+                <p style="margin:4px 0 0 0;">这就是为什么 coloc 共定位分析（coloc + SuSiE）是 MR 的"守门人"——它利用精细定位和贝叶斯模型来区分
+                    H3 和 H4。</p>
+            </div>
+        </div>
+
+        <div style="background:#ebf5fb; border-radius:8px; padding:14px; margin-top:14px;">
+            <strong style="color:#2471a3; font-size:1.05em;">[实用问题] 不同祖先群体的 LD 结构差异</strong>
+            <p style="margin:4px 0 0 0;">LD 的衰减速度在不同人群中差别显著：</p>
+            <ul style="margin:4px 0; padding-left:16px;">
+                <li><strong>非洲人群</strong>：LD 块最短（~5-10 kb）——因为非洲是人类的起源地，积累了最多的重组事件</li>
+                <li><strong>欧洲人群</strong>：LD 块较长（~20-60 kb）——经历过"瓶颈效应"的重组历史较少</li>
+                <li><strong>东亚人群</strong>：LD 块居中偏长（~15-40 kb）</li>
+            </ul>
+            <p style="margin:4px 0 0 0;"><strong>直接后果</strong>：在 GWAS 中，非洲人群需要更密集的 SNP
+                芯片才能达到与欧洲人群相同的覆盖率。在 MR 中，一个在欧洲人群中发现为"单个位点"的 GWAS
+                信号，在非洲人群中可能在细颗粒度下分裂为多个独立信号——这意味着<strong>"同一个 SNP
+                    的工具变量效应"在跨人群使用时需要重新评估</strong>。这正是为什么 Yao 等人的卒中蛋白组 MR
+                研究中同时进行东亚和欧洲独立分析，并对所有蛋白验证方向一致性。</p>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="concept">
+    <h3>单倍型（Haplotype）与遗传重组（Recombination）</h3>
+    <div class="def-box"><p><strong>单倍型</strong>是染色体上倾向于一起遗传的一组 SNP——实质上是"LD 的区块化"。<strong>遗传重组</strong>是减数分裂中同源染色体交换片段的过程，是基因型多样性的主要来源，也是
+        LD 随时间减弱的物理机制。在 MR 工具变量选择时，需要确保不同的工具变异来自<strong>不同的 LD 区块</strong>，以免一个信号被重复计数。
+    </p></div>
+</div>
+
+<div class="concept">
+    <h3>野生型（Wild-type）</h3>
+    <div class="def-box"><p>自然群体中最常见的基因型或表型，通常作为实验的<strong>参考基线</strong>。在体外实验中，将"野生型细胞"与"基因敲除/过表达细胞"比较是验证
+        MR 预测的标准方法。例如，Yao 论文中 KO 小鼠模型将<em>基因敲除小鼠</em>的表型与<em>野生型小鼠</em>比较来确认基因的功能。
+    </p></div>
+</div>
+
+<h3>L5：基因表达</h3>
+
+<div class="concept">
+    <h3>RNA 与 mRNA（信使 RNA）</h3>
+    <div class="def-box"><p>RNA 是 DNA 的"工作副本"——转录时将基因序列复制为 RNA，经过剪接（去除内含子）后形成成熟的 mRNA，然后
+        mRNA 被核糖体翻译为蛋白质。转录组(transcriptome)指的是一组细胞中所有 mRNA
+        的集合——反映的是"哪些基因正在被读取"。</p></div>
+</div>
+
+<div class="concept">
+    <h3>转录因子（Transcription Factor, TF）</h3>
+    <div class="def-box"><p>转录因子是结合到 DNA 特定序列上并调控基因转录的蛋白质。它们就像"基因的开关"——某些 TF
+        激活转录（开启），另一些抑制转录（关闭）。在 MR 中，如果一个 SNP 落在转录因子的结合模体(motif)中，它可能通过改变 TF
+        结合亲和力来调控下游基因表达。Yoshiji 论文中发现 rs11677932 可能影响 MEF2B 的结合——MEF2B 是 MEF2
+        转录因子家族的成员，在肌肉和脂肪细胞分化中起作用。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+        (两步MR)</a></div>
+</div>
+
+<div class="concept">
+    <h3>蛋白质（Protein）与蛋白质组（Proteome）</h3>
+    <div class="def-box"><p>蛋白质是基因功能的<strong>最终执行者</strong>——酶催化生化反应、受体感知信号、结构蛋白维持细胞形态。蛋白质组是一个生物样本中所有蛋白质的集合。在
+        MR 中，pQTL（蛋白数量性状位点）直接将遗传变异与蛋白水平关联起来——这是连接"基因型"和"疾病表型"之间的关键中间层。Olink
+        PEA 和 SomaScan 是两种主流的高通量蛋白质组学平台。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a> <a
+            href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji (两步MR)</a></div>
+</div>
+
+<h3>L6：表观遗传调控</h3>
+
+<div class="concept">
+    <h3>染色质（Chromatin）与组蛋白修饰</h3>
+    <div class="def-box">
+        <p><strong>染色质</strong>是 DNA 与组蛋白的复合物——DNA 像线一样缠绕在组蛋白"线轴"上。每个组蛋白核心（H2A/H2B/H3/H4
+            各两份）被约 147 bp 的 DNA 缠绕 1.65 圈，形成<strong>核小体</strong>——染色质的基本结构单元。一连串核小体像"珠子串在绳子上"，再进一步折叠压缩，最终把长达
+            ~2 米的 DNA 塞进直径仅 ~10 微米的细胞核中。</p>
+
+        <div style="margin:14px 0; display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div style="background:#e8f8f5; border-radius:8px; padding:14px;">
+                <strong style="color:#1e8449; font-size:1.05em;">常染色质 (Euchromatin) = 开放的"工作区"</strong>
+                <ul style="margin:6px 0 0 0; padding-left:16px;">
+                    <li><strong>结构</strong>：核小体排列松散，DNA 与组蛋白的结合较松，染色质纤维处于"解压缩"的低折叠状态
+                    </li>
+                    <li><strong>染色特征</strong>：在光学显微镜下着色浅（"eu-" = 真正的、良好的）</li>
+                    <li><strong>功能</strong>：<strong>转录活跃</strong>——RNA 聚合酶和转录因子可以物理访问 DNA
+                        序列。绝大多数蛋白质编码基因位于常染色质区域
+                    </li>
+                    <li><strong>实验检测</strong>：ATAC-seq 信号高的区域 = 常染色质；DNase I 超敏感位点 = 常染色质</li>
+                    <li><strong>与 MR 的关系</strong>：如果一个 pQTL SNP 落在常染色质区域（ATAC-seq 峰），说明该 SNP
+                        所在的调控元件在该组织中<strong>可以被转录机器访问</strong>——这是该 SNP "有功能"的第一层证据
+                    </li>
+                </ul>
+            </div>
+            <div style="background:#f4ecf7; border-radius:8px; padding:14px;">
+                <strong style="color:#6c3483; font-size:1.05em;">异染色质 (Heterochromatin) = 关闭的"档案室"</strong>
+                <ul style="margin:6px 0 0 0; padding-left:16px;">
+                    <li><strong>结构</strong>：核小体紧密堆叠，DNA 与组蛋白结合非常紧密，染色质高度折叠压缩</li>
+                    <li><strong>染色特征</strong>：在光学显微镜下着色深（"hetero-" = 不同的）</li>
+                    <li><strong>功能</strong>：<strong>转录沉默</strong>——基因被"锁在档案室"里，无法被读取。分为两类：<em>组成型异染色质</em>（永久沉默，如着丝粒、端粒——维持染色体结构完整性）和<em>兼性异染色质</em>（可逆沉默，如
+                        X 染色体失活——在不同发育阶段或组织中可被重新激活）
+                    </li>
+                    <li><strong>实验检测</strong>：ATAC-seq 信号极低或缺失；H3K9me3 和 H3K27me3 是异染色质的经典组蛋白标记
+                    </li>
+                    <li><strong>与 MR 的关系</strong>：如果一个 SNP 落在异染色质区域，即使它在统计上达到了 GWAS
+                        显著性，它<strong>不太可能直接通过调控基因表达来影响性状</strong>——更可能是通过 LD "搭了便车"（H3
+                        假设）
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="background:#ebf5fb; border-radius:8px; padding:14px; margin-top:14px;">
+            <strong style="color:#2471a3; font-size:1.05em;">关键区分：为什么这对 MR 研究很重要</strong>
+            <p style="margin:4px 0 0 0;">常染色质 ↔ 异染色质
+                并不是固定的二元分类——<strong>同一个基因组区域在不同细胞类型中可以处于不同的染色质状态</strong>。例如，<em>PCSK9</em>
+                基因在肝细胞中处于常染色质状态（高表达，调控
+                LDL-C），但在神经元中处于异染色质状态（沉默）。这就是为什么<strong>组织特异性的表观基因组数据</strong>（如
+                GTEx、ENCODE）在解释 GWAS 和 pQTL 信号时至关重要——你需要确认 SNP
+                所在的调控区域在<strong>与疾病相关的组织</strong>中是开放的（常染色质），而非在不相关的组织中。</p>
+            <p style="margin:6px 0 0 0;">在 Yoshiji 论文的 5.3 节中，ATAC-seq 分析发现 rs11677932
+                在脂肪组织和动脉组织中处于常染色质状态（开放），<strong>但</strong>在其他不表达 COL6A3
+                的组织中可能处于异染色质状态（关闭）。这种组织特异性的开放模式是该 SNP 具备调控功能的最有力证据。</p>
+        </div>
+
+        <p style="margin-top:10px;"><strong>组蛋白修饰</strong>是加在组蛋白尾部的化学标记，它们充当染色质状态的"路标"——告诉细胞哪些区域是常染色质（"可以读"）还是异染色质（"不要读"）。两个最常用的活性标记：H3K4me3（活性启动子，"这里准备转录了"）和
+            H3K27ac（活性增强子，"这个远端的调控元件正在工作"）。对应的沉默标记：H3K9me3（组成型异染色质）和 H3K27me3（Polycomb
+            介导的基因沉默）。</p>
+    </div>
+</div>
+
+<div class="concept">
+    <h3>ATAC-seq 与 ChIP-seq</h3>
+    <div class="def-box"><p><strong>ATAC-seq</strong>：用 Tn5 转座酶插入基因组中开放的区域并测序——检测哪些基因组区域处于"解压缩"状态，可以在特定组织中被调控。如果某个
+        SNP 落在 ATAC-seq 峰中，说明该区域在该组织中是可调控的。<strong>ChIP-seq</strong>：用特定组蛋白修饰的抗体"拉下"富集了该修饰的
+        DNA 片段并测序——定位活跃的启动子和增强子。Yoshiji 论文中，ATAC-seq + ChIP-seq 的组合证明了 rs11677932
+        在脂肪和动脉组织中是一个活跃的调控元件。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+        (两步MR)</a></div>
+</div>
+
+<h3>L7：应用遗传学（MR 的底层工具）</h3>
+
+<div class="concept">
+    <h3>GWAS（全基因组关联研究）</h3>
+    <div class="def-box"><p>GWAS 是同时检验<strong>数百万个 SNP</strong> 与某个性状（如
+        BMI、血压、血脂）的关联，目的是发现与性状显著相关的基因组位点。全基因组显著性阈值通常为 P < 5×10<sup>-8</sup>（Bonferroni
+        校正）。GWAS 的产出——SNP-性状关联的汇总统计——是 MR 的直接原料。GWAS
+        的优势在于"假设自由"（不需要事先知道哪些基因重要），局限在于发现的位点大多落在非编码区且效应小（每个 SNP 通常解释
+        <0.5% 的表型变异）。</p></div>
+</div>
+
+<div class="concept">
+    <h3>pQTL（蛋白数量性状位点）</h3>
+    <div class="def-box"><p>pQTL 是与<strong>蛋白质表达水平</strong>相关的遗传位点。分为两类：<strong>cis-pQTL</strong>（位于编码基因附近，通常
+        ±500kb~1Mb 范围内）——因为靠近源头，水平多效性风险较低，是 MR 的首选工具变量；<strong>trans-pQTL</strong>（位于远处染色体区域）——可能通过网络效应间接影响蛋白水平，多效性风险较大。Yao
+        论文中仅使用每个蛋白的 lead cis-pQTL 作为工具变量。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a></div>
+</div>
+
+<div class="concept">
+    <h3>GTEx（基因型-组织表达数据库）与组织表达验证</h3>
+    <div class="def-box">
+        <p><strong>GTEx</strong>（Genotype-Tissue Expression）是一个跨组织基因表达与遗传调控数据库，覆盖 50+ 种人体组织（来自近 1000 名捐献者的死后样本），提供每个基因在每个组织中的表达水平及组织特异性的 eQTL 数据。在 MR 药物靶点发现中，GTEx + ATAC-seq + ChIP-seq 的组合用于回答一个关键问题：<strong>"这个蛋白在疾病相关组织中到底存不存在、活不活跃？"</strong>——即因果推断的<strong>生物学合理性</strong>。</p>
+        <p>这一步验证分为三层递进逻辑：</p>
+        <ul>
+            <li><strong>第一层——位置对不对？</strong>GTEx 跨组织表达图谱直接回答：如果 MR 发现 PROCR 与卒中因果相关，但 PROCR 只在肝脏表达、在血管和大脑中完全不表达，那"PROCR→卒中"的因果链条就缺少物理载体——蛋白分子必须在疾病发生的现场才能发挥作用。PROCR 的实际 GTEx 数据：在肾脏、脂肪组织、心血管系统中高表达，恰好覆盖了卒中病理的关键组织。</li>
+            <li><strong>第二层——开关开了没有？</strong>ATAC-seq 检测染色质可及性（DNA 区域是否"开放"）；ChIP-seq 检测组蛋白修饰——H3K4me3（活性启动子，"这里准备转录了"）和 H3K27ac（活性增强子，"这个远端调控元件正在工作"）。两者共同证明驱动蛋白表达的遗传变异所在的调控区域在疾病相关组织中处于<strong>活跃</strong>而非<strong>沉默</strong>状态。如果 SNP 落在异染色质区域，即使 MR 统计显著，也更可能是 LD"搭车客"（H3 假阳性）。</li>
+            <li><strong>第三层——为什么这一步不可跳过？</strong>MR 是统计推断，它告诉你"基因预测的蛋白水平变化与疾病风险变化存在关联"，但不证明这种关联有生物学基础。以下两种情形在统计上难以区分，只有组织表达验证能分辨：
+                <table style="margin:10px 0;">
+                    <tr><th>情形</th><th>MR 结果</th><th>组织表达</th><th>结论</th></tr>
+                    <tr><td>真实因果</td><td>PROCR↑→卒中↓</td><td>PROCR 在动脉/脑高表达，调控区开放</td><td style="color:#27ae60">生物学合理 ✓</td></tr>
+                    <tr><td>LD 伪影</td><td>PROCR↑→卒中↓（实际是隔壁基因造成）</td><td>PROCR 在血管中基本不表达</td><td style="color:#e74c3c">统计显著但生物不合理 ✗</td></tr>
+                </table>
+            </li>
+        </ul>
+        <p>在 Yoshiji 论文 5.3 节中，rs11677932（COL6A3 的 lead cis-pQTL）正式通过了这三层检验——ATAC-seq 在脂肪/冠状动脉/主动脉中均呈开放染色质，H3K4me3 + H3K27ac 双阳性，且可能影响 MEF2B 转录因子结合——最终结论是："rs11677932 不是随机的统计噪音，它有分子机制支撑。"</p>
+    </div>
+    <div class="papers">相关论文：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji (两步MR)</a> §5.3 | 外部数据：<a href="https://gtexportal.org/" target="_blank">GTEx Portal</a></div>
+</div>
+
+<div class="concept">
+    <h3>多效性（Pleiotropy）与多基因评分（Polygenic Score）</h3>
+    <div class="def-box">
+        <p><strong>多效性</strong>：一个遗传变异影响多个性状。在 MR 中，水平多效性（通过非暴露通路影响结局）是因果推断有效性的最大威胁。
+        <p><strong>多基因评分</strong>：将多个遗传变异的效应加权求和，形成一个单一的工具变量。通常解释的表型变异更多（统计功效更高），但多效性风险也更高。
+        </p>
+    </div>
+</div>
+
+<div class="concept">
+    <h3>PheWAS（全表型组关联研究）</h3>
+    <div class="def-box">
+        <p><strong>PheWAS</strong>（Phenome-Wide Association Study）是 GWAS 的"反向"操作——不再在一个 SNP × 全基因组中寻找关联，而是用<strong>一个遗传变异 × 全表型组</strong>中扫描关联。典型规模：同时筛查数百种疾病和数百种表型（如 Yao 论文中筛查了 555 种疾病 + 642 种表型）。</p>
+        <p><strong>在 MR 药物靶点发现中的作用——回答"靶向这个蛋白安全吗？"（脱靶效应筛查）</strong></p>
+        <p>药物开发中最大的失败原因不是疗效不足，而是<strong>不可预期的副作用</strong>。PheWAS 能在投入临床试验之前用遗传数据预判这个问题：</p>
+        <ul>
+            <li><strong>核心逻辑</strong>：用靶点蛋白的 cis-pQTL 作为工具，扫描所有可测量的疾病和表型——疗效 = 靶点对目标疾病的因果效应（MR 主分析），安全性 = 靶点对所有<em>其他</em>表型的因果效应（PheWAS 扫描）。如果该遗传变异不仅与目标疾病相关，还与血糖升高、肾功能异常等"不想要的方向"相关，那就是<strong>脱靶效应信号</strong>。</li>
+            <li><strong>经典案例</strong>：PCSK9 的遗传变异降低 CHD 风险（疗效 ✓），但 PheWAS 发现其同时增加 2 型糖尿病风险（安全性 ⚠️）——后续 RCT 证实了这一预测。MR-PheWAS 在 UK Biobank 40 万人、1081 种结局中完成了对 Lp(a) 靶点的系统性安全性筛查。</li>
+            <li><strong>与多效性的关系</strong>：PheWAS 本质上是将 MR 中"水平多效性"（威胁因果推断有效性）的概念系统化应用于药物安全性评估。在因果关系验证语境下，水平多效性是<strong>方法论威胁</strong>；在药物开发语境下，它变成了<strong>需要被主动发现的潜在副作用</strong>——两者是同一个生物学现象（一个遗传变异影响多个性状）在不同应用场景下的两面。</li>
+            <li><strong>结果解读</strong>：PheWAS 干净（无显著脱靶信号）→ 靶点安全性初步通过；PheWAS 有信号 → 需结合组织表达和 KO 小鼠数据交叉印证（如在 PROCR 案例中，PheWAS 提示肾脏和造血系统信号，KO 小鼠也验证了造血表型异常——两条独立证据链相互印证了安全性风险）。</li>
+        </ul>
+    </div>
+    <div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a> §3.4 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson (MR-CVD)</a> §14</div>
+</div>
+
+<div class="concept">
+    <h3>基因敲除（Knockout, KO）与直系同源（Ortholog）</h3>
+    <div class="def-box"><p><strong>基因敲除(KO)</strong>：通过实验手段删除或失活某个特定基因，然后观察表型变化——这是验证
+        MR 因果预测的终极实验方法。Yao 论文中，通过查询 IMPC 数据库中 KO 小鼠的表型来交叉验证 MR 发现的蛋白靶点。
+
+        <p><strong>直系同源</strong>：不同物种中由共同祖先基因演化而来的对应基因——在不同物种中通常保留相似的功能。LyMOI
+        利用直系同源关系构建了跨越 562 个物种的蛋白质互作图谱。</p></div>
+    <div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a> <a
+            href="../papers/Tang_2025_Deep_learning_large_zh.html">Tang (LyMOI)</a></div>
+</div>
+
+<footer>
+    <div class="rb"><strong><span data-zh>导航：</span><span data-en>Navigate:</span></strong> <a href="reading_path.html"><span data-zh>阅读路径主页</span><span data-en>Reading Path Home</span></a> <a
+            href="knowledge_supplement.html"><span data-zh>补充知识点</span><span data-en>Background Notes</span></a> <a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a></div>
+    <p style="margin-top:12px;"><span data-zh>AI4Research 文献精读项目 · 基础生物学概念 · 2026-08-14</span><span data-en>AI4Research Literature Project · Basic Biology Concepts · 2026-08-14</span></p></footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

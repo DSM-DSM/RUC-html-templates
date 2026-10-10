@@ -527,172 +527,172 @@
         };
     </script>
     <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script>window.A4R={mode:1,lang:1,themeKey:'lecture-theme',lightId:'14',darkId:'01'};</script>
+<script src="../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
 </head>
 <body data-default-theme="14" data-asset-prefix="">
 <!-- 侧边导航（无需手动填写，JS 自动根据 .act-header / .slide 生成目录） -->
 <nav class="side-nav" id="sideNav">
-    <div class="nav-title">📋 {讲演目录标题}</div>
+    <div class="nav-title"><span data-zh>📋 {讲演目录标题}</span><span data-en>📋 {Table of contents title}</span></div>
     <div id="navList"></div>
 </nav>
 
 <!-- ==================== 封面 header（替换为你的主题） ==================== -->
 <header>
     <!-- 主题专属装饰（由 data-theme 控制显隐，各主题 CSS 自行定位） -->
-    <div class="seal" data-decor="05">演 示</div>
+    <div class="seal" data-decor="05"><span data-zh>演 示</span><span data-en>Demo</span></div>
     <span class="hole h1" data-decor="09"></span>
     <span class="hole h2" data-decor="09"></span>
-    <div class="tab" data-decor="09">{分类：如 甲-科研-复现}</div>
+    <div class="tab" data-decor="09"><span data-zh>{分类：如 甲-科研-复现}</span><span data-en>{Category: e.g., A-Research-Reproduction}</span></div>
     <span class="dot d1" data-decor="10"></span>
     <span class="dot d2" data-decor="10"></span>
     <span class="dot d3" data-decor="10"></span>
-    <div class="bar-title" data-decor="10">{讲演主题} — 数据终端</div>
+    <div class="bar-title" data-decor="10"><span data-zh>{讲演主题} — 数据终端</span><span data-en>{Lecture topic} — Data Terminal</span></div>
     <span class="cross c1" data-decor="11"></span>
     <span class="cross c2" data-decor="11"></span>
     <span class="cross c3" data-decor="11"></span>
     <span class="cross c4" data-decor="11"></span>
-    <span class="tick x" data-decor="11">X — {项目代号}</span>
-    <span class="tick y" data-decor="11">Y — {讲演主题}</span>
-    <span class="constellation" data-decor="12">{星区 / 主题代号}</span>
-    <span class="coord" data-decor="12">RA {赤经} · DEC {赤纬}</span>
+    <span class="tick x" data-decor="11"><span data-zh>X — {项目代号}</span><span data-en>X — {Project code}</span></span>
+    <span class="tick y" data-decor="11"><span data-zh>Y — {讲演主题}</span><span data-en>Y — {Lecture topic}</span></span>
+    <span class="constellation" data-decor="12"><span data-zh>{星区 / 主题代号}</span><span data-en>{Star region / topic code}</span></span>
+    <span class="coord" data-decor="12"><span data-zh>RA {赤经} · DEC {赤纬}</span><span data-en>RA {right ascension} · DEC {declination}</span></span>
     <div class="num-block" data-decor="13">01</div>
-    <div class="kicker" data-decor="13">{主题代号} — {分类}</div>
-    <h1>{讲演大标题}</h1>
-    <div class="sub">{一句话副标题}</div>
-    <div class="meta">{项目名} · {日期} · 适合远程会议讲解 · 预计时长 {N}-{M} 分钟</div>
-    <div class="stamp" data-decor="09">已解密</div>
+    <div class="kicker" data-decor="13"><span data-zh>{主题代号} — {分类}</span><span data-en>{Topic code} — {Category}</span></div>
+    <h1><span data-zh>{讲演大标题}</span><span data-en>{Main lecture title}</span></h1>
+    <div class="sub"><span data-zh>{一句话副标题}</span><span data-en>{One-line subtitle}</span></div>
+    <div class="meta"><span data-zh>{项目名} · {日期} · 适合远程会议讲解 · 预计时长 {N}-{M} 分钟</span><span data-en>{Project} · {Date} · Suited for remote delivery · Est. {N}-{M} min</span></div>
+    <div class="stamp" data-decor="09"><span data-zh>已解密</span><span data-en>Declassified</span></div>
     <div class="status" data-decor="10"><span class="prompt">$</span> <span class="path">~/project</span> --run presentation</div>
     <div class="titleblock" data-decor="11">
-        <span><b>DWG</b> / {图号}</span>
+        <span><b>DWG</b><span data-zh>/ {图号}</span><span data-en>/ {Sheet no.}</span></span>
         <span><b>SCALE</b> / 1:1</span>
-        <span><b>REV</b> / {版本}</span>
+        <span><b>REV</b><span data-zh>/ {版本}</span><span data-en>/ {Version}</span></span>
     </div>
-    <div class="ra" data-decor="12">✦ 观测历元 {历元} · 视星等 {星等} ✦</div>
+    <div class="ra" data-decor="12"><span data-zh>✦ 观测历元 {历元} · 视星等 {星等} ✦</span><span data-en>✦ Epoch {epoch} · Apparent mag {magnitude} ✦</span></div>
 </header>
 
 <!-- 相关链接条：指向详细文档 / 数据 / 脚本 / 其他页面（按需增删） -->
 <div class="rb" style="margin-bottom:24px;">
-    <a href="#">📄 文档一</a>
-    <a href="#">📋 工作流</a>
-    <a href="#">📊 数据</a>
-    <a href="#">🔗 链接</a>
+    <a href="#"><span data-zh>📄 文档一</span><span data-en>📄 Doc 1</span></a>
+    <a href="#"><span data-zh>📋 工作流</span><span data-en>📋 Workflow</span></a>
+    <a href="#"><span data-zh>📊 数据</span><span data-en>📊 Data</span></a>
+    <a href="#"><span data-zh>🔗 链接</span><span data-en>🔗 Links</span></a>
 </div>
 
 <!-- ==================== 第一幕：开场（替换为主题） ==================== -->
 <div class="act-header" data-act="I">
-<h2><span class="no" data-decor="07">壹</span>第一幕：{幕主题}（{N}张）</h2>
-    <div class="sub">{幕的副标题}</div>
+<h2><span class="no" data-decor="07"><span data-zh>壹</span><span data-en>I</span></span><span data-zh>第一幕：{幕主题}（{N}张）</span><span data-en>Act I: {act topic} ({N} slides)</span></h2>
+    <div class="sub"><span data-zh>{幕的副标题}</span><span data-en>{Act subtitle}</span></div>
 </div>
 
 <!-- 基础卡片：标题 + 核心问题 + 核心信息 + 表格 + 参考 -->
 <div class="slide">
-    <h3>1. {标题}<span class="q">核心问题：{这张幻灯片要回答的关键问题}</span></h3>
-    <div class="key-box"><strong>核心信息：</strong>{一句话总结本张要点：先给结论，再给论证}</div>
-    <p>{正文段落。<strong>重点加粗</strong>，术语首次出现时<strong>加粗并附括号解释</strong>。</p>
+    <h3><span data-zh>1. {标题}</span><span data-en>1. {Title}</span><span class="q"><span data-zh>核心问题：{这张幻灯片要回答的关键问题}</span><span data-en>Key question: {the key question this slide answers}</span></span></h3>
+    <div class="key-box"><strong><span data-zh>核心信息：</span><span data-en>Key message:</span></strong><span data-zh>{一句话总结本张要点：先给结论，再给论证}</span><span data-en>{One-sentence takeaway: conclusion first, then evidence}</span></div>
+    <p><span data-zh>{正文段落。</span><span data-en>{Body paragraph. </span><strong><span data-zh>重点加粗</span><span data-en>bold for emphasis</span></strong><span data-zh>，术语首次出现时</span><span data-en>, and when a term first appears</span><strong><span data-zh>加粗并附括号解释</span><span data-en>bold it with a parenthetical gloss</span></strong><span data-zh>。</span><span data-en>.</span></p>
     <table>
-        <tr><th>维度</th><th>说明</th><th>结论</th></tr>
-        <tr><td>条目一</td><td>{内容}</td><td>{结论}</td></tr>
-        <tr class="row-pos"><td>正向项</td><td>{内容}</td><td>{绿底 = 正向 / 支持}</td></tr>
-        <tr class="row-neg"><td>负向项</td><td>{内容}</td><td>{红底 = 负向 / 反对}</td></tr>
+        <tr><th><span data-zh>维度</span><span data-en>Dimension</span></th><th><span data-zh>说明</span><span data-en>Description</span></th><th><span data-zh>结论</span><span data-en>Finding</span></th></tr>
+        <tr><td><span data-zh>条目一</span><span data-en>Item 1</span></td><td><span data-zh>{内容}</span><span data-en>{Content}</span></td><td><span data-zh>{结论}</span><span data-en>{Finding}</span></td></tr>
+        <tr class="row-pos"><td><span data-zh>正向项</span><span data-en>Positive item</span></td><td><span data-zh>{内容}</span><span data-en>{Content}</span></td><td><span data-zh>{绿底 = 正向 / 支持}</span><span data-en>{Green = positive / supporting}</span></td></tr>
+        <tr class="row-neg"><td><span data-zh>负向项</span><span data-en>Negative item</span></td><td><span data-zh>{内容}</span><span data-en>{Content}</span></td><td><span data-zh>{红底 = 负向 / 反对}</span><span data-en>{Red = negative / opposing}</span></td></tr>
     </table>
-    <div class="ref">📖 详细解读：<a href="#">来源一</a> §X | <a href="#">来源二</a> §Y</div>
+    <div class="ref"><span data-zh>📖 详细解读：</span><span data-en>📖 In depth:</span><a href="#"><span data-zh>来源一</span><span data-en>Source 1</span></a> §X | <a href="#"><span data-zh>来源二</span><span data-en>Source 2</span></a> §Y</div>
 </div>
 
 <!-- 统计卡片：用大数字 3 秒传递核心指标 -->
 <div class="slide">
-    <h3>2. 一眼看懂的统计卡片<span class="q">核心问题：如何用一屏数字快速传递关键指标？</span></h3>
+    <h3><span data-zh>2. 一眼看懂的统计卡片</span><span data-en>2. Scannable stat cards</span><span class="q"><span data-zh>核心问题：如何用一屏数字快速传递关键指标？</span><span data-en>Key question: how to convey key metrics in one screen of numbers?</span></span></h3>
     <div class="stat-grid">
-        <div class="stat-card green"><div class="num">15/15</div><div class="label">达成目标</div></div>
-        <div class="stat-card yellow"><div class="num">12/15</div><div class="label">提前完成</div></div>
-        <div class="stat-card"><div class="num">0/15</div><div class="label">未达标</div></div>
+        <div class="stat-card green"><div class="num">15/15</div><div class="label"><span data-zh>达成目标</span><span data-en>Goals met</span></div></div>
+        <div class="stat-card yellow"><div class="num">12/15</div><div class="label"><span data-zh>提前完成</span><span data-en>Finished early</span></div></div>
+        <div class="stat-card"><div class="num">0/15</div><div class="label"><span data-zh>未达标</span><span data-en>Below target</span></div></div>
     </div>
-    <p><strong>提示：</strong>把数字与标签替换为你项目的核心指标（覆盖率、收益、性能提升、通过率等），
-        <code>green</code> / <code>yellow</code> 变体用于区分达标与预警。</p>
-    <div class="src-ref">📖 数据来源：{你的数据文件 / 统计口径}</div>
+    <p><strong><span data-zh>提示：</span><span data-en>Tip:</span></strong><span data-zh>把数字与标签替换为你项目的核心指标（覆盖率、收益、性能提升、通过率等），</span><span data-en>Replace the numbers and labels with your project's core metrics (coverage, revenue, speedup, pass rate);</span><code>green</code> / <code>yellow</code><span data-zh>变体用于区分达标与预警。</span><span data-en>variants separate on-target from at-risk.</span></p>
+    <div class="src-ref"><span data-zh>📖 数据来源：{你的数据文件 / 统计口径}</span><span data-en>📖 Data source: {your data file / counting rule}</span></div>
 </div>
 
 <!-- 三种提示框 + 公式 -->
 <div class="slide">
-    <h3>3. 提示框与公式演示<span class="q">核心问题：如何用三种颜色的提示框区分信息类型？</span></h3>
-    <div class="warn-box"><strong>关键发现：</strong>{警告、风险、阻塞或踩坑的原因与对策，红色提醒听众注意}</div>
-    <div class="key-box"><strong>核心信息：</strong>{结论、要点或下一步，蓝色是每张幻灯片的标配}</div>
-    <div class="success-box"><strong>破局关键：</strong>{成功经验、解决思路或收尾结论，绿色传递正向信号}</div>
-    <p>公式用 MathJax 渲染：行内公式 $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$，
-        独立成行用两个美元符 <code>$$...$$</code>。不需要公式时，删除
-        <code>&lt;script&gt;</code> 中的 MathJax 两行引用即可。</p>
-    <div class="src-ref">📖 文档出处：{文档 / 报告 / 规范编号}</div>
+    <h3><span data-zh>3. 提示框与公式演示</span><span data-en>3. Callouts and formulas</span><span class="q"><span data-zh>核心问题：如何用三种颜色的提示框区分信息类型？</span><span data-en>Key question: how to separate information types with three callout colors?</span></span></h3>
+    <div class="warn-box"><strong><span data-zh>关键发现：</span><span data-en>Key finding:</span></strong><span data-zh>{警告、风险、阻塞或踩坑的原因与对策，红色提醒听众注意}</span><span data-en>{Cause and fix for risks, blockers, or pitfalls — red flags them for the audience}</span></div>
+    <div class="key-box"><strong><span data-zh>核心信息：</span><span data-en>Key message:</span></strong><span data-zh>{结论、要点或下一步，蓝色是每张幻灯片的标配}</span><span data-en>{Conclusion, takeaway, or next step — blue is the staple of every slide}</span></div>
+    <div class="success-box"><strong><span data-zh>破局关键：</span><span data-en>Breakthrough:</span></strong><span data-zh>{成功经验、解决思路或收尾结论，绿色传递正向信号}</span><span data-en>{Success story, solution, or closing conclusion — green signals progress}</span></div>
+    <p><span data-zh>公式用 MathJax 渲染：行内公式 $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$，
+        独立成行用两个美元符</span><span data-en>Formulas render via MathJax: inline math $\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i$; display math takes two dollar signs </span><code>$$...$$</code><span data-zh>。不需要公式时，删除</span><span data-en>. To remove formulas, delete the two</span><code>&lt;script&gt;</code><span data-zh>中的 MathJax 两行引用即可。</span><span data-en>MathJax lines inside.</span></p>
+    <div class="src-ref"><span data-zh>📖 文档出处：{文档 / 报告 / 规范编号}</span><span data-en>📖 Source: {document / report / spec no.}</span></div>
 </div>
 
 <!-- 进度条：阶段 / 里程碑总览 -->
 <div class="slide">
-    <h3>4. 进度总览<span class="q">核心问题：如何让听众一眼看到项目各阶段的状态？</span></h3>
+    <h3><span data-zh>4. 进度总览</span><span data-en>4. Progress overview</span><span class="q"><span data-zh>核心问题：如何让听众一眼看到项目各阶段的状态？</span><span data-en>Key question: how to show every stage's status at a glance?</span></span></h3>
     <div class="progress-row">
-        <span class="progress-step">阶段一</span>
-        <span class="progress-name">需求分析与调研</span>
+        <span class="progress-step"><span data-zh>阶段一</span><span data-en>Stage 1</span></span>
+        <span class="progress-name"><span data-zh>需求分析与调研</span><span data-en>Requirements & research</span></span>
         <div class="progress-bar"><div class="progress-fill" style="width:100%;background:#27ae60;"></div></div>
-        <span class="badge badge-done">✅ 完成</span>
+        <span class="badge badge-done"><span data-zh>✅ 完成</span><span data-en>✅ Done</span></span>
     </div>
     <div class="progress-row">
-        <span class="progress-step">阶段二</span>
-        <span class="progress-name">原型与验证</span>
+        <span class="progress-step"><span data-zh>阶段二</span><span data-en>Stage 2</span></span>
+        <span class="progress-name"><span data-zh>原型与验证</span><span data-en>Prototype & validation</span></span>
         <div class="progress-bar"><div class="progress-fill" style="width:60%;background:#f39c12;"></div></div>
-        <span class="badge badge-warn">🟡 部分完成</span>
+        <span class="badge badge-warn"><span data-zh>🟡 部分完成</span><span data-en>🟡 Partial</span></span>
     </div>
     <div class="progress-row">
-        <span class="progress-step">阶段三</span>
-        <span class="progress-name">上线与推广</span>
+        <span class="progress-step"><span data-zh>阶段三</span><span data-en>Stage 3</span></span>
+        <span class="progress-name"><span data-zh>上线与推广</span><span data-en>Launch & rollout</span></span>
         <div class="progress-bar"><div class="progress-fill" style="width:0%;background:#e74c3c;"></div></div>
-        <span class="badge badge-block">🔒 阻塞</span>
+        <span class="badge badge-block"><span data-zh>🔒 阻塞</span><span data-en>🔒 Blocked</span></span>
     </div>
-    <div class="success-box"><strong>下一步优先级：</strong>{谁来做、做什么、何时开始}。</div>
+    <div class="success-box"><strong><span data-zh>下一步优先级：</span><span data-en>Next priorities:</span></strong><span data-zh>{谁来做、做什么、何时开始}。</span><span data-en>{Who does what, starting when}.</span></div>
 </div>
 
 <!-- ==================== 第二幕（复制上面的 slide 块填充） ==================== -->
 <div class="act-header" data-act="II">
-<h2><span class="no" data-decor="07">贰</span>第二幕：{幕主题}（{N}张）</h2>
-    <div class="sub">{幕的副标题}</div>
+<h2><span class="no" data-decor="07"><span data-zh>贰</span><span data-en>II</span></span><span data-zh>第二幕：{幕主题}（{N}张）</span><span data-en>Act II: {act topic} ({N} slides)</span></h2>
+    <div class="sub"><span data-zh>{幕的副标题}</span><span data-en>{Act subtitle}</span></div>
 </div>
 
 <!-- 图文网格：多图并排对照（可调列数） -->
 <div class="slide">
-    <h3>5. 多图并排对照<span class="q">核心问题：如何在一张幻灯片里对比多张图 / 多个面板？</span></h3>
+    <h3><span data-zh>5. 多图并排对照</span><span data-en>5. Side-by-side figures</span><span class="q"><span data-zh>核心问题：如何在一张幻灯片里对比多张图 / 多个面板？</span><span data-en>Key question: how to compare multiple figures or panels on one slide?</span></span></h3>
     <div class="fig3-grid">
         <div class="fig3-cell">
             <img alt="Panel a" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
-            <div class="fig3-label"><strong>a · {小标题}</strong></div>
-            <p>{解释文字}</p>
+            <div class="fig3-label"><strong><span data-zh>a · {小标题}</span><span data-en>a · {Caption}</span></strong></div>
+            <p><span data-zh>{解释文字}</span><span data-en>{Explanatory text}</span></p>
         </div>
         <div class="fig3-cell">
             <img alt="Panel b" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='640' height='360' fill='%23e8e8ea'/%3E%3C/svg%3E">
-            <div class="fig3-label"><strong>b · {小标题}</strong></div>
-            <p>{解释文字}</p>
+            <div class="fig3-label"><strong><span data-zh>b · {小标题}</span><span data-en>b · {Caption}</span></strong></div>
+            <p><span data-zh>{解释文字}</span><span data-en>{Explanatory text}</span></p>
         </div>
     </div>
-    <div class="ref">详细解读：<a href="#">来源</a> | 图片出处：{出处}</div>
+    <div class="ref"><span data-zh>详细解读：</span><span data-en>In depth:</span><a href="#"><span data-zh>来源</span><span data-en>Source</span></a> | <span data-zh>图片出处：{出处}</span><span data-en>Figure source: {source}</span></div>
 </div>
 
 <!-- 效果量条形图（森林图风格）：多个条目的估计值 + 区间对比 -->
 <div class="slide">
-    <h3>6. 效果量条形图（森林图风格）<span class="q">核心问题：如何在同一张图里比较多个条目的估计值与不确定性？</span></h3>
+    <h3><span data-zh>6. 效果量条形图（森林图风格）</span><span data-en>6. Effect-size bars (forest-plot style)</span><span class="q"><span data-zh>核心问题：如何在同一张图里比较多个条目的估计值与不确定性？</span><span data-en>Key question: how to compare estimates and uncertainty across items in one chart?</span></span></h3>
     <table class="forest-table">
-        <tr><th>条目</th><th>方向</th><th>估计值</th><th></th></tr>
-        <tr><td><span class="badge badge-pos f-pos">方案 A ↑</span></td><td>正向</td><td>+1.21</td><td class="f-bar">        ●━━━▶</td></tr>
-        <tr><td><span class="badge badge-pos f-pos">方案 B ↑</span></td><td>正向</td><td>+0.37</td><td class="f-bar">       ●━━━▶</td></tr>
-        <tr><td><span class="badge badge-neg f-neg">方案 C ↓</span></td><td>负向</td><td>−0.89</td><td class="f-bar">  ◀━━━●━━━━</td></tr>
-        <tr class="axis-row"><td colspan="3" style="text-align:right;">← 负向</td><td>正向 →</td><td>−1.00    0.00    +1.00</td></tr>
+        <tr><th><span data-zh>条目</span><span data-en>Item</span></th><th><span data-zh>方向</span><span data-en>Direction</span></th><th><span data-zh>估计值</span><span data-en>Estimate</span></th><th></th></tr>
+        <tr><td><span class="badge badge-pos f-pos"><span data-zh>方案 A ↑</span><span data-en>Option A ↑</span></span></td><td><span data-zh>正向</span><span data-en>Positive</span></td><td>+1.21</td><td class="f-bar">        ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-pos f-pos"><span data-zh>方案 B ↑</span><span data-en>Option B ↑</span></span></td><td><span data-zh>正向</span><span data-en>Positive</span></td><td>+0.37</td><td class="f-bar">       ●━━━▶</td></tr>
+        <tr><td><span class="badge badge-neg f-neg"><span data-zh>方案 C ↓</span><span data-en>Option C ↓</span></span></td><td><span data-zh>负向</span><span data-en>Negative</span></td><td>−0.89</td><td class="f-bar">  ◀━━━●━━━━</td></tr>
+        <tr class="axis-row"><td colspan="3" style="text-align:right;"><span data-zh>← 负向</span><span data-en>← negative</span></td><td><span data-zh>正向 →</span><span data-en>positive →</span></td><td>−1.00    0.00    +1.00</td></tr>
     </table>
-    <p class="fig-caption">图 1. {图注：比较多个条目的点估计（●）与区间（━），左负右正}。</p>
-    <div class="ref">📎 {说明这张图对应你项目的哪份输出 / 哪张原图}</div>
+    <p class="fig-caption"><span data-zh>图 1. {图注：比较多个条目的点估计（●）与区间（━），左负右正}。</span><span data-en>Figure 1. {Caption: point estimates (●) and intervals (━) compared across items; negative left, positive right}.</span></p>
+    <div class="ref"><span data-zh>📎 {说明这张图对应你项目的哪份输出 / 哪张原图}</span><span data-en>📎 {State which output / original figure of your project this maps to}</span></div>
 </div>
 
 <!-- ==================== 页脚 ==================== -->
 <footer>
-    <p class="brand" data-decor="13">{项目名}</p>
-    <p style="margin-top:10px;" class="exit" data-decor="10">[ 会话结束 ] — 感谢观看</p>
+    <p class="brand" data-decor="13"><span data-zh>{项目名}</span><span data-en>{Project}</span></p>
+    <p style="margin-top:10px;" class="exit" data-decor="10"><span data-zh>[ 会话结束 ] — 感谢观看</span><span data-en>[ Session end ] — Thanks for watching</span></p>
     <p>
-        <strong>{项目名}：</strong>{一句话定位}<br>
-        <strong>最近更新：</strong>{日期} · <strong>主讲：</strong>{姓名}
-    </p>
-    <p style="margin-top:12px;">📎 相关链接：<a href="#">链接</a> · <a href="#">链接</a></p>
+        <strong><span data-zh>{项目名}：</span><span data-en>{Project}:</span></strong><span data-zh>{一句话定位}</span><span data-en>{One-line positioning}</span><br>
+        <strong><span data-zh>最近更新：</span><span data-en>Last updated:</span></strong><span data-zh>{日期} ·</span><span data-en>{Date} ·</span><strong><span data-zh>主讲：</span><span data-en>Presenter:</span></strong><span data-zh>{姓名}</span><span data-en>{Name}</span></p>
+    <p style="margin-top:12px;"><span data-zh>📎 相关链接：</span><span data-en>📎 Related:</span><a href="#"><span data-zh>链接</span><span data-en>Link</span></a> · <a href="#"><span data-zh>链接</span><span data-en>Link</span></a></p>
 </footer>
 
 <!-- ==================== 侧边导航 JS（自动生成目录 + 滚动高亮，勿改） ==================== -->
@@ -709,7 +709,8 @@
                 if (!h2) return;
                 var d = document.createElement('div');
                 d.className = 'nav-act';
-                d.textContent = h2.textContent.trim();
+                /* 目录沿用双语双节点（data-zh/data-en），显隐交给语言 CSS */
+                d.innerHTML = h2.innerHTML;
                 navList.appendChild(d);
             } else {
                 idx++;
@@ -720,12 +721,12 @@
                     var c = h3.cloneNode(true);
                     var q = c.querySelector('.q');
                     if (q) q.remove();
-                    title = c.textContent.trim();
+                    title = c.innerHTML.trim();
                 }
-                if (!title) title = '第' + idx + '页';
+                if (!title) title = '<span data-zh>第 ' + idx + ' 页</span><span data-en>Page ' + idx + '</span>';
                 var a = document.createElement('a');
                 a.href = '#' + id;
-                a.textContent = title;
+                a.innerHTML = title;
                 a.dataset.target = id;
                 a.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -772,7 +773,7 @@
     </svg>
 </button>
 <div id="themeSwitcherPanel" class="ts-panel" hidden>
-    <div class="ts-head">主题</div>
+    <div class="ts-head"><span data-zh>主题</span><span data-en>Theme</span></div>
     <div class="ts-grid" id="themeSwitcherGrid"></div>
 </div>
 <script src="theme-pack.js"></script>

@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>东亚与欧洲人群蛋白质组范围遗传研究发现缺血性卒中多重治疗靶点 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ==================== TOP NAVIGATION BAR ==================== -->
+<div class="top-nav-bar">
+<span class="current"><span data-zh>← 当前论文</span><span data-en>← Current paper</span></span>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">📄 STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📄 MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR-CVD</a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>📄 两步MR</span><span data-en>📄 Two-step MR</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<!-- ==================== HEADER ==================== -->
+<header>
+  <div class="journal">Stroke. 2025;56:2147–2158 &nbsp;|&nbsp; DOI: 10.1161/STROKEAHA.125.050982</div>
+  <h1>东亚与欧洲人群蛋白质组范围遗传研究发现缺血性卒中多重治疗靶点</h1>
+  <p style="font-style:italic; color:#566573;">
+    Proteome-Wide Genetic Study in East Asians and Europeans Identified Multiple Therapeutic Targets for Ischemic Stroke
+  </p>
+  <div class="authors">
+    <strong>Pang Yao</strong>, Mohsen Mazidi, Alfred Pozarickij, Andri Iona, Neil Wright, Kuang Lin, Iona Y. Millwood, Hannah Fry, Christiana Kartsonaki, Yiping Chen, Ling Yang, Huaidong Du, Daniel Avery, Dan Schmidt-Valle, Dianjianyi Sun, Pei Pei, Jun Lv, Canqing Yu, Michael Hill, Derrick A. Bennett, Robin G. Walters, Liming Li, Robert Clarke, <strong>Zhengming Chen</strong> —— 代表中国慢性病前瞻性研究项目（CKB）协作组
+  </div>
+  <div class="abstract-box">
+    <strong>核心发现：</strong>利用中国慢性病前瞻性研究项目（CKB，东亚人群）和英国生物银行（UKB，欧洲人群）的基因组-蛋白质组学数据，通过孟德尔随机化（Mendelian Randomization, MR）和共定位（colocalization）分析，从2923种血浆蛋白中鉴定出<strong>10种与缺血性卒中（IS）具有因果关联的蛋白</strong>。其中1种（F11）已有卒中药物靶点、2种（ALDH2, MMP12）可重新利用现有药物、6种（PROCR, GRK5, FGF5, FURIN, KIAA0319, TMPRSS5）为全新的潜在药物靶点。
+  </div>
+</header>
+
+<!-- ==================== TABLE OF CONTENTS ==================== -->
+<nav class="toc">
+  <h3>📑 <span data-zh>目录</span><span data-en>Contents</span></h3>
+  <ol>
+    <li><a href="#sec-0">阅读导引：预备知识与符号约定</a></li>
+    <li><a href="#sec-1">研究背景与科学动机</a>
+      <ol>
+        <li><a href="#sec-1-1">缺血性卒中的全球负担</a></li>
+        <li><a href="#sec-1-2">从基因组学到蛋白质组学药物靶点发现</a></li>
+        <li><a href="#sec-1-3">前人研究的局限与本研究的创新</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-2">研究方法全景</a>
+      <ol>
+        <li><a href="#sec-2-1">研究人群与蛋白质组学检测</a></li>
+        <li><a href="#sec-2-2">cis-pQTL发现与遗传工具变量</a></li>
+        <li><a href="#sec-2-3">两样本孟德尔随机化</a></li>
+        <li><a href="#sec-2-4">共定位分析</a></li>
+        <li><a href="#sec-2-5">下游验证分析链条</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-3">核心结果</a>
+      <ol>
+        <li><a href="#sec-3-1">MR分析：10种因果蛋白的发现</a></li>
+        <li><a href="#sec-3-2">共定位证据</a></li>
+        <li><a href="#sec-3-3">中介分析：蛋白→危险因素→卒中</a></li>
+        <li><a href="#sec-3-4">PheWAS与下游验证</a></li>
+        <li><a href="#sec-3-5">药物靶点全景</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-4">10种因果蛋白深度解读</a>
+      <ol>
+        <li><a href="#sec-4-1">已知靶点：F11</a></li>
+        <li><a href="#sec-4-2">可重新利用靶点：ALDH2、MMP12</a></li>
+        <li><a href="#sec-4-3">全新靶点：PROCR、GRK5、FGF5、FURIN、KIAA0319、TMPRSS5</a></li>
+        <li><a href="#sec-4-4">不可成药靶点：ABO</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-5">讨论与展望</a>
+      <ol>
+        <li><a href="#sec-5-1">研究优势</a></li>
+        <li><a href="#sec-5-2">局限性</a></li>
+        <li><a href="#sec-5-3">未来方向</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-6">要点总结</a></li>
+  </ol>
+</nav>
+
+<!-- ================================================================ -->
+<!-- SECTION 0: READING GUIDE -->
+<!-- ================================================================ -->
+<section id="sec-0">
+  <h2>0. 阅读导引：预备知识与符号约定</h2>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>本文本质上是用<strong>基因变异作为"自然随机对照试验"</strong>来解决一个核心问题：<em>改变某种蛋白在血液中的水平，是否会因果性地增加或降低缺血性卒中的风险？</em> 如果答案是"是"，那么这种蛋白就可以成为药物的靶点——开发药物来抑制（或增强）该蛋白的功能，从而预防卒中。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引 / Background
+</span>
+</div>
+
+  <h3>为什么需要这篇论文？</h3>
+  <p>传统的观察性研究容易受到混杂因素和反向因果的干扰（例如，某种蛋白水平高的人卒中风险也高，可能是因为他们本身就有其他疾病，而不是蛋白本身导致卒中）。而<strong>孟德尔随机化（MR）</strong>利用基因变异作为蛋白水平的"代理"，这些基因变异从出生时就随机分配（类似于随机对照试验中的随机分组），因此可以推断因果方向。</p>
+  <p>更重要的是，以往类似研究<strong>几乎只局限于欧洲人群</strong>。但东亚人群的卒中发病率、危险因素分布和遗传结构都与欧洲人群有很大差异——在这一个人群中发现的靶点未必适用于另一个人群。本研究首次在<strong>东亚和欧洲双人群</strong>中进行了蛋白质组范围的系统筛查。</p>
+
+  <h3>关键术语表</h3>
+  <table>
+    <tr><th>缩写</th><th>英文全称</th><th>中文</th><th>一句话解释</th></tr>
+    <tr><td>MR</td><td>Mendelian Randomization</td><td>孟德尔随机化</td><td>用基因变异作为工具变量推断因果的方法</td></tr>
+    <tr><td>pQTL</td><td>protein Quantitative Trait Loci</td><td>蛋白数量性状位点</td><td>影响蛋白表达水平的基因位点</td></tr>
+    <tr><td>cis-pQTL</td><td>—</td><td>顺式pQTL</td><td>位于编码基因附近的pQTL，较少受多效性干扰</td></tr>
+    <tr><td>GWAS</td><td>Genome-Wide Association Study</td><td>全基因组关联研究</td><td>扫描全基因组寻找与性状关联的变异</td></tr>
+    <tr><td>IS</td><td>Ischemic Stroke</td><td>缺血性卒中</td><td>因血管阻塞导致的脑卒中（约占全部卒中的80%）</td></tr>
+    <tr><td>PP4</td><td>Posterior Probability for H4</td><td>H4假设后验概率</td><td>蛋白和疾病共享同一因果变异的概率（>0.7为强证据）</td></tr>
+    <tr><td>OR</td><td>Odds Ratio</td><td>比值比</td><td>每SD蛋白水平升高对应的疾病风险倍数</td></tr>
+    <tr><td>PheWAS</td><td>Phenome-Wide Association Study</td><td>全表型组关联研究</td><td>同时检验基因变异与数百种表型的关联</td></tr>
+    <tr><td>CKB</td><td>China Kadoorie Biobank</td><td>中国慢性病前瞻性研究</td><td>包含51万中国成年人的大型前瞻性队列</td></tr>
+    <tr><td>UKB</td><td>UK Biobank</td><td>英国生物银行</td><td>包含50万英国成年人的大型前瞻性队列</td></tr>
+    <tr><td>EAS</td><td>East Asians</td><td>东亚人群</td><td>—</td></tr>
+    <tr><td>EUR</td><td>Europeans</td><td>欧洲人群</td><td>—</td></tr>
+    <tr><td>SBP</td><td>Systolic Blood Pressure</td><td>收缩压</td><td>—</td></tr>
+    <tr><td>LDL-C</td><td>Low-Density Lipoprotein Cholesterol</td><td>低密度脂蛋白胆固醇</td><td>—</td></tr>
+    <tr><td>T2D</td><td>Type 2 Diabetes</td><td>2型糖尿病</td><td>—</td></tr>
+    <tr><td>AF</td><td>Atrial Fibrillation</td><td>心房颤动</td><td>—</td></tr>
+    <tr><td>BMI</td><td>Body Mass Index</td><td>体重指数</td><td>—</td></tr>
+  </table>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>本文是一个跨种族（东亚+欧洲）的<strong>蛋白质组范围MR研究</strong>，旨在系统发现缺血性卒中的新型药物靶点。核心方法链为：<strong>GWAS发现cis-pQTL → 两样本MR检验因果性 → 共定位确认共享因果变异 → 多种下游分析验证机制和可成药性</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引 / Background
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 1: BACKGROUND -->
+<!-- ================================================================ -->
+<section id="sec-1">
+  <h2>1. 研究背景与科学动机</h2>
+
+  <h3 id="sec-1-1">1.1 缺血性卒中的全球负担</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>卒中（中风）是全球第二大致死原因，每年造成超过650万人死亡和大量长期残疾。打个比方：每2秒就有1人发生卒中；每4人中就有1人在一生中会经历卒中。而<strong>缺血性卒中（IS）</strong>——因血栓堵塞脑血管导致的卒中——占据了所有卒中的约80%。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Background（卒中全球负担）
+</span>
+</div>
+
+  <p>尽管过去几十年在卒中预防和治疗方面取得了巨大进展——例如他汀类药物（降胆固醇）和降压药物的广泛应用——但卒中依然是全球公共卫生的重大挑战。现有的治疗策略主要针对高血压、血脂异常等<strong>已知的中间危险因素</strong>，而<strong>直接靶向卒中发生通路的新型药物严重匮乏</strong>。</p>
+
+  <h3 id="sec-1-2">1.2 从基因组学到蛋白质组学药物靶点发现</h3>
+
+  <p>2022年，一项跨种族GWAS研究在<em>Nature</em>上报道了与卒中类型相关的89个独立基因位点（其中61个为首次发现）。然而，GWAS信号本身通常落在非编码区，<strong>仅凭基因位点难以直接推断因果基因和致病机制</strong>。</p>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>药物靶点发现的"中心法则"</h4>
+    <p>血浆蛋白处于人类生物学的核心位置，也是<strong>最主要的药物靶点来源</strong>。据估算，约95%的已获批药物的作用靶点是蛋白质。因此，将基因组数据（GWAS）与蛋白质组数据（pQTL）整合，可以：</p>
+    <ol>
+      <li><strong>明确因果关系</strong>：蛋白水平的变化是否<em>导致</em>疾病？</li>
+      <li><strong>定位作用机制</strong>：蛋白通过什么中间通路影响疾病？</li>
+      <li><strong>评估可成药性</strong>：该蛋白是否适合作为药物靶点？已有药物管线吗？</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：Background（蛋白质组学药物靶点发现）
+</span>
+</div>
+
+  <h3 id="sec-1-3">1.3 前人研究的局限与本研究的创新</h3>
+
+  <table>
+    <tr><th>前人研究的局限</th><th>本研究的改进</th></tr>
+    <tr><td>几乎只包含欧洲人群</td><td>同时纳入东亚人群（CKB）和欧洲人群（UKB），实现跨种族验证</td></tr>
+    <tr><td>蛋白数量有限（41–653种）</td><td>使用Olink Explore 3072 panel覆盖<strong>2923种蛋白</strong></td></tr>
+    <tr><td>卒中GWAS样本量较小</td><td>使用迄今最大的种族特异性卒中GWAS（EAS: 22664例; EUR: 62100例）</td></tr>
+    <tr><td>仅进行MR分析</td><td>MR + 共定位 + 中介分析 + PheWAS + 组织表达 + KO小鼠 + 药物数据库查询</td></tr>
+    <tr><td>仅发现靶点，缺乏机制验证</td><td>通过调解分析和PheWAS阐明蛋白→卒中因果通路</td></tr>
+  </table>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>本研究的三个核心目标：(1) 利用cis-pQTL评估2923种蛋白与IS的因果关系（MR + 共定位）；(2) 揭示蛋白通过何种通路（血压、血脂、血糖、BMI、房颤等中间危险因素）影响卒中；(3) 评估因果蛋白的可成药性、预测副作用和额外适应症。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Background（前人研究局限）
+</span>
+</div>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>本研究的报告遵循 <a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR 报告规范</a>（20条目检查清单）。STROBE-MR 为 MR 研究提供了完整的质量评估框架——读者可使用其清单作为"质量检查表"来系统评估本研究的透明度和可靠性。详见 <a href="../knowledge_graph.html">知识图谱 → STROBE-MR ↔ <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a>。
+  </div>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 2: METHODS -->
+<!-- ================================================================ -->
+<section id="sec-2">
+  <h2>2. 研究方法全景</h2>
+
+  <p>本节讲解研究方法——原论文 Figure 1 是研究设计总览，把"数据来源→pQTL→MR→下游验证"的完整证据链浓缩在一张图上，完整原图如下，可对照本节各小节讲解：</p>
+
+  <img src="images/Yao/Yao_Fig1.jpg" alt="原论文Figure 1：研究设计、分析方法与关键发现总览——从CKB/UKB蛋白质组到12个因果蛋白的药物评估证据链">
+
+  <p class="fig-caption"><strong>原论文 Figure 1：研究设计、分析方法与关键发现总览。</strong>这张总览图按分析流程编排：数据来源为 CKB（中国慢性病前瞻性研究）与 UKB（英国生物样本库）两个大队列的 Olink 蛋白质组检测（2,923 种蛋白）；分析链条为 cis-pQTL 鉴定（CKB 1,159 个、UKB 1,954 个蛋白，重叠 1,148 个）→ 两样本 MR（EAS：CKB+BBJ，971 个 cis-pQTL；EUR：UKB+GIGASTROKE，1,455 个 cis-pQTL）→ 共定位（coloc/SuSiE）→ 中介分析（BP、LDL、BMI、T2D、AF 五大危险因素）→ PheWAS（555 种疾病、642 种表型）→ KO 小鼠模型与 DrugBank/OpenTargets 药物数据库查询；关键发现为 EAS 中 ALDH2、FGF5 两个因果蛋白，EUR 中 11 个因果蛋白，合计 12 个潜在治疗靶点。图注缩写与正文一一对应：AF=房颤；AS=any stroke；BBJ=日本生物样本库；BMI=体重指数；BP=血压；CKB=中国 Kadoorie 生物样本库；EAS=东亚人群；EUR=欧洲人群；GTEx=基因型-组织表达数据库；GWAS=全基因组关联研究；IS=缺血性卒中；KO=基因敲除；LDL=低密度脂蛋白；MR=孟德尔随机化；PheWAS=全表型组关联研究；pQTL=蛋白数量性状位点；T2D=2型糖尿病；UKB=英国生物样本库。<br>图源：Yao et al., <em>Stroke</em> (2025)。</p>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>本研究的方法可以类比为一条<strong>"证据链"</strong>：每一环都在回答一个不同的问题。第一步回答"基因变异能不能作为蛋白水平的可靠代理？"；第二步回答"蛋白水平变化是否因果性地改变卒中风险？"；第三步回答"蛋白和卒中的遗传信号是否来自同一个因果变异？"；之后的每一步都在回答"这个蛋白到底通过什么机制影响卒中，以及它值不值得作为药物靶点？"。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Background（前人研究局限）
+</span>
+</div>
+
+  <h3 id="sec-2-1">2.1 研究人群与蛋白质组学检测</h3>
+
+  <table>
+    <tr><th>特征</th><th>CKB（东亚）</th><th>UKB（欧洲）</th></tr>
+    <tr><td>总样本量</td><td>512,724</td><td>503,317</td></tr>
+    <tr><td>蛋白质组学样本</td><td>3,977（无CVD史、未服用降脂药）</td><td>54,306（UKB-PPP子集）</td></tr>
+    <tr><td>检测平台</td><td>Olink Explore 1536 + Expansion</td><td>Olink Explore 3072</td></tr>
+    <tr><td>蛋白数量</td><td>2,923</td><td>2,923（相同panel）</td></tr>
+    <tr><td>检测技术</td><td>PEA（邻位延伸分析）</td><td>PEA</td></tr>
+  </table>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>Olink PEA技术原理</h4>
+    <p>Proximity Extension Assay（PEA，邻位延伸分析）是一种高通量蛋白质组学技术。每种目标蛋白配有一对抗体，每支抗体偶联一段独特的DNA寡核苷酸链。当两支抗体同时结合到同一蛋白分子上时，两段DNA链靠近并通过PCR延伸形成可扩增的DNA报告分子。扩增产物通过qPCR或NGS读出。PEA实现了<strong>高特异性（双抗体识别）+ 高灵敏度（PCR信号放大）</strong>的组合，仅需微量血浆样本即可同时测量数千种蛋白。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（研究人群与蛋白质组学检测）
+</span>
+</div>
+
+  <h3 id="sec-2-2">2.2 cis-pQTL发现与遗传工具变量</h3>
+
+  <p>pQTL（protein Quantitative Trait Loci）是指与蛋白表达水平显著相关的遗传位点。根据与编码基因的距离，分为两类：</p>
+  <ul>
+    <li><strong>cis-pQTL（顺式）</strong>：位于编码基因附近（CKB: ±500 Kbp; UKB: ±1 Mbp），受水平多效性（horizontal pleiotropy）影响较小，是MR的<strong>首选工具变量</strong></li>
+    <li><strong>trans-pQTL（反式）</strong>：位于远处染色体区域，可能通过复杂网络发挥作用，多效性风险较大</li>
+  </ul>
+
+  <p>cis-pQTL的显著性阈值设定为 $P &lt; 1.7 \times 10^{-11}$（即 $5 \times 10^{-8} / 2923$ 的Bonferroni多重检验校正）。对于有多个cis-pQTL的蛋白，仅使用<strong>P值最小的领先变异</strong>作为工具变量。</p>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>为什么优先使用cis-pQTL？</h4>
+    <p>假设一个trans-pQTL同时影响蛋白质A的表达和蛋白质B的表达，且B才是真正影响卒中的蛋白。如果只用这个trans-pQTL作为A的工具变量，就可能错误地得出"A导致卒中"的结论(这就是水平多效性的问题)。而cis-pQTL位于A的编码基因旁边，它的效应更"专一"——主要是通过调控A的表达来发挥作用，大大降低了这种偏倚风险。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（cis-pQTL发现与遗传工具变量）
+</span>
+</div>
+
+  <h3 id="sec-2-3">2.3 两样本孟德尔随机化（2-Sample MR）</h3>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>两样本MR的数学框架</h4>
+    <p><strong>Wald比值法（Wald ratio method）</strong>是最简单的MR估计器。对于单个遗传变异 $G$：</p>
+    <p>$$\hat{\beta}_{MR} = \frac{\hat{\beta}_{GY}}{\hat{\beta}_{GX}}$$</p>
+    <p>其中 $\hat{\beta}_{GX}$ 是 $G$ 对暴露 $X$（蛋白水平）的效应，$\hat{\beta}_{GY}$ 是 $G$ 对结局 $Y$（卒中）的效应。两者的比值估计了暴露对结局的因果效应。</p>
+    <p>对于二分类结局（卒中），比值比（OR）及其标准误的计算采用：</p>
+    <p>$$\widehat{\text{OR}} = \exp\left(\frac{\hat{\beta}_{GY}}{\hat{\beta}_{GX}}\right)$$</p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（两样本孟德尔随机化）
+</span>
+</div>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>MR的原理可以用一个简单的类比来理解：假设你想知道"每天多跑1公里能否降低体重"，但你不能做随机对照试验（无法随机分配一些人每天跑步）。这时你发现有一个基因变异会让人天生更喜欢跑步（每天多跑约0.5公里），同时这个基因变异与体重相关（携带者平均轻2公斤）。那么，<strong>每多跑1公里的因果效应</strong>就是 $2/0.5 = 4$ 公斤。这个计算的逻辑是：基因变异通过跑步行为间接影响了体重，所以基因→体重的效应除以基因→跑步的效应，就得到了跑步→体重的因果效应估计。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（两样本孟德尔随机化）
+</span>
+</div>
+
+  <div class="warning">
+    <span class="tag">关键前提</span>
+    <p>MR推断因果需要满足三个核心假设：</p>
+    <ol>
+      <li><strong>关联性（Relevance）</strong>：遗传变异与暴露显著相关——本研究使用F统计量>30确保强工具变量</li>
+      <li><strong>独立性（Independence）</strong>：遗传变异不与混杂因素相关——通过种族分层GWAS和选择cis-pQTL来满足</li>
+      <li><strong>排他性（Exclusion Restriction）</strong>：遗传变异仅通过暴露影响结局——这是最难验证的假设，本研究通过共定位分析来加强</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（两样本孟德尔随机化）
+</span>
+</div>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>上述 Wald 比值法和 IV 三大假设是 MR 方法论的核心。如需系统学习双样本 MR 的完整数学推导（包括 IVW、MR-Egger 等多工具变量方法），参见 <a href="Sanderson_2022_Mendelian_randomization_zh.html">MR 方法学 Primer 详解</a>。
+  </div>
+
+  <h3 id="sec-2-4">2.4 共定位分析（Colocalization）</h3>
+
+  <p>共定位分析回答一个关键问题：<strong>蛋白和卒中在同一基因位点上的关联信号是否来自同一个因果变异？</strong></p>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>Coloc模型的五个假设</h4>
+    <p>Coloc（<code>coloc</code> R包）对每个位点检验五个互斥假设：</p>
+    <ul>
+      <li><strong>H0</strong>：位点与两个性状均无关</li>
+      <li><strong>H1</strong>：位点仅与性状1（蛋白）有关</li>
+      <li><strong>H2</strong>：位点仅与性状2（卒中）有关</li>
+      <li><strong>H3</strong>：位点与两个性状都有关，但由<strong>不同的因果变异</strong>驱动</li>
+      <li><strong>H4</strong>：位点与两个性状都有关，且<strong>共享同一个因果变异</strong></li>
+    </ul>
+    <p>PP4 > 0.7 被认为是支持共享因果变异的"强证据"；PP4 > 0.95 则为"非常强"的证据。</p>
+    <p>本研究采用两步流程：先用 <strong>SuSiE</strong>（Sum of Single Effects）进行精细定位（fine-mapping），识别95%可信集（credible sets），再用<strong>coloc</strong>基于SuSiE输出进行共定位检验。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（共定位分析Colocalization）
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>深度解析 H3 假设：为什么"同一个位点"不等于"同一个因果变异"？</h4>
+<p>H3 是 coloc 五个假设中<strong>最需要警惕的假阳性场景</strong>。它的核心含义是：</p>
+
+<div style="background:#f0f7fb; border:1px solid #aed6f1; border-radius:8px; padding:16px 20px; margin:12px 0;">
+<p style="text-align:center; font-size:1.1em; font-weight:700; color:#1a5276; margin-bottom:12px;">
+  H3：蛋白和卒中的 GWAS 信号落在同一基因组区域，但它们<strong>由两个不同的因果变异驱动</strong></p>
+
+<table style="width:100%; font-size:0.92em; border:none;">
+  <tr>
+    <td style="border:none; text-align:center; padding:12px; width:50%;">
+      <div style="background:#eaf2f8; border-radius:8px; padding:14px;">
+        <strong style="color:#2471a3;">变异 A（蛋白的因果 pQTL）</strong><br>
+        <span style="font-size:0.9em;">→ 改变蛋白水平<br>→ <em>不</em>影响卒中风险</span>
+      </div>
+    </td>
+    <td style="border:none; text-align:center; padding:4px; width:1px;">
+      <span style="font-size:1.5em; color:#e74c3c;">≠</span>
+    </td>
+    <td style="border:none; text-align:center; padding:12px; width:50%;">
+      <div style="background:#fef9e7; border-radius:8px; padding:14px;">
+        <strong style="color:#b7950b;">变异 B（卒中的因果 GWAS 位点）</strong><br>
+        <span style="font-size:0.9em;">→ 改变卒中风险<br>→ <em>不</em>影响蛋白水平</span>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<p style="text-align:center; margin-top:10px; color:#e74c3c; font-weight:600;">
+  两个变异 A 和 B 恰好因 LD（连锁不平衡）处于同一基因组区域<br>
+  → 表面上看起来"蛋白水平与卒中相关"，但实际上<strong>蛋白不是卒中病因</strong>
+</p>
+</div>
+
+<p>想象一下：一个基因区域就像一栋公寓大楼。306 号房间（变异 A）住着"蛋白调控"功能，307 号房间（变异 B）住着"卒中风险"功能。因为 306 和 307 在同一栋楼（LD 连锁），你观察到的现象是"这栋楼的人既有蛋白变化又有卒中风险"——但<strong>把 306 的住户赶走（用药物靶向蛋白）并不能解决 307 住户的问题（卒中风险）</strong>。这就是 H3 场景——如果基于 H3 的变异做 MR，你会错误地认为蛋白是卒中病因，投入数亿美元开发一个无效药物。</p>
+<span class="src-ref">
+    
+📖 原文出处：Methods（共定位分析Colocalization）
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>H3 vs H4：用实际数字理解 colocalization 的阈值</h4>
+<p>假设某基因座有 100 个彼此处于 LD 的 SNP。coloc 分析给出了五个假设的后验概率：</p>
+
+<table style="width:100%; margin:10px 0; font-size:0.92em;">
+  <tr><th style="background:#1a5276;color:#fff;">情景</th><th style="background:#1a5276;color:#fff;">PP0</th><th style="background:#1a5276;color:#fff;">PP1</th><th style="background:#1a5276;color:#fff;">PP2</th><th style="background:#1a5276;color:#fff;background:#fadbd8;">PP3</th><th style="background:#1a5276;color:#fff;background:#d5f5e3;">PP4</th><th style="background:#1a5276;color:#fff;">解读</th></tr>
+
+  <tr>
+    <td><strong>A</strong></td>
+    <td>0.01</td><td>0.02</td><td>0.05</td>
+    <td style="background:#fadbd8;font-weight:700;">0.88</td>
+    <td>0.04</td>
+    <td>PP3=0.88 → <strong style="color:#e74c3c;">H3 占主导：两个独立因果变异</strong><br>蛋白 <em>不</em>是卒中的病因——<br>不应基于这个蛋白开发卒中药物</td>
+  </tr>
+
+  <tr style="background:#f0f7fb;">
+    <td><strong>B</strong></td>
+    <td>0.01</td><td>0.02</td><td>0.05</td>
+    <td>0.03</td>
+    <td style="background:#d5f5e3;font-weight:700;">0.89</td>
+    <td>PP4=0.89 > 0.7 → <strong style="color:#27ae60;">H4 强证据：共享同一因果变异</strong><br>蛋白<em>是</em>卒中的病因——<br>可将其列为药物靶点候选</td>
+  </tr>
+
+  <tr>
+    <td><strong>C</strong></td>
+    <td>0.01</td><td>0.05</td><td>0.04</td>
+    <td style="background:#fadbd8;">0.42</td>
+    <td>0.48</td>
+    <td>PP3≈PP4 → <strong style="color:#f39c12;">不确定</strong><br>现有数据不足以区分 H3 和 H4<br>需要更大的 GWAS 样本量或功能实验来裁决</td>
+  </tr>
+</table>
+
+<p style="margin-top:12px;"><strong>为什么 Yao et al. 选择 PP4 > 0.7 作为阈值？</strong>因为 PP3 和 PP4 加起来通常占主导（其他假设 PP0-PP2 概率很小），所以 PP4 > 0.7 意味着 H4 是 H3 的 <strong>2.3 倍以上更可能</strong>。这为"蛋白确实是疾病的因果因素"提供了足够的置信度。在 Yao 等人的 10 个 IS 相关蛋白中，9 个 PP4 > 0.7（其中 5 个 > 0.95），唯一例外是 ABO（PP4=0.669），也正是因为 PP3 仍有不可忽略的概率（~0.33），ABO 被审慎地归类为"证据不足以确定因果方向"。</p>
+<span class="src-ref">
+    
+📖 原文出处：Methods（共定位分析Colocalization）
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">关键问题</span>
+<h4>为什么 H3 是 MR 药物靶点发现的最大威胁？</h4>
+<p>在蛋白质组范围 MR 中，一个基因组区域通常同时承载着：</p>
+<ul>
+  <li><strong>cis-pQTL</strong>（影响附近基因编码蛋白的表达水平）——你的"暴露"</li>
+  <li><strong>GWAS 疾病位点</strong>（影响疾病风险的变异）——你的"结局"</li>
+</ul>
+<p>如果 coloc 未运行（或 PP3 被忽略），研究者可能错误地将蛋白-疾病关联归因于因果性（H4），而实际是两个独立变异在 LD 中的"邻里效应"（H3）。<strong>这正是为什么 Yao 等人的分析流程是"MR → coloc"而非"MR only"——coloc 是 MR 结论的"质量守门员"。</strong></p>
+<span class="src-ref">
+    
+📖 原文出处：Methods（共定位分析Colocalization）
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<p><strong>H3 的本质是"遗传搭车"。</strong>两个独立的因果变异碰巧在同一基因组区域，因 LD 而表面上关联。区分 H3 和 H4 需要通过 coloc + SuSiE 精细定位，比较哪个假设更好地解释观测数据。<strong>PP4 > 0.7 是通行阈值——意味着共享因果变异（H4）比两个独立变异（H3）至少更可能 2.3 倍。</strong>Yao 等人对 coloc 的严格应用是本研究中 10 个 IS 靶点具有高可信度的关键保证。</p>
+<span class="src-ref">
+    
+📖 原文出处：Methods（共定位分析Colocalization）
+</span>
+</div>
+
+
+
+  <h3 id="sec-2-5">2.5 下游验证分析链条</h3>
+
+  <div class="algorithm">
+    <span class="tag">分析流程</span>
+    <h4>完整分析链条</h4>
+    <p>
+      1. <strong>GWAS → cis-pQTL发现</strong>（CKB n=3974; UKB n=34557）<br>
+      2. <strong>两样本MR</strong>（EAS/EUR各自独立分析）+ 种族间交叉验证<br>
+      3. <strong>共定位分析</strong>（coloc + SuSiE）<br>
+      4. <strong>中介分析</strong>（蛋白 → SBP/LDL-C/BMI/T2D/AF → 卒中）<br>
+      5. <strong>PheWAS</strong>（555种疾病 + 642种表型的全表型组关联）<br>
+      6. <strong>组织表达数据库查询</strong>（GTEx）<br>
+      7. <strong>基因敲除小鼠模型</strong>（International Mouse Phenotyping Consortium）<br>
+      8. <strong>药物数据库查询</strong>（DrugBank + OpenTargets）
+    </p>
+  <span class="src-ref">
+    
+📖 原文出处：Methods（下游验证分析链条）
+</span>
+</div>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 3: CORE RESULTS -->
+<!-- ================================================================ -->
+<section id="sec-3">
+  <h2>3. 核心结果</h2>
+
+  <h3 id="sec-3-1">3.1 MR分析：10种因果蛋白的发现</h3>
+
+  <p>本节讲 pQTL 发现与两样本 MR——原论文 Figure 2 是 EAS 与 EUR 两个人群的曼哈顿图，把 1,159 与 1,954 个蛋白与卒中风险的关联强度按基因组位置排列，完整原图如下：</p>
+
+  <img src="images/Yao/Yao_Fig2.jpg" alt="原论文Figure 2：基因预测蛋白水平与卒中风险的关联曼哈顿图（EAS与EUR，四个面板）">
+
+  <p class="fig-caption"><strong>原论文 Figure 2：曼哈顿图。</strong>展示基因预测的血浆蛋白水平与各卒中结局的关联，EAS 纳入 1,159 个、EUR 纳入 1,954 个蛋白。四个面板构成 2×2 布局：(A)、(B) 为东亚人群（EAS）的两种卒中结局，(C)、(D) 为欧洲人群（EUR）的两种卒中结局。读法：横轴为蛋白编码基因的基因组位置，纵轴为关联显著性 $-log_{10}(P)$——点越高关联越显著；<strong>红色点</strong>代表显著的<strong>正相关</strong>（蛋白水平越高、卒中风险越高），<strong>蓝色点</strong>代表显著的<strong>负相关</strong>（保护作用）；水平虚线为 FDR<0.05 的显著性阈值，部分显著蛋白以基因名标注。与正文呼应：EAS 人群中 ALDH2（IS 关联 $P=8.2\times10^{-11}$）与 FGF5 两个蛋白通过多重检验校正（(A)、(B) 面板），EUR 人群中 11 个蛋白显著（(C)、(D) 面板）。<br>图源：Yao et al., <em>Stroke</em> (2025)。</p>
+
+  <p>在CKB和UKB中，分别鉴定出1,159和1,954种（其中1,148种重叠）具有cis-pQTL的蛋白，用于后续MR分析。</p>
+
+  <div class="theorem">
+    <span class="tag">核心发现</span>
+    <h4>与缺血性卒中因果关联的10种蛋白</h4>
+    <table>
+      <tr><th>蛋白</th><th>全称</th><th>方向</th><th>EAS OR (95% CI)</th><th>EUR OR (95% CI)</th><th>PP4</th></tr>
+      <tr><td><strong>FGF5</strong></td><td>成纤维细胞生长因子5</td><td>↑风险</td><td>1.14 (1.08–1.19)</td><td>1.04 (1.02–1.05)</td><td>0.999</td></tr>
+      <tr><td><strong>TMPRSS5</strong></td><td>跨膜丝氨酸蛋白酶5</td><td>↑风险</td><td>— (仅EUR方向一致)</td><td>1.04 (1.02–1.05)</td><td>0.785</td></tr>
+      <tr><td><strong>FURIN</strong></td><td>弗林蛋白酶</td><td>↑风险</td><td>方向一致</td><td>1.23 (1.14–1.34)</td><td>0.993</td></tr>
+      <tr><td><strong>F11</strong></td><td>凝血因子XI</td><td>↑风险</td><td>方向一致</td><td>1.09 (1.06–1.13)</td><td>0.997</td></tr>
+      <tr><td><strong>ALDH2</strong></td><td>乙醛脱氢酶2</td><td>↑风险</td><td>1.60 (1.39–1.84)</td><td>无cis-pQTL</td><td>0.958</td></tr>
+      <tr><td><strong>ABO</strong></td><td>ABO血型系统转移酶</td><td>↑风险</td><td>方向一致</td><td>1.06 (1.04–1.09)</td><td>0.669</td></tr>
+      <tr><td><strong>GRK5</strong></td><td>G蛋白偶联受体激酶5</td><td>↓风险</td><td>无变异（频率>99.9%）</td><td>0.83 (0.78–0.87)</td><td>0.988</td></tr>
+      <tr><td><strong>KIAA0319</strong></td><td>阅读障碍相关蛋白KIAA0319</td><td>↓风险</td><td>方向一致</td><td>0.90 (0.86–0.94)</td><td>0.965</td></tr>
+      <tr><td><strong>PROCR</strong></td><td>内皮蛋白C受体</td><td>↓风险</td><td>方向一致</td><td>0.89 (0.85–0.94)</td><td>0.991</td></tr>
+      <tr><td><strong>MMP12</strong></td><td>巨噬细胞金属弹性蛋白酶12</td><td>↓风险</td><td>方向一致</td><td>0.93 (0.91–0.96)</td><td>0.999</td></tr>
+    </table>
+  <span class="src-ref">
+    
+📖 原文出处：Results（MR分析：10种因果蛋白）
+</span>
+</div>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <h4>如何解读OR值？</h4>
+    <p>以<strong>ALDH2</strong>为例：OR=1.60意味着，基因预测的ALDH2水平每升高1个标准差（SD），缺血性卒中的风险增加60%。这是一个非常大的效应！相比之下，<strong>TMPRSS5</strong>的OR=1.04表示每SD升高仅增加4%的风险——效应虽小但统计学显著。而<strong>GRK5</strong>（OR=0.83）则意味每SD升高可降低17%的卒中风险——是一个保护性因子。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Results（MR分析：10种因果蛋白）
+</span>
+</div>
+
+  <p>上文的 OR 解读出自原论文 Figure 3 森林图——12 个蛋白在 IS 与 any stroke 两种结局、EAS 与 EUR 两个人群中的效应量与置信区间都画在一张图上，完整原图如下：</p>
+
+  <img src="images/Yao/Yao_Fig3.jpg" alt="原论文Figure 3：12个蛋白每升高1-SD的缺血性卒中与any stroke风险森林图（EAS与EUR）">
+
+  <p class="fig-caption"><strong>原论文 Figure 3：森林图。</strong>展示 12 个蛋白基因预测水平每升高 1 个标准差（1-SD）对应的卒中风险校正比值比（OR）与 95% 置信区间。(A) 为缺血性卒中（IS），(B) 为 any stroke，EAS 与 EUR 两个人群的估计并排列出。方块大小与 log OR 方差的倒数成正比——置信区间越窄（估计越精确）的蛋白方块越大。读图方向：方块与线段位于参考线（OR=1）右侧代表风险升高，如 ALDH2（EAS）OR=1.60 [1.39–1.84]、FURIN（EUR）OR=1.23 [1.14–1.34]；位于左侧代表保护作用，如 GRK5 OR=0.83 [0.78–0.87]、PROCR OR=0.89 [0.85–0.94]、MMP12 OR=0.93 [0.91–0.96]；仅与 any stroke 关联的 Apo[a]（1.05 [1.02–1.07]）与 SCARA5（0.92 [0.88–0.96]）在 (B) 面板中呈现。与上文表格一致：10 种 IS 关联蛋白中 6 种正相关、4 种负相关，两个人群方向一致，是因果推断可靠性的直观体现。<br>图源：Yao et al., <em>Stroke</em> (2025)。</p>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>10种蛋白中，6种为正相关（水平越高→卒中风险越高）、4种为负相关（水平越高→卒中风险越低）。<strong>所有蛋白在两个种族中方向一致</strong>，这是因果推断可靠性最强有力的证据之一。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Results（MR分析：10种因果蛋白）
+</span>
+</div>
+
+  <h3 id="sec-3-2">3.2 共定位证据</h3>
+
+  <p>在10种IS相关蛋白中，<strong>9种的PP4 > 0.7</strong>（强证据支持共享因果变异），其中F11、MMP12、PROCR、KIAA0319和GRK5共5种蛋白的PP4 > 0.95（非常强证据）。唯一的例外是ABO（PP4=0.669，略低于阈值）。</p>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>MR和共定位是互补的分析。MR告诉我们"蛋白水平和卒中之间有没有因果关系"；共定位告诉我们"这个因果结论可不可靠——蛋白和卒中的遗传信号是否确实来自同一个DNA变异"。两者结合使用可以大幅减少因连锁不平衡（LD）混杂导致的假阳性发现。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Results（共定位证据）
+</span>
+</div>
+
+  <h3 id="sec-3-3">3.3 中介分析：蛋白→危险因素→卒中</h3>
+
+  <p>本节讲中介分析——蛋白如何经由血压、血脂、血糖、BMI、房颤等中间危险因素影响卒中。原论文 Figure 4 用弦图把 12 个因果蛋白与 5 大危险因素的关联浓缩在一张图上，完整原图如下：</p>
+
+  <img src="images/Yao/Yao_Fig4.jpg" alt="原论文Figure 4：弦图——12个潜在因果蛋白与5大卒中危险因素的关联网络">
+
+  <p class="fig-caption"><strong>原论文 Figure 4：弦图。</strong>弦图外围为 12 个潜在因果蛋白与 5 大卒中危险因素的扇区，内部连线表示蛋白与危险因素之间显著的遗传关联（蛋白水平→危险因素水平）。按正文结果读图：与血压（BP/SBP）<strong>正相关</strong>的有 FGF5、FURIN、Apo[a]、TMPRSS5（EUR）及 ALDH2（EAS），<strong>负相关</strong>的有 KIAA0319、PROCR、SCARA5；与 LDL-C 正相关的有 ABO、Apo[a]；与 T2D 正相关的有 ABO、MMP12；与 BMI 相关的是 PROCR；与 AF 相关的有 Apo[a]、FGF5、TMPRSS5、MMP12 及 ALDH2（EAS）。这些关联方向全部与各自对卒中风险的作用方向一致（例如升高血压的蛋白同时升高卒中风险），构成中介分析的核心证据——下文 FGF5 效应中 77%（EUR）经由 SBP 介导即由此而来。图注缩写：AF=房颤；BMI=体重指数；BP=血压；LDL=低密度脂蛋白；T2D=2型糖尿病。<br>图源：Yao et al., <em>Stroke</em> (2025)。</p>
+
+  <table>
+    <tr><th>蛋白</th><th>SBP</th><th>LDL-C</th><th>BMI</th><th>T2D</th><th>AF</th></tr>
+    <tr><td>FGF5</td><td>↑ (正)</td><td>—</td><td>—</td><td>—</td><td>↑ (正)</td></tr>
+    <tr><td>FURIN</td><td>↑ (正)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>TMPRSS5</td><td>↑ (正)</td><td>—</td><td>—</td><td>—</td><td>↑ (正)</td></tr>
+    <tr><td>ALDH2</td><td>↑ (正)</td><td>—</td><td>—</td><td>↑ (正)</td><td>↑ (正)</td></tr>
+    <tr><td>ABO</td><td>—</td><td>↑ (正)</td><td>—</td><td>↑ (正)</td><td>—</td></tr>
+    <tr><td>KIAA0319</td><td>↓ (反)</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr><td>PROCR</td><td>↓ (反)</td><td>—</td><td>↓ (反)</td><td>—</td><td>—</td></tr>
+    <tr><td>MMP12</td><td>—</td><td>—</td><td>—</td><td>↑ (正)</td><td>↑ (正)</td></tr>
+  </table>
+
+  <div class="theorem">
+    <span class="tag">关键中介发现</span>
+    <p>中介分析显示，<strong>FGF5对IS的效应在EUR中有77%是通过SBP介导的</strong>（但在EAS中仅为5%）。FURIN通过SBP介导的效应占比为41%。其他蛋白的中介效应较小（KIAA0319 8%, TMPRSS5 6%, PROCR 1%, ALDH2 1%）。这表明<strong>不同蛋白通过不同通路影响卒中</strong>：FGF5和FURIN主要通过升高血压起作用，而其他蛋白可能通过更直接的血栓形成或血管重塑通路。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Results（中介分析）
+</span>
+</div>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>中介 MR 分析在心血管研究中有两种典型的应用范式——"广度优先"（如 <a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson MR-CVD</a>：102种暴露→6种CVD的多通路筛选）和"深度优先"（如 <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji 两步MR</a>：BMI→COL6A3/endotrophin→CAD 的单通路精密量化）。本研究采用中间策略——对10种蛋白逐一做中介分析,同时覆盖SBP、LDL-C、BMI、T2D、AF五种中介因子。详见 <a href="../knowledge_graph.html">知识图谱 → 关系卡片</a>。
+  </div>
+
+  <h3 id="sec-3-4">3.4 PheWAS与下游验证</h3>
+
+  <p>本节讲 PheWAS 与下游验证——原论文随文附有一张 PheWAS 汇总表（无编号，表题 "Table. PheWAS Results of 10 Proteins..."），把 10 个蛋白的多效性关联、高表达组织、KO 小鼠表型与药物开发状态逐行列出，完整原表截图如下：</p>
+
+  <img src="images/Yao/Yao_PheWAS.jpg" alt="原论文Table：PheWAS Results of 10 Proteins——10种IS相关蛋白的多效性、组织表达、KO小鼠表型与药物开发状态汇总">
+
+  <p class="fig-caption"><strong>原论文 Table：PheWAS Results of 10 Proteins…。</strong>表题意为"10 种与缺血性卒中遗传关联蛋白的 PheWAS 结果及其作为新靶点或重利用靶点的潜力"。逐列读法：第 1 列 <strong>Protein</strong> 为蛋白名；第 2、3 列 <strong>GWAS / MR</strong> 为该蛋白与卒中的既往遗传学证据；第 4 列 <strong>PheWAS associations (phenotypes)</strong> 列出蛋白与其他表型的关联（心血管、血液、肝、血糖、血脂、肾、人体测量等）；第 5 列 <strong>Highly expressed tissues</strong> 为高表达组织；第 6 列 <strong>KO mouse phenotype</strong> 为单基因敲除小鼠表型；第 7 列 <strong>Drug target development</strong> 为药物开发状态，自上而下分四类：<strong>Not druggable</strong>（ABO，不可成药）、<strong>In clinical trials for stroke</strong>（F11，已有卒中适应症的 II–III 期试验）、<strong>In clinical trials for other indications (repurpose)</strong>（ALDH2、MMP12，在其他适应症有 I–IV 期试验，可重利用）、<strong>Novel drug targets</strong>（PROCR、GRK5、FGF5、FURIN、KIAA0319、TMPRSS5 共 6 个全新靶点，无药物开发记录）。这张表是"靶点安全性/多效性"论断的证据底座：多效性广的蛋白（如 ALDH2 关联人体测量、心血管、血液、肝、血糖、肾、血脂多类表型）提示脱靶副作用风险；ABO 因参与血型合成被判定不可成药；6 个无既往药物记录的蛋白则是全新的机会窗口，与 3.5 节药物靶点全景互相对应。<br>图源：Yao et al., <em>Stroke</em> (2025)。</p>
+
+  <p>PheWAS分析覆盖555种疾病和642种表型：</p>
+  <ul>
+    <li><strong>8种蛋白</strong>（ABO, F11, ALDH2, MMP12, PROCR, GRK5, FGF5, FURIN）与IS或其他心血管结局（如心肌梗死）相关联</li>
+    <li><strong>KIAA0319和TMPRSS5</strong>与血液学表型（血小板体积、血小板计数）、肝功能、肾功能和人体测量表型相关联</li>
+    <li><strong>ALDH2, ABO, FURIN</strong>——在中枢血管或中枢神经系统中高表达——还与多种脂质标志物（甘油三酯、总胆固醇、HDL-C）相关</li>
+  </ul>
+
+  <p>单基因敲除小鼠模型进一步确认了这些蛋白在以下表型中的重要性：</p>
+  <ul>
+    <li><strong>心血管表型</strong>：ALDH2, GRK5, FURIN</li>
+    <li><strong>造血表型</strong>：F11, MMP12, KIAA0319, PROCR, ALDH2</li>
+    <li><strong>中枢神经系统表型</strong>：GRK5, MMP12, KIAA0319</li>
+  </ul>
+
+  <h3 id="sec-3-5">3.5 药物靶点全景</h3>
+
+  <table>
+    <tr><th>类别</th><th>蛋白</th><th>药物开发状态</th></tr>
+    <tr><td style="background:#d5f5e3;">已知卒中靶点</td><td>F11</td><td>F11抑制剂（如abelacimab）正处于II–III期临床试验</td></tr>
+    <tr><td style="background:#fdebd0;">可重新利用靶点</td><td>ALDH2</td><td>>30项I–IV期试验（酒精依赖、可卡因依赖、感染、癌症），但<strong>非卒中</strong></td></tr>
+    <tr><td style="background:#fdebd0;">可重新利用靶点</td><td>MMP12</td><td>乳腺癌/肺癌（III期）、丙肝（II期）、COPD（II期），但<strong>非卒中</strong></td></tr>
+    <tr><td style="background:#d6eaf8;">全新靶点</td><td>PROCR, GRK5, FGF5, FURIN, KIAA0319, TMPRSS5</td><td>无任何已知药物开发记录</td></tr>
+    <tr><td style="background:#fadbd8;">不可成药</td><td>ABO</td><td>靶向ABO可能改变血型，带来不可预测的多组织副作用</td></tr>
+  </table>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>本文用 <strong>cis-pQTL MR</strong>（局部编码变异→蛋白→卒中）筛选治疗靶点；<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">Salamone et al. (2026) DANDELION</a> 则走另一条互补路线——用 <strong>trans-regulatory 反式调控关联 + WES 负担检验</strong>定位"疾病近端基因"（DPG），把远端调控变异纳入因果链条。两者共同回答"哪个基因/蛋白值得做成药靶"，但一个聚焦局部蛋白、一个扫描全局调控网络，可相互印证靶点优先级。
+    详见 <a href="../knowledge_graph.html">知识图谱 → 关系卡片</a>。
+  </div>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 4: DEEP DIVE INTO EACH PROTEIN -->
+<!-- ================================================================ -->
+<section id="sec-4">
+  <h2>4. 10种因果蛋白深度解读</h2>
+
+  <h3 id="sec-4-1">4.1 已知靶点：F11（凝血因子XI）</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>F11是凝血级联反应中的关键因子，参与血栓的<strong>传播和稳定</strong>。如果把血栓形成比作房屋倒塌，F11不是最初推倒第一块砖的力量（那是组织因子/FVII的作用），而是在房屋已经开始倾斜时加速倒塌的关键力量。因此，抑制F11可以<strong>在不完全阻断正常止血功能的前提下减缓血栓形成</strong>——这是一个理想的抗凝靶点特征。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（F11已知靶点）
+</span>
+</div>
+
+  <p>F11抑制剂（如abelacimab，一种单克隆抗体）目前正在多项临床试验中评估卒中预防效果（NCT04755283, NCT04304508, NCT03766581）。本研究的遗传学证据为这些开发项目提供了强有力的"概念验证"支持：基因预测的较高F11水平因果性地增加IS风险（OR=1.09），且共定位证据极强（PP4=0.997）。此外，F11与心源性栓塞亚型IS的关联尤为显著（OR=1.26, PP4=0.995）。</p>
+
+  <div class="warning">
+    <span class="tag">安全性考量</span>
+    <p>抗凝治疗最大的担忧是出血风险。但近期研究表明，F11的遗传学降低<strong>不增加脑出血风险</strong>——这与传统抗凝药（如华法林）形成鲜明对比。这进一步支持F11作为"既能抗凝又不过度增加出血"的理想靶点。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（F11已知靶点）
+</span>
+</div>
+
+  <h3 id="sec-4-2">4.2 可重新利用靶点：ALDH2和MMP12</h3>
+
+  <h4>ALDH2（乙醛脱氢酶2）</h4>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>ALDH2是线粒体中的一种解毒酶，负责将酒精代谢产生的有毒乙醛转化为无害的乙酸。这解释了为什么约36%的东亚人群（携带ALDH2*2失活突变）喝酒后会脸红——他们体内的ALDH2活性不足，导致乙醛堆积。但这项研究的发现远远超越了酒精代谢：<strong>ALDH2还是东亚人群中与IS关联最强的遗传信号</strong>（OR=1.60），其效应远大于任何已知的卒中风险位点。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（ALDH2 + MMP12可重利用）
+</span>
+</div>
+
+  <p>有趣的是，ALDH2与IS的关联在欧洲人群中无法验证，因为ALDH2的cis-pQTL在英国人中未被发现（该功能缺失突变几乎仅在东亚人群中有较高频率）。这凸显了<strong>在不同种族人群中进行研究的价值</strong>——如果只研究欧洲人群，这个重要的靶点就会被完全遗漏。</p>
+
+  <p>ALDH2抑制剂目前已在>30项I–IV期临床试验中进行评估，适应症包括酒精依赖、可卡因依赖、感染和癌症——<strong>但唯独不包括卒中</strong>。鉴于ALDH2与IS极为强烈的遗传关联，将已有的ALDH2抑制剂（如disulfiram）重新用于卒中预防是一个极具吸引力的药物重利用机会。</p>
+
+  <h4>MMP12（巨噬细胞金属弹性蛋白酶12）</h4>
+
+  <div class="warning">
+    <span class="tag">学术争议</span>
+    <p>MMP12与卒中的关系存在重要争议。一项基于人群的观察性研究（n=2983，450例IS事件）发现MMP12水平与IS风险呈<strong>正相关</strong>（HR=1.30）。但本研究及<strong>所有先前的遗传学研究</strong>均发现MMP12与IS呈<strong>负相关</strong>（即MMP12水平越高，风险越低）。这种观察性研究与遗传学研究方向相反的"冲突"强烈提示观察性研究中存在混杂或反向因果——例如，MMP12水平升高可能是机体对亚临床动脉粥样硬化的补偿性反应，而非致病原因。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（ALDH2 + MMP12可重利用）
+</span>
+</div>
+
+  <p>MMP12属于基质金属蛋白酶家族，参与血管重塑和动脉粥样硬化。动物实验中，敲除MMP12可改善胰岛素敏感性、减少全身炎症和动脉粥样硬化特征。在IS动物模型中，MMP12表达在脑内急剧升高，抑制MMP12可减轻脑损伤并促进神经功能恢复。</p>
+
+  <p><strong>药物重利用机会：</strong>MMP12已有针对癌症（III期）、丙肝（II期）和COPD（II期）的药物开发项目，但尚无卒中相关试验。将这些药物重新用于卒中是极具前景的方向。</p>
+
+  <h3 id="sec-4-3">4.3 六大全新靶点</h3>
+
+  <h4>PROCR（内皮蛋白C受体）</h4>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>PROCR（又称活化蛋白C受体）是蛋白C（PROC）的受体，能增强蛋白C的激活。蛋白C是一个强效的抗凝因子和细胞保护因子——它就像血液中的"天然消防员"，不仅能抑制过度凝血，还能保护血管内皮细胞免受炎症损伤。基因预测的较高PROCR水平与<strong>更低的</strong>卒中风险相关（OR=0.89），PP4达0.991——说明"消防员"越多，卒中风险越低。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（PROCR/GRK5/FGF5/FURIN/KIAA0319/TMPRSS5全新靶点）
+</span>
+</div>
+
+  <p>目前尚无直接靶向PROCR的药物。但<strong>PROC激活剂</strong>（如3K3A-APC，一种重组活化蛋白C变体）已在急性IS治疗的II期试验中显示出安全性信号，并即将进入III期试验（NCT02222714）。PheWAS结果确认了PROCR在心血管疾病和肾功能中的重要性。综合现有证据，PROCR激动剂作为IS的<strong>预防和治疗双重作用靶点</strong>具有巨大潜力。</p>
+
+  <h4>GRK5（G蛋白偶联受体激酶5）</h4>
+
+  <p>GRK5是UKB中<strong>与IS关联最强</strong>的蛋白（OR=0.83）。但在CKB中未发现显著关联——原因是GRK5的cis-pQTL（rs10886430-A）在东亚人群中几乎固定（频率>99.9%），而在欧洲人群中频率仅为88%。这是一个"自然实验"的典型例子：一个变异在一个人群中没有变异就无法检验其效应，但在另一个人群中可以通过频率差异来验证。</p>
+
+  <p>GRK5属于GPCR激酶家族，能磷酸化多种活化态的GPCR。在血小板RNA测序数据中，<strong>GRK5是GRK家族中表达最高的成员</strong>，提示GRK5很可能是血小板中发挥关键功能的家族成员。rs10886430-A通过降低凝血酶诱导的血小板活性来减少卒中、肺栓塞和静脉血栓栓塞风险。这意味着<strong>GRK5抑制剂可能通过抗血小板活性来预防血栓性卒中</strong>——特别是在欧洲人群中。</p>
+
+  <h4>FGF5（成纤维细胞生长因子5）</h4>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>FGF5是一种多肽生长因子，参与生长、发育、神经元功能、代谢和血管生成。它是少数在<strong>EAS和EUR中都显著</strong>与IS相关的蛋白之一（使用不同的领先变异）。FGF5在CKB中的效应（OR=1.14）大于UKB（OR=1.04），可能反映了不同领先变异的频率差异（CKB 42% vs UKB 28%）。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（PROCR/GRK5/FGF5/FURIN/KIAA0319/TMPRSS5全新靶点）
+</span>
+</div>
+
+  <p>FGF5与血压的关联是全基因组最显著的信号之一。在EUR中的中介分析显示，<strong>FGF5对卒中的效应有77%通过SBP介导</strong>——这是一个非常高的中介比例。在动物实验中，上调FGF5可增加心肌血流和功能、减少心肌细胞凋亡并增加心肌细胞数量。这些发现一方面支持FGF5在某些组织（心脏）中的有益作用，另一方面也提示<strong>系统性抑制FGF5以降低血压和卒中风险可能是一种可行的治疗策略</strong>，但需要注意组织特异性的平衡。</p>
+
+  <h4>FURIN（弗林蛋白酶/PCSK3）</h4>
+
+  <p>FURIN是EUR中<strong>与IS关联最强</strong>的蛋白之一（OR=1.23, PP4=0.993）。它是一种催化酶，参与多种参与炎症和动脉粥样硬化的蛋白的激活。本研究团队此前已报道FURIN与缺血性心脏病（IHD）的因果关联。约<strong>41%</strong>的FURIN-卒中效应通过SBP介导，说明血压是其主要通路之一，但仍有一半以上的效应可能通过其他机制发挥。</p>
+
+  <div class="warning">
+    <span class="tag">药物开发空白</span>
+    <p>尽管FURIN在心血管疾病中的作用日渐清晰（包括卒中和缺血性心脏病），但目前<strong>没有任何针对FURIN的药物开发项目（与卒中或IHD相关）</strong>。这是一个明显的药物开发空白，值得学术界和工业界的高度关注。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（PROCR/GRK5/FGF5/FURIN/KIAA0319/TMPRSS5全新靶点）
+</span>
+</div>
+
+  <h4>KIAA0319（阅读障碍相关蛋白KIAA0319）</h4>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>KIAA0319长期以来被认为是一个"阅读障碍基因"——多项遗传关联研究将其与阅读障碍易感性联系在一起。但这项研究的发现为其赋予了全新的生物学意义：<strong>KIAA0319不仅与脑发育有关，还可能在卒中后的神经修复中发挥关键作用</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（PROCR/GRK5/FGF5/FURIN/KIAA0319/TMPRSS5全新靶点）
+</span>
+</div>
+
+  <p>KIAA0319是一种跨膜蛋白，在脊髓神经元和脊神经节神经元中高表达。最新动物研究表明，KIAA0319通过Smad2信号通路<strong>调节轴突生长和再生</strong>。基因预测的较高KIAA0319水平与较低的SBP相关（可能部分解释其对卒中的保护作用），但其对IS的保护效应（OR=0.90）似乎不完全由血压介导（仅8%）。<strong>KIAA0319可能成为一种改善卒中后功能恢复的治疗靶点</strong>——通过调节神经发生和神经可塑性。</p>
+
+  <h4>TMPRSS5（跨膜丝氨酸蛋白酶5）</h4>
+
+  <p>TMPRSS5是II型跨膜丝氨酸蛋白酶家族的成员，但其在心血管疾病中的功能尚不明确。其mRNA在大脑中表达，蛋白主要定位于神经元及其轴突中。TMPRSS5在之前的MR研究中已被报道与IS风险相关，本研究进一步确认了这一发现，并发现其可能通过血压和房颤介导效应。</p>
+
+  <p>PheWAS揭示了TMPRSS5与血液学性状（平均血小板体积、血小板计数）的关联——暗示其可能还有<strong>血小板相关的抗血栓通路</strong>。但总体而言，TMPRSS5代表了一个"有前景但机制不明"的新型靶点，需要更多基础研究来阐明其作用机制。</p>
+
+  <h3 id="sec-4-4">4.4 不可成药靶点：ABO</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>ABO基因编码一种糖基转移酶，决定ABO血型。非O型血个体（具有更高的ABO酶活性）患静脉血栓栓塞、IS和心肌梗死的风险更高——这一观察已被大量流行病学研究反复证实。可能的机制是ABO酶通过修饰凝血因子（如FVIII和von Willebrand因子）上的糖链来影响其血浆水平。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（ABO不可成药）
+</span>
+</div>
+
+  <p>然而，<strong>靶向ABO作为药物是不可行的</strong>：抑制ABO酶可能会改变血型并带来不可预测的免疫学和血液学后果——这就像"为了修复一个房间而拆除整栋房子"。ABO的PP4（0.669）也略低于共定位阈值，意味着其作为因果靶点的遗传证据相对较弱。尽管如此，ABO作为卒中风险分层的<strong>生物标志物</strong>仍有价值。</p>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 5: DISCUSSION -->
+<!-- ================================================================ -->
+<section id="sec-5">
+  <h2>5. 讨论与展望</h2>
+
+  <h3 id="sec-5-1">5.1 研究优势</h3>
+
+  <div class="summary">
+    <span class="tag">优势清单</span>
+    <ol>
+      <li><strong>双种族设计</strong>：首次在EAS和EUR中同时进行蛋白质组范围MR分析，增强了发现的普适性和可靠性</li>
+      <li><strong>大规模</strong>：使用最大的种族特异性卒中GWAS（EAS: 22,664例; EUR: 62,100例）</li>
+      <li><strong>种族特异性遗传工具</strong>：在各自人群中独立识别cis-pQTL，避免跨种族的LD差异导致的工具变量偏倚</li>
+      <li><strong>多层次下游验证</strong>：MR + 共定位 + 中介分析 + PheWAS + GTEx + KO小鼠 + 药物数据库——七重证据链</li>
+      <li><strong>种族间交叉验证</strong>：所有10种蛋白在两个种族中方向一致，这是因果推断的最有力证据之一</li>
+      <li><strong>克服观察性研究偏倚</strong>：MR + 共定位的设计有效避免了混杂和反向因果的干扰</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（讨论、局限、展望）
+</span>
+</div>
+
+  <h3 id="sec-5-2">5.2 局限性</h3>
+
+  <div class="warning">
+    <span class="tag">局限性与注意事项</span>
+    <table>
+      <tr><th>局限</th><th>具体影响</th></tr>
+      <tr><td>CKB蛋白遗传工具数量较少</td><td>发现能力受限，仅1种蛋白在两个种族中都达到显著性（所有蛋白方向一致）</td></tr>
+      <tr><td>cis-pQTL定义差异</td><td>CKB用±500 Kbp，UKB用±1 Mbp；但所有UKB的IS相关cis-pQTL实际都位于基因±500 Kbp内</td></tr>
+      <tr><td>仅使用领先cis-pQTL</td><td>可能遗漏由多个独立cis-pQTL共同驱动的蛋白关联；但10个IS相关蛋白恰好都只有1个cis-pQTL</td></tr>
+      <tr><td>部分MR工具变量的后验包含概率较低</td><td>精细定位的不确定性可能影响因果推断精度；但共定位分析提供了交叉验证</td></tr>
+      <tr><td>UKB与GIGASTROKE有3.5%参与者重叠</td><td>重叠比例小，影响可忽略；且用MEGASTROKE（零重叠）的复制分析支持了主要发现</td></tr>
+      <tr><td>共定位仅在MR显著蛋白中进行</td><td>可能遗漏某些因果蛋白；但这一策略与同类研究一致</td></tr>
+      <tr><td>未系统探索trans-pQTL</td><td>trans-pQTL可能提供额外的致病机制信息，但多效性风险更大</td></tr>
+    </table>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（讨论、局限、展望）
+</span>
+</div>
+
+  <h3 id="sec-5-3">5.3 未来方向</h3>
+
+  <div class="intuition">
+    <span class="tag">前瞻</span>
+    <p>本研究鉴定出10种与IS因果相关的蛋白，但<strong>这只是起点而非终点</strong>。接下来的关键步骤包括：</p>
+    <ol>
+      <li><strong>体外和体内功能实验</strong>：针对6个全新靶点进行蛋白功能验证，阐明它们影响卒中的分子机制</li>
+      <li><strong>靶点选择性优化</strong>：评估靶向这些蛋白可能产生的脱靶效应和组织特异性副作用</li>
+      <li><strong>药物开发</strong>：对FGF5、FURIN等正相关蛋白开发抑制剂；对PROCR、GRK5等负相关蛋白开发激动剂</li>
+      <li><strong>药物重利用临床试验</strong>：将已有ALDH2和MMP12抑制剂/激动剂重新用于卒中适应症的临床试验</li>
+      <li><strong>扩大种族多样性</strong>：在非洲、南亚等人群中重复分析，进一步验证发现的普适性</li>
+      <li><strong>跨疾病分析</strong>：评估这些蛋白对其他心血管疾病（心肌梗死、心力衰竭等）的影响，寻找"一石多鸟"的靶点</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（讨论、局限、展望）
+</span>
+</div>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 6: KEY TAKEAWAYS -->
+<!-- ================================================================ -->
+<section id="sec-6">
+  <h2>6. 要点总结</h2>
+
+  <div class="summary">
+    <span class="tag">全文总结</span>
+    <ol>
+      <li><strong>10种因果蛋白</strong>：通过蛋白质组范围MR+共定位分析，在2923种血浆蛋白中鉴定了10种与缺血性卒中具有因果关联的蛋白。</li>
+      <li><strong>6正4反</strong>：6种蛋白水平升高增加卒中风险（FGF5, TMPRSS5, FURIN, F11, ALDH2, ABO）；4种蛋白水平升高降低卒中风险（GRK5, KIAA0319, PROCR, MMP12）。</li>
+      <li><strong>种族一致性</strong>：所有蛋白在两个种族中方向一致，这是因果推断可靠性的有力支持。</li>
+      <li><strong>三重证据链</strong>：MR（因果推断）+ 共定位（共享因果变异）+ 多种下游验证（PheWAS、组织表达、KO小鼠）构成了完整的证据链。</li>
+      <li><strong>1个已知靶点</strong>：F11的抑制剂已进入II-III期卒中临床试验。</li>
+      <li><strong>2个可重利用靶点</strong>：ALDH2和MMP12已有针对其他疾病的药物开发项目，可重新用于卒中。</li>
+      <li><strong>6个全新靶点</strong>：PROCR, GRK5, FGF5, FURIN, KIAA0319, TMPRSS5——无任何药物开发记录，代表全新的药物发现机会。</li>
+      <li><strong>中介通路</strong>：不同蛋白通过不同危险因素通路影响卒中——FGF5和FURIN主要经SBP通路，而其他蛋白的效应更多通过非血压机制。</li>
+      <li><strong>跨种族研究价值</strong>：ALDH2仅因在东亚人群中存在功能性变异而被发现——如果仅研究欧洲人群，这个效应最强的靶点将完全遗漏。</li>
+      <li><strong>转化前景</strong>：至少5种蛋白（PROCR, GRK5, FGF5, FURIN, ALDH2）具有明确的卒中药物靶点开发或重利用价值，值得优先推进后续验证。</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（讨论、局限、展望）
+</span>
+</div>
+
+  <div class="intuition">
+    <span class="tag">一句话总结</span>
+    <p>这项研究相当于对3000种血浆蛋白进行了一次<strong>"基因因果筛选"</strong>，从中间挑出了10种与缺血性卒中存在因果关系的蛋白——其中6种是<strong>全新的药物靶点候选者</strong>，如果后续实验验证成功，可能为卒中预防和治疗带来革命性的新选择。</p>
+  <span class="src-ref">
+    
+📖 原文出处：Discussion（讨论、局限、展望）
+</span>
+</div>
+
+  <a href="#" class="back-top"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ================================================================ -->
+<!-- FOOTER -->
+<!-- ================================================================ -->
+<footer>
+  <div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">📄 STROBE-MR 报告规范</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📄 <span data-zh>MR方法学</span><span data-en>MR Methodology</span> Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR与心血管疾病</a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>📄 两步MR</span><span data-en>📄 Two-step MR</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+<a href="https://doi.org/10.1161/STROKEAHA.125.050982" target="_blank"><span data-zh>🔗 论文DOI</span><span data-en>🔗 Paper DOI</span></a>
+</div>
+  <p style="margin-top:16px;">
+    <strong><span data-zh>论文信息：</span><span data-en>Paper info: </span></strong>Yao P, Mazidi M, Pozarickij A, et al. Proteome-Wide Genetic Study in East Asians and Europeans Identified Multiple Therapeutic Targets for Ischemic Stroke. <em>Stroke</em>. 2025;56:2147–2158.<br>
+    <strong><span data-zh>解读生成日期：</span><span data-en>Generated: </span></strong>2026-08-14 &nbsp;|&nbsp; <span data-zh>本文为AI辅助生成的中文学术解读，仅供学习和研究参考。</span><span data-en>This is an AI-assisted Chinese academic interpretation, for study and research reference only.</span>
+  </p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

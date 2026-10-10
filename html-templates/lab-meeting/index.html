@@ -711,6 +711,9 @@
             chtml: { scale: 0.95 }
         };
     </script>
+<script>window.A4R={mode:1,lang:1,themeKey:'labmeeting-theme',lightId:'11_ruc_beamer',darkId:'02_wwdc_dark'};</script>
+<script src="../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
 </head>
 <body data-default-theme="11_ruc_beamer" data-asset-prefix="">
 
@@ -721,21 +724,21 @@
     <!-- TEMPLATE: 项目名由 site_meta.project_name 渲染（见底部 JS），也可直接写死 -->
     <div class="nav-brand">
         <span class="ic ic-dashboard" style="font-size:1.05em;"></span>
-        <span id="project-name">项目名 实验进度报告</span>
+        <span id="project-name"><span data-zh>项目名 实验进度报告</span><span data-en>Project Name · Experiment Progress Report</span></span>
     </div>
     <!-- TEMPLATE: 子页面入口集中在此（每个子页面一条，与子页面顶导互链） -->
     <nav class="nav-links" id="nav-links">
-        <a href="01_example_method/index.html"><span class="ic ic-paper"></span> 子页面示例（方法 + 论文详解）</a>
-        <a href="01_example_method/index.html">① 方法1</a>
-        <a href="01_example_method/index.html">② 方法2</a>
+        <a href="01_example_method/index.html"><span class="ic ic-paper"></span><span data-zh>子页面示例（方法 + 论文详解）</span><span data-en>Subpage Example (Method + Paper Walkthrough)</span></a>
+        <a href="01_example_method/index.html"><span data-zh>① 方法1</span><span data-en>① Method 1</span></a>
+        <a href="01_example_method/index.html"><span data-zh>② 方法2</span><span data-en>② Method 2</span></a>
     </nav>
     <div class="header-right">
-        <span class="countdown" id="countdown">下次组会: ·</span>
+        <span class="countdown" id="countdown"><span data-zh>下次组会: ·</span><span data-en>Next meeting: ·</span></span>
         <span id="current-date" style="font-size:0.72rem;"></span>
         <!-- TEMPLATE: 主题一键切换器（10 主题由 theme-pack.js 提供，选择跨页保持） -->
         <div class="theme-switcher" id="theme-switcher">
             <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
-                <span class="ic ic-palette"></span><span class="ts-cur">主题</span>
+                <span class="ic ic-palette"></span><span class="ts-cur"><span data-zh>主题</span><span data-en>Theme</span></span>
             </button>
             <div class="ts-panel" id="ts-panel" hidden></div>
         </div>
@@ -748,28 +751,21 @@
          ① 此处 sidebar-child 的 data-target  ② 卡片 div 的 id  ③ 底部 JS sections 数组 -->
     <div class="sidebar-section">
         <div class="sidebar-parent expanded" onclick="toggleSidebar(this,'children-nav')">
-            <span class="ic ic-nav"></span> 页面内导航
-            <span class="arrow">▶</span>
+            <span class="ic ic-nav"></span><span data-zh>页面内导航</span><span data-en>On This Page</span><span class="arrow">▶</span>
         </div>
         <div class="sidebar-children open" id="children-nav">
             <div class="sidebar-child active" data-target="sec-dashboard" onclick="scrollToSection('sec-dashboard',this)">
-                <span class="ic ic-dashboard"></span> 整体指标仪表盘
-            </div>
+                <span class="ic ic-dashboard"></span><span data-zh>整体指标仪表盘</span><span data-en>Overall Metrics Dashboard</span></div>
             <div class="sidebar-child" data-target="sec-experiments" onclick="scrollToSection('sec-experiments',this)">
-                <span class="ic ic-flask"></span> 实验卡片
-            </div>
+                <span class="ic ic-flask"></span><span data-zh>实验卡片</span><span data-en>Experiment Cards</span></div>
             <div class="sidebar-child" data-target="sec-summary" onclick="scrollToSection('sec-summary',this)">
-                <span class="ic ic-search"></span> 汇总指标
-            </div>
+                <span class="ic ic-search"></span><span data-zh>汇总指标</span><span data-en>Summary Metrics</span></div>
             <div class="sidebar-child" data-target="sec-timeline" onclick="scrollToSection('sec-timeline',this)">
-                <span class="ic ic-calendar"></span> 每周进度时间线
-            </div>
+                <span class="ic ic-calendar"></span><span data-zh>每周进度时间线</span><span data-en>Weekly Progress Timeline</span></div>
             <div class="sidebar-child" data-target="sec-thisweek" onclick="scrollToSection('sec-thisweek',this)">
-                <span class="ic ic-clipboard"></span> 本周任务清单
-            </div>
+                <span class="ic ic-clipboard"></span><span data-zh>本周任务清单</span><span data-en>This Week's Tasks</span></div>
             <div class="sidebar-child" data-target="sec-todos" onclick="scrollToSection('sec-todos',this)">
-                <span class="ic ic-check"></span> 待办清单
-            </div>
+                <span class="ic ic-check"></span><span data-zh>待办清单</span><span data-en>Todo List</span></div>
         </div>
     </div>
 </nav>
@@ -783,14 +779,14 @@
 <!-- ═══ Dashboard（数据驱动：由 web_data/report_data.json 渲染，见底部 renderDashboard） ═══ -->
 <div class="card" id="sec-dashboard">
     <div class="card-header">
-        <div class="card-title"><span class="ic ic-dashboard"></span> 整体指标仪表盘</div>
+        <div class="card-title"><span class="ic ic-dashboard"></span><span data-zh>整体指标仪表盘</span><span data-en>Overall Metrics Dashboard</span></div>
         <div style="display:flex;align-items:center;gap:8px;">
             <!-- 仪表盘双视图切换：卡片少用转盘（自动旋转逐张聚焦），卡片多时切分组折叠网格一览全貌；
                  选择记忆在 localStorage（labmeeting-dashboard-view） -->
             <button class="dash-view-toggle" id="dash-view-toggle" type="button" aria-pressed="false" title="切换仪表盘展示方式">
-                <span class="ic ic-nav"></span><span id="dash-view-label">网格视图</span>
+                <span class="ic ic-nav"></span><span id="dash-view-label"><span data-zh>网格视图</span><span data-en>Grid View</span></span>
             </button>
-            <span class="status-tag status-ok" id="dashboard-status">加载中...</span>
+            <span class="status-tag status-ok" id="dashboard-status"><span data-zh>加载中...</span><span data-en>Loading...</span></span>
         </div>
     </div>
     <!-- 3D 转盘：方法标签在水平圆环上滚动（自动旋转 / 拖拽 / 点击转到前方），
@@ -823,30 +819,27 @@
     <!-- ═══ 实验示例卡片（TEMPLATE: 用你的实验替换其中内容；新卡片插在本卡之后。
           卡片内所有数值（0.8xxx / +0.xx / xx.x% / ~x.xM 等）与文字均为占位符，含义见 README「占位符说明」） ═══ -->
     <div class="card-header">
-        <div class="card-title"><span class="ic ic-flask"></span> 实验示例卡片：方向 A · 模块改进</div>
-        <span class="status-tag status-ok">✅ 状态示例</span>
+        <div class="card-title"><span class="ic ic-flask"></span><span data-zh>实验示例卡片：方向 A · 模块改进</span><span data-en>Example Experiment Card: Direction A · Module Improvement</span></div>
+        <span class="status-tag status-ok"><span data-zh>✅ 状态示例</span><span data-en>✅ Status Example</span></span>
     </div>
-    <p class="source-line">
-        来源: <code>docs/实验设计文档.md</code> |
-        实现: <code>src/models/module.py</code> |
-        分析: <code>analysis/experiment_analysis.ipynb</code>
+    <p class="source-line"><span data-zh>来源:</span><span data-en>Source:</span><code>docs/实验设计文档.md</code><span data-zh>|
+        实现:</span><span data-en>| Implementation:</span><code>src/models/module.py</code><span data-zh>|
+        分析:</span><span data-en>| Analysis:</span><code>analysis/experiment_analysis.ipynb</code>
     </p>
 
     <!-- 两栏结构：左 .viz = 图/表展示（细节折叠），右 .explain = 文字解释 -->
     <div class="card-body">
 
     <div class="viz">
-    <h4 class="section-h4 c-primary">① 核心指标：N 组变体对比（val 集口径）</h4>
-    <p style="font-size:0.72rem;color:var(--gray-500);margin:-4px 0 6px;">
-        ⚠️ 口径约定：主表为 <strong>val 集 (agg0)</strong> 口径，test 集 (agg1) 并列给出。
-    </p>
+    <h4 class="section-h4 c-primary"><span data-zh>① 核心指标：N 组变体对比（val 集口径）</span><span data-en>① Key Metrics: N-variant Comparison (val split)</span></h4>
+    <p style="font-size:0.72rem;color:var(--gray-500);margin:-4px 0 6px;"><span data-zh>⚠️ 口径约定：主表为</span><span data-en>⚠️ Convention: the main table reports the</span><strong><span data-zh>val 集 (agg0)</span><span data-en>val split (agg0)</span></strong><span data-zh>口径，test 集 (agg1) 并列给出。</span><span data-en>convention, with the test split (agg1) listed alongside.</span></p>
     <table class="data-table" style="max-width:880px;">
-    <thead><tr><th>变体</th><th>Val Macro AUROC (agg0) [95% CI]</th><th>Test Macro AUROC (agg1)</th><th>Δ val (pp)</th><th>Δ test (pp)</th><th>参数量</th><th>判定</th></tr></thead>
+    <thead><tr><th><span data-zh>变体</span><span data-en>Variant</span></th><th>Val Macro AUROC (agg0) [95% CI]</th><th>Test Macro AUROC (agg1)</th><th>Δ val (pp)</th><th>Δ test (pp)</th><th><span data-zh>参数量</span><span data-en>Params</span></th><th><span data-zh>判定</span><span data-en>Verdict</span></th></tr></thead>
     <tbody>
-        <tr style="background:var(--accent-light);"><td><strong>变体 1（最优示例）</strong></td><td class="num highlight"><strong>0.8xxx [0.8xxx, 0.8xxx]</strong></td><td class="num">0.8xxx</td><td class="num up"><strong>+0.xx</strong></td><td class="num up"><strong>+0.xx</strong></td><td class="num">~x.xM</td><td>🟡 0.5~1pp</td></tr>
-        <tr><td>变体 2</td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num up">+0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td>🟢 &lt;0.5pp</td></tr>
-        <tr><td>对照（原结构）</td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num">0.00</td><td class="num">0.00</td><td class="num">0.xxM</td><td>baseline</td></tr>
-        <tr><td>变体 3</td><td class="num down">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num down">0.8xxx</td><td class="num down">−0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td>🔴 下跌</td></tr>
+        <tr style="background:var(--accent-light);"><td><strong><span data-zh>变体 1（最优示例）</span><span data-en>Variant 1 (best example)</span></strong></td><td class="num highlight"><strong>0.8xxx [0.8xxx, 0.8xxx]</strong></td><td class="num">0.8xxx</td><td class="num up"><strong>+0.xx</strong></td><td class="num up"><strong>+0.xx</strong></td><td class="num">~x.xM</td><td>🟡 0.5~1pp</td></tr>
+        <tr><td><span data-zh>变体 2</span><span data-en>Variant 2</span></td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num up">+0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td>🟢 &lt;0.5pp</td></tr>
+        <tr><td><span data-zh>对照（原结构）</span><span data-en>Control (original architecture)</span></td><td class="num">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num">0.8xxx</td><td class="num">0.00</td><td class="num">0.00</td><td class="num">0.xxM</td><td>baseline</td></tr>
+        <tr><td><span data-zh>变体 3</span><span data-en>Variant 3</span></td><td class="num down">0.8xxx [0.8xxx, 0.8xxx]</td><td class="num down">0.8xxx</td><td class="num down">−0.xx</td><td class="num down">−0.xx</td><td class="num">~x.xM</td><td><span data-zh>🔴 下跌</span><span data-en>🔴 Drop</span></td></tr>
     </tbody>
     </table>
 
@@ -855,14 +848,13 @@
          data-fold 与右栏 .explain-item 配对：折叠/展开时对应解释文字同步显隐 -->
     <div class="fold" data-fold="exp-fig">
         <button class="fold-head" type="button" aria-expanded="false">
-            <span class="ic ic-chart"></span> 结果对比图（各变体指标柱状图/曲线图）
-            <span class="fold-chevron ic ic-arrow"></span>
-            <span class="fold-hint">点击展开 / 收起</span>
+            <span class="ic ic-chart"></span><span data-zh>结果对比图（各变体指标柱状图/曲线图）</span><span data-en>Results Comparison (bar / line charts of variant metrics)</span><span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint"><span data-zh>点击展开 / 收起</span><span data-en>Click to expand / collapse</span></span>
         </button>
         <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
             <div class="figure">
-                <div class="img-placeholder"><span class="ph-icon">📈</span>图片占位：结果对比图<br>（替换为你的分析图 &lt;img src="..."&gt;）</div>
-                <div class="fig-caption">图 1 · 各变体指标对比（占位图注）</div>
+                <div class="img-placeholder"><span class="ph-icon">📈</span><span data-zh>图片占位：结果对比图</span><span data-en>Image placeholder: results comparison</span><br><span data-zh>（替换为你的分析图 &lt;img src="..."&gt;）</span><span data-en>(replace with your analysis figure &lt;img src="..."&gt;)</span></div>
+                <div class="fig-caption"><span data-zh>图 1 · 各变体指标对比（占位图注）</span><span data-en>Fig. 1 · Metric comparison across variants (placeholder caption)</span></div>
             </div>
         </div></div></div>
     </div>
@@ -870,22 +862,21 @@
     <!-- 折叠区：消融数据与附图（data-fold 与右栏消融解释配对） -->
     <div class="fold" data-fold="exp-abl">
         <button class="fold-head" type="button" aria-expanded="false">
-            <span class="ic ic-chart"></span> ② 消融数据：分组统计表 + 直方图/散点图
-            <span class="fold-chevron ic ic-arrow"></span>
-            <span class="fold-hint">点击展开 / 收起</span>
+            <span class="ic ic-chart"></span><span data-zh>② 消融数据：分组统计表 + 直方图/散点图</span><span data-en>② Ablation Data: Grouped Statistics + Histogram / Scatter</span><span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint"><span data-zh>点击展开 / 收起</span><span data-en>Click to expand / collapse</span></span>
         </button>
         <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
             <table class="data-table" style="max-width:780px;">
-            <thead><tr><th>维度</th><th>分组</th><th>N</th><th>mean Δ (pp)</th><th>改善率</th></tr></thead>
+            <thead><tr><th><span data-zh>维度</span><span data-en>Dimension</span></th><th><span data-zh>分组</span><span data-en>Group</span></th><th>N</th><th>mean Δ (pp)</th><th><span data-zh>改善率</span><span data-en>Improvement rate</span></th></tr></thead>
             <tbody>
-                <tr><td rowspan="3">按某属性分组</td><td>分组 1</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
-                <tr><td>分组 2</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
-                <tr><td>分组 3</td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+                <tr><td rowspan="3"><span data-zh>按某属性分组</span><span data-en>Grouped by an attribute</span></td><td><span data-zh>分组 1</span><span data-en>Group 1</span></td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+                <tr><td><span data-zh>分组 2</span><span data-en>Group 2</span></td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
+                <tr><td><span data-zh>分组 3</span><span data-en>Group 3</span></td><td class="num">xxx</td><td class="num">+0.xx</td><td class="num">xx.x%</td></tr>
             </tbody>
             </table>
             <div class="fig-grid" style="margin-top:8px;">
-                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📊</span>图片占位：消融直方图</div><div class="fig-caption">分组 Δ 直方图（占位图注）</div></div>
-                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📈</span>图片占位：散点图</div><div class="fig-caption">属性 vs Δ 散点图（占位图注）</div></div>
+                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📊</span><span data-zh>图片占位：消融直方图</span><span data-en>Image placeholder: ablation histogram</span></div><div class="fig-caption"><span data-zh>分组 Δ 直方图（占位图注）</span><span data-en>Per-group Δ histogram (placeholder caption)</span></div></div>
+                <div class="figure"><div class="img-placeholder"><span class="ph-icon">📈</span><span data-zh>图片占位：散点图</span><span data-en>Image placeholder: scatter plot</span></div><div class="fig-caption"><span data-zh>属性 vs Δ 散点图（占位图注）</span><span data-en>Attribute vs Δ scatter (placeholder caption)</span></div></div>
             </div>
         </div></div></div>
     </div>
@@ -893,18 +884,17 @@
     <!-- 折叠区：后续行动 -->
     <div class="fold">
         <button class="fold-head" type="button" aria-expanded="false">
-            <span class="ic ic-clipboard"></span> ③ 后续行动清单
-            <span class="fold-chevron ic ic-arrow"></span>
-            <span class="fold-hint">点击展开 / 收起</span>
+            <span class="ic ic-clipboard"></span><span data-zh>③ 后续行动清单</span><span data-en>③ Next Actions</span><span class="fold-chevron ic ic-arrow"></span>
+            <span class="fold-hint"><span data-zh>点击展开 / 收起</span><span data-en>Click to expand / collapse</span></span>
         </button>
         <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
             <table class="data-table" style="max-width:880px;">
-            <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+            <thead><tr><th><span data-zh>优先级</span><span data-en>Priority</span></th><th><span data-zh>任务</span><span data-en>Task</span></th><th><span data-zh>说明</span><span data-en>Notes</span></th></tr></thead>
             <tbody>
-                <tr style="background:var(--success-bg);"><td>✅ 已闭环</td><td><s>示例已闭环任务</s></td><td><strong>已完成</strong>，（结论一句话）</td></tr>
-                <tr style="background:var(--danger-bg);"><td><strong>⭐ 主线</strong></td><td><strong>示例主线任务</strong></td><td>消融指向的下一步方向，（说明）</td></tr>
-                <tr><td>叠加</td><td>示例叠加实验</td><td>验证与其它方向的正交叠加效果</td></tr>
-                <tr><td>写作</td><td>示例写作任务</td><td>（章节/叙事说明）</td></tr>
+                <tr style="background:var(--success-bg);"><td><span data-zh>✅ 已闭环</span><span data-en>✅ Closed</span></td><td><s><span data-zh>示例已闭环任务</span><span data-en>Example closed task</span></s></td><td><strong><span data-zh>已完成</span><span data-en>Done</span></strong><span data-zh>，（结论一句话）</span><span data-en>, (one-line conclusion)</span></td></tr>
+                <tr style="background:var(--danger-bg);"><td><strong><span data-zh>⭐ 主线</span><span data-en>⭐ Mainline</span></strong></td><td><strong><span data-zh>示例主线任务</span><span data-en>Example mainline task</span></strong></td><td><span data-zh>消融指向的下一步方向，（说明）</span><span data-en>Next step suggested by the ablation, (notes)</span></td></tr>
+                <tr><td><span data-zh>叠加</span><span data-en>Stacking</span></td><td><span data-zh>示例叠加实验</span><span data-en>Example stacking experiment</span></td><td><span data-zh>验证与其它方向的正交叠加效果</span><span data-en>Verify orthogonal stacking with other directions</span></td></tr>
+                <tr><td><span data-zh>写作</span><span data-en>Writing</span></td><td><span data-zh>示例写作任务</span><span data-en>Example writing task</span></td><td><span data-zh>（章节/叙事说明）</span><span data-en>(section / narrative notes)</span></td></tr>
             </tbody>
             </table>
         </div></div></div>
@@ -913,35 +903,29 @@
 
     <div class="explain">
     <div class="info-box info">
-        <strong>📌 问题：</strong>（在此填写问题背景。本卡片是「实验卡片」的完整写法示范，结构为：问题背景 → ① 对比实验 → ② 消融分析 → ③ 后续行动，可按需增减小节。）
-    </div>
+        <strong><span data-zh>📌 问题：</span><span data-en>📌 Problem:</span></strong><span data-zh>（在此填写问题背景。本卡片是「实验卡片」的完整写法示范，结构为：问题背景 → ① 对比实验 → ② 消融分析 → ③ 后续行动，可按需增减小节。）</span><span data-en>(Fill in the problem background here. This card is a complete reference for writing an experiment card, structured as: problem background → ① comparative experiments → ② ablation analysis → ③ next actions; add or remove sections as needed.)</span></div>
     <!-- explain-item 与左栏同名 data-fold 折叠区联动：折叠时同步隐藏 -->
     <div class="explain-item" data-fold="exp-fig">
         <div class="info-box success">
-            <strong>📐 关键发现：</strong>（在此填写结论，例如：变体 1 是唯一通过门槛的方案（CI 下界 &gt; 对照点估计），涨幅具有统计可靠性；变体 3 不涨反跌，原因分析……）
-        </div>
+            <strong><span data-zh>📐 关键发现：</span><span data-en>📐 Key Findings:</span></strong><span data-zh>（在此填写结论，例如：变体 1 是唯一通过门槛的方案（CI 下界 &gt; 对照点估计），涨幅具有统计可靠性；变体 3 不涨反跌，原因分析……）</span><span data-en>(Fill in your conclusion here, e.g.: Variant 1 is the only scheme that clears the bar (CI lower bound &gt; control point estimate), so its gain is statistically reliable; Variant 3 drops instead — analyze the cause...)</span></div>
     </div>
     <div class="explain-item" data-fold="exp-abl">
-        <h4 class="section-h4 c-accent">② 消融分析：增益来源</h4>
+        <h4 class="section-h4 c-accent"><span data-zh>② 消融分析：增益来源</span><span data-en>② Ablation Analysis: Where the Gain Comes From</span></h4>
         <div class="info-box info">
-            <strong>📌 两种假设，「增益从哪里来」：</strong>(a) 假设一（如结构信息被利用）；(b) 假设二（如独立参数化带来增益）。<strong>可检验的预测：</strong>（写出两种假设各自可区分的预测，例如 (a) 预测某类样本受益更多，Δ 应随某属性递增；(b) 预测增益均匀分布。）
-        </div>
+            <strong><span data-zh>📌 两种假设，「增益从哪里来」：</span><span data-en>📌 Two hypotheses about where the gain comes from:</span></strong><span data-zh>(a) 假设一（如结构信息被利用）；(b) 假设二（如独立参数化带来增益）。</span><span data-en>(a) Hypothesis 1 (e.g., structural information is exploited); (b) Hypothesis 2 (e.g., independent parameterization brings the gain).</span><strong><span data-zh>可检验的预测：</span><span data-en>Testable predictions:</span></strong><span data-zh>（写出两种假设各自可区分的预测，例如 (a) 预测某类样本受益更多，Δ 应随某属性递增；(b) 预测增益均匀分布。）</span><span data-en>(Write down the distinguishing predictions of each hypothesis, e.g., (a) predicts that some sample types benefit more, so Δ should increase with a certain attribute; (b) predicts a uniformly distributed gain.)</span></div>
         <p style="font-size:0.82rem;line-height:1.7;color:var(--gray-700);margin-top:8px;">
-            <strong>数据与假设的对照：</strong>（在此填写分组统计是否支持假设 (a)，例如：各组 Δ 几乎相同、秩相关 ρ ≈ 0 且不显著，说明「随某属性递增」的趋势在统计上不存在。）
-        </p>
+            <strong><span data-zh>数据与假设的对照：</span><span data-en>Data vs. hypotheses:</span></strong><span data-zh>（在此填写分组统计是否支持假设 (a)，例如：各组 Δ 几乎相同、秩相关 ρ ≈ 0 且不显著，说明「随某属性递增」的趋势在统计上不存在。）</span><span data-en>(Report whether the grouped statistics support hypothesis (a), e.g.: Δ is nearly identical across groups and the rank correlation ρ ≈ 0 is non-significant, meaning the increasing-with-attribute trend does not exist statistically.)</span></p>
         <div class="info-box success" style="margin-top:10px;">
-            <strong>📐 消融结论：</strong>（在此填写消融裁决，增益来自哪种机制、如何支持/否定了哪种假设。）
-        </div>
+            <strong><span data-zh>📐 消融结论：</span><span data-en>📐 Ablation Conclusion:</span></strong><span data-zh>（在此填写消融裁决，增益来自哪种机制、如何支持/否定了哪种假设。）</span><span data-en>(State the ablation verdict here: which mechanism the gain comes from, and how it supports / refutes each hypothesis.)</span></div>
     </div>
     </div>
 
     </div>
 
-    <p class="code-ref">
-        设计文档：<code>docs/实验设计文档.md</code> |
-        实现：<code>src/models/module.py</code> |
-        脚本：<code>src/run_experiment.sh</code> |
-        分析：<code>analysis/experiment_analysis.ipynb</code> | 图片：<code>analysis/experiment_*.png</code>
+    <p class="code-ref"><span data-zh>设计文档：</span><span data-en>Design doc:</span><code>docs/实验设计文档.md</code><span data-zh>|
+        实现：</span><span data-en>| Implementation:</span><code>src/models/module.py</code><span data-zh>|
+        脚本：</span><span data-en>| Script:</span><code>src/run_experiment.sh</code><span data-zh>|
+        分析：</span><span data-en>| Analysis:</span><code>analysis/experiment_analysis.ipynb</code><span data-zh>| 图片：</span><span data-en>| Figures:</span><code>analysis/experiment_*.png</code>
     </p>
 
     <!-- ═══════ TEMPLATE: 新实验卡片插入点 ═══════
@@ -953,7 +937,7 @@
 <!-- ═══ 汇总指标卡（可选数据源驱动：web_data/metrics_summary.json，缺失时整卡隐藏） ═══ -->
 <div class="card" id="sec-summary" style="display:none;">
     <div class="card-header">
-        <div class="card-title"><span class="ic ic-search"></span> 汇总指标</div>
+        <div class="card-title"><span class="ic ic-search"></span><span data-zh>汇总指标</span><span data-en>Summary Metrics</span></div>
     </div>
     <div class="card-body">
         <div class="viz">
@@ -962,10 +946,10 @@
         </div>
         <div class="explain">
             <div id="summary-formula" class="info-box info" style="display:none;">
-                <strong>📐 指标计算公式：</strong>
+                <strong><span data-zh>📐 指标计算公式：</span><span data-en>📐 Metric Formula:</span></strong>
                 <!-- TEMPLATE: 替换为你的指标定义（LaTeX；以下为占位公式示意） -->
                 \[ \mathrm{Metric} = \frac{1}{N} \sum_{i=1}^{N} \mathbf{1}\bigl\{ \text{占位条件} \bigr\} \]
-                <span style="font-size:0.72rem;color:var(--gray-500);">占位说明：替换为你的指标口径说明（样本数、统计对象等）。</span>
+                <span style="font-size:0.72rem;color:var(--gray-500);"><span data-zh>占位说明：替换为你的指标口径说明（样本数、统计对象等）。</span><span data-en>Placeholder: replace with your metric definition (sample size, statistics target, etc.).</span></span>
             </div>
         </div>
     </div>
@@ -974,32 +958,32 @@
 <!-- ═══ 每周进度时间线（数据驱动） ═══ -->
 <div class="card" id="sec-timeline">
     <div class="card-header">
-        <div class="card-title"><span class="ic ic-calendar"></span> 每周进度安排</div>
+        <div class="card-title"><span class="ic ic-calendar"></span><span data-zh>每周进度安排</span><span data-en>Weekly Schedule</span></div>
     </div>
     <div class="timeline" id="timeline-container">
-        <p class="empty-state">加载中...</p>
+        <p class="empty-state"><span data-zh>加载中...</span><span data-en>Loading...</span></p>
     </div>
 </div>
 
 <!-- ═══ 本周任务（数据驱动） ═══ -->
 <div class="card" id="sec-thisweek">
     <div class="card-header">
-        <div class="card-title" id="this-week-title"><span class="ic ic-clipboard"></span> 本周任务</div>
+        <div class="card-title" id="this-week-title"><span class="ic ic-clipboard"></span><span data-zh>本周任务</span><span data-en>This Week's Tasks</span></div>
         <span class="countdown" id="week-countdown"></span>
     </div>
     <div id="this-week-content">
-        <p class="empty-state">加载中...</p>
+        <p class="empty-state"><span data-zh>加载中...</span><span data-en>Loading...</span></p>
     </div>
 </div>
 
 <!-- ═══ 待办清单（数据驱动） ═══ -->
 <div class="card" id="sec-todos">
-    <p class="empty-state">加载中...</p>
+    <p class="empty-state"><span data-zh>加载中...</span><span data-en>Loading...</span></p>
 </div>
 
 <div id="loading-msg" style="text-align:center;padding:40px;color:var(--gray-400);">
     <p style="font-size:2rem;">⏳</p>
-    <p>正在加载数据...</p>
+    <p><span data-zh>正在加载数据...</span><span data-en>Loading data...</span></p>
 </div>
 
 </main>
@@ -1009,15 +993,15 @@
     <!-- TEMPLATE: 作者/机构/版本/更新时间来自 report_data.json 的 site_meta 字段；
          logo 处把 .logo-slot 占位替换为 <img src="..." alt="机构 logo"> -->
     <div class="footer-meta" id="footer-meta">
-        <strong>作者：</strong><span id="f-authors">·</span>
+        <strong><span data-zh>作者：</span><span data-en>Authors:</span></strong><span id="f-authors">·</span>
         <span class="sep">·</span>
-        <strong>机构：</strong><span id="f-institution">·</span>
+        <strong><span data-zh>机构：</span><span data-en>Affiliation:</span></strong><span id="f-institution">·</span>
         <span class="sep">·</span>
         <span id="f-version">v·</span>
         <span class="sep">·</span>
-        <strong>更新：</strong><span id="f-updated">·</span>
+        <strong><span data-zh>更新：</span><span data-en>Updated:</span></strong><span id="f-updated">·</span>
     </div>
-    <div class="footer-logo"><span class="logo-slot">机构 logo 占位</span></div>
+    <div class="footer-logo"><span class="logo-slot"><span data-zh>机构 logo 占位</span><span data-en>Institution logo placeholder</span></span></div>
 </footer>
 
 </div>
@@ -1035,6 +1019,11 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 let D = null, S = null;
 
+/* ═══════ 双语 helper（a4r-bridge 设 html[data-lang]）：英文态取 *_en 副本 ═══════ */
+const isEN = () => document.documentElement.getAttribute('data-lang') === 'en';
+const L = (obj, k) => (obj && isEN() && obj[k + '_en'] != null) ? obj[k + '_en'] : (obj ? obj[k] : undefined);
+const LA = (obj, k) => (obj && isEN() && Array.isArray(obj[k + '_en'])) ? obj[k + '_en'] : ((obj && obj[k]) || []);
+
 async function loadData() {
     try {
         const [r1, r2] = await Promise.all([
@@ -1042,13 +1031,13 @@ async function loadData() {
             fetch('web_data/metrics_summary.json').then(r => r.ok ? r.json() : null)
         ]);
         D = r1; S = r2;
-        if (!D) throw new Error('report_data.json 加载失败');
+        if (!D) throw new Error(isEN() ? 'failed to load report_data.json' : 'report_data.json 加载失败');
         document.getElementById('loading-msg').style.display = 'none';
         initApp();
     } catch (err) {
         document.getElementById('loading-msg').innerHTML =
-            `<p style="font-size:2rem;">⚠️</p><p>数据加载失败: ${err.message}</p>
-            <p style="font-size:0.78rem;margin-top:12px;">请确保在站点目录上级启动 HTTP 服务器:<br><code>python -m http.server 8080</code><br>然后访问站点目录（如 <code>http://localhost:8080/&lt;站点目录名&gt;/</code>）</p>`;
+            `<p style="font-size:2rem;">⚠️</p><p><span data-zh>数据加载失败: ${err.message}</span><span data-en>Failed to load data: ${err.message}</span></p>
+            <p style="font-size:0.78rem;margin-top:12px;"><span data-zh>请确保在站点目录上级启动 HTTP 服务器:<br><code>python -m http.server 8080</code><br>然后访问站点目录（如 <code>http://localhost:8080/&lt;站点目录名&gt;/</code>）</span><span data-en>Make sure an HTTP server is running in the parent directory of the site folder:<br><code>python -m http.server 8080</code><br>then open the site directory (e.g. <code>http://localhost:8080/&lt;site-dir&gt;/</code>)</span></p>`;
     }
 }
 
@@ -1068,11 +1057,11 @@ function initApp() {
 function renderSiteMeta() {
     const meta = D?.site_meta;
     if (!meta) return;
-    if (meta.project_name) document.getElementById('project-name').textContent = meta.project_name;
-    document.getElementById('f-authors').textContent = meta.authors || '·';
-    document.getElementById('f-institution').textContent = meta.institution || '·';
+    if (meta.project_name) document.getElementById('project-name').textContent = L(meta, 'project_name');
+    document.getElementById('f-authors').textContent = L(meta, 'authors') || '·';
+    document.getElementById('f-institution').textContent = L(meta, 'institution') || '·';
     document.getElementById('f-version').textContent = meta.version ? 'v' + meta.version : '·';
-    document.getElementById('f-updated').textContent = meta.updated || '·';
+    document.getElementById('f-updated').textContent = L(meta, 'updated') || '·';
 }
 
 /* ═══════ 折叠区（.fold）：事件委托，点击 .fold-head 切换展开/收起 ═══════
@@ -1262,7 +1251,7 @@ document.getElementById('content').addEventListener('scroll', handleContentScrol
 function updateHeader() {
     const now = new Date();
     document.getElementById('current-date').textContent =
-        now.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'});
+        now.toLocaleDateString(isEN() ? 'en-US' : 'zh-CN',{year:'numeric',month:'long',day:'numeric'});
     let nextMeetingStr = null;
     if (D && D.weekly_progress) {
         const weeks = D.weekly_progress;
@@ -1275,14 +1264,17 @@ function updateHeader() {
         if (daysToMeeting < 0) daysToMeeting = null;
     }
     if (daysToMeeting != null) {
-        document.getElementById('countdown').textContent =
-            `下次组会: ${nextMeeting.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} (${daysToMeeting}天后)`;
+        document.getElementById('countdown').textContent = isEN()
+            ? `Next meeting: ${nextMeeting.toLocaleDateString('en-US',{month:'numeric',day:'numeric'})} (in ${daysToMeeting} days)`
+            : `下次组会: ${nextMeeting.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} (${daysToMeeting}天后)`;
         const wc = document.getElementById('week-countdown');
-        if (wc) wc.textContent = `📅 距下次组会还有 ${daysToMeeting} 天`;
+        if (wc) wc.textContent = isEN()
+            ? `📅 ${daysToMeeting} days to the next meeting`
+            : `📅 距下次组会还有 ${daysToMeeting} 天`;
     } else {
-        document.getElementById('countdown').textContent = '下次组会: 待定';
+        document.getElementById('countdown').textContent = isEN() ? 'Next meeting: TBA' : '下次组会: 待定';
         const wc = document.getElementById('week-countdown');
-        if (wc) wc.textContent = '📅 下次组会日期待定';
+        if (wc) wc.textContent = isEN() ? '📅 Next meeting date TBA' : '📅 下次组会日期待定';
     }
 }
 
@@ -1301,12 +1293,12 @@ function renderDashboard() {
     const CLS = ['ct-m1','ct-m2','ct-m3','ct-m1','ct-m2','ct-m3'];
     const carouselItems = [];
     const mkDetail = (name, t, v, extra) =>
-        `<span class="cd-item">测试集 (agg1): <strong>${t}</strong> / 验证集 (agg0): <strong>${v}</strong>${extra ? ` · ${extra}` : ''}</span>`;
+        `<span class="cd-item"><span data-zh>测试集 (agg1): </span><span data-en>Test (agg1): </span><strong>${t}</strong><span data-zh> / 验证集 (agg0): </span><span data-en> / Val (agg0): </span><strong>${v}</strong>${extra ? ` · ${extra}` : ''}</span>`;
     carouselItems.push({
         cls: 'ct-m1', name: 'Baseline',
         t: baseAgg1?.toFixed(4)||'·', v: baseAgg0?.toFixed(4),
         tn: baseAgg1 ?? null, vn: baseAgg0 ?? null, grp: '基准',   // tn/vn: 数值（网格分组头排序用）
-        deltaHtml: baseVR != null ? `<div class="ci-delta down">VR: ${baseVR.toFixed(2)}% (测试集)</div>` : '',
+        deltaHtml: baseVR != null ? `<div class="ci-delta down">VR: ${baseVR.toFixed(2)}% <span data-zh>(测试集)</span><span data-en>(test)</span></div>` : '',
         detailRun: base.run_name || 'main',
         detailHtml: mkDetail('Baseline', baseAgg1?.toFixed(4)||'·', baseAgg0?.toFixed(4),
             baseVR != null ? `VR ${baseVR.toFixed(2)}%` : '') + `<span class="cd-item">${base.run_name || 'main'}</span>`
@@ -1319,22 +1311,22 @@ function renderDashboard() {
         const dv = v != null ? (v - baseAgg0) : null;
         const vr = m.subgroups ? (m.subgroups.squared?.best_vr ?? m.subgroups.linear?.best_vr ?? null) : null;
         carouselItems.push({
-            cls: CLS[i % CLS.length], name: m.name,
+            cls: CLS[i % CLS.length], name: L(m, 'name'),
             t: t?.toFixed(4)||'·', v: v?.toFixed(4)||'·',
-            tn: t ?? null, vn: v ?? null, grp: m.group || null,   // group: 可选分组字段（schema.md）
+            tn: t ?? null, vn: v ?? null, grp: L(m, 'group') || null,   // group: 可选分组字段（schema.md）
             deltaHtml: dt != null
-                ? `<div class="ci-delta ${dt<0?'down':'up'}">Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}${vr != null ? ` · VR ${vr.toFixed(3)}%` : ''}</div>`
-                : '<div class="ci-delta">暂无数据</div>',
+                ? `<div class="ci-delta ${dt<0?'down':'up'}"><span data-zh>Δ(测试集) </span><span data-en>Δ(test) </span>${dt>=0?'+':''}${dt.toFixed(4)}${vr != null ? ` · VR ${vr.toFixed(3)}%` : ''}</div>`
+                : '<div class="ci-delta"><span data-zh>暂无数据</span><span data-en>No data yet</span></div>',
             detailRun: r?.run_name || m.status || '',
-            detailHtml: mkDetail(m.name, t?.toFixed(4)||'·', v?.toFixed(4)||'·',
-                (dt != null ? `Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}，Δ(验证集) ${dv>=0?'+':''}${dv.toFixed(4)}` : '') +
-                (vr != null ? `，VR ${vr.toFixed(3)}%` : '')) + `<span class="cd-item">${r?.run_name || m.status || ''}</span>`
+            detailHtml: mkDetail(L(m, 'name'), t?.toFixed(4)||'·', v?.toFixed(4)||'·',
+                (dt != null ? `<span data-zh>Δ(测试集) ${dt>=0?'+':''}${dt.toFixed(4)}，Δ(验证集) ${dv>=0?'+':''}${dv.toFixed(4)}</span><span data-en>Δ(test) ${dt>=0?'+':''}${dt.toFixed(4)}, Δ(val) ${dv>=0?'+':''}${dv.toFixed(4)}</span>` : '') +
+                (vr != null ? `<span data-zh>，VR ${vr.toFixed(3)}%</span><span data-en>, VR ${vr.toFixed(3)}%</span>` : '')) + `<span class="cd-item">${r?.run_name || m.status || ''}</span>`
         });
     }
     // ── 未来扩展实验占位: 在此数组追加新方法卡片 ──
     const FUTURE_METHODS = [
         // { cls: 'ct-m2', name: '未来方法 (M-x)', t: '·', v: '·',
-        //   deltaHtml: '<div class="ci-delta">待开展</div>', detailHtml: '<span class="cd-item">待开展</span>' },
+        //   deltaHtml: '<div class="ci-delta"><span data-zh>待开展</span><span data-en>Not started</span></div>', detailHtml: '<span class="cd-item"><span data-zh>待开展</span><span data-en>Not started</span></span>' },
     ];
     for (const fm of FUTURE_METHODS) {
         carouselItems.push({ cls: fm.cls, name: fm.name, t: fm.t, v: fm.v,
@@ -1347,7 +1339,7 @@ function renderDashboard() {
     // 明细对比表
     let tb = `<table class="data-table" style="min-width:760px;">
     <thead><tr>
-    <th>方法</th><th>子类型 / 配置</th><th class="num">Val AUROC (agg0)</th><th class="num">Test AUROC (agg1)</th><th class="num">Δ val</th><th class="num">Δ test</th><th class="num">VR%</th><th class="num">备注</th>
+    <th><span data-zh>方法</span><span data-en>Method</span></th><th><span data-zh>子类型 / 配置</span><span data-en>Subtype / Config</span></th><th class="num">Val AUROC (agg0)</th><th class="num">Test AUROC (agg1)</th><th class="num">Δ val</th><th class="num">Δ test</th><th class="num">VR%</th><th class="num"><span data-zh>备注</span><span data-en>Notes</span></th>
     </tr></thead><tbody>`;
 
     tb += `<tr style="background:var(--gray-50);">
@@ -1372,7 +1364,7 @@ function renderDashboard() {
                 const d0 = sg.best_agg0 - baseAgg0;
                 const d1 = agg1 != null ? (agg1 - baseAgg1) : null;
                 tb += `<tr style="background:var(--success-bg);">
-                ${si===0?`<td rowspan="${sgEntries.length}">${done?'<strong>':'<strong style="opacity:0.5;">'}${m.name}</strong></td>`:''}
+                ${si===0?`<td rowspan="${sgEntries.length}">${done?'<strong>':'<strong style="opacity:0.5;">'}${L(m,'name')}</strong></td>`:''}
                 <td>${sgName}</td>
                 <td class="num highlight up">${sg.best_agg0.toFixed(4)}</td>
                 <td class="num up">${agg1?.toFixed(4)||'·'}</td>
@@ -1386,23 +1378,23 @@ function renderDashboard() {
             const d0 = r?.test_auroc_macro_agg0 != null ? (r.test_auroc_macro_agg0 - baseAgg0) : null;
             const d1 = r?.test_auroc_macro_agg1 != null ? (r.test_auroc_macro_agg1 - baseAgg1) : null;
             tb += `<tr style="${done?'background:var(--success-bg);':'opacity:0.5;'}">
-            <td><strong>${m.name}</strong></td>
-            <td style="color:var(--gray-500);">${r?.run_name || (done?'·':'待开展')}</td>
+            <td><strong>${L(m,'name')}</strong></td>
+            <td style="color:var(--gray-500);">${r?.run_name || (done?'·':'<span data-zh>待开展</span><span data-en>Not started</span>')}</td>
             <td class="num ${done?'highlight up':''}" style="${done?'':'color:var(--gray-400);'}">${r?.test_auroc_macro_agg0?.toFixed(4)||'·'}</td>
             <td class="num ${done?'up':''}">${r?.test_auroc_macro_agg1?.toFixed(4)||'·'}</td>
             <td class="num ${done?(d0>=0?'up':'down'):''}">${d0!=null?((d0>=0?'+':'')+d0.toFixed(4)):'·'}</td>
             <td class="num ${done?(d1>=0?'up':'down'):''}">${d1!=null?((d1>=0?'+':'')+d1.toFixed(4)):'·'}</td>
             <td class="num">·</td>
-            <td class="num">${r?.notes||'·'}</td></tr>`;
+            <td class="num">${L(r,'notes')||'·'}</td></tr>`;
         }
     }
 
     tb += `</tbody></table>`;
     document.getElementById('dashboard-table').innerHTML = tb;
     document.getElementById('dashboard-note').innerHTML =
-        '📐 口径: 各卡大字为 <strong>测试集 (agg1)</strong> 主指标、小字为验证集 (agg0)；Δ 主行为测试集口径、括号为验证集口径' +
-        (bl.reference_from_paper ? ` | 论文声称: ${bl.reference_from_paper}` : '');
-    document.getElementById('dashboard-status').textContent = '✅ 已更新';
+        '<span data-zh>📐 口径: 各卡大字为 <strong>测试集 (agg1)</strong> 主指标、小字为验证集 (agg0)；Δ 主行为测试集口径、括号为验证集口径</span><span data-en>📐 Convention: on each card the large number is the <strong>test split (agg1)</strong> main metric and the small one the val split (agg0); the Δ row is test-split with the val split in parentheses</span>' +
+        (bl.reference_from_paper ? ` | <span data-zh>论文声称: </span><span data-en>Paper claims: </span>${L(bl, 'reference_from_paper')}` : '');
+    document.getElementById('dashboard-status').textContent = isEN() ? '✅ Updated' : '✅ 已更新';
     document.getElementById('dashboard-status').className = 'status-tag status-ok';
 }
 
@@ -1555,6 +1547,8 @@ function renderDashboardGrid(items) {
     const box = document.getElementById('dashboard-cards');
     if (!box) return;
     // 分组：group 字段优先，Baseline 固定「基准」，缺省进「方法总览」；组序按数据出现顺序
+    // （基准/方法总览 为内置组名，展示时按当前语言映射；JSON group 字段本身已是所选语言）
+    const GRP_LABEL = { '基准': ['基准', 'Baseline'], '方法总览': ['方法总览', 'Method Overview'] };
     const grpOf = it => it.grp || (it.name === 'Baseline' ? '基准' : '方法总览');
     const order = [], byGrp = {};
     for (const it of items) {
@@ -1567,9 +1561,10 @@ function renderDashboardGrid(items) {
         const cards = byGrp[g];
         const withNum = cards.filter(c => c.tn != null);
         const best = withNum.length ? withNum.reduce((a, b) => b.tn > a.tn ? b : a) : null;
+        const gLabel = (GRP_LABEL[g] || [g, g])[isEN() ? 1 : 0];
         html += `<details class="dash-group"${g === order[0] ? ' open' : ''}>`
-            + `<summary>${g}<span class="dg-best">${best ? best.t : '—'}</span>`
-            + `<span class="dg-count">${cards.length} 张</span></summary>`
+            + `<summary>${gLabel}<span class="dg-best">${best ? best.t : '—'}</span>`
+            + `<span class="dg-count"><span data-zh>${cards.length} 张</span><span data-en>${cards.length} cards</span></span></summary>`
             + `<div class="compare-grid">${cards.map(it => `
                 <div class="compare-card ${it.cls.replace('ct-', 'm')}">
                     <div class="cc-name">${it.name}</div>
@@ -1589,7 +1584,7 @@ function setDashView(v, save) {
     grid.hidden = (v !== 'grid');
     const lbl = document.getElementById('dash-view-label');
     const btn = document.getElementById('dash-view-toggle');
-    if (lbl) lbl.textContent = (v === 'carousel') ? '网格视图' : '转盘视图';
+    if (lbl) lbl.textContent = (v === 'carousel') ? (isEN() ? 'Grid View' : '网格视图') : (isEN() ? 'Carousel View' : '转盘视图');
     if (btn) btn.setAttribute('aria-pressed', v === 'grid' ? 'true' : 'false');
     if (save) { try { localStorage.setItem(DASH_VIEW_KEY, v); } catch (e) {} }
 }
@@ -1624,10 +1619,10 @@ function renderSummaryMetrics() {
         }
     }
     document.getElementById('summary-grid').innerHTML = `
-        <div class="metric-card"><div class="metric-label">Baseline 指标</div><div class="metric-value" style="color:var(--danger);">${baseVR?.toFixed(2)??'·'}%</div></div>
-        <div class="metric-card"><div class="metric-label">最优指标</div><div class="metric-value" style="color:var(--success);">${bestVR?.toFixed(2)??'·'}%</div><div class="metric-detail">${bestName}</div></div>
-        <div class="metric-card"><div class="metric-label">改善幅度</div><div class="metric-value" style="color:var(--success);">${(baseVR!=null&&bestVR!=null)?(baseVR-bestVR).toFixed(2):'·'}%</div></div>
-        <div class="metric-card"><div class="metric-label">约束对数</div><div class="metric-value">${S.n_pairs ?? '·'}</div></div>
+        <div class="metric-card"><div class="metric-label"><span data-zh>Baseline 指标</span><span data-en>Baseline Metric</span></div><div class="metric-value" style="color:var(--danger);">${baseVR?.toFixed(2)??'·'}%</div></div>
+        <div class="metric-card"><div class="metric-label"><span data-zh>最优指标</span><span data-en>Best Metric</span></div><div class="metric-value" style="color:var(--success);">${bestVR?.toFixed(2)??'·'}%</div><div class="metric-detail">${bestName}</div></div>
+        <div class="metric-card"><div class="metric-label"><span data-zh>改善幅度</span><span data-en>Improvement</span></div><div class="metric-value" style="color:var(--success);">${(baseVR!=null&&bestVR!=null)?(baseVR-bestVR).toFixed(2):'·'}%</div></div>
+        <div class="metric-card"><div class="metric-label"><span data-zh>约束对数</span><span data-en>Constraint Pairs</span></div><div class="metric-value">${S.n_pairs ?? '·'}</div></div>
     `;
     document.getElementById('summary-formula').style.display = 'block';
     ensureMathJax();
@@ -1635,7 +1630,7 @@ function renderSummaryMetrics() {
         .filter(([,r]) => r.status === 'ok' && r.violations)
         .sort((a,b) => (a[1].violations?.overall_violation_rate||0) - (b[1].violations?.overall_violation_rate||0))
         .slice(0, 8);
-    let html = `<table class="data-table"><thead><tr><th>Run</th><th>指标%</th><th>Δ vs Baseline</th><th>受影响样本</th></tr></thead><tbody>`;
+    let html = `<table class="data-table"><thead><tr><th>Run</th><th><span data-zh>指标%</span><span data-en>Metric %</span></th><th>Δ vs Baseline</th><th><span data-zh>受影响样本</span><span data-en>Affected Samples</span></th></tr></thead><tbody>`;
     for (const [name, r] of sortedRuns) {
         const v = r.violations;
         if (!v) continue;
@@ -1684,15 +1679,15 @@ function renderTimeline() {
         html += `<div class="timeline-node ${cls}${isPast ? ' collapsed' : ''}" id="tl-${origIdx}">`;
         html += `<div class="timeline-dot" ${isPast ? `onclick="toggleTimeline(${origIdx})"` : ''}></div>`;
         html += `<div class="timeline-card ${isCurrent ? 'current' : ''}">`;
-        html += `<div class="timeline-date" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>📅 ${w.week_start || w.saturday} → ${w.saturday}（组会日）${isCurrent ? ' <span style="color:var(--primary);font-weight:700;">← 本周</span>' : ''}</div>`;
-        html += `<div class="timeline-summary" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>${w.summary}</div>`;
-        html += `<ul class="timeline-list">${(w.completed || []).map(c => `<li>✅ ${c}</li>`).join('')}${(w.issues || []).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')}${(w.next_steps || []).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')}</ul>`;
-        if (Object.keys(w.key_metrics || {}).length > 0) {
-            html += `<div class="timeline-metric">📊 ${Object.entries(w.key_metrics).map(([k, v]) => `${k}: <strong>${typeof v === 'number' ? v.toFixed(4) : v}</strong>`).join(' | ')}</div>`;
+        html += `<div class="timeline-date" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>📅 ${w.week_start || w.saturday} → ${w.saturday}<span data-zh>（组会日）</span><span data-en> (meeting day)</span>${isCurrent ? ' <span style="color:var(--primary);font-weight:700;"><span data-zh>← 本周</span><span data-en>← this week</span></span>' : ''}</div>`;
+        html += `<div class="timeline-summary" ${isPast ? `onclick="toggleTimeline(${origIdx})" style="cursor:pointer;"` : ''}>${L(w, 'summary')}</div>`;
+        html += `<ul class="timeline-list">${LA(w, 'completed').map(c => `<li>✅ ${c}</li>`).join('')}${LA(w, 'issues').map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')}${LA(w, 'next_steps').map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')}</ul>`;
+        if (Object.keys((isEN() && w.key_metrics_en) ? w.key_metrics_en : (w.key_metrics || {})).length > 0) {
+            html += `<div class="timeline-metric">📊 ${Object.entries((isEN() && w.key_metrics_en) ? w.key_metrics_en : w.key_metrics).map(([k, v]) => `${k}: <strong>${typeof v === 'number' ? v.toFixed(4) : v}</strong>`).join(' | ')}</div>`;
         }
         if (isPast) {
-            const totalItems = (w.completed || []).length + (w.issues || []).length + (w.next_steps || []).length;
-            html += `<div class="timeline-toggle" onclick="toggleTimeline(${origIdx})">▶ ${totalItems} 项详情</div>`;
+            const totalItems = LA(w, 'completed').length + LA(w, 'issues').length + LA(w, 'next_steps').length;
+            html += `<div class="timeline-toggle" onclick="toggleTimeline(${origIdx})"><span data-zh>▶ ${totalItems} 项详情</span><span data-en>▶ ${totalItems} item details</span></div>`;
         }
         html += `</div></div>`;
     });
@@ -1707,7 +1702,9 @@ function toggleTimeline(idx) {
     const toggle = node.querySelector('.timeline-toggle');
     if (toggle) {
         const totalItems = node.querySelectorAll('.timeline-list li').length;
-        toggle.textContent = isCollapsed ? `▼ ${totalItems} 项详情` : `▶ ${totalItems} 项详情`;
+        toggle.textContent = isCollapsed
+            ? (isEN() ? `▼ ${totalItems} item details` : `▼ ${totalItems} 项详情`)
+            : (isEN() ? `▶ ${totalItems} item details` : `▶ ${totalItems} 项详情`);
     }
 }
 
@@ -1716,18 +1713,20 @@ function renderThisWeek() {
     if (!D) return;
     const weeks = D.weekly_progress || [];
     const latest = weeks[weeks.length-1] || {};
-    document.getElementById('this-week-title').textContent = `📝 本周任务 (${latest.week_start||'·'} → ${latest.saturday||'·'})`;
+    document.getElementById('this-week-title').textContent = isEN()
+        ? `📝 This Week (${latest.week_start||'·'} → ${latest.saturday||'·'})`
+        : `📝 本周任务 (${latest.week_start||'·'} → ${latest.saturday||'·'})`;
     document.getElementById('this-week-content').innerHTML = `
     <div class="timeline-card current" style="margin-bottom:10px;">
-        <div class="timeline-date">📅 ${latest.week_start||'·'} → ${latest.saturday||'·'}（组会日）</div>
-        <div class="timeline-summary">${latest.summary||'·'}</div>
+        <div class="timeline-date">📅 ${latest.week_start||'·'} → ${latest.saturday||'·'}<span data-zh>（组会日）</span><span data-en> (meeting day)</span></div>
+        <div class="timeline-summary">${L(latest,'summary')||'·'}</div>
     </div>
-    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">✅ 本周完成</h4>
-    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.completed||[]).map(c => `<li>✅ ${c}</li>`).join('')||'<li>暂无</li>'}</ul>
-    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">⚠️ 遇到的问题</h4>
-    <ul class="timeline-list" style="margin-bottom:8px;">${(latest.issues||[]).map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')||'<li>暂无</li>'}</ul>
-    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;">📋 下周计划</h4>
-    <ul class="timeline-list">${(latest.next_steps||[]).map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')||'<li>暂无</li>'}</ul>`;
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;"><span data-zh>✅ 本周完成</span><span data-en>✅ Completed This Week</span></h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${LA(latest,'completed').map(c => `<li>✅ ${c}</li>`).join('')||'<li><span data-zh>暂无</span><span data-en>None</span></li>'}</ul>
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;"><span data-zh>⚠️ 遇到的问题</span><span data-en>⚠️ Issues Encountered</span></h4>
+    <ul class="timeline-list" style="margin-bottom:8px;">${LA(latest,'issues').map(i => `<li style="color:var(--warning);">⚠️ ${i}</li>`).join('')||'<li><span data-zh>暂无</span><span data-en>None</span></li>'}</ul>
+    <h4 style="font-size:0.8rem;color:var(--gray-600);margin:6px 0;"><span data-zh>📋 下周计划</span><span data-en>📋 Next Week's Plan</span></h4>
+    <ul class="timeline-list">${LA(latest,'next_steps').map(n => `<li style="color:var(--primary);">📋 ${n}</li>`).join('')||'<li><span data-zh>暂无</span><span data-en>None</span></li>'}</ul>`;
 }
 
 /* ═══════ 待办清单 ═══════
@@ -1739,22 +1738,22 @@ function renderTodos() {
     let html = '';
     for (const cat of todos) {
         html += `<h4 style="font-size:0.83rem;color:var(--gray-700);margin:14px 0 6px;padding-bottom:3px;border-bottom:2px solid var(--gray-200);">
-        ${cat.category.includes('紧急')?'🔴':'📌'} ${cat.category}</h4>`;
+        ${cat.category.includes('紧急')?'🔴':'📌'} ${L(cat,'category')}</h4>`;
         for (const item of cat.items) {
             html += `
         <div class="todo-item ${item.done?'done':''}" style="${item.urgent?'background:#fef2f2;border-radius:6px;padding:6px 8px;':''}">
             <input type="checkbox" ${item.done?'checked':''} onchange="this.parentElement.classList.toggle('done')">
-            <label>${item.text}</label>
-            ${item.in_progress?'<span class="status-tag status-progress" style="font-size:0.62rem;">进行中</span>':''}
-            ${item.urgent?'<span class="status-tag status-danger" style="font-size:0.62rem;">紧急</span>':''}
+            <label>${L(item,'text')}</label>
+            ${item.in_progress?'<span class="status-tag status-progress" style="font-size:0.62rem;"><span data-zh>进行中</span><span data-en>In progress</span></span>':''}
+            ${item.urgent?'<span class="status-tag status-danger" style="font-size:0.62rem;"><span data-zh>紧急</span><span data-en>Urgent</span></span>':''}
         </div>`;
         }
     }
-    const note = D.todos_note
-        ? `<div class="info-box success" style="margin-top:14px;">${D.todos_note}</div>` : '';
+    const note = (D.todos_note || D.todos_note_en)
+        ? `<div class="info-box success" style="margin-top:14px;">${L(D,'todos_note')}</div>` : '';
     document.getElementById('sec-todos').innerHTML = `
-    <div class="card-header"><div class="card-title"><span class="ic ic-check"></span> 待办清单</div></div>
-    ${html || '<p class="empty-state">暂无待办</p>'}
+    <div class="card-header"><div class="card-title"><span class="ic ic-check"></span><span data-zh>待办清单</span><span data-en>Todo List</span></div></div>
+    ${html || '<p class="empty-state"><span data-zh>暂无待办</span><span data-en>No todos</span></p>'}
     ${note}`;
 }
 
@@ -1771,6 +1770,15 @@ function ensureMathJax() {
 }
 
 document.addEventListener('DOMContentLoaded', loadData);
+
+/* ═══════ 语言联动（a4r-bridge）：data-lang 变化时整页重载，让 JS 渲染区
+   （倒计时/仪表盘/时间线/待办）按新语言重建（避免转盘 rAF 循环与监听器堆叠） ═══════ */
+(function watchLang() {
+    let cur = document.documentElement.getAttribute('data-lang');
+    new MutationObserver(() => {
+        if (document.documentElement.getAttribute('data-lang') !== cur) location.reload();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+})();
 
 /* 顶导当前页高亮：URL 与当前页一致的 nav-links 链接自动加 .active */
 (function highlightCurrentNav() {
@@ -1794,13 +1802,21 @@ document.addEventListener('DOMContentLoaded', loadData);
     const panel = document.getElementById('ts-panel');
     const curLabel = sw.querySelector('.ts-cur');
 
-    // 面板：默认蓝系 + 10 个主题
+    // 面板：默认蓝系 + 10 个主题（英文名按 id 映射；theme-pack.js 仅存中文名）
+    const THEME_NAME_EN = {
+        'default': 'Default Blue', '01_wwdc_light': 'WWDC Light', '02_wwdc_dark': 'WWDC Dark',
+        '03_dark_premium': 'Dark Premium', '04_glassmorphism': 'Glassmorphism',
+        '05_ink_vermilion': 'Ink & Vermilion', '06_cyber_terminal': 'Cyber Terminal',
+        '07_blueprint': 'Blueprint', '08_starmap': 'Starmap', '09_editorial': 'Editorial',
+        '10_aurora_night': 'Aurora Night', '11_ruc_beamer': 'RUC Red Beamer'
+    };
+    const nameEn = id => THEME_NAME_EN[id] || '';
     const opts = [{ id: 'default', name: '默认蓝系', swatch: ['#2563eb', '#0e7490', '#059669'] }]
         .concat(THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch })));
     panel.innerHTML = opts.map(o =>
         `<button class="ts-opt" type="button" data-theme="${o.id}">
             <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
-            <span class="ts-name">${o.name}</span>
+            <span class="ts-name"><span data-zh>${o.name}</span><span data-en>${nameEn(o.id) || o.name}</span></span>
             <span class="ts-check ic ic-check"></span>
         </button>`).join('');
 
@@ -1834,7 +1850,8 @@ document.addEventListener('DOMContentLoaded', loadData);
         applyFonts(t);
         // 变体页（__PREVIEW_THEME__ 存在）不写全局偏好：预览内的试切不污染用户选择
         if (!window.__PREVIEW_THEME__) { try { localStorage.setItem(KEY, id); } catch (e) {} }
-        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        const o0 = opts.find(o => o.id === id);
+        curLabel.innerHTML = `<span data-zh>${(o0 || { name: '主题' }).name}</span><span data-en>${(o0 && nameEn(o0.id)) || 'Theme'}</span>`;
         panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
         // 广播主题变化（转盘环心徽章等监听）
         document.dispatchEvent(new CustomEvent('labmeeting-themechange', { detail: { id: id } }));

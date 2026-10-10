@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>需要补充的知识点 - AI4Research</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.4em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--ink); font-weight: 600; margin: 1.4em 0 0.6em; }
+    p { margin: 10px 0; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header {
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 28px 4px 22px; margin-bottom: 30px;
+    }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+    }
+    header .sub { font-size: .96em; color: var(--ink-2); margin-top: 6px; }
+
+    /* ====================================================================
+       概念卡片 (.concept) —— 一个卡片 = 一个背景概念
+       ==================================================================== */
+    .concept {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+    }
+    .concept:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .concept h2 { margin: 0 0 8px; font-size: 1.15em; font-family: var(--font-body); border: none; padding: 0; }
+    .concept h2::after { display: none; }
+    .concept .papers { font-size: .9em; color: var(--ink-2); margin-top: 10px; }
+    .concept .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept .links a {
+      padding: 5px 13px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .concept .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    /* ====================================================================
+       定义框 (.def-box) —— 承载概念的简明白话解释
+       ==================================================================== */
+    .def-box {
+      background: var(--c-def-bg); border: 1px solid var(--c-def-bd);
+      border-radius: var(--radius-s); padding: 12px 16px; margin: 12px 0;
+    }
+    .def-box strong { color: var(--c-def-fg); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .9em; color: var(--ink-2); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
+    .rb a {
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<header><h1><span data-zh>需要补充的知识点</span><span data-en>Background Knowledge to Fill In</span></h1><div class="sub"><span data-zh>MR与AI科学发现的背景概念速查——每个知识点配有简明解释和相关论文链接</span><span data-en>Quick reference of background concepts behind MR and AI-driven scientific discovery — each with a brief explanation and links to related papers</span></div></header><div class="concept"><h3>孟德尔随机化（MR）原理与IV三大假设</h3><div class="def-box"><p>利用遗传变异作为工具变量(IV)来推断暴露对结局的因果效应。三大假设：(1)关联性——IV与暴露显著相关；(2)独立性——IV不与混杂因素相关；(3)排他性——IV仅通过暴露影响结局。</p></div><div class="papers">相关论文：<a href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">Skrivankova</a>, <a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson</a></div><div class="links"><a href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">跳转到Skrivankova论文</a> <a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">跳转到Sanderson论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>顺式pQTL与共定位分析(coloc+SuSiE)</h3><div class="def-box"><p>pQTL是影响蛋白表达水平的基因位点。cis-pQTL位于编码基因附近(±500kb-1Mb)，水平多效性风险较小。共定位分析验证蛋白和疾病在同一基因位点是否共享同一因果变异——PP4>0.7为强证据。SuSiE用于精细定位，识别95%可信集。</p></div><div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao</a></div><div class="links"><a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">跳转到Yao论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>Wald ratio / IVW / MR-Egger / 多效性</h3><div class="def-box"><p>Wald ratio是最简单的MR估计器：因果效应估计=变异-结局效应/变异-暴露效应。IVW(逆方差加权)是多工具变量场景下的元分析方法。MR-Egger允许工具变量有定向多效性。多效性(pleiotropy)是指一个遗传变异通过多个通路影响多种性状。</p></div><div class="papers">相关论文：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson</a>, <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson</a></div><div class="links"><a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">跳转到Sanderson论文</a> <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">跳转到Larsson论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>两步MR与中介分析</h3><div class="def-box"><p>两步MR(Mediation MR)用于量化"暴露-中介-结局"因果链的中介效应占比。Step1:暴露对中介的因果效应。Step2:中介对结局的因果效应。Product方法估计间接效应，Delta方法估计标准误。</p></div><div class="papers">相关论文：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji</a>, <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson</a></div><div class="links"><a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">跳转到Yoshiji论文</a> <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">跳转到Larsson论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>药物靶点MR与药物重利用</h3><div class="def-box"><p>药物靶点MR以编码药物靶点的基因为工具变量，推断靶点调节对疾病的因果效应。若基因预测的靶点水平变化因果性地改变疾病风险，则该靶点是潜在的药物靶点。药物重利用(drug repurposing)是将已有安全性数据的药物用于新适应症。</p></div><div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao</a>, <a href="../papers/Ghareeb_2025_Multi_Agent_System_zh.html">Ghareeb</a>, <a href="../papers/Tang_2025_Deep_learning_large_zh.html">Tang</a></div><div class="links"><a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">跳转到Yao论文</a> <a href="../papers/Ghareeb_2025_Multi_Agent_System_zh.html">跳转到Ghareeb论文</a> <a href="../papers/Tang_2025_Deep_learning_large_zh.html">跳转到Tang论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>PheWAS与下游验证</h3><div class="def-box"><p>全表型组关联研究(PheWAS)同时检验遗传变异与数百种表型的关联——用于评估靶点的多效性效应和潜在副作用。结合GTEx组织表达数据库、KO小鼠模型和DrugBank/OpenTargets药物数据库构成完整下游验证链。</p></div><div class="papers">相关论文：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao</a></div><div class="links"><a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">跳转到Yao论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>LLM多智能体科学发现</h3><div class="def-box"><p>大语言模型(LLM)智能体可以协作执行科学发现：Crow做简洁文献综述、Falcon做深度评估、Finch做数据分析。通过LLM评委的Bradley-Terry成对比较排序假设。ROBIN展示了"文献-假设-实验分析-迭代"的完整闭环。</p></div><div class="papers">相关论文：<a href="../papers/Ghareeb_2025_Multi_Agent_System_zh.html">Ghareeb</a></div><div class="links"><a href="../papers/Ghareeb_2025_Multi_Agent_System_zh.html">跳转到Ghareeb论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>图卷积网络(GCN)与LLM的混合架构</h3><div class="def-box"><p>GCN在蛋白质互作图谱上通过消息传递学习节点表示——融合多组学表达数据和网络拓扑。LLM(GPT-3.5/4o)提供Chain-of-Thought机制解释。LyMOI混合框架：GCN做定量预测(哪些是调控因子)，LLM做定性推理(如何调控)。分层微调策略：教师模型学通用模式-学生模型学条件特异性。</p></div><div class="papers">相关论文：<a href="../papers/Tang_2025_Deep_learning_large_zh.html">Tang</a></div><div class="links"><a href="../papers/Tang_2025_Deep_learning_large_zh.html">跳转到Tang论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+<div class="concept"><h3>多模态基础模型(MFM)</h3><div class="def-box"><p>MFM将多模态数据(基因组学/蛋白质组学/影像学/临床记录)统一到单一AI框架中进行联合建模。目标是实现"从分子到临床"的端到端理解，代表了AI+生物学融合的宏观愿景。</p></div><div class="papers">相关论文：<a href="../papers/Cui_2025_Multimodal_foundation_models_zh.html">Cui</a></div><div class="links"><a href="../papers/Cui_2025_Multimodal_foundation_models_zh.html">跳转到Cui论文</a> <a href="reading_path.html">返回路径主页</a></div></div>
+
+
+<footer>
+<div class="rb"><strong><span data-zh>导航：</span><span data-en>Navigate:</span></strong> <a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a> <a href="mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a> <a href="reading_path.html"><span data-zh>阅读路径主页</span><span data-en>Reading Path Home</span></a> <a href="basic_bio_knowledge.html"><span data-zh>基础生物学</span><span data-en>Basic Biology</span></a> <a href="knowledge_supplement.html"><span data-zh>返回顶部</span><span data-en>Back to top</span></a></div>
+<p style="margin-top:12px;">AI4Research 文献精读项目 · <span data-zh>补充知识点</span><span data-en>Background Notes</span> · 2026-08-14</p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

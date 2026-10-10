@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>孟德尔随机化（MR）系统讲演 - AI4Research</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.4em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--ink); font-weight: 600; margin: 1.4em 0 0.6em; }
+    p { margin: 10px 0; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header {
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 28px 4px 22px; margin-bottom: 30px;
+    }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+    }
+    header .sub { font-size: .96em; color: var(--ink-2); margin-top: 6px; }
+
+    /* ====================================================================
+       概念卡片 (.concept) —— 一个卡片 = 一个背景概念
+       ==================================================================== */
+    .concept {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+    }
+    .concept:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .concept h2 { margin: 0 0 8px; font-size: 1.15em; font-family: var(--font-body); border: none; padding: 0; }
+    .concept h2::after { display: none; }
+    .concept .papers { font-size: .9em; color: var(--ink-2); margin-top: 10px; }
+    .concept .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept .links a {
+      padding: 5px 13px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .concept .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    /* ====================================================================
+       定义框 (.def-box) —— 承载概念的简明白话解释
+       ==================================================================== */
+    .def-box {
+      background: var(--c-def-bg); border: 1px solid var(--c-def-bd);
+      border-radius: var(--radius-s); padding: 12px 16px; margin: 12px 0;
+    }
+    .def-box strong { color: var(--c-def-fg); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .9em; color: var(--ink-2); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
+    .rb a {
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+  <style id="legacy-css">
+:root {
+        --blue-dark: var(--accent);
+        --blue-mid: var(--accent);
+        --blue-light: var(--link);
+        --green: var(--c-int-fg);
+        --yellow: var(--c-ex-fg);
+        --purple: var(--c-th-fg);
+        --red: var(--c-wa-fg);
+        --gray-d: var(--ink);
+        --gray-m: var(--ink-2);
+        --bg: #fafbfc
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 17px;
+        line-height: 1.85;
+        color: var(--gray-d);
+        background: var(--bg);
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px 24px
+    }
+
+    a {
+        color: var(--blue-light);
+        text-decoration: none
+    }
+
+    a:hover {
+        text-decoration: underline
+    }
+
+    h2 {
+        font-size: 1.4em;
+        color: var(--blue-dark);
+        border-bottom: 2px solid var(--c-def-bd);
+        padding-bottom: 6px;
+        margin: 2em 0 0.8em
+    }
+
+    h3 {
+        font-size: 1.2em;
+        color: var(--blue-dark);
+        margin: 0 0 0.4em
+    }
+
+    .act-header {
+        text-align: center;
+        margin: 32px 0 16px;
+        padding: 18px;
+        background: var(--accent);
+        color: #fff;
+        border-radius: 10px
+    }
+
+    .act-header h2 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.4em;
+        border: none;
+        padding: 0
+    }
+
+    .act-header .sub {
+        font-size: 0.9em;
+        opacity: 0.8;
+        margin-top: 4px
+    }
+
+    header {
+        background: var(--accent);
+        color: #fff;
+        border-radius: 10px;
+        padding: 28px 32px;
+        margin-bottom: 28px;
+        text-align: center
+    }
+
+    header h1 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.8em
+    }
+
+    header .sub {
+        font-size: 1em;
+        opacity: 0.88;
+        margin-top: 8px
+    }
+
+    .slide {
+        background: #fff;
+        border-radius: 8px;
+        padding: 24px 28px;
+        margin: 16px 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06)
+    }
+
+    .slide h3 .q {
+        font-size: 0.85em;
+        color: var(--gray-m);
+        font-weight: 400;
+        display: block;
+        margin-top: 2px
+    }
+
+    .slide .ref {
+        font-size: 0.84em;
+        color: var(--gray-m);
+        margin-top: 14px;
+        padding: 10px 14px;
+        background: #f7f9fc;
+        border-radius: 4px;
+        border-left: 3px solid var(--blue-light)
+    }
+
+    .slide .ref a {
+        font-weight: 600
+    }
+
+    .key-box {
+        background: var(--accent-soft);
+        border-left: 4px solid var(--blue-light);
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin: 12px 0
+    }
+
+    .key-box strong {
+        color: var(--blue-dark)
+    }
+
+    .src-ref {
+        font-size: 0.82em;
+        color: var(--ink-2);
+        font-style: italic;
+        display: inline-block;
+        margin-top: 6px;
+        border-top: 1px dotted var(--rule);
+        padding-top: 6px
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 0.88em
+    }
+
+    th, td {
+        border: 1px solid var(--rule);
+        padding: 7px 10px;
+        text-align: left
+    }
+
+    th {
+        background: var(--accent-soft);
+        font-weight: bold;
+        color: var(--blue-dark)
+    }
+
+    tr:nth-child(even) {
+        background: #fafbfc
+    }
+
+    .rb {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 0;
+        justify-content: center
+    }
+
+    .rb a {
+        padding: 5px 14px;
+        border-radius: 4px;
+        border: 1px solid var(--rule);
+        background: #fff;
+        font-size: 0.88em
+    }
+
+    .rb a:hover {
+        background: var(--accent-soft)
+    }
+
+    footer {
+        background: #fff;
+        border-radius: 8px;
+        padding: 18px 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        font-size: 0.88em;
+        color: var(--gray-m);
+        text-align: center
+    }
+
+    .fig3-grid {
+        display: grid;
+        grid-template-columns:1fr 1fr;
+        gap: 14px;
+        margin: 18px 0
+    }
+
+    .fig3-cell {
+        background: #fafbfc;
+        border: 1px solid var(--rule);
+        border-radius: 6px;
+        padding: 10px;
+        text-align: center
+    }
+
+    .fig3-cell img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        background: #fff
+    }
+
+    .fig3-cell .fig3-label {
+        font-size: 0.9em;
+        color: var(--blue-dark);
+        margin: 8px 0 4px
+    }
+
+    .fig3-cell p {
+        font-size: 0.82em;
+        color: var(--gray-m);
+        line-height: 1.6;
+        text-align: left;
+        margin: 0
+    }
+
+    @media (max-width: 768px) {
+        body {
+            font-size: 15px;
+            padding: 10px 12px
+        }
+
+        h1 {
+            font-size: 1.5em
+        }
+
+        .fig3-grid {
+            grid-template-columns:1fr
+        }
+    }
+
+    .side-nav {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 208px;
+        height: 100vh;
+        overflow-y: auto;
+        background: #fff;
+        border-right: 1px solid var(--rule);
+        padding: 16px 12px;
+        font-size: 0.82em;
+        z-index: 50;
+        display: none;
+        box-shadow: 2px 0 6px rgba(0, 0, 0, 0.04)
+    }
+
+    .side-nav .nav-title {
+        font-weight: 700;
+        color: var(--blue-dark);
+        font-size: 1.05em;
+        padding: 2px 6px 10px;
+        border-bottom: 2px solid var(--c-def-bd);
+        margin-bottom: 8px
+    }
+
+    .side-nav .nav-act {
+        margin: 12px 0 4px;
+        padding: 5px 8px;
+        background: var(--accent-soft);
+        border-radius: 4px;
+        font-weight: 700;
+        color: var(--blue-mid);
+        font-size: 0.92em;
+        line-height: 1.3
+    }
+
+    .side-nav a {
+        display: block;
+        padding: 5px 8px;
+        color: var(--gray-d);
+        border-radius: 4px;
+        line-height: 1.4;
+        border-left: 3px solid transparent
+    }
+
+    .side-nav a:hover {
+        background: #f7f9fc;
+        text-decoration: none
+    }
+
+    .side-nav a.active {
+        background: var(--accent-soft);
+        border-left-color: var(--blue-light);
+        font-weight: 600;
+        color: var(--blue-dark)
+    }
+
+    @media (min-width: 1100px) {
+        body {
+            max-width: 1246px;
+            padding-left: 222px
+        }
+
+        .side-nav {
+            display: block
+        }
+    }
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<nav class="side-nav" id="sideNav">
+    <div class="nav-title"><span data-zh>📋 MR讲解目录</span><span data-en>📋 MR Lecture Contents</span></div>
+    <div id="navList"></div>
+</nav>
+<header><h1><span data-zh>孟德尔随机化（MR）系统讲演</span><span data-en>Mendelian Randomization (MR): A Systematic Lecture</span></h1>
+    <div class="sub"><span data-zh>从原理到应用——基于8篇核心论文的知识整合</span><span data-en>From principles to applications — a synthesis built on 8 core papers</span></div>
+    <div style="font-size:0.85em;opacity:0.65;margin-top:6px;"><span data-zh>AI4Research 文献精读项目 · 2026-08-14 · 适合远程会议讲解 · 预计时长 35-50 分钟</span><span data-en>AI4Research Literature Project · 2026-08-14 · designed for remote-meeting delivery · est. duration 35–50 min</span>
+    </div>
+</header>
+<div class="rb" style="margin-bottom:24px;"><a href="reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a> <a
+        href="knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a> <a href="basic_bio_knowledge.html"><span data-zh>基础生物学</span><span data-en>Basic Biology</span></a> <a
+        href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a></div>
+<div class="act-header"><h2>第一幕：为什么要做 MR（4张）</h2>
+    <div class="sub">从观察性研究不可靠到"大自然帮我们做了随机分组"</div>
+</div>
+<div class="slide">
+    <h3>1. 我们为什么需要因果推断？<span
+            class="q">核心问题：如果观察性研究和RCT都已经存在了，为什么还需要MR？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>观察性研究面临混杂和反向因果的致命缺陷，RCT经常不可行（伦理/成本/时间），MR填补了两者之间的方法论空白——它不是替代品，而是三角验证的关键一环。
+    </div>
+    <p>心血管疾病是全球头号杀手。我们需要知道<strong>什么因素真正导致了疾病</strong>——而不仅仅是"什么因素碰巧与疾病统计相关"。
+    </p>
+    <table>
+        <tr>
+            <th>证据类型</th>
+            <th>优势</th>
+            <th>劣势</th>
+            <th>MR的角色</th>
+        </tr>
+        <tr>
+            <td>观察性研究</td>
+            <td>快速、低成本、大样本</td>
+            <td>混杂、反向因果严重：<br>HDL-C与冠心病：观察=保护 → MR=无因果 → RCT全部失败</td>
+            <td>MR可以"校正"观察性结论</td>
+        </tr>
+        <tr>
+            <td>RCT（随机对照试验）</td>
+            <td>因果推断金标准</td>
+            <td>昂贵、耗时、伦理受限：<br>不能随机分配人吸烟或酗酒</td>
+            <td>MR可预览RCT结果、研究终身效应</td>
+        </tr>
+        <tr>
+            <td><strong>孟德尔随机化</strong></td>
+            <td>利用天然随机分组<br>可利用公开GWAS数据</td>
+            <td>依赖不可检验的假设</td>
+            <td>—</td>
+        </tr>
+    </table>
+    <p><strong>三角验证的逻辑：</strong>观察性研究（混杂问题）+ RCT（外推问题）+ MR（多效性问题）=
+        三种方法有<strong>不同的偏倚来源</strong>。当三者方向一致时，结论可信度最高；当三者矛盾时（如HDL-C），揭露了某种方法的偏倚。
+    </p>
+    <div class="ref">📖 详细解读：<a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD综述)</a> §1, §3, §11, §12.3 | <a
+            href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson
+        (MR Primer)</a> §1
+    </div>
+</div>
+<div class="slide">
+    <h3>2. 基因型如何成为"大自然的随机分组"？<span class="q">核心问题：基因型为什么可以当作随机分组来用？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>在受孕时，父母的等位基因通过减数分裂随机分配给子代——这个过程类似于RCT中的抛硬币。你"恰好"继承了使血钙水平偏高的等位基因，别人的等位基因使其血钙偏低——这种天然的随机分组使得两组在其他特征上"平均可比"，混杂得到了控制。
+    </div>
+    <p><strong>生物学基础（首次出现术语——附解释）：</strong></p>
+    <ul>
+        <li><strong>SNP（单核苷酸多态性，Single Nucleotide Polymorphism）：</strong>基因组中单个碱基位置上的变异。例如在DNA某位置，大多数人携带C碱基，少数人携带T碱基。人类基因组中有约1亿个已知SNP，是MR最常用的工具变量类型。
+        </li>
+        <li><strong>等位基因（Allele）：</strong>SNP的两个版本。例如rs671的G等位基因（正常功能）和A等位基因（功能缺失）。你的两个等位基因分别来自父亲和母亲。
+        </li>
+        <li><strong>基因型（Genotype）：</strong>个体的两个等位基因的组合——AA、AG或GG。MR中通常编码为0/1/2（效应等位基因的剂量）作为连续变量使用。
+        </li>
+    </ul>
+    <p><strong>孟德尔第二定律（独立分配律）：</strong>遗传等位基因在配子形成时随机分离。你的基因型在出生时已经固定，且不会被后续的疾病状态改变——这消除了反向因果的可能性。MR利用这种天然的随机化机制来模拟RCT的随机分组。
+    </p>
+    <p><strong>类比：</strong>RCT中抛硬币决定你进"吃药组"还是"安慰剂组"——MR中，大自然在你受孕时替你抛了硬币，决定了你的基因型。这不是完美的随机分组（不能重新抛一次），但在统计上已经足够接近。
+    </p>
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> §1.1-1.2 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §2 | <a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a> §3 |
+        <a
+                href="basic_bio_knowledge.html">基础生物学 → SNP/等位基因/基因型</a></div>
+</div>
+<div class="slide">
+    <h3>3. MR 如何做因果推断？—— Wald Ratio 入门<span
+            class="q">核心问题：有了基因型和疾病数据，怎么算出因果效应的大小？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>MR的核心计算就是一个简单的除法——把"基因对疾病的效应"除以"基因对暴露的效应"，就得到了"暴露对疾病的因果效应"。分子÷分母
+        = 因果效应量。
+    </div>
+    <p><strong>完整数值示例：</strong>假设你想知道C反应蛋白（CRP）升高是否因果性地增加收缩压（SBP）：</p>
+    <table>
+        <tr>
+            <th>步骤</th>
+            <th>计算</th>
+            <th>结果</th>
+        </tr>
+        <tr>
+            <td>① G→X：基因使CRP升高多少？</td>
+            <td>从GWAS获取SNP→CRP的β</td>
+            <td>每增加一个效应等位基因，CRP升高 <strong>0.5 SD</strong></td>
+        </tr>
+        <tr>
+            <td>② G→Y：基因使SBP升高多少？</td>
+            <td>从GWAS获取SNP→SBP的β</td>
+            <td>每增加一个效应等位基因，SBP升高 <strong>2.0 mmHg</strong></td>
+        </tr>
+        <tr>
+            <td>③ β<sub>MR</sub> = ② ÷ ①</td>
+            <td>2.0 ÷ 0.5 = 4.0</td>
+            <td>CRP每升高 <strong>1 SD</strong>，SBP升高 <strong>4.0 mmHg</strong></td>
+        </tr>
+    </table>
+    <p><strong>为什么除法有效？</strong>G→Y的效应（2.0 mmHg）是"G通过X影响Y"的效应。G→X的效应（0.5
+        SD）是"G对X的影响力度"。两者相除相当于做了尺度换算——将"基因的尺度"转化到"暴露的尺度"上。这就好比你知道"量杯刻度每厘米代表50毫升"，水面上升了2厘米，你就知道倒了100毫升水。
+    </p>
+    <p><strong>两个关键术语：</strong></p>
+    <ul>
+        <li><strong>工具变量（Instrumental Variable, IV）：</strong>遗传变异G在MR中扮演的角色——它是暴露X的"代理"，用来过滤掉混杂的干扰
+        </li>
+        <li><strong>暴露与结局：</strong>暴露（Exposure）= 你想研究其因果效应的因素（如CRP水平）；结局（Outcome）=
+            你想预测的疾病或表型（如SBP或冠心病）
+        </li>
+    </ul>
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> §1.3-1.5（含ITT vs IV数值演示）| <a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+        §3.1（含DAG图）
+    </div>
+</div>
+
+<div class="slide">
+    <h3>3+. 图解：所有假设满足时的理想 MR 因果图<span
+            class="q">核心问题：当 IV 三大假设全部满足时，G到X到Y 的因果链长什么样？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>理想情况下，遗传变异 G 只通过暴露 X 影响结局 Y（排他性），G 与混杂 U
+        独立（独立性），且 G 与 X 强相关（相关性）。此时 Wald Ratio = (G到Y)除以(G到X) 就是干净的因果效应估计。
+    </div>
+    <figure style="text-align:center; margin:24px 0;">
+        <svg style="max-width:600px; width:100%; height:auto; font-family:'PingFang SC','Microsoft YaHei',sans-serif;"
+             viewBox="0 0 680 470"
+             xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="ivArrowBlack3" markerHeight="7" markerWidth="7" orient="auto-start-reverse" refX="9"
+                        refY="5" viewBox="0 0 10 10">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#2c3e50"/>
+                </marker>
+                <marker id="ivArrowGreen3" markerHeight="7" markerWidth="7" orient="auto-start-reverse" refX="9"
+                        refY="5" viewBox="0 0 10 10">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#27ae60"/>
+                </marker>
+                <marker id="ivArrowGray3" markerHeight="7" markerWidth="7" orient="auto-start-reverse" refX="9" refY="5"
+                        viewBox="0 0 10 10">
+                    <path d="M0,0 L10,5 L0,10 z" fill="#7f8c8d"/>
+                </marker>
+            </defs>
+            <circle cx="425" cy="100" fill="#fef9e7" r="30" stroke="#b7950b" stroke-dasharray="5,4" stroke-width="2"/>
+            <text dominant-baseline="central" fill="#7d6608" font-size="22" font-weight="700" text-anchor="middle"
+                  x="425" y="100">U
+            </text>
+            <text fill="#7d6608" font-size="13" text-anchor="middle" x="425" y="150">未观测混杂</text>
+            <line marker-end="url(#ivArrowGray3)" stroke="#7f8c8d" stroke-dasharray="5,4" stroke-width="1.8" x1="408"
+                  x2="338" y1="128" y2="280"/>
+            <line marker-end="url(#ivArrowGray3)" stroke="#7f8c8d" stroke-dasharray="5,4" stroke-width="1.8" x1="442"
+                  x2="512" y1="128" y2="280"/>
+            <text fill="#7f8c8d" font-size="11" font-style="italic" text-anchor="middle" x="425" y="210">
+                后门路径（混杂）
+            </text>
+            <line marker-end="url(#ivArrowGreen3)" stroke="#27ae60" stroke-width="2.5" x1="140" x2="290" y1="310"
+                  y2="310"/>
+            <text fill="#1e8449" font-size="13" font-weight="600" text-anchor="middle" x="215" y="298">相关性</text>
+            <line marker-end="url(#ivArrowBlack3)" stroke="#2c3e50" stroke-width="2.5" x1="350" x2="500" y1="310"
+                  y2="310"/>
+            <text fill="#1a5276" font-size="16" font-style="italic" font-weight="700" text-anchor="middle" x="425"
+                  y="298">Beta
+            </text>
+            <text fill="#566573" font-size="11" text-anchor="middle" x="425" y="340">待估计的因果效应</text>
+            <circle cx="110" cy="310" fill="#eaf2f8" r="30" stroke="#1a5276" stroke-width="2"/>
+            <text dominant-baseline="central" fill="#1a5276" font-size="22" font-weight="700" text-anchor="middle"
+                  x="110" y="310">G
+            </text>
+            <text fill="#566573" font-size="13" text-anchor="middle" x="110" y="360">遗传变异</text>
+            <text fill="#566573" font-size="11" text-anchor="middle" x="110" y="376">(工具变量)</text>
+            <circle cx="320" cy="310" fill="#eaf2f8" r="30" stroke="#1a5276" stroke-width="2"/>
+            <text dominant-baseline="central" fill="#1a5276" font-size="22" font-weight="700" text-anchor="middle"
+                  x="320" y="310">X
+            </text>
+            <text fill="#566573" font-size="13" text-anchor="middle" x="320" y="360">暴露</text>
+            <circle cx="530" cy="310" fill="#eaf2f8" r="30" stroke="#1a5276" stroke-width="2"/>
+            <text dominant-baseline="central" fill="#1a5276" font-size="22" font-weight="700" text-anchor="middle"
+                  x="530" y="310">Y
+            </text>
+            <text fill="#566573" font-size="13" text-anchor="middle" x="530" y="360">结局</text>
+            <text fill="#c0392b" font-size="14" font-weight="700" text-anchor="middle" x="215" y="220">G 独立于 U</text>
+            <text fill="#c0392b" font-size="11" text-anchor="middle" x="215" y="238">独立性</text>
+            <line opacity="0.5" stroke="#c0392b" stroke-dasharray="4,4" stroke-width="1.5" x1="140" x2="500" y1="400"
+                  y2="400"/>
+            <line stroke="#c0392b" stroke-width="2.5" x1="305" x2="325" y1="390" y2="410"/>
+            <line stroke="#c0392b" stroke-width="2.5" x1="325" x2="305" y1="390" y2="410"/>
+            <text fill="#c0392b" font-size="13" font-weight="700" text-anchor="middle" x="320" y="432">G-/-Y
+                排他性（无直接效应）
+            </text>
+            <rect fill="#f8f9fa" height="20" rx="4" stroke="#e5e8e8" stroke-width="1" width="600" x="40" y="445"/>
+            <text fill="#555" font-size="11" text-anchor="middle" x="340" y="459">绿色=G到X因果链 | 黑色=X到Y待估计效应
+                | 灰虚线=U后门路径 | 红叉=被禁止的直接效应
+            </text>
+        </svg>
+        <figcaption style="font-size:0.88em; color:#7f8c8d; margin-top:10px; line-height:1.6; text-align:center;">
+            <strong>图：所有假设都满足时的 MR 有向无环图（DAG）。</strong>这是理想的 MR 场景——遗传变异 G 通过暴露 X 影响结局
+            Y（绿色实线，相关性假设），G 与混杂 U 独立（左侧标注），且 G 没有绕过 X 直接影响 Y 的通路（底部叉号，排他性假设）。<br><strong>对比：</strong>当参与研究成为一个
+            collider（同时受 G/U 影响）时，条件化会诱导 G 与 U 之间出现虚假关联（破坏独立性），这就是 Sanderson 论文中
+            Collider Bias DAG 展示的危险场景。
+        </figcaption>
+    </figure>
+    <div class="ref">详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> collider bias DAG | <a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a> 三大假设的 DAG
+        详解
+    </div>
+</div>
+<div class="act-header"><h2>第二幕：MR 的三大支柱（7张）</h2>
+    <div class="sub">假设、数据、方法——MR大厦的地基、砖瓦和工程规范</div>
+</div>
+<div class="slide">
+    <h3>4. 支柱一：三大假设——MR 有效性的地基<span class="q">核心问题：MR 结论在什么条件下才是可信的？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>工具变量三大假设是 MR
+        的"三条腿的凳子"——任何一条腿断了，整个因果推断就站不稳。其中排他性假设（无水平多效性）是最难验证的，也是 MR
+        最大的争议来源。
+    </div>
+    <table>
+        <tr>
+            <th>假设</th>
+            <th>含义</th>
+            <th>可检验性</th>
+            <th>违反后果</th>
+            <th>类比</th>
+        </tr>
+        <tr>
+            <td><strong>① 相关性<br>(Relevance)</strong></td>
+            <td>遗传变异必须与暴露显著相关：G→X 必须真实存在</td>
+            <td style="color:#27ae60">✅ 可检验<br>(F统计量>10)</td>
+            <td>弱工具变量偏倚——MR估计偏向观察性关联</td>
+            <td>证人必须真的目击了事件</td>
+        </tr>
+        <tr>
+            <td><strong>② 独立性<br>(Independence)</strong></td>
+            <td>遗传变异不与混杂因素相关：G 与 U 必须独立</td>
+            <td style="color:#f39c12">⚠️ 部分可检验<br>(检查G与已知混杂的关联)</td>
+            <td>混杂偏倚——类似于观察性研究的问题</td>
+            <td>证人与被告没有利益关系</td>
+        </tr>
+        <tr>
+            <td><strong>③ 排他性<br>(Exclusion)</strong></td>
+            <td>遗传变异只能通过暴露影响结局：G→X→Y 是唯一通路，G↛Y，G↛U</td>
+            <td style="color:#e74c3c">❌ 不可直接检验<br>(需生物学论证+敏感性分析)</td>
+            <td>多效性偏倚——最严重也是最常见的威胁</td>
+            <td>证人只能通过自己的目击影响判决，不能贿赂法官</td>
+        </tr>
+    </table>
+    <p><strong>MR 的内在张力：</strong>这三个假设给了 MR 比观察性研究更强的因果推断力——但第三个假设的不可检验性意味着
+        MR 的结论永远带有一层不确定性。这就是为什么稳健的 MR 研究必须使用多种敏感性分析，以及与 RCT 和观察性证据进行三角验证。
+    </p>
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> §1.3 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §4 | <a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a>
+        §3.1（含DAG因果图）
+    </div>
+</div>
+<div class="slide">
+    <h3>5. 支柱二：GWAS 与 pQTL——MR 的数据燃料<span class="q">核心问题：驱动 MR 分析的原始数据从哪里来？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>GWAS 提供"SNP→性状"的关联数据，pQTL 提供"SNP→蛋白水平"的关联数据。两者结合
+        + 双样本 MR 设计 = 可以仅用公开汇总数据完成一次从基因到疾病的完整因果推断。
+    </div>
+    <table>
+        <tr>
+            <th>数据源</th>
+            <th>检测对象</th>
+            <th>规模示例</th>
+            <th>在MR中的角色</th>
+        </tr>
+        <tr>
+            <td><strong>GWAS</strong></td>
+            <td>数百万SNP × 某个性状（BMI/血压/血脂/疾病）</td>
+            <td>GIANT BMI GWAS: ~681,000人<br>CARDIoGRAM CAD GWAS: ~1,166,000人</td>
+            <td>提供 SNP→暴露（β<sub>GX</sub>）和 SNP→结局（β<sub>GY</sub>）的效应估计</td>
+        </tr>
+        <tr>
+            <td><strong>pQTL</strong></td>
+            <td>SNP × 蛋白质表达水平</td>
+            <td>UKB-PPP: 54,306人, 2923蛋白<br>CKB: 3,977人, 2923蛋白</td>
+            <td>提供 SNP→蛋白暴露的效应估计<br><strong>cis-pQTL</strong>（基因附近）= MR首选</td>
+        </tr>
+    </table>
+    <p><strong>cis-pQTL vs trans-pQTL：</strong>cis-
+        位于编码基因附近（±500kb~1Mb），因为靠近"源头"，通过其他通路影响疾病的可能性较小——水平多效性风险更低。trans-
+        位于远处染色体区域，可能通过复杂的生物学网络间接发挥作用——多效性风险较大。Yao等人的卒中MR研究仅使用每个蛋白的<strong>leading
+            cis-pQTL</strong>作为工具变量。</p>
+    <p><strong>跨种族数据的价值——一个生动的教训：</strong>ALDH2 基因的功能缺失突变 rs671 几乎只在东亚人群中有较高频率（MAF
+        ~20-30%）。在Yao等人的研究中，ALDH2
+        是东亚人群中最强的卒中因果信号（OR=1.60）。但这个靶点在欧洲人群中无法验证——因为该变异频率极低。如果只研究欧洲人群，这个效应最强的卒中靶点将完全遗漏。
+    </p>
+    <div class="ref">📖 详细解读：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao
+        (<span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span>)</a>
+        §2.1-2.2 | <a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR Primer)</a>
+        §2 |
+        <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson (MR-CVD)</a> §7
+        | <a
+                href="basic_bio_knowledge.html">基础生物学 → GWAS / pQTL / LD</a></div>
+</div>
+<div class="slide">
+    <h3>6. 支柱三：多工具变量 MR 的统计工具箱<span class="q">核心问题：有多个SNP时，如何综合它们的信息？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>IVW（逆方差加权法）是主力引擎——统计功效最强。但"绝不能只有
+        IVW"——稳健的
+        MR 研究必须同时运行 MR-Egger、加权中位数、MR-PRESSO 等敏感性分析。当所有方法方向一致时，因果推断的可信度最高。
+    </div>
+    <table>
+        <tr>
+            <th>方法</th>
+            <th>原理</th>
+            <th>优势</th>
+            <th>劣势</th>
+        </tr>
+        <tr>
+            <td><strong>Wald Ratio</strong></td>
+            <td>单个SNP：β<sub>GY</sub> ÷ β<sub>GX</sub></td>
+            <td style="color:#27ae60">最直观</td>
+            <td style="color:#e74c3c">仅适用于单工具变量</td>
+        </tr>
+        <tr>
+            <td><strong>IVW（逆方差加权）</strong></td>
+            <td>多个Wald比值的加权元分析</td>
+            <td style="color:#27ae60">统计功效最强</td>
+            <td style="color:#e74c3c">对多效性敏感——要求所有SNP都是有效工具</td>
+        </tr>
+        <tr>
+            <td><strong>MR-Egger 回归</strong></td>
+            <td>回归截距项检验+校正定向多效性</td>
+            <td style="color:#27ae60">可检测方向性多效性</td>
+            <td style="color:#e74c3c">功效较低；对异常值敏感</td>
+        </tr>
+        <tr>
+            <td><strong>加权中位数</strong></td>
+            <td>取各SNP估计值的中位数</td>
+            <td style="color:#27ae60">即使50%的SNP无效，仍可给出一致估计</td>
+            <td style="color:#e74c3c">对SNP的增减敏感</td>
+        </tr>
+        <tr>
+            <td><strong>MR-PRESSO</strong></td>
+            <td>检测并移除多效性异常值</td>
+            <td style="color:#27ae60">可识别"坏工具"</td>
+            <td style="color:#e74c3c">存在多个无效工具时假阳性率高</td>
+        </tr>
+    </table>
+    <p><strong>典型双样本MR分析流程：</strong>① GWAS中选择独立SNP（P < 5×10⁻⁸, LD clumping r²<0.001, F>10）→ ②
+        提取暴露+结局GWAS的β和SE → ③ 协调等位基因方向 → ④ IVW主分析 → ⑤ 敏感性分析（MR-Egger + 加权中位数 +
+        MR-PRESSO）→ ⑥ 异质性检验（Cochran Q）→ ⑦ 留一法（逐一剔除每个SNP看结果是否被单个SNP驱动）。</p>
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> §4 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §9
+    </div>
+</div>
+<div class="slide">
+    <h3>7. 进阶方法：从"解开单个暴露"到"解开暴露网络"<span
+            class="q">核心问题：如果BMI和血压同时影响冠心病，MR如何区分各自的独立效应？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>多变量 MR 可以在遗传层面"解耦"高度相关的风险因素，帮助识别最根本的因果驱动因素。经典案例——LDL-C
+        vs apoB 之争：单变量 MR 中两者都与冠心病因果相关，但多变量 MR 中只有 apoB 保持稳健，说明 apoB
+        才是更"根本"的致动脉粥样硬化实体。
+    </div>
+    <p><strong>多变量 MR 的原理：</strong>同时将遗传变异与<strong>多个风险因素</strong>的关联纳入同一个模型。这类似于做"多重线性回归"——在调整了其他暴露的遗传效应后，看某个暴露是否仍有独立的因果效应。
+    </p>
+    <p><strong>中介 MR（两步法）：</strong>定量回答"暴露 X 的因果效应有多少比例是通过中介 M 发挥的？"Step 1 = X→M
+        的因果效应。Step 2 = M→Y 的因果效应。总效应 = 直接效应 +
+        间接效应（通过M）。在Larsson的CVD综述中，BMI→冠心病的效应有27%通过SBP介导，41%通过2型糖尿病倾向介导。</p>
+    <p><strong>两种互补范式：</strong></p>
+    <table>
+        <tr>
+            <th>范式</th>
+            <th>论文</th>
+            <th>逻辑</th>
+        </tr>
+        <tr>
+            <td><strong>广度优先</strong></td>
+            <td>Larsson MR-CVD</td>
+            <td>102种暴露 × 6种CVD → 筛选谁有因果效应</td>
+        </tr>
+        <tr>
+            <td><strong>深度优先</strong></td>
+            <td>Yoshiji 两步MR</td>
+            <td>单一因果链（BMI→COL6A3/endotrophin→CAD）的精密量化</td>
+        </tr>
+    </table>
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> §5 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §10 | <a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+        (两步MR)</a> §2
+    </div>
+</div>
+<div class="slide">
+    <h3>8. 核心陷阱：多效性、LD 与共定位——MR 的"阿喀琉斯之踵"<span
+            class="q">核心问题：MR 什么时候会给出错误的答案？如何防止？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>MR 失败的最常见原因是水平多效性——遗传变异通过不涉及暴露的通路影响结局。共定位分析（coloc）是
+        MR 的"守门人"——通过区分 H3（两个独立因果变异因LD伪造成同一信号）和 H4（真正的共享因果变异），在因果推断的最后一关拦截虚假发现。
+    </div>
+    <p><strong>水平多效性 vs 垂直多效性：</strong>这是区分 MR 结论是否有效的<strong>最关键概念</strong>。</p>
+    <ul>
+        <li><strong>水平多效性（= 坏的）：</strong>SNP → 暴露 AND SNP → 另一通路 → 结局。SNP
+            通过<strong>不涉及暴露的独立通路</strong>影响结局 → 违反排他性 → MR 估计有偏。例如：一个 BMI 相关的
+            SNP
+            同时独立地影响吸烟行为——那么它对冠心病的效应就不完全是通过 BMI。
+        </li>
+        <li><strong>垂直多效性（= 无害的）：</strong>SNP → 暴露 → 中介 → 结局。这是同一因果链上的下游效应 →
+            <strong>不违反排他性</strong>。例如：SNP→BMI→血压→冠心病——血压是
+            BMI→冠心病因果链上的一个中间环节，这不影响 BMI MR 的有效性。
+        </li>
+    </ul>
+    <p><strong>LD（连锁不平衡）的双刃剑：</strong></p>
+    <table>
+        <tr>
+            <th>面</th>
+            <th>机制</th>
+            <th>影响</th>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">积极</td>
+            <td>相邻SNP"组团行动"→ 测一个标签SNP就代表整个区域</td>
+            <td>GWAS芯片只需50-200万SNP就能覆盖约80%的常见变异</td>
+        </tr>
+        <tr>
+            <td style="background:#fadbd8;">消极</td>
+            <td>两个独立因果变异因LD被"绑定"在一起</td>
+            <td>Coloc H3假阳性——统计上看是同一信号，生物学上完全不相关</td>
+        </tr>
+    </table>
+    <p><strong>Coloc 共定位——H3 vs H4 的区分：</strong>PP4（后验概率H4）> 0.7 = 共享因果变异的强证据（H4 的概率是 H3
+        的
+        2.3 倍以上）。Yao 等人的 10 个 IS 因果蛋白中，9 个 PP4 > 0.7（其中 5 个 > 0.95），唯一例外是
+        ABO（PP4=0.669）。这也是为什么
+        ABO 被审慎地排除在了"强证据因果靶点"之外。</p>
+    <div class="ref">📖 详细解读：<a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §5-6 | <a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a>
+        §2.4（含H3详解和数值示例）| <a href="basic_bio_knowledge.html">基础生物学 → LD</a></div>
+</div>
+
+
+<div class="slide">
+    <h3>8+. 图解：多效性的类型（Fig. 3, Sanderson 2022）<span class="q">核心问题：原文 Fig. 3 用 6 个 DAG 展示了多效性的哪些类型？哪些会偏倚、哪些不会？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>原文 Fig. 3 用 6 个有向无环图（DAG）完整刻画了 MR
+        中多效性的全部场景。<strong>只有 b（水平多效性·无偏）和 d（垂直多效性）不引入偏倚</strong>；a、c、e、f 均违反 IV2 或
+        IV3，会导致 MR 估计偏倚。区分 a（有偏水平多效性）与 d（垂直多效性）是 MR 分析中最关键的概念判断——前者违反排他性致偏，后者是因果链中介不违反排他性。
+    </div>
+
+    <div class="fig3-grid">
+        <div class="fig3-cell">
+            <img alt="Panel a 水平多效性（有偏）" src="images/fig3_a.jpg">
+            <div class="fig3-label"><strong>a · 水平多效性（有偏）</strong></div>
+            <p>G 通过两条独立通路影响 Y：G→X→Y 与 G→C→Y。C 是另一表型，不在暴露通路上 → 违反排他性(IV3)，MR
+                估计有偏。最需警惕的"不纯"工具。</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel b 水平多效性（无偏）" src="images/fig3_b.jpg">
+            <div class="fig3-label"><strong>b · 水平多效性（无偏）</strong></div>
+            <p>G 虽与 C 相关，但 C 不在 G→Y 的因果通路上（仅统计相关，非因果中介）。MR 估计无偏。</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel c LD混淆" src="images/fig3_c.jpg">
+            <div class="fig3-label"><strong>c · LD 混淆</strong></div>
+            <p>G<sub>1</sub> 是 X 的工具，却与 G<sub>2</sub> 处于连锁不平衡(LD)。G<sub>2</sub> 经独立通路影响 Y，造成的偏倚与
+                a 在统计上无法区分——这正是 coloc 必须区分 H3 与 H4 的原因。</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel d 垂直多效性" src="images/fig3_d.jpg">
+            <div class="fig3-label"><strong>d · 垂直多效性</strong></div>
+            <p>C 位于 G→X→Y 因果链上（中介变量，可在 X 之前或之后）。不违反排他性，MR 仍然有效——这正是中介 MR
+                分析的研究对象。</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel e 主表型误设" src="images/fig3_e.jpg">
+            <div class="fig3-label"><strong>e · 主表型误设</strong></div>
+            <p>G 实际主要关联 C，却误把 X 当作主表型。C→Y 的替代通路引入偏倚。Steiger 过滤可剔除这类"主表型搞反"的工具。</p>
+        </div>
+        <div class="fig3-cell">
+            <img alt="Panel f 相关多效性" src="images/fig3_f.jpg">
+            <div class="fig3-label"><strong>f · 相关多效性</strong></div>
+            <p>G 同时关联暴露与暴露-结局的混杂因素，多效性强度与工具-暴露关联强度相关。极难检测，会破坏 MR-Egger 的 InSIDE
+                假设。</p>
+        </div>
+    </div>
+    <p style="font-size:0.82em;color:#7f8c8d;margin-top:10px;line-height:1.6;">
+        图例：G=遗传变异，X=暴露，Y=结局，U=未测量混杂，C=另一表型。图源：Sanderson et al. (2022) <em>Nat Rev Methods
+        Primers</em> Fig. 3（按原文 2×3 布局还原）。</p>
+
+    <div class="ref">详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR
+        Primer)</a> 3（多效性详解）| <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> 5 | 图片出处：Sanderson et al. (2022) Fig. 3
+    </div>
+</div>
+
+<div class="slide">
+    <h3>8++. 补充：MR 的其他前提假定<span class="q">核心问题：除三大核心假设外，MR 还依赖哪些隐含前提？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>IV 三大假设是 MR 的<strong>必要但非充分</strong>条件。MR 还依赖六项<strong>隐含前提</strong>——其中<strong>基因-环境效应等价</strong>对临床转化至关重要：遗传改变暴露的效应 ≠ 药物靶向同一暴露的效应。</div>
+
+    <table>
+        <tr><th>隐含假定</th><th>含义</th><th>违反后果</th><th>应对</th></tr>
+        <tr>
+            <td><strong>基因-环境效应等价</strong><br>(Gene-Environment Equivalence)</td>
+            <td>遗传变异改变暴露的效应量 = 环境/药物干预的效应量。例：基因升 BMI 1 kg/m&sup2; 对 CVD 的影响 ≈ 节食升 BMI 1 kg/m&sup2;</td>
+            <td style="color:#e74c3c">MR 效应量不可直接外推为药物剂量——遗传效应终生温和，药物效应急性且幅度更大。</td>
+            <td>用药物靶点 MR（cis-变异）校准遗传与药理效应。</td>
+        </tr>
+        <tr>
+            <td><strong>无发育补偿</strong><br>(No Canalization)</td>
+            <td>终生遗传暴露未触发代偿（如天生低 LDL-C → LDL 受体表达上调），使表型对外部干预的反应与遗传效应一致。</td>
+            <td style="color:#e74c3c">MR 可能<strong>高估</strong>干预效果——身体已适应终生遗传状态。</td>
+            <td>对比 KO 小鼠表型与药物靶点 MR；区分“遗传因果”与“可干预因果”。</td>
+        </tr>
+        <tr>
+            <td><strong>线性与同质性</strong><br>(Linearity &amp; Homogeneity)</td>
+            <td>因果效应在所有暴露水平和亚组中恒定。Wald Ratio/IVW 估计的是<strong>平均因果效应</strong>。</td>
+            <td style="color:#f39c12">U/J 型/阈值 → MR 仅反映工具覆盖范围的平均；亚组异质性 → 总体不代表个体。</td>
+            <td>非线性 MR；分层 MR 按年龄/性别/种族。</td>
+        </tr>
+        <tr>
+            <td><strong>无群体分层</strong><br>(No Population Stratification)</td>
+            <td>GWAS 关联不由祖先差异驱动。</td>
+            <td style="color:#e74c3c">SNP-暴露与 SNP-结局同时被群体结构混淆 → MR 偏倚。</td>
+            <td>调整主成分(PCs)；家系内 MR；跨种族复制。</td>
+        </tr>
+        <tr>
+            <td><strong>无选择偏倚</strong><br>(No Selection / Collider Bias)</td>
+            <td>样本代表目标人群；参与研究不是 collider（同时受 G 和 U 影响）。</td>
+            <td style="color:#e74c3c">选择性入组破坏 G-U 独立性 → 违反 IV2。典型：只研究存活者。</td>
+            <td>全人群代表性队列；多种样本来源敏感性分析。</td>
+        </tr>
+        <tr>
+            <td><strong>无 dynastic 效应</strong><br>(No Dynastic Effects)</td>
+            <td>父母基因型不通过家庭环境间接影响子代表型。</td>
+            <td style="color:#f39c12">父母遗传效应混杂 MR。例：母亲 BMI 基因 → 孕期营养 → 子代代谢，不经子代 BMI。</td>
+            <td>家系内 MR——比较兄弟姐妹遗传差异。</td>
+        </tr>
+    </table>
+
+    <p><strong>实践核查清单：</strong>阅读 MR 论文时，除 IV 三大假设外，另问：① 基因效应与药效是否等价？② 是否考虑了非线性/异质性？③ 样本有无选择偏倚？④ 是否排除了 dynastic 效应？</p>
+
+    <div class="ref">📖 详细解读：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson (MR Primer)</a> §6 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson (MR-CVD)</a> §16 | <a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a> §5</div>
+</div>
+
+<div class="act-header"><h2>第三幕：如何规范地报告 MR（2张）</h2>
+
+    <div class="sub">STROBE-MR —— MR 研究的及格线</div>
+</div>
+
+<div class="slide">
+    <h3>9. STROBE-MR 声明：MR 研究的"及格线"<span
+            class="q">核心问题：作为读者，如何系统评估一篇 MR 论文的质量？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>STROBE-MR 提供了 20 条检查清单，覆盖 MR
+        研究从标题到讨论的全部关键环节。它不是"怎么做出好的MR"的方法指南（那是MR
+        Primer的角色），而是"报告MR时应该呈现什么信息"的规范——让读者能够判断这项 MR 研究是否可信。
+    </div>
+    <p><strong>六大领域概览：</strong></p>
+    <table>
+        <tr>
+            <th>领域</th>
+            <th>条目数</th>
+            <th>最关键要求</th>
+        </tr>
+        <tr>
+            <td>标题与摘要（Title & Abstract）</td>
+            <td>条目1</td>
+            <td>在标题/摘要中明确提及"孟德尔随机化"</td>
+        </tr>
+        <tr>
+            <td>引言（Introduction）</td>
+            <td>条目2-3</td>
+            <td>阐明科学背景、为何选择MR这个研究设计</td>
+        </tr>
+        <tr>
+            <td>方法——数据来源</td>
+            <td><strong>条目4</strong></td>
+            <td>详细描述每个GWAS数据源（样本量、人群、表型定义、基因分型平台）——这是可复现性的关键</td>
+        </tr>
+        <tr>
+            <td>方法——假设与统计</td>
+            <td>条目5-9</td>
+            <td><strong>条目8</strong>：工具变量选择标准（P值阈值、LD标准、F统计量）<br><strong>条目9</strong>：统计方法描述（主分析+敏感性分析）
+            </td>
+        </tr>
+        <tr>
+            <td>结果（Results）</td>
+            <td>条目10-13</td>
+            <td><strong>条目13</strong>：报告所有敏感性分析的结果——"IVW是主力，但不能只有IVW"</td>
+        </tr>
+        <tr>
+            <td>讨论（Discussion）</td>
+            <td>条目14-17</td>
+            <td>条目16：审慎使用因果语言；条目17：讨论可推广性</td>
+        </tr>
+    </table>
+    <p><strong>实际使用价值：</strong>当审稿/阅读一篇 MR 论文时，可将 STROBE-MR 的 20
+        个条目作为"审计清单"逐一对照。例如，检查它是否报告了工具变量的
+        F 统计量（关联性假设）、是否做了 MR-Egger 和留一法（敏感性分析）、是否讨论了多效性的可能影响（排他性假设）。</p>
+    <div class="ref">📖 详细解读：<a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR
+        声明</a> §4（20条目逐条详解 + 每条目的临床上下文）
+    </div>
+</div>
+<div class="slide">
+    <h3>10. 如何用 STROBE-MR 审计一篇真实的 MR 论文？<span
+            class="q">核心问题：用刚学的清单，现场解剖一篇 MR 论文</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>以 Yao（2025）卒中蛋白组 MR 为解剖对象。它在条目4（数据来源透明）、条目8（cis-pQTL
+        选择标准严格）、条目13（种族间交叉验证+共定位分析）上表现优异；但部分 colocalization 仅对MR显著蛋白执行（可能遗漏某些因果靶点），且
+        trans-pQTL 未被系统探索（作者已在局限性中充分讨论）。
+    </div>
+    <table>
+        <tr>
+            <th>评估维度</th>
+            <th>Yao (2025) 的表现</th>
+            <th>评级</th>
+        </tr>
+        <tr>
+            <td>条目4：数据来源</td>
+            <td>详细描述了CKB、UKB、BioBank Japan、GIGASTROKE等所有数据源的样本量、人群、表型定义</td>
+            <td style="color:#27ae60">优秀</td>
+        </tr>
+        <tr>
+            <td>条目8：IV选择</td>
+            <td>只用lead cis-pQTL（F>30），给出Bonferroni显著性阈值（P<1.7×10⁻¹¹），LD参考面板明确</td>
+            <td style="color:#27ae60">优秀</td>
+        </tr>
+        <tr>
+            <td>条目9+13：统计方法+敏感性</td>
+            <td>MR主分析（Wald ratio）+ coloc（colo+SuSiE）+ 中介 + 跨种族交叉验证 + 新GWAS复制（MEGASTROKE）</td>
+            <td style="color:#27ae60">非常全面</td>
+        </tr>
+        <tr>
+            <td>条目16：因果语言</td>
+            <td>使用"genetically predicted levels were causally associated"，措辞审慎</td>
+            <td style="color:#27ae60">适当</td>
+        </tr>
+        <tr>
+            <td>条目17：局限性讨论</td>
+            <td>系统讨论了7条局限性（CKB蛋白遗传工具少、cis-pQTL定义差异、仅用lead SNP、样本有3.5%重叠等）</td>
+            <td style="color:#27ae60">全面</td>
+        </tr>
+    </table>
+    <div class="ref">📖 详细解读：<a
+            href="../papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR
+        声明</a> §4 + <a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (<span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span>)</a>
+        §5（局限性讨论）
+    </div>
+</div>
+<div class="act-header"><h2>第四幕：应用案例（4张）</h2>
+    <div class="sub">MR 如何回答真实的生物学和转化医学问题</div>
+</div>
+<div class="slide">
+    <h3>11. 案例一：CVD 风险因素的 MR 全景扫描<span
+            class="q">核心问题：MR 究竟告诉我们哪些因素真正导致心血管疾病？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>MR
+        在心血管领域同时完成了两件大事——确认了一批传统风险因素的因果地位（BMI/SBP/apoB/Lp(a)/吸烟），也推翻了一些长期的错误信念（HDL-C
+        无独立保护效应、适度饮酒不保护心脏、咖啡不降低CVD风险）。
+    </div>
+    <table>
+        <tr>
+            <th>因素</th>
+            <th>MR 因果证据</th>
+            <th>关键教训</th>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">BMI / 肥胖</td>
+            <td style="background:#d5f5e3;">强证据：与全部14种CVD风险增加相关</td>
+            <td>Larsson荟萃分析的最一致发现之一</td>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">SBP（收缩压）</td>
+            <td style="background:#d5f5e3;">强证据：大多数CVD的因果危险因素</td>
+            <td>降压的获益有遗传学支撑</td>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">apoB</td>
+            <td style="background:#d5f5e3;">强证据：多变量MR中最稳健的致动脉粥样硬化因子</td>
+            <td>可能比LDL-C更好的治疗靶点</td>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">Lp(a)</td>
+            <td style="background:#d5f5e3;">强证据：IV解释>60%方差，效应独立于apoB</td>
+            <td>MR驱动了Lp(a)降低疗法的临床试验</td>
+        </tr>
+        <tr>
+            <td style="background:#fadbd8;">HDL-C</td>
+            <td style="background:#fadbd8;"><strong>被推翻</strong>：调整apoB后无独立因果效应</td>
+            <td>解释了CETP抑制剂的失败——靶向HDL-C的RCT全部失败，MR预见到了</td>
+        </tr>
+        <tr>
+            <td style="background:#fadbd8;">适度饮酒</td>
+            <td style="background:#fadbd8;"><strong>被推翻</strong>：J型曲线是混杂假象</td>
+            <td>中国CKB的ALDH2/ADH1B MR显示饮酒与IS风险呈连续正相关——"没有安全的饮酒量"</td>
+        </tr>
+        <tr>
+            <td style="background:#fef9e7;">身体活动</td>
+            <td style="background:#fef9e7;">不确定：MR功效不足</td>
+            <td>阴性 ≠ 无因果——工具变量仅解释0.1-0.24%的变异，几乎不可能检测到弱至中等的效应</td>
+        </tr>
+    </table>
+    <div class="ref">📖 详细解读：<a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §12（传统因素）§13（生活方式——吸烟/饮酒/咖啡/运动/睡眠）
+    </div>
+</div>
+<div class="slide">
+    <h3>12. 案例二：药物靶点 MR——在临床试验之前"预览"药物效果<span
+            class="q">核心问题：能否用遗传数据预测一个药物的疗效和副作用？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>药物靶点 MR 使用药物靶点编码基因附近的 cis
+        变异来模拟药理扰动——在投入数亿美元临床试验之前，用几乎零成本的遗传数据完成一次"虚拟临床试验"。MR 已经成功预测了
+        PCSK9 抑制剂和他汀类药物的 RCT 结果。
+    </div>
+    <p><strong>原理：</strong>大多数药物通过靶向蛋白质发挥作用，而蛋白质由基因编码 → 该基因区域的 cis
+        变异可模拟"抑制该蛋白"的药理效应。MR 分析检验：遗传模拟的药物靶点扰动 → 是否降低疾病风险？→ 是否有隐藏的不良反应？
+    </p>
+    <table>
+        <tr>
+            <th>药物靶点</th>
+            <th>MR预测的疗效</th>
+            <th>MR预测的不良反应</th>
+            <th>与RCT的一致性</th>
+        </tr>
+        <tr>
+            <td><strong>HMGCR</strong>（他汀类靶点）</td>
+            <td>降低冠心病、缺血性卒中、腹主动脉瘤</td>
+            <td>脑出血风险增加</td>
+            <td>一致</td>
+        </tr>
+        <tr>
+            <td><strong>PCSK9</strong>（PCSK9抑制剂靶点）</td>
+            <td>降低冠心病、腹主动脉瘤</td>
+            <td>2型糖尿病风险增加</td>
+            <td>一致</td>
+        </tr>
+        <tr>
+            <td><strong>NPC1L1</strong>（依折麦布靶点）</td>
+            <td>降低冠心病</td>
+            <td>胆石症风险增加</td>
+            <td>一致</td>
+        </tr>
+        <tr>
+            <td><strong>LPA</strong>（Lp(a)降低疗法靶点）</td>
+            <td>降低多种CVD（冠心病、主动脉瓣狭窄、外周动脉疾病）</td>
+            <td>可能增加阿尔茨海默病风险（待确认）</td>
+            <td>RCT正在进行中</td>
+        </tr>
+    </table>
+    <p><strong>Lp(a) 是药物靶点 MR 的典范：</strong>强工具变量（LPA位点解释>60%的变异）→ 广泛的CVD效应 →
+        独立于apoB（多变量MR确认）→ MR-PheWAS筛查安全性（UK Biobank 40万人, 1081种结局）→ 支持推进临床试验。</p>
+    <div class="ref">📖 详细解读：<a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §14（药物靶点MR）§15（药物重定位）
+    </div>
+</div>
+<div class="slide">
+    <h3>13. 案例三：蛋白质组范围 MR——从3000种蛋白中筛出10个卒中靶点<span
+            class="q">核心问题：如何在一项研究中同时筛选三千个可能的药物靶点？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>Yao 等人的研究是 MR 方法学的"满级装备展示"——双种族设计 ×
+        2923蛋白
+        × cis-pQTL × MR+coloc × 中介 × PheWAS × KO小鼠 × DrugBank。最终从三千种蛋白中筛选出 10 个 IS 因果蛋白，其中
+        6
+        个是全新药物靶点候选。
+    </div>
+    <p><strong>研究设计（8步管道）：</strong></p>
+    <ol>
+        <li>CKB（东亚n=3977）和UKB（欧洲n=34557）中测量2923种血浆蛋白（Olink PEA平台）</li>
+        <li>GWAS识别cis-pQTL：CKB中1159个蛋白、UKB中1954个蛋白有遗传工具</li>
+        <li>两样本MR（种族特异性）：EAS人群（22,664 IS病例）、EUR人群（62,100 IS病例）</li>
+        <li>Coloc共定位（coloc+SuSiE）：确认H4共享因果变异</li>
+        <li>中介分析：蛋白→SBP/LDL-C/BMI/T2D/AF→卒中——其中FGF5的效应77%通过SBP介导</li>
+        <li>PheWAS：筛查555种疾病+642种表型中的脱靶信号</li>
+        <li>KO小鼠：查询IMPC数据库验证基因敲除表型</li>
+        <li>DrugBank+OpenTargets：评估可成药性</li>
+    </ol>
+    <p><strong>10个IS因果蛋白的分类：</strong></p>
+    <table>
+        <tr>
+            <th>类别</th>
+            <th>蛋白</th>
+            <th>意义</th>
+        </tr>
+        <tr>
+            <td style="background:#d5f5e3;">已知卒中靶点</td>
+            <td>F11</td>
+            <td>F11抑制剂（abelacimab）正在II-III期卒中试验中——MR提供了遗传学支持</td>
+        </tr>
+        <tr>
+            <td style="background:#fdebd0;">可重利用</td>
+            <td>ALDH2, MMP12</td>
+            <td>已有针对其他疾病的药物（如disulfiram/ALDH2抑制剂），可重新用于卒中</td>
+        </tr>
+        <tr>
+            <td style="background:#d6eaf8;"><strong>全新靶点</strong></td>
+            <td><strong>PROCR, GRK5, FGF5, FURIN, KIAA0319, TMPRSS5</strong></td>
+            <td>无任何已知药物——代表全新的药物发现机会</td>
+        </tr>
+        <tr>
+            <td style="background:#fadbd8;">不可成药</td>
+            <td>ABO</td>
+            <td>靶向ABO可能改变血型，PP4=0.669也未达强证据阈值</td>
+        </tr>
+    </table>
+    <div class="ref">📖 详细解读：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao
+        (<span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span>)</a>
+        §2-4（方法全景+10蛋白深度解读）
+    </div>
+</div>
+<div class="slide">
+    <h3>14. 案例四：两步 MR——追踪一条完整的因果链<span
+            class="q">核心问题：如果MR发现了一个因果蛋白，如何验证它确实是因果链上的一环？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>Yoshiji 展示了 MR
+        的"深度优先"范式——从3000+种蛋白中逐步收敛至单一因果蛋白COL6A3/endotrophin，并通过表观基因组学的五步证据链为"统计因果"提供了"生物学可解释性"。
+    </div>
+    <p><strong>两步MR设计：</strong>Step 1 = BMI（暴露GWAS）→ 循环蛋白（中介pQTL）→ 筛选BMI因果的蛋白。Step 2 = 这些蛋白
+        →
+        CAD/卒中/CVD（结局GWAS）→ 筛选疾病因果的蛋白。两步的交集 = 既受BMI调控又因果影响CVD的蛋白。</p>
+    <p><strong>从3000到1的收敛过程：</strong>3283种循环蛋白（SomaScan平台）→ 30种与BMI的遗传工具显著相关的蛋白 →
+        3种通过Step 2筛选的蛋白 →
+        1种经过共定位、MVMR和外部复制验证的蛋白：<strong>COL6A3来源的endotrophin</strong>。
+    </p>
+    <p><strong>表观基因组学五步证据链（Yoshiji §5.3）：</strong></p>
+    <ol>
+        <li>GWAS定位：rs11677932 是C-COL6A3的lead cis-pQTL</li>
+        <li>ATAC-seq：该区域在脂肪组织、冠状动脉、主动脉中呈开放染色质状态</li>
+        <li>ChIP-seq：H3K4me3（活性启动子）和H3K27ac（活性增强子）在脂肪和动脉组织中高度富集</li>
+        <li>转录因子预测：rs11677932可能影响MEF2B的结合——MEF2家族在肌肉和脂肪细胞分化中起关键作用</li>
+        <li>整合结论：rs11677932不是"随机的统计噪音"——它有分子机制支持</li>
+    </ol>
+    <p><strong>与Yao的范式对比：</strong></p>
+    <table>
+        <tr>
+            <th>维度</th>
+            <th>Yao（广度优先）</th>
+            <th>Yoshiji（深度优先）</th>
+        </tr>
+        <tr>
+            <td>蛋白数量</td>
+            <td>2923（Olink）</td>
+            <td>3283（SomaScan）</td>
+        </tr>
+        <tr>
+            <td>疾病</td>
+            <td>缺血性卒中</td>
+            <td>冠心病</td>
+        </tr>
+        <tr>
+            <td>核心方法</td>
+            <td>MR+coloc+多重下游</td>
+            <td>两步MR+coloc+表观基因组</td>
+        </tr>
+        <tr>
+            <td>产出</td>
+            <td>10个因果蛋白分类</td>
+            <td>1个因果蛋白的完整因果链</td>
+        </tr>
+        <tr>
+            <td>下游验证</td>
+            <td>PheWAS+KO小鼠+DrugBank</td>
+            <td>ATAC-seq+ChIP-seq+TF预测</td>
+        </tr>
+    </table>
+    <div class="ref">📖 详细解读：<a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+        (两步MR)</a> §2-6（完整管道+五步证据链详解）
+    </div>
+</div>
+<div class="act-header"><h2>第五幕：全流程解剖——MR 药物靶点发现的完整管道（3张）🆕</h2>
+    <div class="sub">将前21张幻灯片中分散讲解的所有概念串联为一个可执行的端到端流程</div>
+</div>
+<div class="slide">
+    <h3>15. 全流程解剖（上）：从疾病名称到候选靶点——数据获取与因果筛选<span class="q">核心问题：如果我明天想用 MR 为某个疾病找新药靶点，第一步该做什么？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>整个 MR
+        药物靶点发现管道可以分为两大阶段。第一阶段（因果筛选）解决"哪些蛋白可能因果性地影响疾病"——从疾病名称开始，经过
+        GWAS 数据获取、pQTL 工具变量选择、两样本 MR、共定位分析，最终产出满足三重标准（MR显著 + coloc强证据 +
+        种族间方向一致）的因果蛋白候选列表。
+    </div>
+
+    <div style="background:#f7f9fc; border:1px solid #aed6f1; border-radius:8px; padding:16px 20px; margin:14px 0;">
+        <p style="font-weight:700; color:#1a5276; margin-bottom:10px;">📍 第一阶段管道（共6步）</p>
+        <table style="margin:0;">
+            <tr>
+                <th style="width:8%;">步骤</th>
+                <th style="width:25%;">操作</th>
+                <th style="width:15%;">使用的工具/数据</th>
+                <th style="width:12%;">关键标准</th>
+                <th style="width:40%;">来自哪篇论文</th>
+            </tr>
+            <tr>
+                <td><strong>①</strong></td>
+                <td><strong>确定疾病 + 获取 GWAS</strong></td>
+                <td>暴露GWAS（如CKB/UKB pQTL）<br>结局GWAS（如GIGASTROKE IS）</td>
+                <td>人群匹配<br>无样本重叠</td>
+                <td>Sanderson §2 / Larsson §7<br>（双样本MR设计要求）</td>
+            </tr>
+            <tr>
+                <td><strong>②</strong></td>
+                <td><strong>识别 cis-pQTL</strong></td>
+                <td>蛋白GWAS汇总统计<br>LD参考面板</td>
+                <td>P < 1.7×10⁻¹¹<br>±500kb~1Mb<br>LD clumping r²<0.001<br>F > 10</td>
+                <td>Yao §2.2 / Sanderson §3<br>（工具变量选择标准）</td>
+            </tr>
+            <tr>
+                <td><strong>③</strong></td>
+                <td><strong>执行两样本 MR</strong></td>
+                <td>Wald ratio（单SNP）<br>IVW（多SNP元分析）</td>
+                <td>以IVW为主分析</td>
+                <td>Sanderson §4 / Larsson §9<br>（Wald ratio→IVW方法）</td>
+            </tr>
+            <tr>
+                <td><strong>④</strong></td>
+                <td><strong>全套敏感性分析</strong></td>
+                <td>MR-Egger + 加权中位数<br>+ MR-PRESSO + 留一法</td>
+                <td>所有方法方向一致<br>Cochran Q无显著异质性<br>MR-Egger截距P>0.05</td>
+                <td>Sanderson §4 / Larsson §9<br>（敏感性分析流程）</td>
+            </tr>
+            <tr>
+                <td><strong>⑤</strong></td>
+                <td><strong>Coloc 共定位</strong></td>
+                <td>SuSiE精细定位<br>→ coloc PP.H4</td>
+                <td><strong>PP4 > 0.7</strong><br>（H4比H3至少更可能2.3倍）</td>
+                <td>Yao §2.4 / STROBE-MR §3.1<br>（coloc+SuSiE详解）</td>
+            </tr>
+            <tr>
+                <td><strong>⑥</strong></td>
+                <td><strong>种族间交叉验证</strong></td>
+                <td>EAS GWAS + EUR GWAS<br>各自独立MR分析</td>
+                <td>所有蛋白方向一致<br>（不要求都显著）</td>
+                <td>Yao §3.1-3.2<br>（种族间复制设计）</td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="font-weight:700; color:#1a5276;">🔑 第一阶段输出：</p>
+    <p>满足<strong>三重标准的因果蛋白列表</strong>：① MR 在至少一个人群中显著（FDR<0.05）；② coloc PP4 >
+        0.7（强证据共享因果变异）；③ EAS 和 EUR 中方向一致。Yao 论文中这一阶段从2923种蛋白中筛选出10种IS因果蛋白。
+    </p>
+
+    <div class="ref">📖 综合分析自：<a href="../papers/Sanderson_2022_Mendelian_randomization_zh.html">Sanderson
+        (MR
+        Primer)</a> §2-4 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+        (MR-CVD)</a> §7-9 | <a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a>
+        §2.1-2.4, §3.1-3.2
+    </div>
+</div>
+<div class="slide">
+    <h3>16. 全流程解剖（中）：从因果蛋白到药物靶点——下游验证与机制确认<span class="q">核心问题：MR 说这个蛋白因果——但如何证明它不是统计幻象，而是值得投入数亿美元开发药物？</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>第二阶段（下游验证）通过五层独立证据为第一阶段的统计因果推断提供生物学可信度——中介分析揭示因果通路、PheWAS筛查脱靶风险、组织表达确认生物学合理性、KO小鼠提供体内功能证据、药物数据库查询评估可成药性。只有通过全部五层验证的蛋白，才应被列为"高优先级药物靶点"。
+    </div>
+
+    <div style="background:#f7f9fc; border:1px solid #aed6f1; border-radius:8px; padding:16px 20px; margin:14px 0;">
+        <p style="font-weight:700; color:#1a5276; margin-bottom:10px;">📍 第二阶段管道（共5步）</p>
+        <table style="margin:0;">
+            <tr>
+                <th style="width:8%;">步骤</th>
+                <th style="width:25%;">操作</th>
+                <th style="width:15%;">使用的工具/数据</th>
+                <th style="width:12%;">关键标准</th>
+                <th style="width:40%;">来自哪篇论文</th>
+            </tr>
+            <tr>
+                <td><strong>⑦</strong></td>
+                <td><strong>中介分析</strong></td>
+                <td>两步MR（Product方法估计间接效应，Delta方法估计SE）</td>
+                <td>报告中介比例<br>判断主通路 vs 辅通路</td>
+                <td>Larsson §10 / Yoshiji §2<br>（中介MR方法论）<br>Yao §3.3（蛋白→SBP→卒中）</td>
+            </tr>
+            <tr>
+                <td><strong>⑧</strong></td>
+                <td><strong>PheWAS</strong></td>
+                <td>Human Genetic Evidence scores<br>555种疾病 + 642种表型</td>
+                <td>识别脱靶效应信号<br>（如靶向某蛋白可能<br>同时升高血糖）</td>
+                <td>Yao §3.4<br>（PheWAS下游验证）</td>
+            </tr>
+            <tr>
+                <td><strong>⑨</strong></td>
+                <td><strong>组织表达验证</strong></td>
+                <td>GTEx数据库<br>ATAC-seq + ChIP-seq</td>
+                <td>蛋白在疾病相关组织中表达<br>调控区域为常染色质（开放）<br>H3K4me3+H3K27ac双标记</td>
+                <td>Yoshiji §5.3<br>（表观基因组学五步证据链）<br>Yao §3.4（GTEx查询）</td>
+            </tr>
+            <tr>
+                <td><strong>⑩</strong></td>
+                <td><strong>KO 小鼠表型</strong></td>
+                <td>IMPC数据库<br>单基因敲除小鼠表型数据</td>
+                <td>敲除该基因的小鼠出现<br>预期的心血管/血液表型</td>
+                <td>Yao §3.5<br>（KO小鼠交叉验证）</td>
+            </tr>
+            <tr>
+                <td><strong>⑪</strong></td>
+                <td><strong>药物数据库查询</strong></td>
+                <td>DrugBank + OpenTargets</td>
+                <td>四分类：已知靶点 /<br>可重利用 / 全新 / 不可成药</td>
+                <td>Yao §3.5<br>（可成药性评估框架）</td>
+            </tr>
+        </table>
+    </div>
+
+    <p style="font-weight:700; color:#1a5276;">🔑 第二阶段输出：</p>
+    <p>每个因果蛋白的<strong>五维档案</strong>——因果通路（中介比例）、安全性（PheWAS脱靶信号）、生物学合理性（组织表达+表观基因组）、体内功能证据（KO小鼠表型）、可成药性（DrugBank/OpenTargets）。将蛋白分类为四个优先级：已知靶点（直接推进临床）、可重利用（推进II期）、全新靶点（需先做体外/体内功能验证）、不可成药（放弃或仅作生物标志物）。
+    </p>
+
+    <div class="ref">📖 综合分析自：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao
+        (卒中蛋白MR)</a>
+        §2.5, §3.3-3.5 | <a href="../papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji
+            (两步MR)</a> §5-7 | <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson
+            (MR-CVD)</a> §10, §14
+    </div>
+
+    <div class="key-box" style="margin-top:16px;">
+    <strong>🔍 深入理解：为什么 PheWAS 回答"安全性"？</strong>
+    <p>PheWAS 的核心逻辑是<strong>脱靶效应筛查</strong>——用同一个基因工具扫描所有其他表型。疗效 = 靶点对目标疾病的因果效应（MR 主分析），安全性 = 靶点对所有<em>其他</em>表型的因果效应（PheWAS）。经典案例：PCSK9 遗传变异降低 CHD 风险（疗效 ✓），但 PheWAS 发现同时增加 T2D 风险（安全性 ⚠️）——RCT 后来证实了这一预测。结果判断：PheWAS 干净 → 安全性初步通过；PheWAS 有信号 → 需结合组织表达和 KO 小鼠交叉印证。</p>
+    </div>
+
+    <div class="key-box" style="margin-top:8px;">
+    <strong>🔍 深入理解：为什么组织表达验证回答"生物学合理性"？</strong>
+    <p>MR 是统计推断，不能证明生物学基础。组织表达验证有三层递进逻辑：<strong>①位置对不对？</strong>GTEx 跨组织表达图谱——如果 PROCR 只在肝脏表达、在血管和脑中不表达，则"PROCR→卒中"缺少物理载体。<strong>②开关开了没有？</strong>ATAC-seq（染色质可及性）+ ChIP-seq H3K4me3/H3K27ac（活性启动子/增强子）——证明驱动蛋白的 SNP 在疾病相关组织中处于"活跃"而非"沉默"状态。SNP 落在异染色质区域 → 即使 MR 显著，更可能是 LD 搭车客（H3 假阳性）。<strong>③区分 LD 伪影</strong>——真实因果（PROCR 在动脉高表达 + 调控区开放）vs LD 伪影（PROCR 在血管中不表达，MR 信号来自隔壁基因）。</p>
+    </div>
+</div>
+<div class="slide">
+    <h3>17. 全流程解剖（下）：一个具体靶点的完整旅程——以 PROCR 为例<span
+            class="q">核心问题：用刚学的管道，跟踪一个真实靶点从GWAS信号到药物开发建议的完整旅程</span>
+    </h3>
+    <div class="key-box"><strong>核心信息：</strong>PROCR（内皮蛋白C受体）是 Yao 论文中"6个全新靶点"之一。它完美展示了
+        MR 靶点发现管道的全部11个步骤——从GWAS中的统计信号，经过层层验证，最终被判定为"值得优先推进体外和体内功能验证的高优先级全新靶点"。
+    </div>
+
+    <p><strong>PROCR 的完整旅程（11步全管道）：</strong></p>
+
+    <div style="background:#f0f7fb; border-radius:8px; padding:16px; margin:12px 0;">
+        <table style="margin:0;">
+            <tr>
+                <th style="width:8%;">步骤</th>
+                <th style="width:22%;">操作</th>
+                <th style="width:70%;">PROCR 的具体情况</th>
+            </tr>
+            <tr>
+                <td>①</td>
+                <td>疾病+GWAS</td>
+                <td>疾病=缺血性卒中（IS）；暴露GWAS=UKB PPP的PROCR pQTL；结局GWAS=GIGASTROKE EUR IS（62,100病例）</td>
+            </tr>
+            <tr>
+                <td>②</td>
+                <td>cis-pQTL识别</td>
+                <td>rsXXXX 是PROCR的leading cis-pQTL（UKB中F>45）</td>
+            </tr>
+            <tr>
+                <td>③</td>
+                <td>两样本MR</td>
+                <td>Wald ratio：遗传预测的每SD PROCR升高 → IS风险<strong>降低11%</strong>（OR=0.89, 95%CI
+                    0.85-0.94）🧬
+                    保护性蛋白
+                </td>
+            </tr>
+            <tr>
+                <td>④</td>
+                <td>敏感性分析</td>
+                <td>方向在EAS和EUR中一致；MEGASTROKE复制中保持名义显著</td>
+            </tr>
+            <tr>
+                <td>⑤</td>
+                <td>Coloc共定位</td>
+                <td><strong>PP4 = 0.991</strong> → H4证据极强：99.1%的概率是PROCR的同一个因果变异同时影响蛋白水平和卒中风险
+                </td>
+            </tr>
+            <tr>
+                <td>⑥</td>
+                <td>种族间交叉验证</td>
+                <td>方向在EAS中一致（虽未达EAS显著性阈值——CKB样本量较小）</td>
+            </tr>
+            <tr style="background:#fff3cd;">
+                <td>⑦</td>
+                <td>中介分析</td>
+                <td>PROCR→IS 的效应仅<strong>1%</strong>通过SBP介导 → PROCR主要通过<strong>非血压通路</strong>发挥保护作用（很可能与抗凝/细胞保护有关）
+                </td>
+            </tr>
+            <tr style="background:#fff3cd;">
+                <td>⑧</td>
+                <td>PheWAS</td>
+                <td>PROCR与心血管疾病、肾功能、人体测量表型相关 → 需关注潜在脱靶效应，尤其是肾脏功能</td>
+            </tr>
+            <tr style="background:#fff3cd;">
+                <td>⑨</td>
+                <td>组织表达验证</td>
+                <td>GTEx：PROCR在肾脏、脂肪组织和心血管系统中高表达 → 生物学上合理</td>
+            </tr>
+            <tr style="background:#fff3cd;">
+                <td>⑩</td>
+                <td>KO小鼠表型</td>
+                <td>IMPC：PROCR敲除小鼠出现<strong>造血表型异常</strong> → 进一步支持其在血液/血管生物学中的功能
+                </td>
+            </tr>
+            <tr style="background:#d5f5e3;">
+                <td>⑪</td>
+                <td>药物数据库</td>
+                <td>DrugBank/OpenTargets：<strong>当前没有直接靶向PROCR的药物</strong> → 全新靶点。<br>但PROC（蛋白C）激活剂3K3A-APC正在急性IS的II期试验中（NCT02222714），即将进入III期
+                    → PROCR激动剂具有明确的临床转化路径
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <p><strong>PROCR 靶点档案总结：</strong></p>
+    <table>
+        <tr>
+            <th>维度</th>
+            <th>评估</th>
+        </tr>
+        <tr>
+            <td>因果证据</td>
+            <td style="color:#27ae60;">极强（OR=0.89, PP4=0.991, 种族间方向一致）</td>
+        </tr>
+        <tr>
+            <td>作用机制</td>
+            <td style="color:#27ae60;">主要通过非血压通路（抗凝/细胞保护），SBP介导仅1%</td>
+        </tr>
+        <tr>
+            <td>安全性</td>
+            <td style="color:#f39c12;">需关注肾脏和造血系统的脱靶效应（PheWAS+KO小鼠提示）</td>
+        </tr>
+        <tr>
+            <td>可成药性</td>
+            <td style="color:#27ae60;">全新靶点，但PROC激活剂已有II期数据——提供了一条清晰的转化捷径</td>
+        </tr>
+        <tr>
+            <td>优先级</td>
+            <td style="color:#27ae60; font-weight:700;">高——推荐优先推进体外PROCR激动剂筛选和体内功能验证</td>
+        </tr>
+    </table>
+
+    <div class="ref">📖 综合分析自：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao
+        (卒中蛋白MR)</a>
+        §4（PROCR深度解读段）§3.1-3.5（全部下游验证分析）| 外部数据：DrugBank, OpenTargets, GTEx, IMPC
+    </div>
+</div>
+<div class="act-header"><h2>第六幕：未来展望（1张）</h2>
+    <div class="sub">更大的生物银行、更智能的 AI、更深的组学</div>
+</div>
+<div class="slide">
+    <h3>18. MR 的未来：更大的生物银行、更智能的 AI、更深的组学<span
+            class="q">核心问题：10 年后的 MR 研究是什么样子的？</span></h3>
+    <div class="key-box"><strong>核心信息：</strong>MR
+        的未来是三个维度的同时扩展——规模（更大、更多样化的生物银行提升功效和跨种族可推广性）、深度（多组学整合使因果解析从蛋白水平细化到通路和组织特异性水平）、智能（AI提供假设生成能力，MR提供因果约束——"LLM提出，MR验证"）。
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin:14px 0;">
+        <div style="background:#eaf2f8; border-radius:8px; padding:14px;">
+            <strong style="color:#2471a3; font-size:1.05em;">📊 规模</strong>
+            <ul style="margin:6px 0 0 0; padding-left:16px;">
+                <li>All of Us（美国百万人队列）</li>
+                <li>FinnGen（芬兰50万人）</li>
+                <li>CKB 二期（中国51万人追踪）</li>
+                <li>跨血统GWAS成为标准</li>
+                <li>功效不再是大瓶颈</li>
+            </ul>
+        </div>
+        <div style="background:#e8f8f5; border-radius:8px; padding:14px;">
+            <strong style="color:#1e8449; font-size:1.05em;">🔬 深度</strong>
+            <ul style="margin:6px 0 0 0; padding-left:16px;">
+                <li>蛋白质组+代谢组+转录组<br>三组学整合</li>
+                <li>从"这个蛋白有因果效应"<br>→"通过这个通路<br>在这个组织中发挥效应"</li>
+                <li>表观基因组学作为标准下游验证</li>
+            </ul>
+        </div>
+        <div style="background:#f4ecf7; border-radius:8px; padding:14px;">
+            <strong style="color:#6c3483; font-size:1.05em;">🤖 智能</strong>
+            <ul style="margin:6px 0 0 0; padding-left:16px;">
+                <li>ROBIN：LLM多智能体自主产生假设</li>
+                <li>LyMOI：GCN+LLM混合组学解读</li>
+                <li>MR为AI提供因果约束——<br><strong>"LLM提出，MR验证"</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <p><strong>AI + MR 的独特协同：</strong>LLM擅长从海量文献中综合知识并产生假设，但也可能产生幻觉（"自信地编造"不存在的关系）。MR提供了一种系统化的方法来验证这些AI生成的假设——在被LLM提出的大量候选靶点中，MR可以筛选出有遗传因果证据支持的那些。多模态基础模型（Cui
+        2025）代表了这一融合的终极愿景——将基因组学、蛋白质组学、影像学、临床记录统一到单一AI框架中，而MR嵌入其中作为因果推理引擎。
+    </p>
+
+    <p><strong>从"手工MR"到"自动化科学发现"的演化光谱：</strong></p>
+    <table>
+        <tr>
+            <th>阶段</th>
+            <th>方式</th>
+            <th>代表论文</th>
+        </tr>
+        <tr>
+            <td>1. 手工MR</td>
+            <td>人类科学家选择暴露、选择工具变量、运行分析、解读结果</td>
+            <td>Larsson, Sanderson, STROBE-MR</td>
+        </tr>
+        <tr>
+            <td>2. 半自动MR</td>
+            <td>人类设定框架，AI执行大规模筛选和下游验证</td>
+            <td>Yao, Yoshiji</td>
+        </tr>
+        <tr>
+            <td>3. 全自动科学发现</td>
+            <td>AI自主产生假设、设计实验、分析数据、迭代优化——MR嵌入其中作为因果验证模块</td>
+            <td>ROBIN, LyMOI</td>
+        </tr>
+    </table>
+
+    <div class="ref">📖 详细解读：<a href="../papers/Yao_2025_Proteome_Wide_Genetic_zh.html">Yao (卒中蛋白MR)</a>
+        §5 |
+        <a href="../papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson (MR-CVD)</a> §16
+        |
+        <a href="../papers/Cui_2025_Multimodal_foundation_models_zh.html">Cui (多模态基础模型)</a> | <a
+                href="../papers/Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN (多智能体科学发现)</a> | <a
+                href="../papers/Tang_2025_Deep_learning_large_zh.html">Tang (LyMOI GCN+LLM)</a></div>
+</div>
+
+<footer>
+    <div class="rb"><strong><span data-zh>导航：</span><span data-en>Navigate:</span></strong> <a href="reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a> <a
+            href="knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a> <a href="basic_bio_knowledge.html"><span data-zh>基础生物学</span><span data-en>Basic Biology</span></a> <a
+            href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a></div>
+    <p style="margin-top:12px;"><span data-zh>AI4Research 文献精读项目 · MR 系统讲演 · 21张幻灯片 · 2026-08-14</span><span data-en>AI4Research Literature Project · MR Systematic Lecture · 21 slides · 2026-08-14</span></p></footer>
+<script>
+    (function () {
+        var navList = document.getElementById('navList');
+        if (!navList) return;
+        var linkMap = {};
+        var idx = 0;
+        var navEl = document.getElementById('sideNav');
+        document.querySelectorAll('.act-header, .slide').forEach(function (el) {
+            if (el.classList.contains('act-header')) {
+                var h2 = el.querySelector('h2');
+                if (!h2) return;
+                var d = document.createElement('div');
+                d.className = 'nav-act';
+                d.textContent = h2.textContent.trim();
+                navList.appendChild(d);
+            } else {
+                idx++;
+                var id = 'slide-' + idx;
+                el.id = id;
+                var h3 = el.querySelector('h3'), title = '';
+                if (h3) {
+                    var c = h3.cloneNode(true);
+                    var q = c.querySelector('.q');
+                    if (q) q.remove();
+                    title = c.textContent.trim();
+                }
+                if (!title) title = '第' + idx + '页';
+                var a = document.createElement('a');
+                a.href = '#' + id;
+                a.textContent = title;
+                a.dataset.target = id;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var t = document.getElementById(this.dataset.target);
+                    if (t) t.scrollIntoView({behavior: 'smooth', block: 'start'});
+                });
+                navList.appendChild(a);
+                linkMap[id] = a;
+            }
+        });
+        if ('IntersectionObserver' in window) {
+            var vis = new Set();
+            var obs = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (e.isIntersecting) vis.add(e.target.id); else vis.delete(e.target.id);
+                });
+                var best = null, bt = Infinity;
+                vis.forEach(function (id) {
+                    var r = document.getElementById(id).getBoundingClientRect();
+                    if (r.top < bt) {
+                        bt = r.top;
+                        best = id;
+                    }
+                });
+                if (best) {
+                    Object.keys(linkMap).forEach(function (id) {
+                        linkMap[id].classList.toggle('active', id === best);
+                    });
+                    var act = linkMap[best], r = act.getBoundingClientRect(), nr = navEl.getBoundingClientRect();
+                    if (r.top < nr.top) navEl.scrollTop -= (nr.top - r.top + 4);
+                    else if (r.bottom > nr.bottom) navEl.scrollTop += (r.bottom - nr.bottom + 4);
+                }
+            }, {rootMargin: '0px 0px -75% 0px', threshold: 0});
+            document.querySelectorAll('.slide').forEach(function (t) {
+                obs.observe(t);
+            });
+        }
+    })();
+</script>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

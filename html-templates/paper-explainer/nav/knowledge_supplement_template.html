@@ -45,7 +45,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>需要补充的知识点 · {项目名}</title>
   <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
-  <script src="../theme-pack.js"></script>
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
   <style>
     /* ====================================================================
        设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
@@ -230,36 +233,36 @@
 
 <!-- ============ HEADER ============ -->
 <header>
-  <h1>需要补充的知识点</h1>
-  <div class="sub">{项目主题}的背景概念速查，每个知识点配有简明解释和相关论文链接</div>
+  <h1><span data-zh>需要补充的知识点</span><span data-en>Background Knowledge</span></h1>
+  <div class="sub"><span data-zh>{项目主题}的背景概念速查，每个知识点配有简明解释和相关论文链接</span><span data-en>A quick reference of background concepts for {Project Topic}; each entry comes with a concise explanation and links to related papers</span></div>
 </header>
 
 <!-- ============ 概念卡片（复制此块扩展） ============ -->
 <!-- 说明：一个 .concept = 一个背景概念；内含 .def-box(定义) + .papers(相关论文) + .links(跳转) -->
 
 <div class="concept">
-  <h2>{概念 1 名称（如：孟德尔随机化原理与 IV 三大假设）}</h2>
+  <h2><span data-zh>{概念 1 名称（如：孟德尔随机化原理与 IV 三大假设）}</span><span data-en>{Concept 1 name (e.g., Mendelian randomization principles and the three IV assumptions)}</span></h2>
   <div class="def-box">
-    <p>{简明白话解释，2-4 句。术语首次出现附英文，如「工具变量（instrumental variable, IV）」；可加（1）（2）（3）分点列出核心要点。}</p>
+    <p><span data-zh>{简明白话解释，2-4 句。术语首次出现附英文，如「工具变量（instrumental variable, IV）」；可加（1）（2）（3）分点列出核心要点。}</span><span data-en>{Plain-language explanation in 2-4 sentences. On first mention, append the English term, e.g., “instrumental variable (IV)”; core points may be listed as (1) (2) (3).}</span></p>
   </div>
   <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
-  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者1}</a>, <a href="../papers/paper_explainer_page_template.html">{作者2}</a></div>
+  <div class="papers"><span data-zh>相关论文：</span><span data-en>Related papers:</span><a href="../papers/paper_explainer_page_template.html"><span data-zh>{作者1}</span><span data-en>{Author 1}</span></a>, <a href="../papers/paper_explainer_page_template.html"><span data-zh>{作者2}</span><span data-en>{Author 2}</span></a></div>
   <div class="links">
-    <a href="../papers/paper_explainer_page_template.html">跳转到{作者1}论文</a>
-    <a href="../papers/paper_explainer_page_template.html">跳转到{作者2}论文</a>
-    <a href="reading_path_template.html">返回路径主页</a>
+    <a href="../papers/paper_explainer_page_template.html"><span data-zh>跳转到{作者1}论文</span><span data-en>Jump to the {Author 1} paper</span></a>
+    <a href="../papers/paper_explainer_page_template.html"><span data-zh>跳转到{作者2}论文</span><span data-en>Jump to the {Author 2} paper</span></a>
+    <a href="reading_path_template.html"><span data-zh>返回路径主页</span><span data-en>Back to the Reading Path Home</span></a>
   </div>
 </div>
 
 <div class="concept">
-  <h2>{概念 2 名称（如：顺式 pQTL 与共定位分析）}</h2>
+  <h2><span data-zh>{概念 2 名称（如：顺式 pQTL 与共定位分析）}</span><span data-en>{Concept 2 name (e.g., cis-pQTL and colocalization analysis)}</span></h2>
   <div class="def-box">
-    <p>{简明解释。示例：pQTL 是影响蛋白表达水平的基因位点；cis-pQTL 位于编码基因附近，水平多效性风险较小；共定位分析验证蛋白与疾病是否共享同一因果变异……}</p>
+    <p><span data-zh>{简明解释。示例：pQTL 是影响蛋白表达水平的基因位点；cis-pQTL 位于编码基因附近，水平多效性风险较小；共定位分析验证蛋白与疾病是否共享同一因果变异……}</span><span data-en>{Concise explanation. Example: pQTLs are genetic loci affecting protein abundance; cis-pQTLs sit close to the coding gene and carry lower horizontal-pleiotropy risk; colocalization analysis tests whether a protein and a disease share the same causal variant...}</span></p>
   </div>
-  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者3}</a></div>
+  <div class="papers"><span data-zh>相关论文：</span><span data-en>Related papers:</span><a href="../papers/paper_explainer_page_template.html"><span data-zh>{作者3}</span><span data-en>{Author 3}</span></a></div>
   <div class="links">
-    <a href="../papers/paper_explainer_page_template.html">跳转到{作者3}论文</a>
-    <a href="reading_path_template.html">返回路径主页</a>
+    <a href="../papers/paper_explainer_page_template.html"><span data-zh>跳转到{作者3}论文</span><span data-en>Jump to the {Author 3} paper</span></a>
+    <a href="reading_path_template.html"><span data-zh>返回路径主页</span><span data-en>Back to the Reading Path Home</span></a>
   </div>
 </div>
 
@@ -267,10 +270,10 @@
 <div class="concept">
   <h2>{概念 3 名称}</h2>
   <div class="def-box"><p>{简明解释}</p></div>
-  <div class="papers">相关论文：<a href="../papers/paper_explainer_page_template.html">{作者}</a></div>
+  <div class="papers"><span data-zh>相关论文：</span><span data-en>Related papers:</span><a href="../papers/paper_explainer_page_template.html">{作者}</a></div>
   <div class="links">
     <a href="../papers/paper_explainer_page_template.html">跳转到{作者}论文</a>
-    <a href="reading_path_template.html">返回路径主页</a>
+    <a href="reading_path_template.html"><span data-zh>返回路径主页</span><span data-en>Back to the Reading Path Home</span></a>
   </div>
 </div>
 -->
@@ -278,12 +281,12 @@
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="rb">
-    <strong>导航：</strong>
-    <a href="../knowledge_graph_template.html">知识图谱</a>
-    <a href="reading_path_template.html">阅读路径主页</a>
-    <a href="#">返回顶部</a>
+    <strong><span data-zh>导航：</span><span data-en>Navigate:</span></strong>
+    <a href="../knowledge_graph_template.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+    <a href="reading_path_template.html"><span data-zh>阅读路径主页</span><span data-en>Reading Path Home</span></a>
+    <a href="#"><span data-zh>返回顶部</span><span data-en>Back to Top</span></a>
   </div>
-  <p style="margin-top:12px;">{项目名} 项目 · 补充知识点 · {YYYY-MM-DD}</p>
+  <p style="margin-top:12px;"><span data-zh>{项目名} 项目 · 补充知识点 · {YYYY-MM-DD}</span><span data-en>{Project Name} Project · Background Knowledge · {YYYY-MM-DD}</span></p>
 </footer>
 
 <!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
@@ -320,8 +323,8 @@
     var t = PACK.THEMES[i];
     html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
       + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
-      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
-      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+      + '<span class="ts-name"><span data-zh>' + t.name + '<span class="ts-en"> ' + t.en + '</span></span><span data-en>' + t.en + '</span></span>'
+      + '<span class="ts-mode"><span data-zh>' + (t.mode === 'dark' ? '暗' : '明') + '</span><span data-en>' + (t.mode === 'dark' ? 'Dark' : 'Light') + '</span></span></button>';
   }
   panel.innerHTML = html;
   document.body.appendChild(btn); document.body.appendChild(panel);

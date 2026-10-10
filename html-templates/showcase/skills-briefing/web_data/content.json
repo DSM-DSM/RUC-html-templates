@@ -1,0 +1,893 @@
+{
+ "meta": {
+  "brand": "AI × 科研",
+  "brand_en": "AI × Research",
+  "title_line1": "从个人到团队：",
+  "title_line1_en": "From individual to team:",
+  "title_line2": "<span class=\"hl\">AI 驱动</span>的科研实践",
+  "title_line2_en": "<span class=\"hl\">AI-driven</span> research practice",
+  "subtitle": "一个人用 AI 的能力，如何生长为一支团队的生产力——四条叙事线，一个终点。每条线都有可打开、可核对的真实产物。",
+  "subtitle_en": "How one person's ability to work with AI grows into a team's productivity — four story lines, one destination. Every line has real, openable, verifiable artifacts.",
+  "presenter": "俞锦越",
+  "presenter_en": "Yu Jinyue",
+  "institution": "中国人民大学-统计与大数据研究院",
+  "institution_en": "Renmin University of China · ISBD",
+  "date": "2026-08",
+  "hero_cta": "开始演示",
+  "hero_cta_en": "Start the demo"
+ },
+ "overview": {
+  "heading": "四条线，一个终点",
+  "heading_en": "Four lines, one destination",
+  "lede": "前三条线展示 skill 从个人到团队的生长路径——所用技能、技能产出的产品、技能如何被构建；第四条线分享其余值得一试的技能。全部内容来自本地真实文件。",
+  "lede_en": "The first three lines show how skills grow from individual to team — the skills used, the products they yield, and how they are built; the fourth line shares other skills worth trying. Everything comes from real local files.",
+  "metrics": [
+   {
+    "value": "10",
+    "label": "沉淀技能与规范",
+    "label_en": "Skills & specs distilled"
+   },
+   {
+    "value": "14",
+    "label": "接力棒交接（.baton）",
+    "label_en": "Relay batons handed over (.baton)"
+   },
+   {
+    "value": "13",
+    "label": "方向文档 M1–M13",
+    "label_en": "Direction docs M1–M13"
+   }
+  ],
+  "metrics_note": "数据来自本地真实文件：技能目录、.baton/ 与 meeting_records/ 归档。",
+  "metrics_note_en": "Figures come from real local files: the skills directory, .baton/ and meeting_records/ archives."
+ },
+ "lines": [
+  {
+   "no": "01",
+   "title": "个人科研开展",
+   "title_en": "Individual research practice",
+   "theme": "一个人如何用 AI 提速自己的研究",
+   "theme_en": "How one person uses AI to speed up their own research",
+   "intro": "这条线讲个人科研中的两个 AI 技能：把论文与代码对照讲透的 paper-explainer，以及在会话之间交接上下文的 baton。一个负责把复杂的弄明白，一个负责把做了一半的接住。",
+   "intro_en": "This line covers two AI skills for individual research: paper-explainer, which explains papers side by side with their method and code, and baton, which hands context over between sessions. One makes the complicated understandable; the other picks up where you left off.",
+   "skills": [
+    {
+     "name": "paper-explainer · 科研领域 AI 导读",
+     "name_en": "paper-explainer · AI guide for research fields",
+     "tagline": "陌生科研领域的入门向导：批量精读论文 PDF，按行文逻辑讲解，并生成可动态更新的知识图谱。",
+     "tagline_en": "An onboarding guide to unfamiliar research fields: batch deep-reads of paper PDFs, explains each along the paper's own logic, and generates a dynamically updated knowledge graph.",
+     "purpose": "接触一个陌生领域，不再逐篇啃 PDF：把搜集到的若干篇论文交给它，每篇生成一份沿行文逻辑、由浅入深的讲解网页；全部读完后，再生成一张跨论文知识点关联的知识图谱网页；后续追加新论文，两个网页都会动态更新。",
+     "purpose_en": "Entering an unfamiliar field no longer means grinding through PDFs one by one: hand it the papers you have collected and it produces, for each, an explanation webpage that follows the paper's own structure from shallow to deep; once all are read, it generates a knowledge-graph webpage linking concepts across papers; when new papers are added later, both webpages update dynamically.",
+     "capabilities": [
+      "多 PDF 批量精读：每篇一份梗概 + 沿行文逻辑由浅入深的讲解网页",
+      "跨论文知识图谱：梳理各篇知识点之间的关联，独立 HTML 输出",
+      "增量更新：追加新论文后，单篇解析与知识图谱动态同步"
+     ],
+     "capabilities_en": [
+      "Multi-PDF batch deep reading: one overview plus a structured explanation webpage per paper",
+      "Cross-paper knowledge graph: maps how concepts across papers relate, standalone HTML output",
+      "Incremental updates: adding new papers keeps per-paper analyses and the knowledge graph in sync"
+     ]
+    },
+    {
+     "name": "baton · 会话接力棒",
+     "name_en": "baton · session relay baton",
+     "tagline": "把一次会话做了什么、卡在哪、结果与偏好落盘成接力棒，让下一个（多个）AI 会话直接接住上下文。",
+     "tagline_en": "Writes what a session did, where it got stuck, the results and your preferences into a relay baton, so the next AI session — or several at once — picks the context right up.",
+     "purpose": "AI 会话切换会丢失全部上下文。baton 把「做了什么、遇到什么困难、得到什么结果、以及个人偏好」写进一个 markdown 接力棒，交给下一个会话继续跑；接力棒文件多了，还支持合并汇总——既压缩后续会话的上下文输入，也让交接记录成为可管理的数据资产。",
+     "purpose_en": "Switching AI sessions loses all context. baton writes “what was done, what difficulties arose, what results came out, and personal preferences” into a markdown relay baton handed to the next session; as baton files accumulate they can be merged and consolidated — compressing context input for later sessions and turning handover records into a manageable data asset.",
+     "capabilities": [
+      "上下文迁移：落棒、接棒、并棒，交接「进展、困难、结果与偏好」",
+      "文件多了可合并汇总，压缩上下文输入，交接记录成为数据资产",
+      "Iron Rule：落盘前 git 核对真实状态；本仓库 .baton/ 已有 14 份"
+     ],
+     "capabilities_en": [
+      "Context migration: drop, grab and merge batons, handing over “progress, difficulties, results and preferences”",
+      "Merge and consolidate as files pile up; handover records become a data asset",
+      "Iron Rule: verify real state with git before dropping; this repo already holds 14 batons"
+     ],
+     "links": [
+      {
+       "label": "baton · GitHub 仓库",
+       "url": "https://github.com/blader/baton",
+       "label_en": "baton · GitHub repo"
+      }
+     ]
+    }
+   ],
+   "outcomes": {
+    "products": [
+     {
+      "name": "论文讲解网页 × 知识图谱",
+      "name_en": "Paper explanation pages × knowledge graph",
+      "desc": "多 PDF 精读产出的讲解网页：梗概、行文逻辑、公式与代码对照；配套跨论文知识图谱。",
+      "desc_en": "Explanation pages from multi-PDF deep reading: overview, structure, formulas and code side by side; plus a cross-paper knowledge graph.",
+      "shot": "assets/line01-a.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "批量精读",
+        "title_en": "Batch deep reading",
+        "desc": "多篇论文 PDF 一次输入，逐篇提取梗概与行文逻辑。",
+        "desc_en": "Feed many paper PDFs at once; extract the overview and structure of each."
+       },
+       {
+        "step": "02",
+        "title": "讲解成文",
+        "title_en": "Write the explanations",
+        "desc": "每篇按由浅入深的结构生成独立讲解网页。",
+        "desc_en": "Generate a standalone explanation webpage per paper, shallow to deep."
+       },
+       {
+        "step": "03",
+        "title": "图谱关联",
+        "title_en": "Link into a graph",
+        "desc": "梳理跨论文知识点关联，生成知识图谱网页。",
+        "desc_en": "Map cross-paper concept links into a knowledge-graph webpage."
+       },
+       {
+        "step": "04",
+        "title": "增量更新",
+        "title_en": "Update incrementally",
+        "desc": "追加新论文后，单篇解析与知识图谱动态同步。",
+        "desc_en": "Adding new papers keeps the analyses and the graph in sync."
+       }
+      ]
+     },
+     {
+      "name": "接力棒文件（.baton）",
+      "name_en": "Relay baton files (.baton)",
+      "desc": "交接「进展、困难、结果与偏好」；文件多了可合并汇总，交接记录成为数据资产。",
+      "desc_en": "Hands over “progress, difficulties, results and preferences”; files can be merged as they accumulate, turning handovers into a data asset.",
+      "shot": "assets/line01-b.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别痛点",
+        "title_en": "Spot the pain point",
+        "desc": "会话切换丢失上下文，换窗口一切都要从头解释。",
+        "desc_en": "Context is lost on every session switch; each new window means re-explaining everything."
+       },
+       {
+        "step": "02",
+        "title": "定义铁律",
+        "title_en": "Define the iron rule",
+        "desc": "落盘前先 git 核对真实状态，记录现实而非叙述。",
+        "desc_en": "Verify real state with git before writing; record reality, not narrative."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "落棒、接棒、并棒三种用法，固定文件名与 .baton 目录。",
+        "desc_en": "Drop, grab and merge — three usages with fixed filenames and a .baton directory."
+       },
+       {
+        "step": "04",
+        "title": "真实迭代",
+        "title_en": "Iterate for real",
+        "desc": "14 份接力棒覆盖 git 协作、增量管线、讲演材料多主题。",
+        "desc_en": "14 batons covering git collaboration, incremental pipelines, lecture materials and more."
+       }
+      ]
+     }
+    ],
+    "metrics": [
+     {
+      "value": "14",
+      "label": "本仓库接力棒文件",
+      "label_en": "baton files in this repo"
+     },
+     {
+      "value": "8+",
+      "label": "覆盖主题",
+      "label_en": "topics covered"
+     }
+    ],
+    "build": [
+     {
+      "step": "01",
+      "title": "识别重复",
+      "title_en": "Spot the repetition",
+      "desc": "找出研究中反复出现的手工环节：读论文对照代码、会话切换后重新解释上下文。",
+      "desc_en": "Find the manual steps that keep recurring: reading papers against code, re-explaining context after session switches."
+     },
+     {
+      "step": "02",
+      "title": "定义规范",
+      "title_en": "Define the spec",
+      "desc": "把经验固化为规则：解释文档的章节结构，接力棒的「先验证再落盘」铁律。",
+      "desc_en": "Distill experience into rules: the section structure of explainers, the baton “verify before writing” iron rule."
+     },
+     {
+      "step": "03",
+      "title": "封装 Skill",
+      "title_en": "Package as a skill",
+      "desc": "以提示词与工具组合封装为可调用的 skill，每次自动套用同一套流程。",
+      "desc_en": "Wrap prompts and tool combos into callable skills that apply the same pipeline every time."
+     },
+     {
+      "step": "04",
+      "title": "迭代验证",
+      "title_en": "Iterate and verify",
+      "desc": "在真实任务上反复使用并修订：14 份接力棒与解释文档本身就是迭代记录。",
+      "desc_en": "Use and revise on real tasks: the 14 batons and explainer docs are themselves the iteration log."
+     }
+    ]
+   }
+  },
+  {
+   "no": "02",
+   "title": "团队科研协作",
+   "title_en": "Team research collaboration",
+   "theme": "一群人如何用 AI 对齐工作方式",
+   "theme_en": "How a team uses AI to align the way it works",
+   "intro": "这条线讲团队协作中的两个抓手：meeting-to-wechat 把会议纪要压缩成微信群可用的精简消息，CONTRIBUTING.md 用约定式提交与 AI 智能体 SOP 规范整个仓库的协作。一个对齐信息，一个对齐代码。",
+   "intro_en": "This line covers two handles for collaboration: meeting-to-wechat compresses meeting minutes into a paste-ready WeChat group message, and CONTRIBUTING.md standardizes repo collaboration with conventional commits and an AI-agent SOP. One aligns information, the other aligns code.",
+   "skills": [
+    {
+     "name": "meeting-to-wechat · 会议纪要转微信群消息",
+     "name_en": "meeting-to-wechat · minutes to WeChat message",
+     "tagline": "从语音转写稿、会议纪要与时间轴中提取核心信息，生成可直接粘贴微信群的 300 字内消息。",
+     "tagline_en": "Distills the core information from voice transcripts, minutes and timelines into a message under 300 characters, ready to paste straight into a WeChat group.",
+     "purpose": "会后整理纪要是最枯燥的体力劳动。把会议导出的 txt 三件套交给它，直接生成可粘贴微信群的 300 字内消息；而它产出的纪要梗概不只用于同步——还能作为每个队员的初始研究方案，成为后续任务展开的起点。",
+     "purpose_en": "Writing up minutes after a meeting is the dullest chore. Hand it the meeting's exported txt trio and it produces a paste-ready group message under 300 characters; the summary it produces does double duty — beyond syncing the group, it serves as each member's initial research plan and the starting point for follow-up tasks.",
+     "capabilities": [
+      "会议 txt 三件套直接生成微信可粘贴消息，免除会后纪要的体力劳动",
+      "纪要梗概一稿两用：同步到群里 + 作为每个队员的初始研究方案",
+      "专业名词知识库：16 位人名 + 50 余条术语，转写错误自动修正"
+     ],
+     "capabilities_en": [
+      "Meeting txt trio in, paste-ready WeChat message out — no more manual minute-writing after meetings",
+      "One summary, two uses: sync to the group + each member's initial research plan",
+      "Terminology knowledge base: 16 names + 50+ terms, auto-correcting transcription errors"
+     ]
+    },
+    {
+     "name": "git 协作规范 · CONTRIBUTING.md",
+     "name_en": "git collaboration spec · CONTRIBUTING.md",
+     "tagline": "一份写给人和 AI 智能体的仓库协作规范：分支命名、约定式提交、PR 与 Code Review 流程。",
+     "tagline_en": "A repo collaboration spec written for humans and AI agents alike: branch naming, conventional commits, PR and code-review flow.",
+     "purpose": "多人协作的仓库最容易乱在提交历史：「update」「fix bug」式的提交让回溯无从下手。CONTRIBUTING.md 统一了日常开发六步流程（同步、分支、提交、推送、PR、审查）、约定式提交格式（feat/fix/docs + 中文描述），以及 AI 智能体的操作 SOP 与禁止行为清单——AI 提交也必须过同一套规范。本仓库 90 条提交历史即为实践。",
+     "purpose_en": "Multi-person repos rot fastest in their commit history: “update” and “fix bug” commits make retrospection impossible. CONTRIBUTING.md unifies the six-step daily workflow (sync, branch, commit, push, PR, review), the conventional-commit format (feat/fix/docs + description), and an AI-agent SOP with a forbidden-actions list — AI commits go through the same spec. This repo's 90-commit history is the practice.",
+     "capabilities": [
+      "约定式提交：type 用英文、描述用中文，一行 50 字内、动词开头",
+      "分支命名五前缀：feature / fix / docx / refactor / experiment，保护规则强制 PR 合并",
+      "AI 智能体 SOP：环境检查、分支、提交、PR 全流程 + 8 条禁止行为（禁 force push 等）"
+     ],
+     "capabilities_en": [
+      "Conventional commits: English type + Chinese description, one line under 50 characters, verb-first",
+      "Five branch prefixes: feature / fix / docx / refactor / experiment; protection rules force PR merges",
+      "AI-agent SOP: environment check, branch, commit, PR end-to-end + 8 forbidden actions (no force push, etc.)"
+     ]
+    }
+   ],
+   "outcomes": {
+    "products": [
+     {
+      "name": "微信群精简消息",
+      "name_en": "Compact WeChat group message",
+      "desc": "会后同步：TL;DR 加共识/问题/任务，或待确认问题清单，可直接粘贴微信群。",
+      "desc_en": "Post-meeting sync: TL;DR plus consensus/issues/tasks, or a list of open questions — paste-ready for the group.",
+      "shot": "assets/line02-a.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别痛点",
+        "title_en": "Spot the pain point",
+        "desc": "会议三件套冗长、转写含同音错字，直接发群里没人读。",
+        "desc_en": "The meeting trio is long and full of homophone typos; nobody reads it raw in the group."
+       },
+       {
+        "step": "02",
+        "title": "约定规则",
+        "title_en": "Agree on rules",
+        "desc": "纪要 > 时间轴 > 转写分级裁决，300 字与每行 30 字硬约束。",
+        "desc_en": "Minutes > timeline > transcript precedence; hard limits of 300 characters total and 30 per line."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "内部组会与企业研讨会两种语气，专业名词知识库持续积累。",
+        "desc_en": "Two tones — internal lab meeting and corporate workshop; the terminology base keeps growing."
+       },
+       {
+        "step": "04",
+        "title": "落盘迭代",
+        "title_en": "Write out and iterate",
+        "desc": "md + 纯文本双输出并用 ls 验证落盘，知识库随每次会议扩充。",
+        "desc_en": "Dual md + plain-text output verified with ls; the knowledge base grows with every meeting."
+       }
+      ]
+     },
+     {
+      "name": "CONTRIBUTING.md 协作规范",
+      "name_en": "CONTRIBUTING.md collaboration spec",
+      "desc": "仓库级多人协作规范：日常开发六步流程、提交规范、审查礼仪、AI 智能体 SOP。",
+      "desc_en": "Repo-level collaboration spec: six-step daily workflow, commit conventions, review etiquette, AI-agent SOP.",
+      "shot": "assets/line02-b.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别混乱",
+        "title_en": "Spot the chaos",
+        "desc": "提交历史满是 update、fix bug，回溯无从下手。",
+        "desc_en": "Commit history full of update and fix bug; retrospection goes nowhere."
+       },
+       {
+        "step": "02",
+        "title": "约定规则",
+        "title_en": "Agree on rules",
+        "desc": "约定式提交：type 英文 + 中文描述，一行 50 字内、动词开头。",
+        "desc_en": "Conventional commits: English type + Chinese description, one line under 50 characters, verb-first."
+       },
+       {
+        "step": "03",
+        "title": "写入规范",
+        "title_en": "Write the spec",
+        "desc": "六步开发流程、PR 审查礼仪、AI 智能体 SOP 与禁止清单。",
+        "desc_en": "Six-step workflow, PR review etiquette, AI-agent SOP and forbidden list."
+       },
+       {
+        "step": "04",
+        "title": "全员实践",
+        "title_en": "Everyone practices",
+        "desc": "90 条规范提交，人与 AI 智能体走同一套流程。",
+        "desc_en": "90 conventional commits; humans and AI agents run the same flow."
+       }
+      ]
+     }
+    ],
+    "metrics": [
+     {
+      "value": "90",
+      "label": "本仓库规范提交",
+      "label_en": "conventional commits in this repo"
+     },
+     {
+      "value": "16",
+      "label": "知识库人名条目",
+      "label_en": "name entries in the knowledge base"
+     }
+    ],
+    "build": [
+     {
+      "step": "01",
+      "title": "识别分歧",
+      "title_en": "Spot the divergence",
+      "desc": "找出协作中口径不一、反复沟通的环节：会议信息冗长没人读、提交历史无从回溯。",
+      "desc_en": "Find where the team keeps re-aligning: meeting info nobody reads, commit history nobody can trace."
+     },
+     {
+      "step": "02",
+      "title": "约定规则",
+      "title_en": "Agree on rules",
+      "desc": "与团队确认裁决规则：信息源准确率分级、约定式提交与分支保护。",
+      "desc_en": "Confirm adjudication rules with the team: source-accuracy ranking, conventional commits, branch protection."
+     },
+     {
+      "step": "03",
+      "title": "封装 Skill / 写入规范",
+      "title_en": "Package the skill / write the spec",
+      "desc": "meeting-to-wechat 封装为 skill；提交与 PR 流程写入 CONTRIBUTING.md。",
+      "desc_en": "meeting-to-wechat packaged as a skill; commit and PR flow written into CONTRIBUTING.md."
+     },
+     {
+      "step": "04",
+      "title": "交接扩展",
+      "title_en": "Hand over and scale",
+      "desc": "规范落到人与 AI 两类执行者：AI 智能体 SOP 让机器也遵守同一套流程。",
+      "desc_en": "The spec lands on both human and AI executors: the agent SOP makes machines follow the same flow."
+     }
+    ]
+   }
+  },
+  {
+   "no": "03",
+   "title": "从个人到团队",
+   "title_en": "From individual to team",
+   "theme": "个人沉淀的能力，如何成为团队的基础设施",
+   "theme_en": "How individually distilled skills become team infrastructure",
+   "intro": "这条线讲个人技能如何长成团队设施：meeting-to-wechat 的群消息只是入口，后续是完整的会议记录归档——每次会议按日期建目录、原始三件套落盘，再把讨论提炼成 M 系列方向文档，状态可追踪、方向互相引用。接力棒、知识图谱、会议纪要、M 系列文档——过程性信息就此沉淀为可复用的数据资产。",
+   "intro_en": "This line shows personal skills growing into team facilities: the WeChat message from meeting-to-wechat is only the entry point, followed by full meeting-record archiving — a dated directory per meeting with the raw trio stored verbatim, then discussion distilled into numbered M-series direction docs with trackable status and cross-references between directions. Batons, knowledge graphs, minutes, M-series docs — process information settles into reusable data assets.",
+   "skills": [
+    {
+     "name": "会议记录归档 · meeting_records/",
+     "name_en": "Meeting record archive · meeting_records/",
+     "tagline": "把每次会议沉淀为可回溯的目录：原始记录、方向文档、README 索引，状态一目了然。",
+     "tagline_en": "Settles every meeting into a traceable directory: raw records, direction docs, README index — status at a glance.",
+     "purpose": "会开完了，信息不该停在群里。meeting_records/ 的归档规范是：每次会议一个日期目录，腾讯会议三件套（逐字稿、时间轴、纪要）原样落盘；讨论出的研究方向各自成档，材料齐全（文档 + notebook + 图 + 结果 JSON）；目录级 README 提供系列索引、状态总览与方向关系图。新成员进组，读归档即可接上上下文。",
+     "purpose_en": "When a meeting ends, the information should not die in the group chat. The archiving spec for meeting_records/: one dated directory per meeting, the Tencent-Meeting trio (transcript, timeline, minutes) stored verbatim; each research direction gets its own subdirectory with complete materials (doc + notebook + figures + result JSON); a directory-level README provides a series index, status overview and a direction-relationship map. A new member reads the archive and picks up the context.",
+     "capabilities": [
+      "按日期归档 + 原始三件套落盘，一切结论可回溯到会议原话",
+      "研究方向子目录材料齐全：markdown 主文档 + notebook + 图 + 结构化结果",
+      "README 索引：系列索引表、状态总览、方向关系图、更新日志，跨会议交叉引用"
+     ],
+     "capabilities_en": [
+      "Dated archiving + raw trio on disk: every conclusion traces back to the meeting's own words",
+      "Direction subdirectories with complete materials: markdown master doc + notebook + figures + structured results",
+      "README index: series table, status overview, direction map, changelog, cross-meeting references"
+     ]
+    },
+    {
+     "name": "meeting-to-execution-plan-docs · M 系列任务文档",
+     "name_en": "meeting-to-execution-plan-docs · M-series task docs",
+     "tagline": "把会议梗概拆解为编号任务 M1、M2……每个 mission 一份可直接交给 AI Agent 执行的方向文档。",
+     "tagline_en": "Splits meeting summaries into numbered tasks M1, M2… one direction doc per mission, ready to hand straight to an AI Agent.",
+     "purpose": "它直接接收 meeting-to-wechat 产出的会议梗概，把讨论内容拆解成若干个编号任务——M1（Mission 1）、M2……每个 mission 一份 markdown：写明问题动机与可能尝试的方向，拿到文档的 AI Agent 无需再读会议原文就能直接开工。目前已积累 M1–M13。",
+     "purpose_en": "It takes the meeting summary produced by meeting-to-wechat and splits the discussion into numbered tasks — M1 (Mission 1), M2… one markdown per mission: problem motivation plus promising directions to try, so an AI Agent holding the doc can start work without reading the original meeting. M1–M13 accumulated so far.",
+     "capabilities": [
+      "上游接 meeting-to-wechat：会议梗概直接拆解为编号任务 M1 / M2 / …",
+      "每个 mission 一份方向文档：动机 + 可能尝试的方向，可直接交给 AI Agent 执行",
+      "三种输入形态：有编号归类 / 无编号提炼并延续编号 / 核查补录"
+     ],
+     "capabilities_en": [
+      "Upstream of meeting-to-wechat: meeting summaries split into numbered tasks M1 / M2 / …",
+      "One direction doc per mission: motivation + promising directions, directly executable by an AI Agent",
+      "Three input forms: classified by existing number / distilled with continued numbering / audit backfill"
+     ]
+    }
+   ],
+   "outcomes": {
+    "products": [
+     {
+      "name": "meeting_records/ 归档目录",
+      "name_en": "meeting_records/ archive tree",
+      "desc": "三次会议三个日期目录，M1–M13 方向文档与原始记录全部可回溯。",
+      "desc_en": "Three meetings, three dated directories; M1–M13 direction docs and raw records all traceable.",
+      "shot": "assets/line03-a.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "沉淀复用",
+        "title_en": "Settle for reuse",
+        "desc": "群消息发完即弃，讨论要点随聊天记录一起消失。",
+        "desc_en": "Group messages are send-and-forget; key points vanish with the chat history."
+       },
+       {
+        "step": "02",
+        "title": "归档规范",
+        "title_en": "Archiving spec",
+        "desc": "日期目录 + 三件套落盘 + 方向子目录，材料齐全才算闭环。",
+        "desc_en": "Dated directory + trio on disk + direction subdirectories; complete materials close the loop."
+       },
+       {
+        "step": "03",
+        "title": "README 索引",
+        "title_en": "README index",
+        "desc": "系列索引表、状态总览、方向关系图、更新日志一页看清。",
+        "desc_en": "Series table, status overview, direction map and changelog on one page."
+       },
+       {
+        "step": "04",
+        "title": "跨会互引",
+        "title_en": "Cross-reference",
+        "desc": "方向文档互引形成闭环，新成员读归档即可接手。",
+        "desc_en": "Direction docs reference each other into a closed loop; newcomers take over from the archive."
+       }
+      ]
+     },
+     {
+      "name": "M 系列方向文档（M1–M13）",
+      "name_en": "M-series direction docs (M1–M13)",
+      "desc": "会议梗概拆解为 M1/M2 编号任务，方向文档可直接交给 AI Agent 执行。",
+      "desc_en": "Meeting summaries split into M1/M2 numbered tasks; direction docs go straight to an AI Agent.",
+      "shot": "assets/line03-b.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别散落",
+        "title_en": "Spot the scatter",
+        "desc": "会议建议口头说说就散，无状态、无跟踪、无编号。",
+        "desc_en": "Meeting suggestions evaporate verbally — no status, no tracking, no numbering."
+       },
+       {
+        "step": "02",
+        "title": "统一模板",
+        "title_en": "Unify the template",
+        "desc": "每个方向一档，会议原话带发言人与时间戳可回溯。",
+        "desc_en": "One doc per direction; original quotes carry speaker and timestamp for traceability."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "有编号归类、无编号提炼、核查补录三种输入形态。",
+        "desc_en": "Three input forms: classified by number, distilled with numbering, audit backfill."
+       },
+       {
+        "step": "04",
+        "title": "系列迭代",
+        "title_en": "Iterate the series",
+        "desc": "M1–M13 编号延续，README 状态与日志逐次更新。",
+        "desc_en": "M1–M13 numbering continues; README status and changelog update each time."
+       }
+      ]
+     }
+    ],
+    "metrics": [
+     {
+      "value": "13",
+      "label": "方向文档 M1–M13",
+      "label_en": "direction docs M1–M13"
+     },
+     {
+      "value": "3",
+      "label": "会议归档（07-25 / 08-06 / 08-08）",
+      "label_en": "meetings archived (07-25 / 08-06 / 08-08)"
+     }
+    ],
+    "build": [
+     {
+      "step": "01",
+      "title": "沉淀复用",
+      "title_en": "Settle for reuse",
+      "desc": "把群消息背后的原始材料留下来：三件套 + 讨论要点，不再是发完即弃。",
+      "desc_en": "Keep the raw material behind group messages: the trio + discussion points, no longer send-and-forget."
+     },
+     {
+      "step": "02",
+      "title": "归档规范",
+      "title_en": "Archiving spec",
+      "desc": "约定目录结构：日期目录 + 方向子目录 + README 索引，材料齐全才算闭环。",
+      "desc_en": "Agree the directory layout: dated directories + direction subdirectories + README index; complete materials close the loop."
+     },
+     {
+      "step": "03",
+      "title": "方向文档化",
+      "title_en": "Direction docs",
+      "desc": "封装 meeting-to-execution-plan-docs：会议建议成为 M 系列执行计划，原话带时间戳可回溯。",
+      "desc_en": "Package meeting-to-execution-plan-docs: meeting suggestions become M-series plans, original quotes timestamped and traceable."
+     },
+     {
+      "step": "04",
+      "title": "状态追踪闭环",
+      "title_en": "Close the tracking loop",
+      "desc": "README 更新日志记录每次进展，跨会议交叉引用，新成员直接读归档接手。",
+      "desc_en": "README changelog records every step; cross-meeting references; newcomers take over straight from the archive."
+     }
+    ]
+   }
+  },
+  {
+   "no": "04",
+   "title": "其他好用的 skill 推荐",
+   "title_en": "Other skills worth recommending",
+   "theme": "从工具到工具箱：值得一试的四个技能",
+   "theme_en": "From tools to a toolbox: four skills worth trying",
+   "intro": "前三条线之外，还有四个日常高频使用的技能，按用途分两组：提示词优化与网页构建（prompt-enhancer、html-beautify），互联网调研与检索（agent-reach、anysearch）。本演示页就是 html-beautify 构建的。",
+   "intro_en": "Beyond the first three lines, four more skills in daily heavy use, grouped by purpose: prompt optimization and web building (prompt-enhancer, html-beautify), and internet research and retrieval (agent-reach, anysearch). This very demo page was built with html-beautify.",
+   "skills": [
+    {
+     "name": "prompt-enhancer · 提示词优化",
+     "name_en": "prompt-enhancer · prompt optimization",
+     "tagline": "把脑中不成熟、表达不清的想法，格式化拓展成 Agent 能规范执行的提示词。",
+     "tagline_en": "Formats fuzzy, half-formed ideas into prompts an Agent can execute reliably.",
+     "purpose": "想表达的是一团模糊的想法，Agent 只能靠猜。这个技能对不成熟的提示词做格式化拓展与补充，让 Agent 更规范地执行；每份交付都附 What Changed 说明——用得越多，越清楚该怎么向 AI 叙述需求。",
+     "purpose_en": "What you want to express is a vague blob, so the Agent can only guess. This skill formats and expands immature prompts so the Agent executes more reliably; every delivery ships with a What Changed note — the more you use it, the clearer you get about telling AI what you need.",
+     "capabilities": [
+      "模糊想法格式化为结构提示词：角色、任务、动机、步骤、输出契约",
+      "三模式自动路由：第一性原理推导 / eval 驱动迭代 / 标准技巧工程",
+      "交付附 What Changed：间接教会用户如何向 AI 叙述需求"
+     ],
+     "capabilities_en": [
+      "Fuzzy ideas formatted into structured prompts: role, task, motivation, steps, output contract",
+      "Three auto-routed modes: first-principles derivation / eval-driven iteration / standard technique engineering",
+      "Deliveries include What Changed: indirectly teaching you how to phrase requirements to AI"
+     ],
+     "links": [
+      {
+       "label": "getsentry/prompt-optimizer · eval 驱动模式来源",
+       "label_en": "getsentry/prompt-optimizer · source of the eval-driven mode",
+       "url": "https://github.com/getsentry/skills"
+      },
+      {
+       "label": "prompt-engineering-skill · 标准模式来源",
+       "label_en": "prompt-engineering-skill · source of the standard mode",
+       "url": "https://github.com/PhAlves23/prompt-engineering-skill"
+      }
+     ]
+    },
+    {
+     "name": "html-beautify · 网页美化与构建",
+     "name_en": "html-beautify · web polish & building",
+     "tagline": "网页渲染优化与打磨的一站式技能；用得最多的是从零构建一个新网页。",
+     "tagline_en": "A one-stop skill for rendering optimization and page polish; what I use most is building a new page from scratch.",
+     "purpose": "它整合多个上游设计技能与大量高级 HTML 素材库，既能做渲染优化与网页打磨，也能从零构建：把需求交给它，它先从素材库检索相似度最高的模板作为候选，再基于这些高级模板定制出适配本次需求的网页。本演示页就是这么来的。",
+     "purpose_en": "It fuses several upstream design skills and a large library of premium HTML assets; it can optimize rendering and polish pages as well as build from zero: give it a requirement and it first retrieves the closest templates from the asset library as candidates, then tailors one of those premium templates to the need. This demo page is exactly that.",
+     "capabilities": [
+      "match 流程：从 HTML 素材库检索相似度最高的模板作为候选",
+      "基于高级模板定制适配需求的网页，也支持从零设计",
+      "网页渲染优化与打磨；交付 DESIGN.md + finish review 验收"
+     ],
+     "capabilities_en": [
+      "match flow: retrieves the closest templates from the HTML asset library as candidates",
+      "Tailors premium templates to the requirement, or designs from scratch",
+      "Rendering optimization and polish; ships DESIGN.md + finish review acceptance"
+     ],
+     "links": [
+      {
+       "label": "Impeccable · 设计方向上游",
+       "label_en": "Impeccable · design-direction upstream",
+       "url": "https://github.com/pbakaus/impeccable"
+      },
+      {
+       "label": "Emil Kowalski · 设计工程上游",
+       "label_en": "Emil Kowalski · design-engineering upstream",
+       "url": "https://github.com/emilkowalski/skills"
+      },
+      {
+       "label": "Anthropic frontend-design · 上游",
+       "label_en": "Anthropic frontend-design · upstream",
+       "url": "https://github.com/anthropics/skills"
+      },
+      {
+       "label": "qiaomu-design · 58 站点 HTML 素材库",
+       "label_en": "qiaomu-design · HTML asset library of 58 sites",
+       "url": "https://github.com/joeseesun/qiaomu-design"
+      }
+     ]
+    },
+    {
+     "name": "agent-reach · 互联网能力路由器",
+     "name_en": "agent-reach · internet capability router",
+     "tagline": "登录类平台资源的路由器：小红书、微博、B 站……一个入口覆盖 15 个平台。",
+     "tagline_en": "A router for login-gated platforms: Xiaohongshu, Weibo, Bilibili… one entry covering 15 platforms.",
+     "purpose": "很多高质量信息只存在于需要登录的客户端里：小红书、微博、B 站……agent-reach 把这些平台统一成一张路由表，借助社交软件的推荐机制，能高效搜到感兴趣领域的知识——比如 AI 圈的最新动态。",
+     "purpose_en": "Lots of high-quality information exists only inside login-required clients: Xiaohongshu, Weibo, Bilibili… agent-reach unifies them into one routing table; leaning on social platforms' recommendation machinery, it efficiently surfaces knowledge in a field you care about — say the latest moves in the AI scene.",
+     "capabilities": [
+      "覆盖登录类平台：小红书、微博、B 站等 15 个平台统一路由",
+      "借社交平台推荐机制，高效获取 AI 圈等领域的圈内消息",
+      "doctor 体检 + 失败重试链，多后端自动路由"
+     ],
+     "capabilities_en": [
+      "Covers login-gated platforms: Xiaohongshu, Weibo, Bilibili and more — 15 platforms, one route",
+      "Rides social-platform recommendations to pull insider news from fields like the AI scene",
+      "doctor checkup + failure-retry chain, multi-backend auto routing"
+     ],
+     "links": [
+      {
+       "label": "Agent-Reach · GitHub 仓库",
+       "label_en": "Agent-Reach · GitHub repo",
+       "url": "https://github.com/Panniantong/Agent-Reach"
+      }
+     ]
+    },
+    {
+     "name": "anysearch · 实时搜索引擎",
+     "name_en": "anysearch · real-time search engine",
+     "tagline": "管「广度」的搭档：通用 + 垂直域实时搜索，与 agent-reach 的「深度」互为兜底。",
+     "tagline_en": "The “breadth” partner: general + vertical real-time search, backing up agent-reach's “depth”.",
+     "purpose": "agent-reach 与 anysearch 是一对互补：前者是平台路由器——复用登录态进小红书/微博/B 站，读帖子、评论、视频字幕等深层内容；后者是搜索引擎——通用网页、垂直域（金融/学术/法律/安全）与结构化标识符（Stock/CVE/DOI/IATA），batch_search 批量并行、匿名免登录。一个管「找到有哪些东西」，一个管「把东西读出来」，互相兜住对方的盲区。",
+     "purpose_en": "agent-reach and anysearch are a complementary pair: the former is a platform router — reusing logged-in sessions into Xiaohongshu/Weibo/Bilibili to read posts, comments, video subtitles and other deep content; the latter is a search engine — general web, vertical domains (finance/academic/legal/security) and structured identifiers (Stock/CVE/DOI/IATA), with batch_search parallel queries, anonymous and login-free. One finds “what's out there”, the other “reads it out”; each covers the other's blind spot.",
+     "capabilities": [
+      "广度担当：通用网页 + 垂直域结构化（金融/学术/法律/安全）+ Stock/CVE/DOI/IATA 标识符",
+      "batch_search 一次并行 N 个查询、可混域；无需登录、匿名可用",
+      "与 agent-reach 互为 fallback：不可用时切换，中国网络下 agent-reach 内置 codeload/atom 绕行",
+      "标准协作流：anysearch 广谱侦察 → 定位深挖目标 → agent-reach 登录态读正文 → 汇总报告"
+     ],
+     "capabilities_en": [
+      "Breadth: general web + structured verticals (finance/academic/legal/security) + Stock/CVE/DOI/IATA identifiers",
+      "batch_search runs N queries in parallel across mixed domains; no login needed, anonymous access",
+      "Mutual fallback with agent-reach: switch when unavailable; agent-reach ships codeload/atom detours for China networks",
+      "Standard combo: anysearch broad recon → pin deep-dive targets → agent-reach reads full text with logged-in sessions → synthesize the report"
+     ],
+     "links": [
+      {
+       "label": "anysearch-skill · GitHub 仓库",
+       "label_en": "anysearch-skill · GitHub repo",
+       "url": "https://github.com/anysearch-ai/anysearch-skill"
+      }
+     ]
+    }
+   ],
+   "outcomes": {
+    "products": [
+     {
+      "name": "prompt-enhancer · 提示词优化",
+      "name_en": "prompt-enhancer · prompt optimization",
+      "desc": "把不成熟的想法格式化拓展为规范提示词，三模式自动路由。",
+      "desc_en": "Formats immature ideas into disciplined prompts with three-mode auto routing.",
+      "shot": "assets/line04-a.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别模糊",
+        "title_en": "Spot the fuzz",
+        "desc": "提示词太模糊 AI 只能靠猜，差在哪也不清楚。",
+        "desc_en": "A too-vague prompt leaves the AI guessing, with no clue what's missing."
+       },
+       {
+        "step": "02",
+        "title": "三问定位",
+        "title_en": "Three questions",
+        "desc": "只问目标模型、输出类型、受众约束三个影响方向的问题。",
+        "desc_en": "Ask only the three direction-setting questions: target model, output type, audience constraints."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "三模式自动路由 + 质检清单 + 统一交付格式。",
+        "desc_en": "Three-mode auto routing + QA checklist + unified delivery format."
+       },
+       {
+        "step": "04",
+        "title": "交付迭代",
+        "title_en": "Deliver and iterate",
+        "desc": "What Changed 与假设说明随交付，持续修订优化。",
+        "desc_en": "What Changed and assumption notes ship with every delivery; keep revising."
+       }
+      ]
+     },
+     {
+      "name": "html-beautify · 网页美化与构建",
+      "name_en": "html-beautify · web polish & building",
+      "desc": "从素材库检索相似模板定制网页，渲染优化与打磨。",
+      "desc_en": "Retrieves similar templates from the asset library and tailors the page; rendering polish included.",
+      "shot": "assets/line04-b.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别模板感",
+        "title_en": "Spot the template look",
+        "desc": "网页做出来像模板，是缺少设计方向而非缺组件。",
+        "desc_en": "A page that looks like a template lacks a design direction, not components."
+       },
+       {
+        "step": "02",
+        "title": "四系统合成",
+        "title_en": "Fuse four systems",
+        "desc": "设计方向先定，再落地色彩、排版、动效与中文规范。",
+        "desc_en": "Design direction first, then color, typography, motion and Chinese-typography rules."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "match 选参照或从零设计，DESIGN.md 记录 + finish review 验收。",
+        "desc_en": "match picks a reference or designs from zero; DESIGN.md record + finish review acceptance."
+       },
+       {
+        "step": "04",
+        "title": "产出迭代",
+        "title_en": "Produce and iterate",
+        "desc": "本演示页即产出，7 套主题一键切换。",
+        "desc_en": "This demo page is the output — 7 themes, one-click switching."
+       }
+      ]
+     },
+     {
+      "name": "agent-reach · 互联网能力路由器",
+      "name_en": "agent-reach · internet capability router",
+      "desc": "登录类社交平台资源路由器，借推荐机制获取圈内消息。",
+      "desc_en": "Router for login-gated social platforms; rides recommendations for insider news.",
+      "shot": "assets/line04-c.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别零散",
+        "title_en": "Spot the scatter",
+        "desc": "调研信息散在十几个平台，每个平台各找各的办法。",
+        "desc_en": "Research info sits scattered over a dozen platforms, each with its own workaround."
+       },
+       {
+        "step": "02",
+        "title": "路由表化",
+        "title_en": "Routing table",
+        "desc": "15 平台统一入口，动手前 doctor 体检确认后端可用。",
+        "desc_en": "15 platforms, one entry; run doctor before starting to confirm backends."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "多后端路由 + 6 个零配置渠道 + 失败重试链。",
+        "desc_en": "Multi-backend routing + 6 zero-config channels + failure-retry chain."
+       },
+       {
+        "step": "04",
+        "title": "打法迭代",
+        "title_en": "Iterate the playbook",
+        "desc": "搜索 + 社交平台看讨论 + 中文社区看场景，并行汇总。",
+        "desc_en": "Search + social platforms for discussion + Chinese communities for scenarios, merged in parallel."
+       }
+      ]
+     },
+     {
+      "name": "anysearch · 实时搜索引擎",
+      "name_en": "anysearch · real-time search engine",
+      "desc": "agent-reach 的搭档，补全垂直域检索短板。",
+      "desc_en": "agent-reach's partner, covering the vertical-domain retrieval gap.",
+      "shot": "assets/line04-d.webp",
+      "build": [
+       {
+        "step": "01",
+        "title": "识别不准",
+        "title_en": "Spot the misses",
+        "desc": "通用搜索对股票、CVE、DOI 等专业问题命中差。",
+        "desc_en": "General search handles stocks, CVE, DOI and similar queries poorly."
+       },
+       {
+        "step": "02",
+        "title": "垂直域优先",
+        "title_en": "Verticals first",
+        "desc": "get_sub_domains 先发现子域与必填参数再检索。",
+        "desc_en": "get_sub_domains discovers sub-domains and required params before searching."
+       },
+       {
+        "step": "03",
+        "title": "封装 Skill",
+        "title_en": "Package as a skill",
+        "desc": "单 JSON-RPC 端点，跨平台 CLI 无需安装 MCP server。",
+        "desc_en": "A single JSON-RPC endpoint; cross-platform CLI, no MCP server to install."
+       },
+       {
+        "step": "04",
+        "title": "并行迭代",
+        "title_en": "Iterate in parallel",
+        "desc": "batch_search 一个通用 + N 个垂直域，HYBRID 打法。",
+        "desc_en": "batch_search: one general + N vertical queries — the HYBRID playbook."
+       }
+      ]
+     }
+    ],
+    "metrics": [
+     {
+      "value": "15",
+      "label": "agent-reach 覆盖平台",
+      "label_en": "platforms agent-reach covers"
+     },
+     {
+      "value": "16+",
+      "label": "anysearch 垂直域",
+      "label_en": "anysearch vertical domains"
+     }
+    ],
+    "build": [
+     {
+      "step": "01",
+      "title": "检索现状",
+      "title_en": "Search what exists",
+      "desc": "遇到高频需求先搜现成技能：网页设计、提示词优化、平台调研各有成熟方案。",
+      "desc_en": "For frequent needs, look for an existing skill first: web design, prompt optimization and platform research all have mature options."
+     },
+     {
+      "step": "02",
+      "title": "试用评估",
+      "title_en": "Try and evaluate",
+      "desc": "小任务试用，评估是否值得收编：输出质量、稳定性、维护成本。",
+      "desc_en": "Trial on small tasks and judge whether to adopt: output quality, stability, maintenance cost."
+     },
+     {
+      "step": "03",
+      "title": "组合进工作流",
+      "title_en": "Combine into workflows",
+      "desc": "按用途编组：内容创作组与检索调研组互相配合——调研、素材、网页构建一条链。",
+      "desc_en": "Group by purpose: the content-creation and research-retrieval groups cooperate — research, materials and page building in one chain."
+     },
+     {
+      "step": "04",
+      "title": "蒸馏沉淀",
+      "title_en": "Distill and settle",
+      "desc": "高频用法蒸馏为项目级技能，如本项目的 html-lecture-deck 与 meeting-to-wechat。",
+      "desc_en": "High-frequency usage distilled into project-level skills, like this project's html-lecture-deck and meeting-to-wechat."
+     }
+    ]
+   }
+  }
+ ],
+ "closing": {
+  "heading": "四条线，汇于一处",
+  "heading_en": "Four lines, converging",
+  "text": "个人科研中的 AI 能力，经由团队协作被放大；团队协作的公共工具，反过来滋养每个人的研究。从接力棒到知识图谱、从会议纪要到 M 系列文档——过程性信息沉淀为可复用的数据资产，全部有可打开的真实文件佐证。如果这套实践与贵司的业务场景有交汇之处，期待进一步沟通。",
+  "text_en": "AI capability in individual research is amplified through team collaboration; the team's shared tools in turn nourish each member's research. From batons to knowledge graphs, from minutes to M-series docs — process information settles into reusable data assets, all backed by openable real files. If any of this practice intersects with your business scenarios, I look forward to talking further.",
+  "cta_primary": "进一步沟通",
+  "cta_primary_en": "Let's talk",
+  "cta_secondary": "回到技能全景",
+  "cta_secondary_en": "Back to skill overview",
+  "foot_note": "本页由 html-beautify 设计系统构建 · 内容为真实技能实践记录",
+  "foot_note_en": "Built with the html-beautify design system · content is a real record of skill practice"
+ }
+}

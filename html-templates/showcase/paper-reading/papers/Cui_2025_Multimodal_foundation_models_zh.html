@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>迈向分子细胞生物学的多模态基础模型 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="top-nav-bar">
+<span class="current"><span data-zh>&#x1F9EC; MFM 详解</span><span data-en>&#x1F9EC; MFM Deep Dive</span></span>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="../knowledge_graph.html"><span data-zh>&#x1F5FA; 知识图谱</span><span data-en>&#x1F5FA; Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">&#x1F4E5; <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<header>
+  <h1>迈向分子细胞生物学的多模态基础模型<br>—— 详细中文解读</h1>
+  <div class="meta">
+    <span><strong>作者：</strong>Haotian Cui, Alejandro Tejada-Lapuerta, Maria Brbić 等 18 人</span><br>
+    <span><strong>期刊：</strong>Nature</span>
+    <span><strong>卷期：</strong>Vol 640, 17 April 2025</span>
+    <span><strong>类型：</strong>Perspective（前瞻展望）</span><br>
+    <span><strong>DOI：</strong><a href="https://doi.org/10.1038/s41586-025-08710-y">10.1038/s41586-025-08710-y</a></span>
+  </div>
+  <div class="abstract-box">
+    <strong>核心要义：</strong>高通量组学技术带来了生物数据的指数级增长，但从中提取分子层面的洞见仍是一个巨大挑战。本文提出构建<strong>多模态基础模型（Multimodal Foundation Models, MFM）</strong>——在基因组学、转录组学、表观基因组学、蛋白质组学、代谢组学和空间组学等多种组学数据上进行预训练的深度神经网络，以全面刻画细胞的分子状态。通过迁移学习，MFM 可以赋能从新型细胞类型识别、生物标志物发现、基因调控推断到计算机内扰动（in silico perturbation）等广泛的应用。作者认为这一范式将开启 AI 赋能分子生物学分析的新时代。
+  </div>
+</header>
+
+<nav class="toc">
+<details open>
+<summary><span data-zh>目录</span><span data-en>Contents</span></summary>
+<ol>
+  <li><a href="#sec-0">第0节 · 阅读导引</a> — 基础模型是什么？为什么分子生物学需要它？</li>
+  <li><a href="#sec-1">第1节 · 背景与动机：从全细胞建模到数据驱动</a></li>
+  <li><a href="#sec-2">第2节 · 多模态基础模型（MFM）概述</a> — 基础模型概念 + Lab-in-the-Loop</li>
+  <li><a href="#sec-3">第3节 · MFM 的应用机遇</a> — 组织异质性、基因功能预测、in silico 扰动</li>
+  <li><a href="#sec-4">第4节 · 构建 MFM 的计算架构</a> — 统一Token空间、多级注意力、训练任务</li>
+  <li><a href="#sec-5">第5节 · 挑战与局限</a> — 数据与算力、评估标准、可解释性、伦理</li>
+  <li><a href="#sec-6">第6节 · 未来展望：协同创新的生态</a></li>
+</ol>
+</details>
+</nav>
+
+<!-- ================================================================ -->
+<section id="sec-0">
+<h2>第0节 · 阅读导引</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>这篇论文在说什么？</h4>
+<p>简单地说，这篇论文提出了一种<strong>用 AI 大模型统一理解和预测分子生物学</strong>的愿景。就像 ChatGPT 可以通过海量文本学习语言规则并回答各种问题一样，作者设想训练一个"细胞版GPT"——在 DNA、RNA、蛋白质等各类生物数据上进行预训练，从而学会细胞内的分子交互规则，最终能回答诸如"这个基因在癌细胞中起什么作用？""如果敲除这个基因，细胞会怎样？""这两种细胞类型有什么区别？"等问题。</p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>核心术语</h4>
+<table>
+  <tr><th>术语</th><th>含义</th></tr>
+  <tr><td><strong>基础模型（Foundation Model）</strong></td><td>在广泛数据上以自监督方式预训练的大型深度神经网络，通过迁移学习适配到各类下游任务</td></tr>
+  <tr><td><strong>多模态基础模型（MFM）</strong></td><td>能够接受多种组学数据类型（转录组、蛋白质组、表观组等）作为输入的基础模型</td></tr>
+  <tr><td><strong>Transformer</strong></td><td>基于注意力机制的深度学习架构，是现代基础模型的核心技术基石</td></tr>
+  <tr><td><strong>Token（令牌）</strong></td><td>输入数据的基本处理单元。在自然语言中是词片段，在MFM中是基因、蛋白质或核苷酸等</td></tr>
+  <tr><td><strong>预训练（Pretraining）</strong></td><td>在海量无标注数据上训练模型学习通用表示的过程</td></tr>
+  <tr><td><strong>迁移学习（Transfer Learning）</strong></td><td>将预训练学到的知识适配到特定下游任务（如微调、上下文学习）</td></tr>
+  <tr><td><strong>自监督学习（Self-supervised Learning）</strong></td><td>从数据本身构造监督信号（如掩码预测），无需人工标注</td></tr>
+  <tr><td><strong>组学（Omics）</strong></td><td>高通量分子测量技术的统称，如基因组学、转录组学、蛋白质组学</td></tr>
+</table>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<h4>阅读建议</h4>
+<ul>
+  <li><strong>如果你不熟悉深度学习和 Transformer：</strong>请重点阅读第0节和第2节的"基础模型概念"部分，先建立"AI大模型+生物学"的直觉。</li>
+  <li><strong>如果你有 AI/ML 背景但不熟悉生物学：</strong>第1节和第3节的生物学动机和应用场景是关键。</li>
+  <li><strong>如果你熟悉单细胞组学分析：</strong>第4节的多级注意力和统一 Token 空间部分最值得关注。</li>
+  <li><strong>这是一篇 Perspective 论文：</strong>它不报告新实验结果，而是勾勒一个研究范式的愿景蓝图。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-1">
+<h2>第1节 · 背景与动机</h2>
+
+<h3>1.1 分子生物学的核心追问</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>分子细胞生物学有一个根本的追问：<strong>DNA、RNA、蛋白质和代谢物之间是如何动态交互和调控的？</strong>如果我们能完全理解这些交互，就能模拟和预测细胞从发育到衰老、从健康到疾病的全过程——这本质上就是"虚拟细胞"（virtual cell）的梦想。</p>
+<p>打个比方：如果你想知道一个城市如何运作，你需要知道每条道路（通路）的走向、每个红绿灯（调控点位）的设置、交通流量（表达水平）的变化。分子生物学家就是在做"细胞这座城市的交通规划"。</p>
+</div>
+
+<h3>1.2 传统方法的局限：ODE 全细胞模型的困境</h3>
+
+<p>过去几十年，研究者尝试用<strong>常微分方程（ODE）</strong>来建模全细胞。2012年，第一篇全细胞模型用28个ODE模拟了生殖支原体（<em>Mycoplasma genitalium</em>）的细胞过程。</p>
+
+<div class="warning">
+<span class="tag">关键问题</span>
+<h4>为什么 ODE 方法不够？</h4>
+<ul>
+  <li><strong>动力学过度简化：</strong>ODE 假设可以用简单的连续函数描述细胞内复杂的非线性交互，但实际上生物调控涉及大量离散的开关、反馈回路和非线性放大。</li>
+  <li><strong>数学不稳定性：</strong>大规模 ODE 系统对参数极度敏感，微小的参数扰动可能导致截然不同的预测。</li>
+  <li><strong>规模限制：</strong>现有的虚拟细胞模型大多局限于细菌，难以捕捉哺乳动物细胞在组织异质性和时空动态上的复杂性。</li>
+</ul>
+</div>
+
+<h3>1.3 双重突破带来的新机遇</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>两大驱动力</h4>
+<p><strong>突破一：高通量组学技术呈指数级增长</strong></p>
+<ul>
+  <li><strong>单细胞测序</strong>（如 scRNA-seq, scATAC-seq）可以在单个细胞的粒度上测量成千上万个基因的表达</li>
+  <li><strong>多模态联合测量</strong>（如 CITE-seq 同时测量RNA和蛋白质，TEA-seq 同时测量转录组、表位和染色质可及性）正成为可能</li>
+  <li>全球性联盟项目——<strong>Human Cell Atlas (HCA)</strong>, <strong>HuBMAP</strong>, <strong>HTAN</strong>——已积累了数百万细胞的跨模态数据</li>
+</ul>
+<p><strong>突破二：大规模机器学习预训练范式的成熟</strong></p>
+<ul>
+  <li>GPT系列（GPT-3, GPT-4）和 Llama 系列证明了在<strong>海量无标注数据</strong>上预训练的Transformer模型可以习得通用知识，并通过迁移学习快速适配到各种下游任务</li>
+  <li>在生物学中，<strong>AlphaFold2</strong>（蛋白质结构预测）、<strong>ESM2/3</strong>（蛋白质序列语言模型）、<strong>scGPT</strong>（单细胞转录组基础模型）、<strong>GeneFormer</strong>（基因网络预测）等先驱性工作已验证 Transformer 在生物分子建模中的潜力</li>
+</ul>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>scGPT：单细胞领域的"GPT"</h4>
+<p>scGPT（Cui et al., 2024, <em>Nature Methods</em>）——由本文作者之一Haotian Cui主导——在超过 3300 万个单细胞数据上预训练了一个生成式Transformer，学习细胞和基因的表示。预训练后，scGPT 可以通过微调适配到细胞类型注释、基因扰动预测、多组学整合等下游任务。这是 MFM 愿景在单细胞转录组方向的早期实现。</p>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>分子生物学的终极梦想——虚拟细胞——受限于传统ODE方法的规模和非线性处理能力。</li>
+  <li><strong>数据端</strong>：单细胞多组学产生了前所未有的海量数据；<strong>方法端</strong>：Transformer+预训练范式在AI领域取得了革命性成功。</li>
+  <li>两者的交汇点催生了<strong>多模态基础模型（MFM）</strong>的构想。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-2">
+<h2>第2节 · 多模态基础模型（MFM）概述</h2>
+
+<p>在给出 MFM 的定义之前，先看一幅全景图：它展示的是<strong>数据端</strong>——多模态测量技术能产出什么数据——以及这些数据指向的<strong>应用端</strong>，这正是 MFM 愿景的两个支点。</p>
+
+<img src="images/Cui/Cui_Fig1.jpg" alt="原论文Figure 1：多模态分析技术及其应用全景">
+
+<p class="fig-caption"><strong>原论文 Figure 1：多模态分析技术及其应用。</strong>(a) <strong>多模态分析技术</strong>：组织样本解离为单细胞后，可通过微流控单细胞测序获取单细胞分辨率的分子数据，也可直接做空间组学（Spatial profiling），或以质谱等其他分析技术补充测量。(b) <strong>沿中心法则的多组学数据</strong>：同一套方法体系可以并行读出染色质可及性（scATAC-seq）、基因表达（scRNA-seq，经 RNA Pol II）、甲基化修饰、扰动后的转录响应（Perturb-seq，经 sgRNA）以及表面蛋白标志（CITE-seq，条形码抗体）——覆盖从 DNA 到 RNA 再到蛋白质的多个层面。(c) <strong>重建细胞动力学的应用机遇</strong>：从干细胞出发，刻画分化、衰老与疾病进展（如癌症），进而走向计算机内扰动（in silico perturbation）、发育轨迹推演与潜在治疗；箭头表示这些应用的底层机制彼此相连——解决其中一个任务（如扰动预测）能促进其他任务（如发育轨迹推断）。这正是后文"一个 MFM 通吃多任务"愿景的数据基础。<br>图源：Cui et al., <em>Nature</em> (2025)。</p>
+
+<h3>2.1 什么是基础模型？</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>传统机器学习模型像是"专才"——一个模型只擅长一项特定任务（比如只识别猫的照片）。<strong>基础模型</strong>（Foundation Model）则像是"通才"——在海量多元化数据上预训练后，同一个模型可以快速适应到各种各样的任务。</p>
+<p>核心公式：<strong>大规模预训练 → 习得通用知识和表示 → 迁移学习适配下游任务</strong></p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>传统专业模型 vs 多模态基础模型（Table 1）</h4>
+<table>
+  <tr><th>特征</th><th>传统专业模型</th><th>MFM</th></tr>
+  <tr><td>预训练</td><td>无</td><td>在多样化多模态数据上大规模预训练</td></tr>
+  <tr><td>适用性</td><td>限于特定细胞类型/模态/单一任务</td><td>跨细胞类型、跨模态、多任务通用</td></tr>
+  <tr><td>学习范式</td><td>通常需要人工标注的有监督学习</td><td>自监督+对比学习+跨模态目标，可从无标注数据中学习</td></tr>
+  <tr><td>过拟合风险</td><td>小数据集上容易过拟合</td><td>大规模预训练降低了过拟合风险</td></tr>
+  <tr><td>泛化能力</td><td>对新数据/新细胞类型泛化较差</td><td>通过上下文学习泛化到未见的细胞和条件</td></tr>
+</table>
+</div>
+
+<p>上方表格是简化转写，此处附原论文 Table 1 截图，可对照原文的完整表述（含右侧"详细见哪一节"列）。</p>
+
+<img src="images/Cui/Cui_Tab1.jpg" alt="原论文Table 1：分子细胞生物学中传统机器学习模型与 MFM 的对比">
+
+<p class="fig-caption"><strong>原论文 Table 1：传统机器学习模型与 MFM 对比。</strong>行 = 五个关键特征（预训练、适用性、学习范式、过拟合风险、对未见数据与语境的泛化）；中间两列分别给出传统专业模型与 MFM 的对应表述，内容与上方转写表一致；最右一列 <strong>Detailed in section</strong> 指示每个特征在论文的哪一节详细展开——如"适用性"指向 Opportunities of MFMs 一节、"学习范式"指向 Towards building MFMs 一节。<br>图源：Cui et al., <em>Nature</em> (2025)。</p>
+
+<h3>2.2 核心架构：为什么是 Transformer？</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>Transformer 的本质是通过<strong>注意力机制（Attention）</strong>来建模输入序列中任意两个元素之间的交互强度。在自然语言中，这对应着"一个词对另一个词的语义相关性"；在分子生物学中，这对应着<strong>"一个基因对另一个基因的调控强度"或"一个蛋白质与另一个蛋白质的相互作用强度"</strong>。</p>
+<p>也就是说，Transformer 的注意力机制天然地与生物分子交互网络的本质结构同构——生物分子之间的调控、互作、信号传导本质上就是一种"生物注意力"。</p>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>生物学中的 Transformer 里程碑</h4>
+<table>
+  <tr><th>模型</th><th>领域</th><th>关键贡献</th></tr>
+  <tr><td>AlphaFold2 (Jumper 2021)</td><td>蛋白质结构预测</td><td>利用注意力机制建模氨基酸之间的空间关系</td></tr>
+  <tr><td>ESM2/ESM3 (Meta)</td><td>蛋白质语言模型</td><td>在数亿蛋白质序列上训练，可预测结构、功能和新蛋白质生成</td></tr>
+  <tr><td>Enformer (Avsec 2021)</td><td>基因组学</td><td>从 DNA 序列预测基因表达和染色质状态</td></tr>
+  <tr><td>scGPT (Cui 2024)</td><td>单细胞转录组</td><td>3300万细胞预训练，适配到细胞注释、扰动预测等</td></tr>
+  <tr><td>GeneFormer (Theodoris 2023)</td><td>基因网络</td><td>3000万单细胞转录组预训练，实现基因网络预测</td></tr>
+</table>
+</div>
+
+<h3>2.3 Lab-in-the-Loop：数据驱动的新科研范式</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>传统生物学是"假设驱动"的——研究者基于已有知识提出假设，设计实验验证，修正理论。而 MFM 倡导一种<strong>"数据驱动 + 实验室在环"</strong>的新范式：</p>
+<ol>
+  <li>大规模生成假设无关的数据（如单细胞多组学）</li>
+  <li>预训练 MFM 捕捉数据中的复杂非线性模式</li>
+  <li>用 MFM <strong>主动推荐</strong>下一个最有价值的实验（如预测不确定性最高的药物-细胞组合）</li>
+  <li>将实验结果反馈回训练数据，迭代优化模型</li>
+</ol>
+<p>这就像一群科学家与一个 AI 助手在对话：AI 说"我对这几个细胞系的预测最没把握，建议你先做这些"，科学家做完实验后，AI 变得更聪明，再给出下一轮建议。</p>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MFM 核心理念：<strong>跨模态预训练 → 通用分子表示 → 迁移学习</strong>。</li>
+  <li>Transformer + 注意力机制天然适配生物分子交互网络的建模。</li>
+  <li>Lab-in-the-Loop 将生物学从"假设驱动"转向"数据驱动+迭代优化"，类似于 AI 辅助的贝叶斯实验设计（Bayesian experimental design）。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-3">
+<h2>第3节 · MFM 的应用机遇</h2>
+
+<h3>3.1 刻画组织异质性（Characterizing Tissue Heterogeneity）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>即使是同一组织的细胞，其分子状态也可能天差地别——就像同一公司的员工各有不同的分工和状态。这种<strong>细胞异质性</strong>是癌症治疗失败（耐药亚克隆）、发育异常和退行性疾病的关键因素。MFM 可以：</p>
+<ul>
+  <li>发现传统方法遗漏的<strong>稀有细胞亚型</strong></li>
+  <li>在跨模态空间中<strong>精确定位</strong>每个细胞的分子状态</li>
+  <li>整合来自不同研究、不同平台的数据，<strong>消除批次效应</strong></li>
+</ul>
+</div>
+
+<h3>3.2 基因功能与调控推断</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>人类基因组有约2万个编码蛋白的基因，但其中<strong>大量基因的功能尚未被充分理解</strong>。MFM 通过在大规模多组学数据中学习基因之间的共表达、互作和调控模式，可以：</p>
+<ul>
+  <li>预测未知基因的生物学功能（类比"根据一个人的朋友圈推断这个人的职业"）</li>
+  <li>重建<strong>基因调控网络（Gene Regulatory Network, GRN）</strong>——即"谁调控谁"的分子地图</li>
+  <li>整合表观基因组数据（如染色质可及性），识别关键转录因子和增强子-启动子互作</li>
+</ul>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>联合多模态推断调控网络</h4>
+<p>现有方法常依赖单一模态：WGCNA 只用 RNA 表达数据推断共表达网络；ATAC-seq 只测量染色质开放区域。MFM 可以<strong>同时利用 RNA 表达 + 染色质可及性 + 蛋白质丰度 + 空间位置</strong>来综合推断基因间调控关系，这就像断案时综合 DNA、指纹、监控录像和目击证词——比任何单一证据都更可靠。</p>
+</div>
+
+<h3>3.3 计算机内扰动（In Silico Perturbation）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>这是 MFM 最具革命性的应用。如果你想知道"敲除基因A会不会杀死癌细胞？"，传统方法需要花数周到数月做实验。MFM 设想<strong>在模型的参数空间中模拟这种扰动</strong>，得到一个计算预测，然后只用实验验证最有前途的候选——就像一个"分子生物学飞行模拟器"。</p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>In Silico Perturbation 的三种层次</h4>
+<ol>
+  <li><strong>单基因扰动：</strong>预测敲除/过表达单个基因对全转录组的影响。已有工具如 scGen、GEARS 在这一方向取得了初步成功。</li>
+  <li><strong>多基因组合扰动：</strong>同时改变多个基因的表达——这在实验中组合爆炸（combinatorial explosion）使穷举不可能，但 MFM 的计算模拟可以高效探索这个空间。</li>
+  <li><strong>药物响应预测：</strong>将药物处理视为"化学扰动"，预测特定药物在特定细胞类型中的转录响应。</li>
+</ol>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>组织异质性刻画</strong>：发现稀有细胞亚型，实现跨模态细胞状态精准定位。</li>
+  <li><strong>基因功能推断</strong>：利用多模态数据冗余来揭示基因功能和调控关系。</li>
+  <li><strong>In silico 扰动</strong>：MFM 最具变革性的应用——在计算机中模拟基因操作效果，大幅减少实验成本和时间。</li>
+  <li>三个应用方向是<strong>互相关联</strong>的——解决了组织异质性问题，自然就能更好地做基因功能推断和扰动预测。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-4">
+<h2>第4节 · 构建 MFM 的计算架构</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>本节是论文的技术核心。作者提出了构建 MFM 的四大计算组件（Fig. 3），就像汽车需要发动机、变速箱、轮子和方向盘一样，MFM 需要：(1) 将不同组学数据"翻译"成统一的"语言"；(2) 在同一模态内部和多模态之间分别建模交互；(3) 设计聪明的"考题"让模型自学；(4) 融入人类积累的生物先验知识。</p>
+</div>
+
+<p>下面这张 Fig. 3 正是上述架构的全景图：面板 a 对应第 (1)(2) 两个组件的串联数据流，面板 b 是对多级注意力的内部拆解。</p>
+
+<img src="images/Cui/Cui_Fig3.jpg" alt="原论文Figure 3：MFM 计算组件——统一 Token 空间与多级注意力（模内+模间）">
+
+<p class="fig-caption"><strong>原论文 Figure 3：多模态基础模型的计算组件。</strong>(a) <strong>期望组件总览</strong>（数据流从左到右）：基因组学/转录组学/蛋白质组学/空间谱等多模态输入 → 统一分词器（Unified tokenizer）→ 统一 Token 空间（核苷酸 Token、基因 Token、蛋白质 Token 及其他 Token，对应 4.1 节的层级化设计）→ 多级注意力（Multilevel attention，对应 4.2 节）→ 预训练与下游任务（自监督学习、有监督学习，下游覆盖模内预测、跨模态预测、扰动响应预测、基因网络重建、变异检测与疾病分类等）。(b) <strong>模内/模间注意力机制放大图</strong>：$Nx$ 个"多级注意力块"依次堆叠，每块内先做模间注意力（Intermodal attention）、再做模内注意力（Intramodal attention），各自经 Add &amp; Norm 与 Feedforward 处理后融合输出；两侧放大面板展示单头的 Q/K/V 计算与注意力权重矩阵——<strong>实心方块</strong>表示对应 Query–Key 对之间计算注意力，<strong>虚线方块</strong>表示不计算——这正是 4.2 节数学部分 $M_{\text{intra}}$、$M_{\text{inter}}$ 掩码矩阵的图形化表达。<br>图源：Cui et al., <em>Nature</em> (2025)。</p>
+
+<h3>4.1 统一 Token 空间（Unified Token Space）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>从多模态数据到统一 Token</h4>
+<p>MFM 的第一个关键技术挑战是：<strong>如何将性质迥异的组学数据（连续的基因表达值、离散的DNA序列、三维的蛋白质结构）转化为同一个模型能处理的统一格式？</strong></p>
+<p>作者的解决方案是借鉴 NLP 中的 "tokenization"（分词）策略，构建<strong>层级化的统一 Token 空间</strong>：</p>
+<ul>
+  <li><strong>低层级 Token</strong>：将核苷酸（A/T/C/G）或氨基酸（20种）作为离散词汇直接分词（如 DNABERT-2 的做法）</li>
+  <li><strong>高层级 Token</strong>：将基因、蛋白质或其他功能单元作为更高语义的 Token</li>
+  <li><strong>混合粒度：</strong>在同一个模型中同时使用不同层级的 Token，使模型能在多个生物尺度上推理</li>
+</ul>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>Token化类比</h4>
+<p>在 NLP 中，tokenization 将一段文本拆分为词片段：</p>
+<p>"The cat sat on the mat" → ["The", "cat", "sat", "on", "the", "mat"]</p>
+<p>在 MFM 中，tokenization 将分子数据拆分为生物学上有意义的单元：</p>
+<p>一个细胞的转录组 → [Gene<sub>TP53</sub>, Gene<sub>BRCA1</sub>, ..., Gene<sub>ACTB</sub>]</p>
+<p>一段 DNA 序列 → [A, T, G, C, C, G, A, T, ...]</p>
+<p><strong>关键是：所有类型的 Token 共享同一个嵌入空间</strong>，就像不管中文还是英文，都翻译成同一个"概念向量空间"。</p>
+</div>
+
+<h3>4.2 多级注意力（Multilevel Attention）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>模内注意力（Intramodal Attention）+ 模间注意力（Intermodal Attention）</h4>
+<p>分子生物学数据天然具有<strong>多尺度结构</strong>——从单个碱基对到基因，从基因到通路，从通路到细胞状态。作者提出使用<strong>混合 Transformer 架构</strong>来分层建模这些尺度：</p>
+
+<p><strong>模内注意力（Intramodal Attention）：</strong>同一层级 Token 之间的自注意力操作。</p>
+<ul>
+  <li>例：基因→基因的交互（基因调控网络）</li>
+  <li>例：核苷酸→核苷酸的交互（序列基序）</li>
+</ul>
+
+<p><strong>模间注意力（Intermodal Attention）：</strong>跨层级、跨模态 Token 之间的注意力操作。</p>
+<ul>
+  <li>例：基因 ↔ 蛋白质的交互（翻译调控）</li>
+  <li>例：基因 ↔ 染色质区域的交互（表观调控）</li>
+</ul>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>Swin Transformer 的生物学类比</h4>
+<p>在计算机视觉中，Swin Transformer 使用分层的局部+全局注意力来高效处理大图像——先在每个小图像块内部做注意力，再在块之间做注意力。MFM 的多级注意力同理——先在"基因模块"内部建模基因-基因关系，再在"跨组学模块"间建模转录组-蛋白质组的关系。</p>
+<p>有趣的对比：Swin Transformer 处理的是<strong>空间层级</strong>（像素→块→图像），MFM 处理的是<strong>生物层级</strong>（核苷酸→基因→通路→细胞）。</p>
+</div>
+
+<div class="definition">
+<span class="tag">数学基础：从注意力公式到多级掩码</span>
+<h4>第一步 · 单头注意力核心公式（Vaswani et al. 2017）</h4>
+<p>Transformer 中，输入序列的每个元素被编码为一个向量（token embedding）。给每个 token 分配三个角色——<strong>Query（Q，我在找什么）</strong>、<strong>Key（K，我能提供什么）</strong>、<strong>Value（V，我传递什么信息）</strong>——通过三个可学习的线性变换得到：</p>
+
+\[
+Q = XW^Q,\quad K = XW^K,\quad V = XW^V
+\]
+
+<p>其中 \(X \in \mathbb{R}^{n \times d}\) 是 \(n\) 个 token 的嵌入矩阵（每个 \(d\) 维），\(W^Q, W^K, W^V \in \mathbb{R}^{d \times d_k}\) 是可学习的权重矩阵。核心单头计算为：</p>
+
+\[
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\]
+
+<table>
+  <tr><th>步骤</th><th>操作</th><th>输出形状</th><th>含义</th></tr>
+  <tr><td>①</td><td>\(S = QK^T\)</td><td>\(n \times n\)</td><td>每个 Query 与每个 Key 的相似度（内积越大 → 越相关）</td></tr>
+  <tr><td>②</td><td>\(S / \sqrt{d_k}\)</td><td>\(n \times n\)</td><td>缩放——防止 \(d_k\) 太大时内积值过大、softmax 退化为 one-hot</td></tr>
+  <tr><td>③</td><td>\(A = \text{softmax}(S/\sqrt{d_k})\)</td><td>\(n \times n\)</td><td>每行归一化为概率分布（和为1）——这就是 <strong>注意力权重矩阵</strong></td></tr>
+  <tr><td>④</td><td>\(O = AV\)</td><td>\(n \times d_k\)</td><td>用注意力权重对 V 加权求和——每个位置的输出是所有位置 V 的加权组合</td></tr>
+</table>
+
+<p><strong>直观理解：</strong>第 \(i\) 个位置的输出 = "关于我要找的东西（\(Q_i\)），我和每个位置 \(j\) 的匹配度有多高（\(Q_i \cdot K_j\)），我就按这个匹配度去取位置 \(j\) 的实际信息（\(V_j\)）并加权汇总。"</p>
+
+<h4>第二步 · 多头注意力</h4>
+<p>单头只学一种"关联模式"。多头让模型<strong>同时学多种关系</strong>：</p>
+
+\[
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O
+\]
+
+\[
+\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)
+\]
+
+<p>\(h\) 个头各自有独立的 \(W_i^Q, W_i^K, W_i^V\) 矩阵，最后拼接后经 \(W^O\) 变换融合。</p>
+
+<h4>第三步 · 多级注意力：通过掩码拆分为模内 + 模间</h4>
+<p>Cui 论文的核心架构创新在于：<strong>用注意力掩码（attention mask）控制哪些 token 对之间允许计算注意力</strong>，将全连接自注意力拆成两套独立操作：</p>
+
+<p><strong>模内注意力（Intramodal）：</strong></p>
+
+\[
+O_{\text{intra}} = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} \odot M_{\text{intra}}\right)V
+\]
+
+<p>\(M_{\text{intra}}\) 是一个 \(n \times n\) 的二元掩码：仅当 token \(i\) 和 token \(j\) 属于<strong>同一模态且同一层级</strong>时 \(M_{ij}=1\)，否则 \(M_{ij}=0\)（mask 位置在 softmax 前设为 \(-\infty\)，使注意力权重归零）。</p>
+
+<p><strong>模间注意力（Intermodal）：</strong></p>
+
+\[
+O_{\text{inter}} = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}} \odot M_{\text{inter}}\right)V
+\]
+
+<p>\(M_{\text{inter}}\) 仅在<strong>不同模态或不同层级</strong>的 token 之间打开（\(M_{ij}=1\)），同模态内部关闭。最终输出为两者的组合（加权加和或在 Transformer Block 中交替堆叠）：</p>
+
+\[
+O = O_{\text{intra}} + O_{\text{inter}}
+\]
+
+<p>对比传统全连接 Transformer（所有 token 对所有 token 计算注意力，复杂度 \(O(n^2)\) 且无法区分不同类型的交互），多级注意力实现了：<strong>模内聚焦同类交互的高分辨率模式（基因调控网络/蛋白互作网络），模间聚焦跨类交互的宽视野模式（转录→翻译→代谢），两者互不干扰但信息最终融合。</strong></p>
+</div>
+
+<div class="intuition">
+<span class="tag">逐步骤逻辑流</span>
+<h4>为什么 Attention 天然适合生物分子建模？</h4>
+<p>生物分子之间的调控、互作、信号传导本质上就是一种"生物注意力"——TP53 转录因子"关注"MDM2 的启动子区域来激活其转录，转录后 MDM2 蛋白反过来"关注"p53 蛋白进行泛素化降解。Transformer 的 \(QK^T\) 内积计算恰好等价于评估所有分子对之间的"交互强度"：</p>
+
+<table>
+  <tr><th>AI 概念</th><th>生物学等价</th></tr>
+  <tr><td>\(Q_i \cdot K_j\)（注意力得分）</td><td>分子 \(i\) 与分子 \(j\) 之间的物理/调控交互强度</td></tr>
+  <tr><td>softmax 归一化</td><td>在分子的所有"交互伙伴"中按相对强度分配"影响力预算"</td></tr>
+  <tr><td>加权求和 \(AV\)</td><td>每个分子的新表示 = 所有交互伙伴对其贡献的加权汇总</td></tr>
+  <tr><td>\(M_{\text{intra}}\) 掩码</td><td>约束"同类型分子之间才能直接交互"（如蛋白-蛋白互作网络）</td></tr>
+  <tr><td>\(M_{\text{inter}}\) 掩码</td><td>约束"跨类型分子之间才能交互"（如转录因子-基因启动子）</td></tr>
+</table>
+
+<p><strong>与计算机视觉先行者的对应关系：</strong></p>
+
+<table>
+  <tr><th>CV 模型</th><th>CV 层级</th><th>生物学类比</th></tr>
+  <tr><td><strong>Swin Transformer</strong></td><td>小窗口内局部注意力 → 合并窗口后全局注意力</td><td>基因模块内模内注意力 → 跨组学模块间模间注意力</td></tr>
+  <tr><td><strong>MultiScale ViT</strong></td><td>同时处理多个分辨率下的图像块</td><td>同时处理核苷酸、基因、通路三个尺度</td></tr>
+</table>
+
+<p>核心思想一致：<strong>不把所有信息一次性摊平做全连接注意力，而是分层、分块、分尺度地做——每一层注意力只负责自己那一层的"语言"。</strong></p>
+</div>
+
+<div class="example">
+<span class="tag">具体数值示例</span>
+<h4>TP53 / MDM2 的微型 MFM 走查</h4>
+<p>假设一个微型 MFM，输入包含两个模态共 4 个 token，每个是 \(d=4\) 维嵌入向量：</p>
+
+<table>
+  <tr><th>Token</th><th>嵌入向量</th><th>模态</th></tr>
+  <tr><td><code>gene_TP53</code></td><td>[1.0, 0.2, 0.5, 0.1]</td><td>转录组（mRNA）</td></tr>
+  <tr><td><code>gene_MDM2</code></td><td>[0.3, 0.9, 0.4, 0.2]</td><td>转录组（mRNA）</td></tr>
+  <tr><td><code>prot_p53</code></td><td>[1.1, 0.1, 0.6, 0.0]</td><td>蛋白质组（protein）</td></tr>
+  <tr><td><code>prot_MDM2</code></td><td>[0.2, 1.0, 0.5, 0.3]</td><td>蛋白质组（protein）</td></tr>
+</table>
+
+<h4>模内注意力：基因↔基因</h4>
+<p>设 \(d_k = 4\)，\(W^Q, W^K, W^V\) 用单位矩阵简化。仅对基因模态的 2 个 token 计算：</p>
+
+\[
+QK^T = \begin{bmatrix} 1.0 & 0.2 & 0.5 & 0.1 \\ 0.3 & 0.9 & 0.4 & 0.2 \end{bmatrix} \times \begin{bmatrix} 1.0 & 0.3 \\ 0.2 & 0.9 \\ 0.5 & 0.4 \\ 0.1 & 0.2 \end{bmatrix} = \begin{bmatrix} 1.30 & 1.70 \\ 1.70 & 1.10 \end{bmatrix}
+\]
+
+\[
+\frac{QK^T}{\sqrt{4}} = \begin{bmatrix} 0.65 & 0.85 \\ 0.85 & 0.55 \end{bmatrix}
+\]
+
+\[
+\text{softmax（按行）} = \begin{bmatrix} 0.45 & 0.55 \\ 0.57 & 0.43 \end{bmatrix}
+\]
+
+<p><strong>注意力权重的生物含义：</strong></p>
+<ul>
+  <li>TP53 基因对 MDM2 基因的注意力权重 = 0.55（>0.45，对自身的关注）</li>
+  <li>MDM2 基因对 TP53 基因的注意力权重 = 0.57（>0.43，对自身的关注）</li>
+</ul>
+
+<p>模型从数据中"自动发现"了<strong>生物学上的真实调控关系</strong>——p53 转录因子直接激活 MDM2 的转录，注意力权重精准反映了这对基因的调控耦合强度。如果换成两个功能无关的基因（如 TP53 和一个嗅觉受体基因），它们的内积会接近零，注意力权重会被 softmax 压到极低。</p>
+
+<h4>模间注意力：基因↔蛋白</h4>
+<p>模间注意力跨越模态界限。\(M_{\text{inter}}\) 掩码让 <code>gene_TP53</code> 可以关注 <code>prot_p53</code> 和 <code>prot_MDM2</code>，但不能关注 <code>gene_MDM2</code>（后者是模内注意力的职责）。</p>
+
+<p>模间注意力得分的高低直接编码了<strong>跨中心法则的调控特征</strong>：</p>
+<ul>
+  <li>gene_TP53 与 prot_p53 的注意力得分高 → 转录→翻译效率正常，"基因表达多少，蛋白就产出多少"</li>
+  <li>gene_TP53 与 prot_p53 的注意力得分低（但 gene_TP53 表达值高）→ 暗示存在<strong>翻译后调控</strong>——MDM2 蛋白正在泛素化降解 p53，使蛋白水平背离了 mRNA 水平</li>
+</ul>
+
+<h4>对比：如果只用全局注意力</h4>
+<p>传统全连接 Transformer 把 4 个 token 混在一起，每个 token 均摊关注另外 3 个——模型无法区分"基因调控关系"（模内）和"翻译关系"（模间），相当于把生物学上性质完全不同的两类交互混为一谈。多级注意力的优势在此刻显现：<strong>分开计算，各自捕捉自己层级的最佳表示，最后融合，而非混在一起从嘈杂信号中硬学。</strong></p>
+</div>
+
+<h3>4.3 训练任务与 Prompt Token（Fig. 4a）</h3>
+
+<p>下图是原论文 Fig. 4 的上半部分：四种训练任务在"统一 Token 生成框架"下的原始示意（下半部分的四大挑战见 5.1 节）。</p>
+
+<img src="images/Cui/Cui_Fig4a.jpg" alt="原论文Figure 4a：四种预训练任务——掩码重构、纵向生成、跨模态生成、条件生成">
+
+<p class="fig-caption"><strong>原论文 Figure 4a：潜在训练任务（含提示 Token）。</strong>自上而下四行示例：① <strong>掩码重构</strong>——输入部分缺失的 DNA 序列，模型补全生成完整序列；② <strong>纵向（时间）生成</strong>——给定 t 时刻 mRNA 表达，以 "Start: t+1" 为提示，生成未来 t+1 时刻的表达谱；③ <strong>跨模态生成</strong>——给定 mRNA 表达谱，以 "Start: Protein" 为提示，生成蛋白质丰度；④ <strong>条件生成（扰动响应）</strong>——给定敲除（Knock out）提示与扰动前 mRNA 表达，生成扰动后的表达谱。四行任务共享中间的"多级注意力 Transformer"。底部图例给出颜色编码：<strong>模态说明</strong>（Modality specification）、<strong>任务提示</strong>（Task prompt）、<strong>待生成</strong>（To be generated）、<strong>更新</strong>（Update）——即任何任务都可由"模态说明 + 任务提示"几个提示 Token 驱动，与上方文字表中四种任务及正文"统一 Token 生成框架"一一对应。<br>图源：Cui et al., <em>Nature</em> (2025)。</p>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>统一 Token 生成框架下的大类训练任务</h4>
+<table>
+  <tr><th>任务类型</th><th>描述</th><th>示例</th></tr>
+  <tr>
+    <td><strong>掩码重构</strong><br>(Masked reconstruction)</td>
+    <td>随机掩码部分 Token，让模型预测缺失值</td>
+    <td>已知80%基因的表达值，预测剩下20%</td>
+  </tr>
+  <tr>
+    <td><strong>跨模态生成</strong><br>(Cross-modal generation)</td>
+    <td>从一种模态生成另一种模态的数据</td>
+    <td>给定 mRNA 测序数据 → 预测蛋白质丰度</td>
+  </tr>
+  <tr>
+    <td><strong>时间/纵向生成</strong><br>(Longitudinal generation)</td>
+    <td>预测细胞状态随时间的演化</td>
+    <td>给定 t 时刻表达谱 → 预测 t+1 时刻</td>
+  </tr>
+  <tr>
+    <td><strong>条件生成（扰动响应）</strong><br>(Conditional generation)</td>
+    <td>在特定条件下生成对应的分子状态</td>
+    <td>给定正常表达谱 + 敲除提示 → 预测敲除后状态</td>
+  </tr>
+</table>
+<p><strong>关键创新：</strong>所有这些任务都可以通过<strong>几个 Prompt Token</strong>在统一的生成框架中完成。例如，用 &lt;mRNA&gt; → &lt;protein&gt; 作为提示来做 mRNA→蛋白质预测，用 &lt;t+1&gt; 提示时间生成，用 &lt;knock out&gt; 提示扰动响应。这种方法最大化了参数复用。</p>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>Prompt Token 的工作方式</h4>
+<p>类似于你向 ChatGPT 提问时说的 "请将以下英文翻译成中文："——这几个字就是 prompt，告诉模型接下来应该做什么。在 MFM 中：</p>
+<ul>
+  <li><code>&lt;mRNA&gt; ... &lt;protein&gt;</code> = "把这批 mRNA 数据翻译成蛋白质数据"</li>
+  <li><code>&lt;t+1&gt;</code> = "预测下一个时间点的状态"</li>
+  <li><code>&lt;knock out BRCA1&gt;</code> = "模拟敲除 BRCA1 后的效果"</li>
+</ul>
+</div>
+
+<h3>4.4 人类知识的融入</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>结构化与非结构化知识的两种融入策略</h4>
+<p><strong>结构化知识：知识图谱 → 基因 Token 初始化</strong></p>
+<ul>
+  <li>利用 Gene Ontology (GO)、Reactome 通路数据库、蛋白质-蛋白质互作网络等结构化知识</li>
+  <li>用图嵌入方法（如 node2vec）将知识图谱的关系转化为向量</li>
+  <li>将这些向量用作 MFM 中基因 Token 的<strong>初始嵌入</strong>，加速预训练并提供归纳偏置</li>
+</ul>
+
+<p><strong>非结构化知识：生物医学文献 → 检索增强生成</strong></p>
+<ul>
+  <li>用现有的生物医学大语言模型（如 BioGPT、Med-PaLM）将海量文献转化为向量嵌入数据库</li>
+  <li>在 MFM 训练时，将相关文献的嵌入附加到输入中，使模型能同时利用<strong>实验数据 + 先验文献知识</strong></li>
+</ul>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>统一 Token 空间</strong>解决了多模态数据异构性的根本问题——所有生物分子被映射到共享的表示空间。</li>
+  <li><strong>多级注意力</strong>（模内 + 模间）实现了从碱基→基因→通路的<strong>多尺度建模</strong>，类比计算机视觉中的层级视觉 Transformer。</li>
+  <li><strong>Prompt Token</strong>使得多种训练任务在一个统一的生成框架中完成，最大化参数效率和任务通用性。</li>
+  <li><strong>知识融入</strong>（结构化知识图谱 + 非结构化文献）将人类数百年的生物学积累注入数据驱动的学习。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-5">
+<h2>第5节 · 挑战与局限</h2>
+
+<h3>5.1 四大核心挑战（Fig. 4b）</h3>
+
+<p>下图把论文点名的四大挑战收在一张总览里——它是原论文 Fig. 4 的下半部分（上半部分见 4.3 节），四个色块与本节随后展开的四组小节一一对应。</p>
+
+<img src="images/Cui/Cui_Fig4b.jpg" alt="原论文Figure 4b：MFM 的四大潜在挑战">
+
+<p class="fig-caption"><strong>原论文 Figure 4b：潜在挑战。</strong>四个色块依次是：① <strong>数据与算力资源</strong>（多样化大体量多组学数据的获取、并行与加速算力、扩大训练与部署基础模型的可及性）；② <strong>开放科学与伦理考量</strong>（生物基础模型应公开可及、清晰传达能力/局限与使用场景、数据隐私保障）；③ <strong>严格评估</strong>（标准化数据集上的多样化基准、评估预测/生成/扰动等各类生物学洞见能力、开放排行榜与竞赛）；④ <strong>可解释性与幻觉风险</strong>（解释大型深度网络本身即挑战、预测需由训练数据与生物学语境支撑、模型应能承认不确定输出）。注意图中顺序与下文小节顺序略有出入（图中②④分别是下文的"挑战四""挑战三"），内容完全对应。<br>图源：Cui et al., <em>Nature</em> (2025)。</p>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>挑战一：数据与算力资源</h4>
+<ul>
+  <li><strong>配对多组学数据的稀缺：</strong>预训练 MFM 需要<strong>配对和对齐</strong>的多组学数据集（即同一个细胞同时测了转录组、蛋白质组、表观组），这类数据目前体量有限且分散在不同研究中。</li>
+  <li><strong>全球协调需求：</strong>跨联盟的数据整合和标准化需要全球性协调努力。</li>
+  <li><strong>算力成本：</strong>大规模预训练需要高端 GPU 集群，限制了可及性。低资源技术（如 LoRA、Adapter-Transformer）可能是解决路径。</li>
+  <li><strong>合成数据：</strong>在真实配对数据稀缺的场景下，合成数据可以作为补充训练资源。</li>
+</ul>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>挑战二：严格的评估方法论</h4>
+<ul>
+  <li>需要<strong>多样化的标准化基准</strong>来评估 MFM 的不同能力（细胞类型预测、伪样本生成、in silico 扰动等）</li>
+  <li><strong>人工标注作为金标准的悖论：</strong>当前的评估指标（如相互信息量 MI）奖励与人工标注一致的结果。但 MFM 的<strong>核心价值恰恰是发现人工标注未能识别的新知识</strong>——如果一个模型发现了新的细胞亚型或新的基因互作，按现有标准反而会被"扣分"！</li>
+  <li>需要开发<strong>更客观的、去人化的评估指标</strong></li>
+  <li><strong>开放排行榜和竞赛</strong>（如 OpenProblems, DREAM Challenges）是推动社区创新的有效机制</li>
+</ul>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>评估悖论的核心</h4>
+<p>打个比方：老师用标准答案给学生打分。但如果一个学生解出了一道标准答案没有收录的新解法——按规则打分会是0分，但这恰恰可能是最有价值的突破。MFM 面临同样的困境：当它发现了人类尚未标注的新细胞类型或新基因调控关系时，按现有评估标准反而是"错误"的。</p>
+<p>这就是所谓的 <strong>"评估指标正与 MFM 的发现能力相矛盾"</strong>——作者认为这是生物分子数据分析的一个<strong>独特挑战</strong>。</p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>挑战三：可解释性与幻觉风险</h4>
+<p><strong>可解释性：</strong>MFM 可能告诉你一个基因被上调了，但<strong>无法解释为什么</strong>——这对科学发现和临床应用是致命的。Kolmogorov-Arnold Networks (KAN) 等新兴架构有望从梯度下降优化中提取符号化函数，增强可解释性。</p>
+<p><strong>幻觉（Hallucination）：</strong>类似于 LLM 编造虚假但看似可信的内容。作者提出了 MFM 的三个真实性要求：</p>
+<ol>
+  <li><strong>训练数据支撑：</strong>输出应能被训练数据所支持</li>
+  <li><strong>上下文一致性：</strong>如果模型被提示生成 CD4+ T 细胞的表达谱，生成的结果应确实具有 CD4+ T 细胞的基因特征</li>
+  <li><strong>自我认知不确定性：</strong>当模型无法给出准确预测时，应能<strong>承认不确定性</strong>（这是最具挑战性的要求）</li>
+</ol>
+<p><strong>可能的方向：</strong>在模型预测中<strong>量化不确定性</strong>（uncertainty quantification），识别并标记可疑案例。</p>
+</div>
+
+<div class="crossref">
+<span class="xref-tag">🔗 交叉引用</span>
+<p>针对上述"可解释性"挑战，<strong><a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) — PISA</a></strong> 提供了一个已在实际基因组学模型中验证的解决方案：通过二维夏普利值归因矩阵 $P_{ij}$，将 sequence-to-function 模型的每个输出位置预测分解为每个输入碱基的贡献——从而使"为什么模型预测这个位置有核小体/有TF结合"变得可追溯。PISA 的归因框架可视为 MFM 愿景中"可解释性基础设施"的关键组件：它证明了即使没有 KAN 等符号化架构，通过合适的后验归因方法也能从黑箱深度模型中提取机械论级别的生物学洞察。</p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>挑战四：开放科学与伦理考量</h4>
+<ul>
+  <li><strong>模型透明度：</strong>预训练模型应开源公开，清晰说明能力、局限和使用场景。可参考自然语言领域的 Foundation Model Transparency Index 评估维度。</li>
+  <li><strong>数据隐私与安全：</strong>患者数据需要严格的隐私保护。数据集需确保跨人群的代表性和包容性，防止模型性能偏斜。</li>
+  <li><strong>临床应用的责任：</strong>当医生基于患者活检数据收到 MFM 的治疗建议时，必须保证预测的准确性和可解释性——"灵活性越大，幻觉风险越高"。</li>
+</ul>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>最大瓶颈</strong>：配对多模态数据的稀缺性和算力可及性。</li>
+  <li><strong>最独特的挑战</strong>：评估指标鼓励与人工标注一致，但 MFM 的价值恰恰在于发现人工标注之外的新知识。</li>
+  <li><strong>最现实的风险</strong>：幻觉——模型可能生成生物学上看似合理但实际错误的预测，在临床应用中后果尤其严重。</li>
+  <li><strong>最低要求</strong>：开源透明、数据隐私、人群代表性——这些不是"锦上添花"，而是 MFM 走向实际应用的<strong>前提条件</strong>。</li>
+</ul>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="sec-6">
+<h2>第6节 · 未来展望</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>论文以"集体创新的未来"收尾。作者强调，MFM 的成功<strong>不取决于任何单一技术突破</strong>，而取决于<strong>整个生态系统的协同进化</strong>：生物学家产生高质量数据，数据科学家和 AI 研究者设计模型架构和训练策略，伦理学家确保公平和隐私保护，临床研究者验证预测的可靠性。</p>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>MFM 对医学的潜在变革</h4>
+<p>如果 MFM 愿景得以实现，我们可能看到：</p>
+<ul>
+  <li><strong>个性化治疗：</strong>基于患者的多组学数据，MFM 预测最优药物组合和剂量</li>
+  <li><strong>疾病建模：</strong>在 MFM 中构建特定疾病的"数字孪生"，加速药物筛选</li>
+  <li><strong>药物发现：</strong>系统性地预测蛋白靶点的可成药性、潜在的脱靶效应和联合用药策略</li>
+  <li><strong>类比 HCA 的医学影响：</strong>就像 Human Cell Atlas 已经改变了我们对人体细胞多样性的理解，MFM 有望将这种理解扩展到<strong>动态预测和干预</strong>层面</li>
+</ul>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MFM 的终极目标不是替代生物学家，而是<strong>提供一个前所未有的分子模拟和预测引擎</strong>，加速从基础发现到临床转化的全流程。</li>
+  <li>实现这一愿景需要跨学科的<strong>集体创新生态系统</strong>（生物学家 + AI研究员 + 计算科学家 + 伦理学家）。</li>
+  <li>就像 HCA 通过细胞图谱改变了医学研究一样，MFM 有望通过<strong>动态模拟和预测</strong>进入下一阶段——从"知道细胞长什么样"到"预测细胞会怎样变化"。</li>
+  <li>这篇 Perspective 发表于 2025 年 4 月，标志着一个新兴研究范式的正式提出。</li>
+</ul>
+</div>
+</section>
+
+<footer>
+  <div class="related-bar">
+<strong>&#x1F4DA; 相关资源：</strong>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../knowledge_graph.html"><span data-zh>&#x1F5FA; 知识图谱</span><span data-en>&#x1F5FA; Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">&#x1F4E5; <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+<a href="https://doi.org/10.1038/s41586-025-08710-y"><span data-zh>&#x1F517; DOI原文</span><span data-en>&#x1F517; DOI Link</span></a>
+</div>
+  <p style="margin-top: 16px;"><span data-zh>翻译与解读力求准确，但如有疑问请以原始英文论文为准。</span><span data-en>Translation and interpretation aim for accuracy; when in doubt, please refer to the original English paper.</span><br>
+    Generated: 2026-08-14 · <span data-zh>原始论文：</span><span data-en>Original paper: </span>Cui, Tejada-Lapuerta, Brbić et al., <em>Nature</em> 640, 623–633 (2025)
+  </p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

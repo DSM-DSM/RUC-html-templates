@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STROBE-MR 报告声明 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ============ TOP NAV ============ -->
+<div class="top-nav-bar">
+<span class="current"><span data-zh>← 当前论文</span><span data-en>← Current paper</span></span>
+<span class="sep">|</span>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html"><span data-zh>📖 MR Primer 详解</span><span data-en>📖 MR Primer Deep Dive</span></a>
+<span class="sep">|</span>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR-CVD</a>
+<span class="sep">|</span>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>📄 两步MR</span><span data-en>📄 Two-step MR</span></a>
+<span class="sep">|</span>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>📄 <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></span><span data-en>📄 Proteome MR for Stroke</span></a>
+<span class="sep">|</span>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<span class="sep">|</span>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <h1>STROBE-MR 声明：<br>使用孟德尔随机化的观察性流行病学研究报告规范</h1>
+  <div class="meta">
+    <span>📖 JAMA. 2021;326(16):1614–1621</span>
+    <span>🔖 DOI: 10.1001/jama.2021.18236</span>
+  </div>
+  <div class="meta">
+    <span>✍️ Skrivankova VW, Richmond RC, Woolf BAR 等（共17位专家）</span>
+  </div>
+</header>
+
+<!-- ============ TOC ============ -->
+<nav class="toc" id="toc">
+  <h3>📑 <span data-zh>目录</span><span data-en>Contents</span></h3>
+  <ol>
+    <li><a href="#sec-0">阅读导引：这份指南是关于什么的？</a>
+      <ol>
+        <li><a href="#sec-0-1">什么是孟德尔随机化（MR）？</a></li>
+        <li><a href="#sec-0-2">什么是报告指南？</a></li>
+        <li><a href="#sec-0-3">本指南适合谁阅读？</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-1">背景与动机：为什么要制定 STROBE-MR？</a>
+      <ol>
+        <li><a href="#sec-1-1">MR 研究的爆发式增长</a></li>
+        <li><a href="#sec-1-2">报告不完整的普遍问题</a></li>
+        <li><a href="#sec-1-3">STROBE-MR 的定位</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-2">STROBE-MR 的制定方法</a>
+      <ol>
+        <li><a href="#sec-2-1">制定流程总览（EQUATOR 框架）</a></li>
+        <li><a href="#sec-2-2">文献回顾：找到了什么？</a></li>
+        <li><a href="#sec-2-3">共识会议与专家讨论</a></li>
+        <li><a href="#sec-2-4">预印本公开咨询</a></li>
+        <li><a href="#sec-2-5">配套文档：Explanation & Elaboration</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-3">MR 核心概念速览</a>
+      <ol>
+        <li><a href="#sec-3-1">工具变量三大假设</a></li>
+        <li><a href="#sec-3-2">单样本 vs 双样本 MR</a></li>
+        <li><a href="#sec-3-3">水平多效性与连锁不平衡</a></li>
+        <li><a href="#sec-3-4">基因-环境等效性</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-4">STROBE-MR 检查清单详解</a>
+      <ol>
+        <li><a href="#sec-4-1">Title & Abstract（条目1）</a></li>
+        <li><a href="#sec-4-2">Introduction（条目2-3）</a></li>
+        <li><a href="#sec-4-3">Methods — 研究设计与数据来源（条目4）</a></li>
+        <li><a href="#sec-4-4">Methods — 假设与统计方法（条目5-9）</a></li>
+        <li><a href="#sec-4-5">Results（条目10-13）</a></li>
+        <li><a href="#sec-4-6">Discussion（条目14-17）</a></li>
+        <li><a href="#sec-4-7">Other Information（条目18-20）</a></li>
+      </ol>
+    </li>
+    <li><a href="#sec-5">STROBE-MR vs 原始 STROBE</a></li>
+    <li><a href="#sec-6">讨论、局限与结论</a>
+      <ol>
+        <li><a href="#sec-6-1">实施推广计划</a></li>
+        <li><a href="#sec-6-2">声明本身的局限性</a></li>
+        <li><a href="#sec-6-3">核心结论</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ==================== Section 0 ==================== -->
+<section id="sec-0">
+<h2>0. 阅读导引：这份指南是关于什么的？</h2>
+
+<p>2021年10月，<em>JAMA</em> 发表了一篇看似"元研究"（meta-research）的特殊通讯——它不报告任何新的科学发现，而是为一种日益流行的流行病学研究方法制定了报告标准。这就是 <strong>STROBE-MR</strong>：一份关于如何完整、透明地报告孟德尔随机化（Mendelian Randomization, MR）研究的指南。</p>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>一句话概括</h4>
+<p>如果把 MR 研究比作一座建筑，STROBE-MR 就是一份施工验收清单。它不教你如何设计或施工（那是方法学家的事），但告诉你：提交验收报告时，哪些东西必须写清楚，才能让别人相信这座建筑确实稳固。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3 id="sec-0-1">0.1 什么是孟德尔随机化（MR）？</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>想象你想知道"喝牛奶是否能让孩子长高"。如果直接比较喝牛奶和不喝牛奶的孩子，你会发现喝牛奶的孩子确实更高——但这是因为牛奶，还是因为能经常喝牛奶的孩子营养条件更好？这就是<strong>混杂（confounding）</strong>问题。</p>
+<p>MR 的巧妙之处在于：它用<strong>基因变异</strong>作为"替身"。比如，有些人体内乳糖酶基因的变异让他们天生更倾向于喝牛奶。这个基因变异在人群中是随机分配的（类似于抛硬币），不依赖于家庭经济条件。所以，如果用这个基因变异来模拟"喝牛奶"，比较携带不同基因型的人群，就可以更接近因果推断。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>孟德尔随机化（Mendelian Randomization, MR）</h4>
+<p>一种利用与可改变暴露因素（modifiable exposure）相关的遗传变异来评估该暴露与结局之间可能因果关系的方法。其核心目标是减少观察性研究中来自<strong>混杂</strong>和<strong>反向因果</strong>的偏倚。大多数 MR 研究在<strong>工具变量（instrumental variable, IV）</strong>框架下实现，以遗传变异作为工具变量。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3 id="sec-0-2">0.2 什么是报告指南？</h3>
+
+<p>报告指南不是研究设计指南，也不评判研究质量。<strong>它只做一件事：规定论文中应当报告哪些信息。</strong>其基本假设是：只有先让读者看清楚研究者做了什么，读者才能判断这项研究是否可信。</p>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>报告指南能发现什么问题？</h4>
+<p>STROBE-MR 制定过程中，专家们对2018年发表的20篇 MR 文章进行了试审。结果触目惊心：</p>
+<ul>
+  <li><strong>0/10</strong> 双样本 MR 研究详细描述了暴露和结局的研究人群</li>
+  <li>仅 <strong>50%</strong> 报告了检验和校正多效性的努力</li>
+  <li><strong>55%</strong> 缺失基因型数据填补或次要等位基因频率阈值的细节</li>
+  <li>仅 <strong>50%</strong> 报告了遗传工具变量的强度信息</li>
+  <li><strong>50%</strong> 缺乏临床或公共卫生意义的讨论</li>
+  <li><strong>65%</strong> 未讨论研究结果的推广性</li>
+</ul>
+<p>这就像是交了作业但不写解题步骤——老师根本没法判断你是在推理还是在瞎猜。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3 id="sec-0-3">0.3 本指南适合谁阅读？</h3>
+
+<table class="data">
+  <tr><th>读者</th><th>读这份详解可以收获什么？</th></tr>
+  <tr><td>🩺 临床研究者（想做MR）</td><td>了解投稿时一份完整 MR 论文应包含哪些要素</td></tr>
+  <tr><td>📝 期刊审稿人 / 编辑</td><td>获得系统的审稿检查框架</td></tr>
+  <tr><td>📖 医学生 / 研究生</td><td>理解 MR 方法的全貌和关键假设</td></tr>
+  <tr><td>📊 方法学研究者</td><td>了解 MR 报告标准的前沿共识</td></tr>
+</table>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<p><strong>STROBE-MR 的本质：</strong>一份包含 <strong>20个主条目 + 30个子条目</strong>的报告清单，覆盖标题摘要、引言、方法、结果、讨论和其他信息六大板块。它不是方法学教材，而是<strong>透明报告的底线标准</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 1 ==================== -->
+<section id="sec-1">
+<h2>1. 背景与动机：为什么要制定 STROBE-MR？</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>想象 MR 研究是一片快速生长的森林。2003年全年只有1篇 MR 论文发表，到2020年这个数字飙升至>800篇/年。但森林长得太快，路标没跟上——很多论文连核心假设是否检验过都说不清楚。STROBE-MR 就是要为这片森林立路标。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3 id="sec-1-1">1.1 MR 研究的爆发式增长</h3>
+
+<p>MR 方法的受欢迎程度可以从几个数字看出：从2003年的1篇报告到2020年的800+篇。MR 已被应用于极其多样的研究问题，例如：</p>
+
+<ul>
+  <li><strong>IL-6 受体抑制</strong>与 COVID-19 预后</li>
+  <li><strong>大麻使用</strong>与精神分裂症风险</li>
+  <li><strong>教育水平和智力</strong>与阿尔茨海默病风险</li>
+</ul>
+
+<p>这种增长的驱动力是什么？主要是<strong>大规模 GWAS 汇总数据的公开可获得性</strong>——研究者无需自己收集数据，利用公开的 GWAS 汇总统计量即可进行双样本 MR 分析，门槛大幅降低。</p>
+
+<h3 id="sec-1-2">1.2 报告不完整的普遍问题</h3>
+
+<p>门槛降低的同时也带来了质量问题。论文引用了多项系统综述的证据（Davies et al. 2013; Boef et al. 2015; Swanson & Hernán 2013），一致表明：</p>
+
+<blockquote>许多 MR 研究报告未能清晰陈述或检验 MR 方法的各种假设，并且在数据来源方面提供了不充分的细节。</blockquote>
+
+<div class="warning">
+<span class="tag">关键问题</span>
+<h4>报告不完整意味着什么？</h4>
+<p>如果读者无法从论文中判断：（1）工具变量假设是否满足；（2）敏感性分析做了什么；（3）数据从哪里来——那么无论分析本身多么精良，<strong>结论的可信度都无从判断</strong>。这就是"报告质量限制因果推断可信度"的含义。</p>
+<span class="src-ref">
+    
+📖 原文出处：背景与共识方法
+</span>
+</div>
+
+<h3 id="sec-1-3">1.3 STROBE-MR 的定位</h3>
+
+<p>STROBE-MR 是原始 <strong>STROBE 声明</strong>（Strengthening the Reporting of Observational Studies in Epidemiology, von Elm et al. 2007）的专门扩展。STROBE 是观察性流行病学研究的通用报告指南（22项条目 + 18子项），但它不包含 MR 特有的内容——比如工具变量假设、多效性检验、遗传变异选择标准等。</p>
+
+<p>STROBE-MR 以 STROBE 为出发点，对其进行了<strong>彻底改造</strong>：最终包含 20 个主条目（比 STROBE 少2个）和 30 个子条目（比 STROBE 多12个）。<strong>只有1个子条目（6d）没有改动</strong>，其余全部针对 MR 进行了修改或新增。</p>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR 研究数量爆发但报告质量参差不齐，催生了对专门报告指南的需求</li>
+  <li>STROBE-MR 是 STROBE 的扩展，专门针对 MR 的独特要求</li>
+  <li>20项主条目 + 30项子条目，覆盖论文全文</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：背景与共识方法
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 2 ==================== -->
+<section id="sec-2">
+<h2>2. STROBE-MR 的制定方法</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>制定一份好的报告指南本身也有"指南"——EQUATOR Network 的方法论框架。STROBE-MR 的制定严格遵循了这一框架，经历了文献回顾→清单起草→预试验→共识会议→公开咨询→修改定稿的完整流程，历时3年（2018-2021）。</p>
+<span class="src-ref">
+    
+📖 原文出处：背景与共识方法
+</span>
+</div>
+
+<h3 id="sec-2-1">2.1 制定流程总览（EQUATOR 框架）</h3>
+
+<p>EQUATOR（Enhancing the Quality and Transparency of Health Research）网络为报告指南的制定提供了方法论框架。STROBE-MR 的制定流程可以分为以下阶段：</p>
+
+<figure>
+  <!-- Timeline as an ordered list for accessibility -->
+  <div style="display:flex;flex-wrap:wrap;gap:12px;margin:16px 0;font-size:0.9em;">
+    <div style="flex:1;min-width:160px;background:#fff;border-radius:8px;padding:14px;border-top:3px solid #2980b9;">
+      <strong>2018</strong><br>项目启动<br>文献回顾
+    </div>
+    <div style="flex:1;min-width:160px;background:#fff;border-radius:8px;padding:14px;border-top:3px solid #27ae60;">
+      <strong>2019.05</strong><br>Bristol 共识会议<br>17位专家，2天
+    </div>
+    <div style="flex:1;min-width:160px;background:#fff;border-radius:8px;padding:14px;border-top:3px solid #f39c12;">
+      <strong>2019.07</strong><br>预印本发布<br>公开讨论
+    </div>
+    <div style="flex:1;min-width:160px;background:#fff;border-radius:8px;padding:14px;border-top:3px solid #8e44ad;">
+      <strong>2020</strong><br>视频会议<br>反复修订
+    </div>
+    <div style="flex:1;min-width:160px;background:#fff;border-radius:8px;padding:14px;border-top:3px solid #e74c3c;">
+      <strong>2021.07</strong><br>最终定稿<br>JAMA 发表
+    </div>
+  </div>
+  <figcaption>STROBE-MR 制定时间线（2018–2021）</figcaption>
+</figure>
+
+<h3 id="sec-2-2">2.2 文献回顾：找到了什么？</h3>
+
+<p>核心团队在 PubMed 中检索了题目中包含 "instrumental variable" 或 "mendelian randomization" 且标题/摘要中含有 "reporting" 的文章。最后一次更新检索是2021年7月8日。</p>
+
+<p>结果发现：<strong>专门讨论 IV/MR 研究报告的文章寥寥无几。</strong>大部分相关文章在2019年5月会议前被综述（Davies 2013; Boef 2015; Swanson 2013），会后又有两篇新的系统综述发表（Lor et al. 2019 关于肿瘤学 MR 研究; Diemer et al. 2021 关于产前暴露 MR 研究），进一步确认了报告缺陷的普遍性。</p>
+
+<h3 id="sec-2-3">2.3 共识会议与专家讨论</h3>
+
+<p>2019年5月16-17日，在布里斯托大学 MRC Integrative Epidemiology Unit 举行了为期两天的面对面会议。17位参与者涵盖了：</p>
+<ul>
+  <li>MR 方法学家</li>
+  <li>MR 研究设计用户</li>
+  <li>过往报告指南（STROBE、STREGA 等）的制定者</li>
+  <li>期刊编辑（来自 <em>JAMA</em> 和 <em>BMJ</em>）</li>
+</ul>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>会议如何组织？</h4>
+<p>会议前，核心团队用草稿清单对20篇2018年发表的 MR 文章进行了试审（10篇单样本 + 10篇双样本）。这20篇是从404篇候选文章中随机选取的（如果抽到的不是原创研究，则继续随机抽取直到凑够20篇）。</p>
+<p>会议中，每个条目被分配给一位"条目负责人"（item leader），按其专业领域负责最终措辞和在 Explanation & Elaboration 文档中提供示例。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR的制定过程
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<p>需要注意：STROBE-MR 的制定<strong>未进行正式的 Delphi 流程</strong>（即多轮匿名专家投票）。20篇文章的试审规模也是实用主义的（能在会前详细审阅即可），<strong>不是系统综述</strong>。这些是方法学上的实际限制，但不影响指南的实用性。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR的制定过程
+</span>
+</div>
+
+<h3 id="sec-2-4">2.4 预印本公开咨询</h3>
+
+<p>草稿清单于2019年7月以预印本形式发表于 PeerJ Preprints。截至2021年7月，已被浏览 <strong>5000+次</strong>，下载 <strong>3500+次</strong>。收到的评论来自预印本平台、Twitter 以及第4届 MR 会议（2019年7月，Bristol）的现场讨论。所有评论在核心团队的视频会议中被逐条讨论并适当纳入清单修订。</p>
+
+<h3 id="sec-2-5">2.5 配套文档：Explanation & Elaboration（E&E）</h3>
+
+<p>STROBE-MR 本身只是一个清单。为了帮助使用者理解每条目的理由和良好报告的示例，团队同时编写了 <strong>Explanation & Elaboration (E&E) 文档</strong>（发表于 <em>BMJ</em> 2021;375:n2233）。E&E 内容包括：</p>
+<ul>
+  <li>每个条目的理由说明</li>
+  <li>来自已发表文章的"良好报告"示例</li>
+  <li>一个术语表（Glossary）——基于 Davies et al. (2018) 和 Wade et al. (MR Dictionary)</li>
+  <li>关于 MR 关键假设、假设评估/证伪以及因果效应估计解读的补充教育材料</li>
+</ul>
+
+<p>本文（JAMA 2021）中收录了术语表的<strong>精简版</strong>（Table 1），涵盖了最核心的13个 MR 术语。</p>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>制定过程遵循 EQUATOR 框架，历时3年</li>
+  <li>17位国际专家参与，覆盖方法学、应用、编辑三大领域</li>
+  <li>清单经过试审、共识会议和公开咨询三轮打磨</li>
+  <li>配套 E&E 文档提供了详细理由和良好报告示例</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR的制定过程
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 3 ==================== -->
+<section id="sec-3">
+<h2>3. MR 核心概念速览</h2>
+
+<p>在进入检查清单之前，有必要先建立 MR 的核心概念框架。以下内容主要来自 STROBE-MR 的 Table 1（术语表），并结合了解读。原文术语表完整截图如下，可对照下文 3.1–3.5 各节的展开解读逐一理解：</p>
+
+<img src="images/Skrivankova/Skrivankova_Tab1.jpg" alt="原论文Table 1：MR研究常用术语表——11个核心术语的英文定义">
+
+<p class="fig-caption"><strong>原论文 Table 1：MR 研究常用术语表（Glossary of Commonly Used Terms in MR Studies）。</strong>两列结构：左列术语、右列解释，自上而下共 <strong>11 个术语</strong>——MR 本身、1-Sample MR、2-Sample MR、工具变量（IVs）、IV 三大假设、基因-环境等价性、遗传变异、SNP、等位基因评分（Allele score）、连锁不平衡（LD）、水平多效性。<strong>怎么读</strong>：这张表是 MR 领域公认术语的"官方定义"来源（改编自 Davies et al. 与 Wade et al. 两篇方法学经典文献），写 MR 论文时引用术语定义应以它为准。<strong>与正文的关系</strong>：本节 3.1–3.5 依次展开表中加粗的五个核心概念（三大假设、IV、SNP、LD、水平多效性），每节末尾的"原文出处"标注可回溯到本表对应行。<br>图源：Skrivankova et al., <em>JAMA</em> (2021), CC BY 3.0（EQUATOR Network 授权再版）。</p>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>本节仅简要回顾MR核心概念。如需<strong>深入理解Wald Ratio、2SLS、IVW等估计方法的数学原理，以及Fig.3的六类多效性分型</strong>，请参阅 <a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer 详解</a>（Sanderson et al., 2022），其中对MR方法学进行了从基础到前沿的系统讲解。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系1（互补）</a>。
+</div>
+
+<h3 id="sec-3-1">3.1 工具变量三大假设</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>工具变量就像法庭上的"证人"。一个合格的证人必须满足三个条件：（1）他确实目击了事件（与暴露相关）；（2）他与被告没有利益关系（与混杂无关）；（3）他只能通过自己的目击来影响判决，而不是通过贿赂法官（只通过暴露影响结局）。</p>
+<span class="src-ref">
+    
+📖 原文出处：工具变量三大假设
+</span>
+</div>
+
+<div class="assumptions-row">
+  <div class="assumption-card">
+    <div class="num">1</div>
+    <h4>相关性假设<br>(Relevance)</h4>
+    <p>遗传变异必须与暴露因素相关<br>$\text{SNP} \rightarrow \text{暴露}$</p>
+  </div>
+  <div class="assumption-card">
+    <div class="num">2</div>
+    <h4>独立性假设<br>(Independence)</h4>
+    <p>遗传变异不与任何混杂因素共享未测量原因<br>$\text{SNP} \perp \text{混杂}$</p>
+  </div>
+  <div class="assumption-card">
+    <div class="num">3</div>
+    <h4>排他性约束<br>(Exclusion Restriction)</h4>
+    <p>遗传变异仅通过暴露影响结局<br>$\text{SNP} \rightarrow \text{暴露} \rightarrow \text{结局}$</p>
+  </div>
+</div>
+
+<figure style="text-align:center; margin:32px 0;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 410" width="100%" style="max-width:680px; font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+  <defs>
+    <marker id="ivArrowBlack" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><polygon points="0 0, 11 4, 0 8" fill="#2c3e50"/></marker>
+    <marker id="ivArrowRed" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><polygon points="0 0, 11 4, 0 8" fill="#e74c3c"/></marker>
+    <marker id="ivArrowGreen" markerWidth="11" markerHeight="8" refX="10" refY="4" orient="auto"><polygon points="0 0, 11 4, 0 8" fill="#27ae60"/></marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="720" height="410" rx="12" fill="#ffffff" stroke="#d5dbdb" stroke-width="1.5"/>
+
+  <!-- ====== Upper arc: Exclusion restriction (G -> Y, must NOT exist) ====== -->
+  <path d="M 105 100 Q 360 18 615 100" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="7,4"/>
+  <!-- cross on the arc -->
+  <line x1="350" y1="40" x2="370" y2="60" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="370" y1="40" x2="350" y2="60" stroke="#e74c3c" stroke-width="3"/>
+  <rect x="295" y="8" width="130" height="20" rx="4" fill="#fadbd8"/>
+  <text x="360" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">[3] 排他性（无直接效应）</text>
+
+  <!-- ====== Nodes (horizontal at y=100-160) ====== -->
+  <!-- G -->
+  <rect x="40" y="100" width="130" height="60" rx="10" fill="#eaf2f8" stroke="#2471a3" stroke-width="2.5"/>
+  <text x="105" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#1a5276">遗传变异 G</text>
+  <text x="105" y="148" text-anchor="middle" font-size="11" fill="#2471a3">(Instrument / SNP)</text>
+
+  <!-- X -->
+  <rect x="295" y="100" width="130" height="60" rx="10" fill="#e8f8f5" stroke="#27ae60" stroke-width="2.5"/>
+  <text x="360" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#1e8449">暴露 X</text>
+  <text x="360" y="148" text-anchor="middle" font-size="11" fill="#27ae60">(Exposure)</text>
+
+  <!-- Y -->
+  <rect x="550" y="100" width="130" height="60" rx="10" fill="#fef9e7" stroke="#f39c12" stroke-width="2.5"/>
+  <text x="615" y="128" text-anchor="middle" font-size="16" font-weight="700" fill="#b7950b">结局 Y</text>
+  <text x="615" y="148" text-anchor="middle" font-size="11" fill="#f39c12">(Outcome)</text>
+
+  <!-- ====== Main causal path (top row, horizontal) ====== -->
+  <!-- G -> X : Relevance -->
+  <line x1="170" y1="130" x2="290" y2="130" stroke="#27ae60" stroke-width="3" marker-end="url(#ivArrowGreen)"/>
+  <rect x="195" y="108" width="80" height="18" rx="4" fill="#d5f5e3"/>
+  <text x="235" y="121" text-anchor="middle" font-size="11" font-weight="700" fill="#1e8449">[1] 相关性</text>
+
+  <!-- X -> Y : Causal effect -->
+  <line x1="425" y1="130" x2="545" y2="130" stroke="#2c3e50" stroke-width="3.5" marker-end="url(#ivArrowBlack)"/>
+  <text x="485" y="121" text-anchor="middle" font-size="11" font-weight="700" fill="#2c3e50">因果效应</text>
+
+  <!-- ====== Confounder U (bottom center) ====== -->
+  <rect x="295" y="270" width="130" height="60" rx="10" fill="#fdedec" stroke="#e74c3c" stroke-width="2.5"/>
+  <text x="360" y="298" text-anchor="middle" font-size="16" font-weight="700" fill="#c0392b">混杂因素 U</text>
+  <text x="360" y="318" text-anchor="middle" font-size="11" fill="#e74c3c">(Confounders)</text>
+
+  <!-- ====== Backdoor paths: U -> X, U -> Y (red dashed) ====== -->
+  <line x1="340" y1="270" x2="340" y2="162" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#ivArrowRed)"/>
+  <line x1="400" y1="275" x2="585" y2="162" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#ivArrowRed)"/>
+  <text x="318" y="220" text-anchor="middle" font-size="10" fill="#c0392b" font-style="italic">后门路径</text>
+
+  <!-- ====== Independence: G ⊥ U (dashed line with cross, lower-left) ====== -->
+  <line x1="105" y1="160" x2="105" y2="300" stroke="#e74c3c" stroke-width="1.8" stroke-dasharray="5,4"/>
+  <line x1="105" y1="300" x2="290" y2="300" stroke="#e74c3c" stroke-width="1.8" stroke-dasharray="5,4"/>
+  <!-- cross on the G-U connection -->
+  <line x1="95" y1="225" x2="115" y2="245" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="115" y1="225" x2="95" y2="245" stroke="#e74c3c" stroke-width="3"/>
+  <rect x="40" y="250" width="135" height="20" rx="4" fill="#fadbd8"/>
+  <text x="107" y="264" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">[2] 独立性 G⊥U</text>
+
+  <!-- ====== Legend (bottom, aligned) ====== -->
+  <rect x="40" y="350" width="640" height="48" rx="6" fill="#f8f9fa" stroke="#e5e8e8" stroke-width="1"/>
+  <line x1="60" y1="368" x2="105" y2="368" stroke="#27ae60" stroke-width="2.5" marker-end="url(#ivArrowGreen)"/>
+  <text x="115" y="372" font-size="11" fill="#555">需存在的效应路径（G→X）</text>
+  <line x1="290" y1="368" x2="325" y2="368" stroke="#2c3e50" stroke-width="3"/>
+  <text x="335" y="372" font-size="11" fill="#555">待估计的因果效应（X→Y）</text>
+  <line x1="60" y1="388" x2="105" y2="388" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#ivArrowRed)"/>
+  <text x="115" y="392" font-size="11" fill="#555">需阻断的后门路径（U→X, U→Y）</text>
+  <line x1="360" y1="388" x2="395" y2="388" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,4"/>
+  <text x="405" y="392" font-size="11" fill="#555">需排除的直接/关联路径（G⊥U, G↛Y）</text>
+</svg>
+<figcaption style="font-size:0.88em; color:#7f8c8d; margin-top:10px; line-height:1.6;">
+<strong>图 3.1　工具变量因果推断的有向无环图（DAG）。</strong>遗传变异 <em>G</em> 作为工具变量，通过暴露 <em>X</em> 影响结局 <em>Y</em>。
+绿色实线 = 相关性假设（<em>G</em>→<em>X</em> 必须存在）；黑色粗线 = 待估计的因果效应（<em>X</em>→<em>Y</em>）；
+红色虚线 = 必须被阻断的路径——独立性假设要求 <em>G</em>⊥<em>U</em>（<em>G</em> 与混杂无关），排他性约束要求 <em>G</em>↛<em>Y</em>（<em>G</em> 无绕过 <em>X</em> 的直接效应）。三者共同保证因果链 <em>G</em>→<em>X</em>→<em>Y</em> 不受后门路径污染。
+</figcaption>
+</figure>
+
+
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<p>在工具变量框架下，令 $G$ 为遗传变异（工具变量），$X$ 为暴露，$Y$ 为结局，$U$ 为未测量混杂：</p>
+<ul>
+  <li><strong>相关性：</strong> $G \not\perp X$（$G$ 与 $X$ 统计相关）</li>
+  <li><strong>独立性：</strong> $G \perp U$（$G$ 与混杂无关）</li>
+  <li><strong>排他性：</strong> $G \perp Y \mid (X, U)$（给定 $X$ 和 $U$ 后，$G$ 与 $Y$ 独立）</li>
+</ul>
+<p>三个假设合在一起，保证了 $G \to X \to Y$ 的因果链是干净的，没有"后门路径"或"直接捷径"。</p>
+<span class="src-ref">
+    
+📖 原文出处：工具变量三大假设
+</span>
+</div>
+
+<h3 id="sec-3-2">3.2 单样本 vs 双样本 MR</h3>
+
+<table class="data">
+  <tr><th>特征</th><th>单样本 MR（1-Sample MR）</th><th>双样本 MR（2-Sample MR）</th></tr>
+  <tr>
+    <td>数据来源</td>
+    <td>同一组个体</td>
+    <td>两组不同的样本（来自不同研究）</td>
+  </tr>
+  <tr>
+    <td>所需数据类型</td>
+    <td>个体层面数据（individual-level data）</td>
+    <td>汇总统计量（summary-level statistics）</td>
+  </tr>
+  <tr>
+    <td>$G \to X$ 和 $G \to Y$ 关联</td>
+    <td>在同一人群估算</td>
+    <td>分别在两个独立人群估算，然后用荟萃分析工具合并</td>
+  </tr>
+  <tr>
+    <td>优点</td>
+    <td>更灵活，可做更复杂的建模</td>
+    <td>可利用公开 GWAS 数据，不需要个体数据</td>
+  </tr>
+  <tr>
+    <td>关键陷阱</td>
+    <td>弱工具变量偏倚更严重</td>
+    <td>样本重叠可能导致偏倚</td>
+  </tr>
+</table>
+
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>单样本 MR 的典型场景</h4>
+<p>假设你想研究 HDL 胆固醇对冠心病的因果效应，而你恰好有一个同时测量了基因型、HDL 水平和冠心病结局的前瞻性队列（例如 UK Biobank）：</p>
+<ol>
+  <li><strong>一个数据源：</strong>UF Biobank 中，从同一批参与者收集基因型（GWAS 芯片）、暴露（HDL 胆固醇水平）和结局（冠心病事件随访记录）数据</li>
+  <li><strong>两阶段最小二乘法（2SLS）：</strong>第一步——用 SNP 预测 HDL 水平；第二步——用预测的 HDL 水平去回归冠心病风险</li>
+  <li><strong>MR 估计：</strong>2SLS 的第二阶段回归系数即为 HDL→冠心病的因果效应估计。可以方便地添加协变量（年龄、性别）和做亚组分析</li>
+</ol>
+<p>单样本 MR 的优势在于<strong>灵活性和一致性</strong>——因为所有数据来自同一人群，你不需要担心"暴露 GWAS 是欧洲人而结局 GWAS 是东亚人"这样的种族不匹配问题。但代价是"弱工具变量偏倚"更严重（见下表），且你必须自己收集完整的三合一数据。</p>
+<span class="src-ref">
+    
+📖 原文出处：单样本vs双样本MR
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>双样本 MR 的典型场景</h4>
+<p>假设你想研究 BMI（身体质量指数）对冠心病的因果效应：</p>
+<ol>
+  <li><strong>暴露样本：</strong>从 GIANT 联盟的 BMI GWAS（>70万人）获取 SNP→BMI 的关联汇总统计</li>
+  <li><strong>结局样本：</strong>从 CARDIoGRAMplusC4D 联盟的冠心病 GWAS（>18万人）获取 SNP→冠心病的关联汇总统计</li>
+  <li><strong>MR 分析：</strong>用逆方差加权法（IVW）等方法将两套汇总统计量合并，得到 BMI→冠心病的因果效应估计</li>
+</ol>
+<p>这比收集同时测量了基因型、BMI 和冠心病结局的队列数据要容易得多。</p>
+<span class="src-ref">
+    
+📖 原文出处：单样本vs双样本MR
+</span>
+</div>
+
+<h3 id="sec-3-3">3.3 水平多效性与连锁不平衡</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p><strong>水平多效性</strong>就像是证人"绕过了目击这个环节，直接去贿赂了法官"——基因变异不经过暴露就直接影响结局，违反了排他性约束。</p>
+<p><strong>连锁不平衡（LD）</strong>则像是"认错了证人"——你以为在传唤证人A（你选的 SNP），但实际上证人B（与你选的 SNP 高度相关的另一个 SNP）也跟着进来了，而证人B可能与结局有别的关联路径。</p>
+<span class="src-ref">
+    
+📖 原文出处：水平多效性与连锁不平衡
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<ul>
+  <li><strong>水平多效性 (Horizontal Pleiotropy)：</strong>遗传变异通过不依赖于暴露的独立通路影响结局。违反排他性约束假设。</li>
+  <li><strong>连锁不平衡 (Linkage Disequilibrium, LD)：</strong>两个或多个基因座上的等位基因的非随机关联。在一般人群中通常发生在基因组的一个小区域内。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：水平多效性与连锁不平衡
+</span>
+</div>
+
+<h3 id="sec-3-4">3.4 基因-环境等效性</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>这个假设说的是：通过基因变异引起的暴露变化，产生的健康效应应该等同于通过环境干预（如生活方式改变、药物）引起的同样幅度的暴露变化。</p>
+<p>例如：如果你的 BMI 因基因原因比人群平均高 1 kg/m²，这 1 kg/m² 对你心血管风险的影响，应该和因饮食习惯导致的 1 kg/m² 增加具有相同的效应。如果这个假设不成立，那么 MR 估计出的因果效应对实际的公共卫生干预的指导价值就会受限。</p>
+<span class="src-ref">
+    
+📖 原文出处：MR核心概念速览
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR 的核心是三大 IV 假设：相关性、独立性、排他性</li>
+  <li>单样本 vs 双样本是最基本的分类，影响数据需求和偏倚结构</li>
+  <li>水平多效性是排他性假设的主要威胁；LD 是相关性和独立性假设的潜在威胁</li>
+  <li>基因-环境等效性是 MR 结果向实际干预推广的桥梁假设</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：MR核心概念速览
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 4 ==================== -->
+<section id="sec-4">
+<h2>4. STROBE-MR 检查清单详解</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>20 个条目听起来很多，但它们的逻辑是简单而线性的——跟随一篇标准论文的结构：标题摘要→引言→方法→结果→讨论→其他。每个条目都在问同一个核心问题："读者能从你的论文中获得做这个判断所需的全部信息吗？"</p>
+<span class="src-ref">
+    
+📖 原文出处：MR核心概念速览
+</span>
+</div>
+
+<h3 id="sec-4-1">4.1 Title & Abstract（条目1）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目1：标题与摘要</h4>
+<p><strong>清单要求：</strong>在标题和/或摘要中明确指出 MR 是研究的设计方法（如果这是研究的主要目的之一）。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>这看起来微不足道，但在数据库检索中极其重要。如果一个读者在 PubMed 中搜索 "mendelian randomization"，你的论文如果标题和摘要中没有出现这个术语，就可能根本不会被检索到。这也是为什么原始 STROBE 要求标题中标明研究设计类型（队列研究、病例对照研究等）。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</h4>
+<h4>良好报告实践</h4>
+<p><strong>标题示例：</strong>"Body Mass Index and Risk of Coronary Heart Disease: A Two-Sample Mendelian Randomization Study"</p>
+<p><strong>摘要示例：</strong>"...We conducted a two-sample Mendelian randomization study using summary statistics from the GIANT consortium (exposure) and CARDIoGRAMplusC4D consortium (outcome) to assess the potential causal effect of BMI on coronary heart disease risk."</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<h3 id="sec-4-2">4.2 Introduction（条目2-3）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目2：背景与理由</h4>
+<p>解释研究的科学背景和理由。回答三个问题：（1）暴露因素是什么？（2）暴露与结局之间的潜在因果关系在生物学上是否合理？（3）<strong>为什么 MR 是解决这个研究问题的有用方法？</strong></p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>条目2中最特别的要求是"为什么 MR 是有用方法"。这意味着你不能只说"我们做了 MR"，而必须解释：在这个具体研究问题中，<strong>常规观察性分析存在什么样的混杂或反向因果问题</strong>，使得 MR 能提供额外的因果推断价值。这和 Hernán (2018) 的建议一脉相承——研究者应该在引言中就明确因果推断的意图和理由。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目3：目标</h4>
+<p>清晰陈述具体目标，包括<strong>预先设定的因果假设</strong>（如有）。说明 MR 是一种在特定假设下旨在估计因果效应的方法。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<p>"预先设定"（prespecified）这个词很关键。它为读者提供了一个判断基准——哪些分析是计划内的主分析，哪些是事后探索。这有助于防止将探索性发现包装成验证性结论。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<h3 id="sec-4-3">4.3 Methods — 研究设计与数据来源（条目4）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目4：研究设计与数据来源（含6个子条目 4a-4f）</h4>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<p>条目4是方法部分中最长、最详细的一个条目。它包含了6个子条目：</p>
+
+<div class="checklist-grid">
+  <div class="item-no">4a</div>
+  <div class="item-desc"><strong>研究设计总览：</strong>尽早呈现研究设计的关键要素。考虑用一个表格列出所有阶段的数据来源。</div>
+  <div class="item-no">4b</div>
+  <div class="item-desc"><strong>研究设置与人群：</strong>对每个数据来源，描述：（i）研究设计、基础人群、设置、地点和相关日期（招募期、暴露期、随访期、数据收集期）；（ii）参与者资格标准、选择和招募方法。报告样本量和是否进行了功效/样本量计算。</div>
+  <div class="item-no">4c</div>
+  <div class="item-desc"><strong>遗传变异：</strong>描述遗传变异的测量、质量控制（如填补、次要等位基因频率阈值）和选择标准。</div>
+  <div class="item-no">4d</div>
+  <div class="item-desc"><strong>暴露、结局及其他变量：</strong>对每个暴露、结局和其他相关变量，描述评估方法和疾病的诊断标准。</div>
+  <div class="item-no">4e</div>
+  <div class="item-desc"><strong>伦理与知情同意：</strong>提供伦理委员会批准和参与者知情同意的细节（如适用）。</div>
+  <div class="item-no">4f</div>
+  <div class="item-desc"><strong>（STROBE原始条目6d，唯一未修改的子条目）</strong></div>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>良好报告：数据来源表</h4>
+<p>STROBE-MR 建议在方法部分早期（甚至作为第一个表）提供一个数据来源一览表：</p>
+<table class="data">
+  <tr><th>分析阶段</th><th>数据来源/联盟</th><th>样本量</th><th>人群</th><th>GWAS参考文献</th></tr>
+  <tr><td>SNP选择</td><td>GIANT BMI GWAS</td><td>~700,000</td><td>欧洲裔</td><td>Locke et al. 2015</td></tr>
+  <tr><td>暴露（G→X）</td><td>GIANT BMI GWAS</td><td>~700,000</td><td>欧洲裔</td><td>Locke et al. 2015</td></tr>
+  <tr><td>结局（G→Y）</td><td>CARDIoGRAMplusC4D</td><td>184,305</td><td>欧洲裔</td><td>Nikpay et al. 2015</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<p>对于<strong>双样本 MR</strong>，条目4子项中特别强调了两个额外要求（在结果部分的条目10中检查）：</p>
+<ul>
+  <li>证明暴露样本和结局样本中 SNP-暴露关联的相似性</li>
+  <li>报告两样本中重叠个体的数量（样本重叠可能导致偏倚）</li>
+</ul>
+
+<h3 id="sec-4-4">4.4 Methods — 假设与统计方法（条目5-9）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目5：假设</h4>
+<p><strong>明确陈述主分析的三个核心 IV 假设</strong>（相关性、独立性、排他性约束），以及任何额外或敏感性分析的假设。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>这是 STROBE-MR 最核心的要求之一。试审发现许多 MR 文章根本没有明确列出这三大假设。STROBE-MR 的立场是：<strong>不陈述假设 = 不承认假设需要被满足 = 读者无法判断你的结论建立在什么条件之上。</strong></p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目6：主分析的统计方法（含5个子条目 6a-6e）</h4>
+<table class="data">
+  <tr><th>子条目</th><th>内容</th></tr>
+  <tr><td>6a</td><td>定量变量在分析中如何处理的（尺度、单位、模型形式）</td></tr>
+  <tr><td>6b</td><td>遗传变异在分析中如何处理；如适用，其权重如何选择（如等位基因评分中选择的权重方法）</td></tr>
+  <tr><td>6c</td><td>描述 MR 估计量（如两阶段最小二乘法 2SLS、Wald 比值法）及相关统计量。详细列出纳入的协变量；双样本 MR 时，是否两个样本使用了相同的协变量集</td></tr>
+  <tr><td>6d</td><td>缺失数据如何处理（原 STROBE 条目，唯一未修改）</td></tr>
+  <tr><td>6e</td><td>如适用，说明如何处理多重检验</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目7：假设评估</h4>
+<p>描述用于评估假设或论证假设有效性的任何<strong>方法或先验知识</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目8：敏感性分析与额外分析</h4>
+<p>描述任何额外的敏感性分析或附加分析。例如：比较不同方法（IVW、MR-Egger、加权中位数等）的效应估计、独立重复、偏倚分析技术（如 E-value）、工具变量验证、模拟研究。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>条目7-8要求的"假设评估"和"敏感性分析"具体应选择哪些方法？<a href="Sanderson_2022_Mendelian_randomization_zh.html">MR Primer 详解</a>的<strong>第5节（多效性的处理）</strong>提供了完整的方法目录（Table 1：IVW、MR-Egger、加权中位数、加权众数、MR-PRESSO、MR CAUSE等），以及推荐的分析工作流。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系1（互补）</a>。
+</div>
+
+<p>条目7和8共同构成了 MR 研究的"假设诚信体系"：</p>
+<ul>
+  <li><strong>条目7</strong> 要求你说清楚你是如何检验假设的（或至少论证为什么你认为假设是合理的）</li>
+  <li><strong>条目8</strong> 要求你在主分析之外，再做一些分析来测试你的结果对假设违反的敏感程度</li>
+</ul>
+<p>换句话说：<strong>不能只说"我假设排他性成立"，而要展示"我做了这些事来检查排他性是否可能被违反，以及如果被违反了会怎样"。</strong></p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目9：软件与预注册</h4>
+<p>列出使用的统计软件和包（包括版本和设置）。说明研究方案和细节是否经过预注册（以及何时、在何处注册）。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>良好报告：敏感性分析策略</h4>
+<p>"We performed the following sensitivity analyses to assess the robustness of our findings: (i) MR-Egger regression to detect and correct for directional pleiotropy; (ii) weighted median estimator, which is consistent when up to 50% of the information comes from invalid instruments; (iii) MR-PRESSO to detect and remove outlier SNPs; (iv) leave-one-out analysis to identify influential variants. We also calculated the F-statistic to assess instrument strength (F &gt; 10 indicating adequate strength)."</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<h3 id="sec-4-5">4.5 Results（条目10-13）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目10：描述性数据（含4个子条目 10a-10d）</h4>
+<table class="data">
+  <tr><th>子条目</th><th>内容</th></tr>
+  <tr><td>10a</td><td>报告各阶段纳入的个体数及排除原因（建议使用流程图）</td></tr>
+  <tr><td>10b</td><td>报告表型暴露、结局及其他相关变量的汇总统计（均值、标准差、比例等）</td></tr>
+  <tr><td>10c</td><td>如数据来源包含既往研究的荟萃分析，提供这些研究间异质性的评估</td></tr>
+  <tr><td>10d</td><td><strong>双样本 MR 专属：</strong>(i) 提供暴露和结局样本中 SNP-暴露关联相似性的论证；(ii) 报告两样本中重叠个体的数量</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目11：主要结果（含4个子条目 11a-11d）</h4>
+<ul>
+  <li><strong>11a：</strong>报告 SNP-暴露 关联和 SNP-结局 关联，最好在可解释的尺度上（如每个效应等位基因/每SD的 OR 或 β）</li>
+  <li><strong>11b：</strong>报告 MR 估计的 暴露-结局 因果关系及不确定性度量，在可解释的尺度上（如每 SD 差异的 OR 或相对风险）。如相关，考虑将相对风险转化为有意义的绝对风险</li>
+  <li><strong>11c：</strong>考虑用图形可视化结果（森林图、遗传变异-结局 vs 遗传变异-暴露的散点图）</li>
+  <li><strong>11d：</strong>（原始表2中列为11d）如适用</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>条目11中一个细粒度但重要的要求是"<strong>在可解释的尺度上</strong>"报告结果。例如：如果暴露是 BMI，MR 估计的是 "BMI 每增加 1 kg/m² 对冠心病风险的 OR"。但如果 BMI 的基因工具能解释的变异很小（比如只有 0.3 SD），那么直接报告"每等位基因"的效应就几乎没有实际意义。好的做法是报告 "每 SD BMI 增加"的效应，这样临床医生可以直接解读。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目12：假设评估</h4>
+<p>报告假设有效性的评估。报告任何额外统计量（如跨遗传变异的异质性评估：$I^2$、Q 统计量或 E-value）。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目13：敏感性分析与额外分析（含5个子条目 13a-13e）</h4>
+<table class="data">
+  <tr><th>子条目</th><th>内容</th></tr>
+  <tr><td>13a</td><td>报告评估主要结果对假设违反稳健性的敏感性分析</td></tr>
+  <tr><td>13b</td><td>报告其他敏感性分析或额外分析的结果</td></tr>
+  <tr><td>13c</td><td>报告对因果方向性的评估（如双向 MR）</td></tr>
+  <tr><td>13d</td><td>相关时，报告并比较非 MR 分析的估计值（如传统观察性关联）</td></tr>
+  <tr><td>13e</td><td>考虑额外的可视化图形（如留一法分析图）</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>良好报告：双向 MR</h4>
+<p>"To assess the direction of the causal relationship, we performed bidirectional MR: first treating BMI as exposure and coronary heart disease as outcome, then reversing the roles. A causal effect in the reverse direction (CHD → BMI) would suggest reverse causation."</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<h3 id="sec-4-6">4.6 Discussion（条目14-17）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目14：关键结果</h4>
+<p>参照研究目标总结关键结果。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目15：局限性</h4>
+<p>讨论研究的局限性，需考虑：（1）IV 假设的有效性；（2）其他潜在偏倚来源；（3）不精确性。<strong>同时讨论潜在偏倚的方向和大小</strong>，以及为处理它们所做的任何努力。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<p>条目15超越了简单的"承认局限性"——它要求研究者明确讨论偏倚的<strong>方向</strong>（偏向零还是远离零？）和<strong>大小</strong>（大致有多大的数量级影响？），这比含糊地说"可能存在残余混杂"有用得多。</p>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目16：解读（含3个子条目 16a-16c）</h4>
+<table class="data">
+  <tr><th>子条目</th><th>内容</th></tr>
+  <tr><td>16a</td><td><strong>含义：</strong>在局限性背景下，给出谨慎的总体结果解读，并与其他研究比较。</td></tr>
+  <tr><td>16b</td><td><strong>机制：</strong>讨论驱动暴露与结局间潜在因果关系的潜在生物学机制，以及基因-环境等效性假设是否合理。<strong>谨慎使用因果语言</strong>（causal language），明确 IV 估计仅在特定假设下才能提供因果效应。</td></tr>
+  <tr><td>16c</td><td><strong>临床相关性：</strong>讨论结果是否具有临床或公共政策相关性，以及它们在多大程度上能为可能的干预效应大小提供信息。</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>因果语言的审慎使用</h4>
+<p>条目16b 中明确要求"谨慎使用因果语言"。这是流行病学中长期争议的话题——观察性研究（即便是 MR）是否应该使用"cause"/"causal"等词汇。STROBE-MR 的立场不是禁止，而是要求在使用因果语言的<strong>同时</strong>明确告知读者这种因果推断建立在哪些假设条件之上。这是一种"负责任使用"的立场（参见 Hernán 2018, <em>Am J Public Health</em>）。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>条目17：推广性 (Generalizability)</h4>
+<p>讨论研究结果在以下方面的推广性：(a) 到其他人群；(b) 跨不同的暴露时期/时间点；(c) 跨不同的暴露水平。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>条目17 将通常笼统的"讨论推广性"拆成了三个明确的维度：</p>
+<ul>
+  <li><strong>(a) 人群推广性：</strong>大多数 MR 研究基于欧洲裔人群 GWAS。结果适用于亚洲裔、非洲裔人群吗？（LD 结构不同，等位基因频率不同）</li>
+  <li><strong>(b) 时间推广性：</strong>遗传变异代表的是<strong>终身</strong>暴露差异。如果暴露只在某个关键发育窗口期起作用（如胎儿期），终身效应的线性假定可能不成立。</li>
+  <li><strong>(c) 水平推广性：</strong>遗传变异通常代表的是小幅度暴露差异（e.g., 0.1 SD BMI）。将这种小效应的线性外推到大幅度干预（e.g., 减重手术后的 5 SD BMI 变化）是否合理？</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<h3 id="sec-4-7">4.7 Other Information（条目18-20）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>18: 资助 | 19: 数据与数据共享 | 20: 利益冲突</h4>
+<table class="data">
+  <tr><th>条目</th><th>内容</th></tr>
+  <tr><td>18</td><td>描述资助来源及资助者在研究中的角色。如适用，也要说明数据库和原始研究的资助来源。</td></tr>
+  <tr><td>19</td><td><strong>提供所有分析所用的数据</strong>，或报告数据可以从哪里以及如何获取，并在文章中引用这些来源。<strong>提供重现文章结果所需的统计代码</strong>，或报告代码是否可公开获取及其位置。</td></tr>
+  <tr><td>20</td><td>所有作者都应声明所有潜在的利益冲突。</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>条目19 — 数据与代码共享</h4>
+<p>这是 STROBE-MR 相对原始 STROBE 新增的重要条目。MR 分析常常依赖多个公开 GWAS 数据源，计算方法复杂（多个 R 包、多种敏感性分析），如果没有共享代码，同行复现几乎是不可能的。条目19明确要求研究者：<strong>要么公开你的数据和代码，要么说明如何获取它们</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<p>STROBE-MR 原文的 Table 2 检查清单完整原文如下（横跨原文两页，上方为条目 1–12，下方自条目 13 起续排），可对照上文 4.1–4.6 的逐条解读回看：</p>
+
+<img src="images/Skrivankova/Skrivankova_Tab2.jpg" alt="原论文Table 2：STROBE-MR检查清单——20个主条目、30个子条目，覆盖标题摘要到利益冲突的完整报告要求">
+
+<p class="fig-caption"><strong>原论文 Table 2：STROBE-MR 检查清单（Recommend Items to Address in Reports of MR Studies）。</strong>四列结构：Item No.（条目号）、Section（所属部分）、Checklist item（条目内容）。<strong>上半部分（原文 p5）</strong>为条目 1–12：标题摘要（条目 1，标题/摘要中注明 MR 设计）、引言（条目 2 背景、条目 3 目标）、方法（条目 4–9：研究设计与数据来源、IV 假设陈述、统计方法主分析 a–e、假设评估、敏感性分析与软件版本）。<strong>下半部分（原文 p6，"(continued)"）</strong>为条目 13–20：结果（条目 13 敏感性分析报告 a–e）、讨论（条目 14 关键结果、15 局限性、16 解释 a–c、17 可推广性）、其他信息（条目 18 资助、19 数据与代码共享、20 利益冲突）。<strong>怎么读</strong>：写 MR 论文时按行自查——每一行条目都要在论文的相应部分找到明确对应的段落；读者评估一篇 MR 论文的完整性时，也可按此表逐项打勾。<strong>与正文的关系</strong>：上文第 4 节的逐条解读正是按此表的 20 个主条目展开的，本表是"检查清单"一词的原始出处。<br>图源：Skrivankova et al., <em>JAMA</em> (2021), CC BY 3.0（EQUATOR Network 授权再版）。</p>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>20个主条目、30个子条目</strong>覆盖论文从头到尾的所有部分</li>
+  <li><strong>三大 IV 假设</strong>必须在方法部分明确陈述（条目5），在结果部分报告评估结果（条目12）</li>
+  <li><strong>敏感性分析</strong>是必须的——不仅要做，还要清晰报告（条目8 + 条目13）</li>
+  <li><strong>透明性</strong>贯穿始终：预注册、数据来源、软件版本、数据代码共享均应报告</li>
+  <li><strong>"可解释尺度"</strong>是结果报告的反复要求：让临床读者不用换算就能理解你的数字</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 5 ==================== -->
+<section id="sec-5">
+<h2>5. STROBE-MR vs 原始 STROBE：改了什么？</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>原始 STROBE（2007）有 22 个主条目和 18 个子条目（共 40 个检查点）。STROBE-MR 有 20 个主条目和 30 个子条目（共 50 个检查点）。数量变化只是表象——真正重要的是<strong>内容的全面 MR 化改造</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<p>STROBE-MR 与原始 STROBE 相比：</p>
+<ul>
+  <li>减少了 2 个主条目，但增加了 12 个子条目</li>
+  <li><strong>仅 1 个子条目（6d：缺失数据处理）未做任何修改</strong></li>
+  <li>所有其他条目和子条目都被修改以适用于 MR 研究</li>
+</ul>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>关键变化举例</h4>
+<table class="data">
+  <tr><th>维度</th><th>原始 STROBE</th><th>STROBE-MR</th></tr>
+  <tr>
+    <td>暴露/结局测量</td>
+    <td>描述所有变量的评估方法</td>
+    <td>额外要求描述<strong>遗传变异的测量、质量控制和选择</strong>（条目4c）</td>
+  </tr>
+  <tr>
+    <td>偏倚控制</td>
+    <td>描述处理潜在偏倚来源的措施</td>
+    <td>明确要求列出<strong>评估三大 IV 假设的方法</strong>（条目7）和<strong>敏感性分析</strong>（条目8）</td>
+  </tr>
+  <tr>
+    <td>数据来源</td>
+    <td>描述研究设置、地点、日期</td>
+    <td>对<strong>每一个数据来源</strong>分别描述（对双样本 MR 尤其重要）</td>
+  </tr>
+  <tr>
+    <td>推广性</td>
+    <td>讨论结果的外部效度</td>
+    <td>分为三个维度：<strong>人群、时间、暴露水平</strong>（条目17）</td>
+  </tr>
+  <tr>
+    <td>数据共享</td>
+    <td>不包含</td>
+    <td><strong>新增条目</strong>，要求提供数据和代码（条目19）</td>
+  </tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<p>STROBE-MR 不是 STROBE 的"微调版"，而是<strong>从 MR 视角出发的彻底重写</strong>。它保留了 STROBE 的框架结构，但在每一个条目中植入了 MR 特有的概念和方法学要求。</p>
+<span class="src-ref">
+    
+📖 原文出处：STROBE-MR检查清单详解
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+<!-- ==================== Section 6 ==================== -->
+<section id="sec-6">
+<h2>6. 讨论、局限与结论</h2>
+
+<h3 id="sec-6-1">6.1 实施推广计划</h3>
+
+<p>STROBE-MR 的发表只是第一步。论文描述了后续的推广计划：</p>
+<ul>
+  <li>鼓励期刊认可和支持使用该指南，例如通过 EQUATOR 网站提供材料</li>
+  <li>将指南翻译成多种语言（STROBE 已被译为中文、西班牙语、德语等8种语言）</li>
+  <li>随着 MR 方法学的发展（新型测序数据、家庭内设计、医疗数据库链接等）持续更新指南</li>
+  <li>团队将持续监测文献以维护指南内容</li>
+</ul>
+
+<h3 id="sec-6-2">6.2 声明本身的局限性</h3>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>使用 STROBE-MR 时应意识到的三个限制</h4>
+<ol>
+  <li><strong>不覆盖所有方法：</strong>STROBE-MR 描述了主要假设和常用评估方法，但不可能穷尽所有 MR 分析方法。这是任何指南的固有限制。</li>
+  <li><strong>共识而非终稿：</strong>作为共识文件，它代表了当前最佳实践，但将随领域发展而更新。MR 方法学发展极快——新方法（如双向 MR、多变量 MR、网络 MR 等）不断涌现，指南需要周期性更新来跟上。</li>
+  <li><strong>非系统综述基础：</strong>制定过程中的文献回顾和试审是实用主义驱动的，不是系统综述。未来可能需要更系统的审查来补充当前的报告缺陷证据基础。</li>
+</ol>
+<span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>报告指南 ≠ 质量评价工具</h4>
+<p>这是一个经常被误解的点。论文特别强调：</p>
+<blockquote>报告指南不是设计或实施研究的建议…清单也不是评价 MR 研究质量的工具，<strong>不应被用作此目的</strong>（da Costa et al. 2011）。</blockquote>
+<p>打个比方：一份菜谱列出了需要的所有食材和步骤，但照着写出来的菜谱和做出来的菜好不好吃是两回事。同样，满足 STROBE-MR 清单要求不等于研究是高质量的，但不满足则意味着读者无法评估其质量。</p>
+<span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+
+<h3 id="sec-6-3">6.3 核心结论</h3>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>STROBE-MR 是<strong>第一个专门针对 MR 研究的报告指南</strong>，作为 STROBE 的扩展发布</li>
+  <li>它基于<strong>国际专家共识</strong>和<strong>现有实证证据</strong>（尽管不是系统综述）</li>
+  <li>改善 MR 研究报告可以帮助<strong>编辑、审稿人、研究者、临床医生和读者</strong>更好地评估和解读 MR 结果</li>
+  <li>指南<strong>不规定统一格式</strong>——顺序和格式由作者和期刊风格决定</li>
+  <li>它<strong>不是质量评价工具</strong>——但完整报告是质量评价的前提</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>所以呢？这对你的研究意味着什么？</h4>
+<p>如果你正在计划或正在撰写 MR 研究：</p>
+<ol>
+  <li><strong>在设计阶段</strong>就参考 STROBE-MR 清单——明确预注册你的假设，确保你收集了所有需要报告的信息</li>
+  <li><strong>在写作阶段</strong>逐条对照清单——每一条后面写上对应的段落号</li>
+  <li><strong>在投稿阶段</strong>将完成的清单作为补充材料提交（许多期刊现在要求这样做）</li>
+  <li><strong>最大的回报：</strong>一份清晰透明的报告不仅让审稿人更快地理解和接受你的工作，也让你的研究在未来系统综述和荟萃分析中更有可能被纳入</li>
+</ol>
+<span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to contents</span></a>
+</section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+<div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📖 MR Primer 方法学详解</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR-CVD 综述</a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>📄 两步MR</span><span data-en>📄 Two-step MR</span></a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>📄 <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></span><span data-en>📄 Proteome MR for Stroke</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../knowledge_graph.html">🗺️ MR 知识图谱</a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+<a href="https://doi.org/10.1001/jama.2021.18236" target="_blank">🔗 JAMA 原文</a>
+<a href="https://doi.org/10.1136/bmj.n2233" target="_blank">📖 E&E 文档 (BMJ 2021)</a>
+<a href="https://www.equator-network.org/" target="_blank">🌐 EQUATOR Network</a>
+</div>
+
+<p><strong><span data-zh>论文信息：</span><span data-en>Paper info: </span></strong>Skrivankova VW, Richmond RC, Woolf BAR, et al. Strengthening the Reporting of Observational Studies in Epidemiology Using Mendelian Randomization: The STROBE-MR Statement. <em>JAMA</em>. 2021;326(16):1614–1621. doi:10.1001/jama.2021.18236</p>
+
+<p><strong>版权声明：</strong>STROBE-MR 检查清单由 EQUATOR Network 以 Creative Commons Attribution 3.0 Unported (CC BY 3.0) 许可协议授权再版。本详解文档仅供教育和参考目的。</p>
+
+<p style="font-size:0.85em;color:#aaa;"><span data-zh>HTML 详解生成于 2026-08-14 · 使用 paper-explainer skill</span><span data-en>HTML explainer generated 2026-08-14 · built with the paper-explainer skill</span></p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

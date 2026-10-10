@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>/paper-explainer 工作流详解 — 学术论文→中文HTML详解的自动化流水线</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       设计令牌 (Design Tokens) —— 默认主题「纸墨」，与阅读路径页、知识图谱页同源；
+       其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+      --rule: #e4e3db; --rule-strong: #cfcec3;
+      --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+      --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+      --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+      --radius: 10px; --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.8; color: var(--ink);
+      background: var(--bg); max-width: 960px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    h2 { font-size: 1.4em; font-family: var(--font-display); font-weight: 600; color: var(--ink); margin: 2em 0 0.8em; }
+    h3 { font-size: 1.15em; color: var(--ink); font-weight: 600; margin: 1.4em 0 0.6em; }
+    p { margin: 10px 0; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header {
+      border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-strong);
+      padding: 28px 4px 22px; margin-bottom: 30px;
+    }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.8em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+    }
+    header .sub { font-size: .96em; color: var(--ink-2); margin-top: 6px; }
+
+    /* ====================================================================
+       概念卡片 (.concept) —— 一个卡片 = 一个背景概念
+       ==================================================================== */
+    .concept {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 20px 24px; margin: 18px 0; box-shadow: var(--shadow);
+      transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+    }
+    .concept:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+    .concept h2 { margin: 0 0 8px; font-size: 1.15em; font-family: var(--font-body); border: none; padding: 0; }
+    .concept h2::after { display: none; }
+    .concept .papers { font-size: .9em; color: var(--ink-2); margin-top: 10px; }
+    .concept .links { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .concept .links a {
+      padding: 5px 13px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: .9em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .concept .links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    /* ====================================================================
+       定义框 (.def-box) —— 承载概念的简明白话解释
+       ==================================================================== */
+    .def-box {
+      background: var(--c-def-bg); border: 1px solid var(--c-def-bd);
+      border-radius: var(--radius-s); padding: 12px 16px; margin: 12px 0;
+    }
+    .def-box strong { color: var(--c-def-fg); }
+
+    /* ====================================================================
+       页脚 (footer) + 底部导航栏 (.rb)
+       ==================================================================== */
+    footer {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 24px; box-shadow: var(--shadow); margin-top: 42px;
+      font-size: .9em; color: var(--ink-2); text-align: center;
+    }
+    .rb { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; justify-content: center; align-items: center; }
+    .rb strong { color: var(--ink); margin-right: 4px; }
+    .rb a {
+      padding: 5px 14px; border-radius: 999px; border: 1px solid var(--rule);
+      background: var(--surface); font-size: 1em;
+      transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+    }
+    .rb a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\(','\)']], displayMath: [['$$','$$'],['\[','\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="rb" style="justify-content:center;margin-bottom:20px;"><a href="mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a> <a href="reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a> <a href="knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a> <a href="basic_bio_knowledge.html"><span data-zh>基础生物学</span><span data-en>Basic Biology</span></a> <a href="../knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a></div>
+
+<!-- ====== COVER ====== -->
+<div class="cover">
+  <h1><span data-zh>/paper-explainer 工作流详解</span><span data-en>/paper-explainer Workflow Deep Dive</span></h1>
+  <div class="subtitle">学术论文 PDF → 自包含中文 HTML 详解 + 知识图谱的自动化流水线</div>
+  <div class="badge-row">
+    <span class="badge">10 步自动化流程</span>
+    <span class="badge">7 种教学标注盒</span>
+    <span class="badge">11 个教学策略模式</span>
+    <span class="badge">5 类文件输出</span>
+  </div>
+</div>
+
+<!-- ====== OVERVIEW ====== -->
+<h2>概述：这个技能解决什么问题？</h2>
+
+<div class="deck">
+<h4>核心使命</h4>
+<p>将一篇学术论文 PDF <strong>自动转化为</strong>一份深入浅出的中文 HTML 详解文档，同时维护项目内多篇论文之间的<strong>知识关联图谱</strong>和<strong>交叉引用网络</strong>。</p>
+</div>
+
+<div class="deck green">
+<h4>输入 → 输出</h4>
+<table class="data">
+  <tr><th style="width:25%;">环节</th><th>内容</th></tr>
+  <tr><td><strong>输入</strong></td><td>1 篇学术论文 PDF（任意领域，推荐统计学/ML/计算生物学）</td></tr>
+  <tr><td><strong>中间产物</strong></td><td>论文文本提取 → 结构分析 → 知识关联分析 → 详解大纲</td></tr>
+  <tr><td><strong>输出</strong></td><td>(1) 论文详解 HTML (2) 更新后的知识图谱 (3) 已有论文回溯更新 (4) 项目 CLAUDE.md 更新</td></tr>
+</table>
+</div>
+
+<!-- ====== PIPELINE DIAGRAM ====== -->
+<h2>执行流水线：10 步全景图</h2>
+
+<div class="pipeline-track">
+  <div class="pipeline-step input"><span class="num">📥</span>PDF 整理</div>
+  <div class="pipeline-step"><span class="num">📝</span>文本提取</div>
+  <div class="pipeline-step"><span class="num">🔍</span>结构分析</div>
+  <div class="pipeline-step"><span class="num">🔗</span>知识关联</div>
+  <div class="pipeline-step"><span class="num">📋</span>大纲设计</div>
+  <div class="pipeline-step"><span class="num">✍️</span>HTML 撰写</div>
+  <div class="pipeline-step"><span class="num">✅</span>验证</div>
+  <div class="pipeline-step"><span class="num">🗺️</span>图谱更新</div>
+  <div class="pipeline-step"><span class="num">🔄</span>回溯更新</div>
+  <div class="pipeline-step output"><span class="num">📄</span>CLAUDE.md</div>
+</div>
+<p style="text-align:center;font-size:0.9em;color:var(--gray-mid);">前 3 步为"理解阶段"（Understanding），4-6 步为"产出阶段"（Creation），7-10 步为"整合阶段"（Integration）。</p>
+
+<!-- ====== STEP-BY-STEP ====== -->
+<h2>逐步详解</h2>
+
+<div class="step-flow">
+
+<!-- Step 1 -->
+<div class="step-card">
+  <span class="step-icon">📂</span>
+  <h4>Step 1 · 整理 PDF</h4>
+  <p><strong>做什么：</strong>将论文 PDF 复制到项目的 <code>literature/</code> <span data-zh>目录</span><span data-en>Contents</span>。</p>
+  <p><strong>为什么：</strong>确保所有原始 PDF 集中存放，便于后续查找和维护。</p>
+  <p><strong>命令：</strong><code>mkdir -p literature/ && cp paper.pdf literature/</code></p>
+</div>
+
+<!-- Step 2 -->
+<div class="step-card">
+  <span class="step-icon">📝</span>
+  <h4>Step 2 · 提取 PDF 文本</h4>
+  <p><strong>做什么：</strong>使用 <code>pdftotext</code> 将 PDF 转化为纯文本。</p>
+  <p><strong>为什么：</strong>后续的结构分析和内容理解依赖于可搜索的文本。若 PDF 加密，需用户提供无密码版本。</p>
+  <p><strong>关键输出：</strong>文本行数（评估篇幅）+ 前 200 行（获取标题、摘要、作者等元数据）。</p>
+</div>
+
+<!-- Step 3 -->
+<div class="step-card">
+  <span class="step-icon">🔍</span>
+  <h4>Step 3 · 分析论文结构</h4>
+  <p><strong>分四层分析：</strong></p>
+  <ol>
+    <li><strong>元数据识别：</strong>标题、作者、期刊、年份、DOI — 用于 HTML 头部和命名</li>
+    <li><strong>章节解析：</strong>识别引言、方法/模型、理论、实验、讨论的标准结构（论文并不总有明确标注，需要语义推断）</li>
+    <li><strong>关键数学对象提取：</strong>每个核心公式的变量域、维度、角色、约束条件</li>
+    <li><strong>实验与评估：</strong>识别数据生成方式、对比方法和评估指标</li>
+  </ol>
+</div>
+
+<!-- Step 4 -->
+<div class="step-card">
+  <span class="step-icon">🔗</span>
+  <h4>Step 4 · 分析知识关联</h4>
+  <p><strong>仅当项目已有其他论文时执行。</strong>这是知识图谱更新的前期准备：</p>
+  <ul>
+    <li>浏览已有论文详解 HTML 的关键章节（摘要、模型定义、理论结果）</li>
+    <li>对每个核心概念做四类判断：
+      <span class="itag blue">Shared 共享</span>
+      <span class="itag purple">Generalizes 推广</span>
+      <span class="itag green">Complements 互补</span>
+      <span class="itag orange">Unique 独有</span>
+    </li>
+    <li>记录完整的概念-论文映射关系，供后续图谱更新和交叉引用使用</li>
+  </ul>
+</div>
+
+<!-- Step 5 -->
+<div class="step-card">
+  <span class="step-icon">📋</span>
+  <h4>Step 5 · 设计详解大纲</h4>
+  <p><strong>大纲必须包含：</strong></p>
+  <ul>
+    <li><strong>§0 阅读导引：</strong>预备知识速览 + 符号约定表 + <strong>与已有论文的关系对比表</strong></li>
+    <li><strong>§1-N 逐章详解：</strong>每个论文章节 → 一个讲解章节，覆盖背景动机、数学原理、直观理解、应用场景、延伸讨论</li>
+    <li><strong>交叉引用标记点：</strong>在何处插入 <code>.crossref</code> 块指向已有论文</li>
+  </ul>
+  <p><strong>难度递进原则：</strong>§0 几乎无公式 → §1-2 文字为主 → §3-4 逐步增加公式密度 → §5+ 完整技术细节。</p>
+</div>
+
+<!-- Step 6 -->
+<div class="step-card">
+  <span class="step-icon">✍️</span>
+  <h4>Step 6 · 撰写 HTML 文档（核心步骤）</h4>
+  <p><strong>严格遵循的参考规范：</strong></p>
+  <table class="data">
+    <tr><th>参考文件</th><th>规范内容</th></tr>
+    <tr><td><code>html-template.md</code></td><td>HTML 结构骨架、CSS 变量体系、MathJax 3 CDN 配置、响应式断点</td></tr>
+    <tr><td><code>chinese-terminology.md</code></td><td>200+ 中英术语对照表，确保全文翻译一致性</td></tr>
+    <tr><td><code>pedagogical-patterns.md</code></td><td>11 个教学策略模式：三层展开、类比桥梁、具体先于抽象、问答驱动等</td></tr>
+    <tr><td><code>paper-structure-guide.md</code></td><td>论文结构分析方法论，从文本提取到知识关联分析的完整流程</td></tr>
+  </table>
+</div>
+
+<!-- Step 7 -->
+<div class="step-card">
+  <span class="step-icon">✅</span>
+  <h4>Step 7 · 验证</h4>
+  <p><strong>验证清单（7 项）：</strong></p>
+  <ul class="checklist">
+    <li>MathJax 公式语法正确，HTML 标签闭合完整</li>
+    <li>目录锚点链接可跳转（<code>#sec-N</code>）</li>
+    <li>7 种标注盒恰当使用（见下文"标注盒体系"）</li>
+    <li>每节有动机说明和要点总结（<code>.summary</code>）</li>
+    <li>术语翻译与 <code>chinese-terminology.md</code> 一致</li>
+    <li>顶部导航栏和底部相关资源栏完整</li>
+    <li>UTF-8 编码</li>
+  </ul>
+</div>
+
+<!-- Step 8 -->
+<div class="step-card">
+  <span class="step-icon">🗺️</span>
+  <h4>Step 8 · 更新知识图谱</h4>
+  <p><strong>5 项必更新组件：</strong></p>
+  <ol>
+    <li><strong>概念关联图谱</strong>（<code>.network-grid</code>）：新增论文节点 + 独有概念标签 + 共享/桥梁区域调整</li>
+    <li><strong>概念-论文对照矩阵</strong>（<code>.matrix-table</code>）：新增列 + 新概念行</li>
+    <li><strong>论文间关系卡片</strong>（<code>.rel-card</code>）：新论文与每篇已有论文的关系描述</li>
+    <li><strong>推荐阅读路径</strong>（<code>.roadmap-steps</code>）：根据需要调整顺序</li>
+    <li><strong>更新日期 + 论文计数</strong>（<code>.kg-header</code>）</li>
+  </ol>
+</div>
+
+<!-- Step 9 -->
+<div class="step-card">
+  <span class="step-icon">🔄</span>
+  <h4>Step 9 · 回溯更新已有论文</h4>
+  <p>为项目中所有已有详解 HTML 做<strong>增量更新</strong>：</p>
+  <ol>
+    <li>在 <code>.top-nav-bar</code> 中添加新论文链接</li>
+    <li>在相关章节插入指向新论文的 <code>.crossref</code> 块</li>
+    <li>在 <code>.related-bar</code> 中添加新论文条目</li>
+  </ol>
+  <p><strong>核心要求：</strong>交叉引用必须<strong>自然</strong>——在概念重叠处自然地提及，而非生硬插入。例如："本节的 XXX 方法在 YYY 论文中得到了系统应用，参见..."</p>
+</div>
+
+<!-- Step 10 -->
+<div class="step-card">
+  <span class="step-icon">📄</span>
+  <h4>Step 10 · 更新项目 CLAUDE.md</h4>
+  <p>在"已有输出"表格中添加新论文条目，更新项目结构图，调整论文计数。</p>
+  <p>若论文扩展了项目的研究方向（如从纯 MR 拓展到 AI/ML），同步更新项目定位描述。</p>
+</div>
+
+</div> <!-- /.step-flow -->
+
+<!-- ====== HTML STRUCTURE ====== -->
+<h2>输出文件结构</h2>
+
+<div class="file-tree">
+<span class="dir">summary/</span>
+├── <span class="dir">literature/</span>                       <span class="comment">← PDF 原文存放</span>
+│   ├── paper_1.pdf
+│   ├── paper_2.pdf
+│   └── <span class="dir">summary/</span>                     <span class="comment">← HTML 输出目录</span>
+│       ├── <span class="file hl">Sanderson_2022_Mendelian_randomization_zh.html</span>  <span class="comment">← 详解 (按命名规范)</span>
+│       ├── <span class="file hl">Cui_2025_Multimodal_foundation_models_zh.html</span>
+│       └── <span class="file hl">knowledge_graph.html</span>        <span class="comment">← 知识图谱 (固定名称)</span>
+└── <span class="file">CLAUDE.md</span>                         <span class="comment">← 项目导引文件</span>
+</div>
+
+<div class="deck">
+<h4>HTML 文件命名规范</h4>
+<p>格式：<code>{第一作者姓氏}_{年份}_{标题前三个实义词}_zh.html</code></p>
+<p><strong>规则：</strong>跳过冠词（a/an/the）、介词（of/for/in/on）、连接词（and/or），取前三个有实质意义的单词。示例：</p>
+<table class="data">
+  <tr><th>论文标题</th><th>→ 文件名</th></tr>
+  <tr><td>"Mendelian randomization"</td><td><code>Sanderson_2022_Mendelian_randomization_zh.html</code></td></tr>
+  <tr><td>"Strengthening the Reporting of Observational Studies in Epidemiology using Mendelian Randomization"</td><td><code>Skrivankova_2021_Strengthening_Reporting_Observational_zh.html</code></td></tr>
+  <tr><td>"Towards multimodal foundation models in molecular cell biology"</td><td><code>Cui_2025_Multimodal_foundation_models_zh.html</code></td></tr>
+</table>
+</div>
+
+<!-- ====== CALLOUT BOX SYSTEM ====== -->
+<h2>教学标注盒体系（7 + 1 种）</h2>
+
+<p>这是 paper-explainer 最核心的教学基础设施。每种盒型有明确的使用场景和视觉编码。</p>
+
+<table class="data">
+  <tr><th style="width:15%;">盒型</th><th style="width:12%;">CSS 类</th><th style="width:15%;">编码</th><th style="width:28%;">使用场景</th><th>示例</th></tr>
+  <tr>
+    <td><strong>直观理解</strong></td>
+    <td><code>.intuition</code></td>
+    <td>🟢 绿边</td>
+    <td>每个新概念的第一层展开——白话无公式，日常类比</td>
+    <td>"Transformer 的注意力机制就像基因之间的'通信强度'"</td>
+  </tr>
+  <tr>
+    <td><strong>正式定义</strong></td>
+    <td><code>.definition</code></td>
+    <td>🔵 蓝边</td>
+    <td>第三层展开——完整数学定义、公式、条件</td>
+    <td>Wald Ratio 估计量公式 + 符号说明</td>
+  </tr>
+  <tr>
+    <td><strong>具体示例</strong></td>
+    <td><code>.example</code></td>
+    <td>🟡 黄边</td>
+    <td>低维数字演示、具体数据场景、代码片段</td>
+    <td>"假设 SNP1 对 BMI 的效应是 0.3 SD..."</td>
+  </tr>
+  <tr>
+    <td><strong>定理/结论</strong></td>
+    <td><code>.theorem</code></td>
+    <td>🟣 紫边</td>
+    <td>定理陈述、命题、正式理论结果</td>
+    <td>"在 InSIDE 假设下，MR-Egger 给出一致估计"</td>
+  </tr>
+  <tr>
+    <td><strong>算法</strong></td>
+    <td><code>.algorithm</code></td>
+    <td>⬜ 灰边 + 等宽字体</td>
+    <td>分析工作流、伪代码、计算步骤</td>
+    <td>"推荐 MR 分析流程：IVW → 径向 MR → MR-Egger → ..."</td>
+  </tr>
+  <tr>
+    <td><strong>要点总结</strong></td>
+    <td><code>.summary</code></td>
+    <td>🔷 浅蓝边</td>
+    <td>每节末尾的关键收获（bullet 列表）</td>
+    <td>"本节要点：① IV1-IV3 检验因果...② IV4 估计效应..."</td>
+  </tr>
+  <tr>
+    <td><strong>注意事项</strong></td>
+    <td><code>.warning</code></td>
+    <td>🔴 红边</td>
+    <td>局限性、常见陷阱、关键警告</td>
+    <td>"F < 10 = 弱工具，估计偏向观察性关联"</td>
+  </tr>
+  <tr>
+    <td><strong>交叉引用</strong></td>
+    <td><code>.crossref</code></td>
+    <td>📎 虚线绿边</td>
+    <td>指向其他论文的自然连接——"如果你是这么想的，那篇论文..."</td>
+    <td>"详见 STROBE-MR §5 → 知识图谱 关系1"</td>
+  </tr>
+</table>
+
+<!-- ====== TEACHING STRATEGIES ====== -->
+<h2>教学策略模式（精选）</h2>
+
+<div class="deck green">
+<h4>Pattern 1 · 三层展开（Three-Layer Exposition）</h4>
+<p>对每一个核心概念，提供三层递进解释：</p>
+<ol>
+  <li><strong>直觉层（<code>.intuition</code>）：</strong>1-3 句话，0 公式，日常类比 → 目标读者：从未见过这个概念的人</li>
+  <li><strong>半形式化层（正文）：</strong>展示公式 + 逐行注释每个符号 → 桥梁：连接直觉与精确</li>
+  <li><strong>正式层（<code>.definition</code>）：</strong>完整数学定义 → 给需要精确的读者</li>
+</ol>
+</div>
+
+<div class="deck">
+<h4>Pattern 2 · 类比桥梁（Analogy Bridge）</h4>
+<p>将不熟悉的概念连接到熟悉的概念。例如：</p>
+<table class="data">
+  <tr><th>新概念</th><th>熟悉类比</th></tr>
+  <tr><td>CP 分解</td><td>SVD/特征分解的推广</td></tr>
+  <tr><td>模-k 展开</td><td>堆叠矩阵列</td></tr>
+  <tr><td>多级注意力（模内+模间）</td><td>Swin Transformer 的分层注意力</td></tr>
+  <tr><td>IVW（逆方差加权）</td><td>多个"微型研究"的荟萃分析</td></tr>
+</table>
+</div>
+
+<div class="deck orange">
+<h4>Pattern 4 · 问答驱动（Question-Answer Threading）</h4>
+<p>预判读者自然产生的问题并直接回答。核心句式：</p>
+<ul>
+  <li>"<strong>为什么不能</strong>让所有条目共享同一个非线性函数？因为..."</li>
+  <li>"<strong>为什么选择</strong>弹性网而不是纯 Lasso？因为张量数据的相邻条目高度相关..."</li>
+  <li>"<strong>所以呢？</strong>——这个定理的实践含义是..."（Pattern 6）</li>
+</ul>
+</div>
+
+<div class="deck purple">
+<h4>Pattern 3 · 具体先于抽象（Concrete-Before-Abstract）</h4>
+<p>在给出一般公式之前：</p>
+<ol>
+  <li>先展示一个具体的小例子（如 2×2×2 张量 + 具体数字）</li>
+  <li>再推广到任意维度</li>
+  <li>最后连接回论文的实际使用场景</li>
+</ol>
+</div>
+
+<!-- ====== HTML TEMPLATE SKELETON ====== -->
+<h2>HTML 骨架结构</h2>
+
+<div class="file-tree">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh-CN"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;<span class="hl">[论文标题] —— 详细中文解读</span>&lt;/title&gt;
+  &lt;style&gt;<span class="comment">/* 完整内联 CSS：变量体系 + 7种标注盒 + 响应式 */</span>&lt;/style&gt;
+  &lt;script&gt;<span class="comment">/* MathJax 3 配置：inline + display + SVG 渲染 */</span>&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  <span class="comment">&lt;!-- 1. 顶部导航栏 --&gt;</span>
+  <span class="file">&lt;div class="top-nav-bar"&gt;</span>链接知识图谱、其他论文、<span data-zh>原始PDF</span><span data-en>Original PDF</span><span class="file">&lt;/div&gt;</span>
+
+  <span class="comment">&lt;!-- 2. 头部 --&gt;</span>
+  <span class="file">&lt;header&gt;</span>标题、作者、期刊、DOI、<span class="file">&lt;div class="abstract-box"&gt;</span>核心要义<span class="file">&lt;/div&gt;&lt;/header&gt;</span>
+
+  <span class="comment">&lt;!-- 3. <span data-zh>目录</span><span data-en>Contents</span> --&gt;</span>
+  <span class="file">&lt;nav class="toc"&gt;</span>可折叠的锚点链接目录<span class="file">&lt;/nav&gt;</span>
+
+  <span class="comment">&lt;!-- 4. 正文 — 逐节展开 --&gt;</span>
+  <span class="file">&lt;section id="sec-0"&gt;</span>§0 阅读导引<span class="file">&lt;/section&gt;</span>
+  <span class="file">&lt;section id="sec-1"&gt;</span>§1 <span class="file">&lt;/section&gt;</span>
+  ...  <span class="comment">← 每节末尾有 .summary + .back-top</span>
+
+  <span class="comment">&lt;!-- 5. 页脚 --&gt;</span>
+  <span class="file">&lt;footer&gt;</span>
+    <span class="file">&lt;div class="related-bar"&gt;</span>所有论文链接 + 知识图谱 + <span data-zh>原始PDF</span><span data-en>Original PDF</span><span class="file">&lt;/div&gt;</span>
+  <span class="file">&lt;/footer&gt;</span>
+&lt;/body&gt;
+&lt;/html&gt;
+</div>
+
+<!-- ====== KNOWLEDGE GRAPH ====== -->
+<h2>知识图谱的五大组件</h2>
+
+<p>知识图谱（<code>knowledge_graph.html</code>）是 paper-explainer 区别于一次性 PDF 翻译工具的关键所在——它将多篇论文编织成一个<strong>可导航的知识网络</strong>。</p>
+
+<table class="data">
+  <tr><th style="width:18%;">组件</th><th style="width:18%;">CSS 类</th><th>内容</th><th>更新频率</th></tr>
+  <tr>
+    <td><strong>概念关联图谱</strong></td>
+    <td><code>.network-grid</code><br><code>.paper-node</code></td>
+    <td>每篇论文一个"节点卡片"，用颜色编码概念类型：<br>🔵 蓝色 = 共享 · 🟡 黄色 = 独有 · 🟣 紫色 = 桥梁</td>
+    <td>每次新增论文</td>
+  </tr>
+  <tr>
+    <td><strong>概念-论文矩阵</strong></td>
+    <td><code>.matrix</code></td>
+    <td>二维矩阵：行=核心概念，列=论文。●●● = 核心覆盖，◐ = 提及</td>
+    <td>每次新增论文</td>
+  </tr>
+  <tr>
+    <td><strong>关系卡片</strong></td>
+    <td><code>.rel-card</code></td>
+    <td>每对论文的文字关系描述，标签为互补/共享/推广</td>
+    <td>每次新增论文</td>
+  </tr>
+  <tr>
+    <td><strong>推荐阅读路径</strong></td>
+    <td><code>.roadmap-steps</code></td>
+    <td>有序列表，规划从入门到前沿的学习顺序</td>
+    <td>可能需要调整</td>
+  </tr>
+  <tr>
+    <td><strong>论文索引</strong></td>
+    <td><code>.paper-links</code></td>
+    <td>所有论文的快速跳转链接</td>
+    <td>每次新增论文</td>
+  </tr>
+</table>
+
+<!-- ====== QUALITY ====== -->
+<h2>8 条核心质量标准</h2>
+
+<ol class="checklist">
+  <li><strong>数学公式前必有直观白话解释</strong>——不能上来就甩公式</li>
+  <li><strong>每个核心概念至少配一个具体小例子</strong>——最好用低维数字演示</li>
+  <li><strong>理论结果后必须回答"所以呢？"</strong>——实践含义、建模选择、样本需求</li>
+  <li><strong>术语首次出现时附英文原文</strong>——"孟德尔随机化（Mendelian Randomization, MR）"</li>
+  <li><strong>章节间有逻辑过渡句</strong>——"理解了 X 之后，下一个自然的问题是 Y..."</li>
+  <li><strong>全文术语翻译统一</strong>——严格参照 <code>chinese-terminology.md</code></li>
+  <li class="warn"><strong>交叉引用自然</strong>——在合适上下文自然提及，非生硬插入</li>
+  <li class="warn"><strong>知识图谱完整</strong>——每次新增论文后同步更新所有组件</li>
+</ol>
+
+<!-- ====== ANTI-PATTERNS ====== -->
+<h2>反模式（避免）</h2>
+
+<div class="deck red">
+<ul>
+  <li>❌ 以一个正式定义开始一个章节 → <strong>应该从动机/直觉开始</strong></li>
+  <li>❌ 在定义符号之前使用符号 → <strong>定义必须先于使用</strong></li>
+  <li>❌ 假设读者知道统计约定（如 $\asymp$ 的含义）→ <strong>首次出现时解释</strong></li>
+  <li>❌ 不给出定理的"所以呢" → <strong>每个定理/结论后立即回答实践含义</strong></li>
+  <li>❌ 连续 3 段以上的纯数学没有直觉插叙 → <strong>每 2-3 段插入一个 <code>.intuition</code></strong></li>
+  <li>❌ 中英术语不一致 → <strong>建议用全局搜索检查</strong></li>
+</ul>
+</div>
+
+<!-- ====== FILE INVENTORY ====== -->
+<h2>技能参考文件清单</h2>
+
+<table class="data">
+  <tr><th>文件</th><th>类型</th><th>内容</th></tr>
+  <tr><td><code>skills/paper-explainer/SKILL.md</code></td><td>入口指令</td><td>10 步执行流程、触发条件、质量标准</td></tr>
+  <tr><td><code>references/html-template.md</code></td><td>格式规范</td><td>HTML 结构骨架、CSS 设计系统、MathJax 配置、标注盒结构</td></tr>
+  <tr><td><code>references/chinese-terminology.md</code></td><td>术语标准</td><td>200+ 中英对照表（统计/ML/张量/非参数/贝叶斯/应用领域）</td></tr>
+  <tr><td><code>references/pedagogical-patterns.md</code></td><td>教学策略</td><td>11 个教学模式 + 知识图谱维护规范</td></tr>
+  <tr><td><code>references/paper-structure-guide.md</code></td><td>分析方法论</td><td>8 步论文分析流程：从文本提取到知识关联映射</td></tr>
+</table>
+
+<footer>
+  <p><strong><span data-zh>AI4Research 文献精读项目</span><span data-en>AI4Research Literature Project</span></strong><span data-zh> · /paper-explainer 工作流详解 · 2026-08-14</span><span data-en> · /paper-explainer workflow deep dive · 2026-08-14</span></p>
+  <p style="font-size:0.85em;"><span data-zh>本文档同样遵循 paper-explainer 的输出质量标准——自包含、结构化、中英术语统一。</span><span data-en>This document follows the same paper-explainer output quality bar — self-contained, structured, with unified Chinese–English terminology.</span></p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

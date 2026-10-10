@@ -53,7 +53,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{论文标题} · 详细中文解读</title>
   <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
-  <script src="../theme-pack.js"></script>
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
   <style>
     /* ====================================================================
        1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
@@ -384,46 +387,46 @@
      原始 PDF 在 literature/ 下用 ../../xxx.pdf）。
      ⚠️ 模板内互链带 _template 后缀（预览可点）；生成成品页面时去掉该后缀。 -->
 <div class="top-nav-bar">
-  <span class="current">← 当前论文</span>
+  <span class="current"><span data-zh>← 当前论文</span><span data-en>← Current Paper</span></span>
   <span class="sep">|</span>
   <!-- 以下两处为示例链接（指向本模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
-  <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>{其他论文1简称} 详解</a>
+  <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-zh>{其他论文1简称} 详解</span><span data-en>{Other Paper 1 short name} Walkthrough</span></a>
   <span class="sep">|</span>
-  <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>{其他论文2简称}</a>
+  <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg><span data-zh>{其他论文2简称}</span><span data-en>{Other Paper 2 short name}</span></a>
   <span class="sep">|</span>
-  <a href="../nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>阅读路径</a>
-  <a href="../knowledge_graph_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v6M15.5 7.5c-3 1.5-6.5 1.5-9.5 4.5"/></svg>知识图谱</a>
+  <a href="../nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+  <a href="../knowledge_graph_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v6M15.5 7.5c-3 1.5-6.5 1.5-9.5 4.5"/></svg><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
   <span class="sep">|</span>
-  <a href="../../{原始论文.pdf}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10.5l5 5 5-5M4.5 21h15"/></svg>原始 PDF</a>
+  <a href="../../{原始论文.pdf}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10.5l5 5 5-5M4.5 21h15"/></svg><span data-zh>原始 PDF</span><span data-en>Original PDF</span></a>
 </div>
 
 <!-- ============ HEADER ============ -->
 <header>
-  <h1>{论文标题：<br>中文副标题（如有）}</h1>
+  <h1><span data-zh>{论文标题：</span><span data-en>{Paper Title:</span><br><span data-zh>中文副标题（如有）}</span><span data-en>Subtitle in Chinese (if any)}</span></h1>
   <div class="meta">
-    <span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>{期刊名}. {年份};{卷}({期}):{页码}</span>
+    <span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span data-zh>{期刊名}. {年份};{卷}({期}):{页码}</span><span data-en>{Journal}. {Year};{Vol}({Issue}):{Pages}</span></span>
     <span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3L7 21M17 3l-2 18M4 8h17M3 16h17"/></svg>DOI: {doi}</span>
   </div>
   <div class="meta">
-    <span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 21a7.5 7.5 0 0 1 15 0"/></svg>{第一作者姓氏} {名首字母}, {第二作者}, {第三作者} 等（共 {N} 位作者）</span>
+    <span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 21a7.5 7.5 0 0 1 15 0"/></svg><span data-zh>{第一作者姓氏} {名首字母}, {第二作者}, {第三作者} 等（共 {N} 位作者）</span><span data-en>{First author's surname} {initials}, {Second author}, {Third author}, et al. ({N} authors in total)</span></span>
   </div>
 </header>
 
 <!-- ============ TOC ============ -->
 <nav class="toc" id="toc">
-  <h2><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>目录</h2>
+  <h2><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span data-zh>目录</span><span data-en>Contents</span></h2>
   <ol>
-    <li><a href="#sec-0">阅读导引：{这篇论文是关于什么的？}</a>
+    <li><a href="#sec-0"><span data-zh>阅读导引：{这篇论文是关于什么的？}</span><span data-en>Reading Guide: {What is this paper about?}</span></a>
       <ol>
-        <li><a href="#sec-0-1">{第一个预备概念}</a></li>
-        <li><a href="#sec-0-2">{第二个预备概念}</a></li>
+        <li><a href="#sec-0-1"><span data-zh>{第一个预备概念}</span><span data-en>{Prerequisite concept 1}</span></a></li>
+        <li><a href="#sec-0-2"><span data-zh>{第二个预备概念}</span><span data-en>{Prerequisite concept 2}</span></a></li>
       </ol>
     </li>
-    <li><a href="#sec-1">{第一章：背景与动机}</a></li>
-    <li><a href="#sec-2">{第二章：模型 / 方法}</a></li>
-    <li><a href="#sec-3">{第三章：理论 / 算法}</a></li>
-    <li><a href="#sec-4">{第四章：实验 / 应用}</a></li>
-    <li><a href="#sec-5">{第五章：讨论、局限与结论}</a></li>
+    <li><a href="#sec-1"><span data-zh>{第一章：背景与动机}</span><span data-en>{Chapter 1: Background and Motivation}</span></a></li>
+    <li><a href="#sec-2"><span data-zh>{第二章：模型 / 方法}</span><span data-en>{Chapter 2: Model / Method}</span></a></li>
+    <li><a href="#sec-3"><span data-zh>{第三章：理论 / 算法}</span><span data-en>{Chapter 3: Theory / Algorithm}</span></a></li>
+    <li><a href="#sec-4"><span data-zh>{第四章：实验 / 应用}</span><span data-en>{Chapter 4: Experiments / Applications}</span></a></li>
+    <li><a href="#sec-5"><span data-zh>{第五章：讨论、局限与结论}</span><span data-en>{Chapter 5: Discussion, Limitations, and Conclusion}</span></a></li>
   </ol>
 </nav>
 
@@ -432,37 +435,37 @@
 <!-- ==================== Section 0 ==================== -->
 <!-- 阅读导引：极简符号 + 一句话定位 + 与已有论文的关系对比 -->
 <section id="sec-0">
-<h2>0. 阅读导引：{这篇论文是关于什么的？}</h2>
+<h2><span data-zh>0. 阅读导引：{这篇论文是关于什么的？}</span><span data-en>0. Reading Guide: {What is this paper about?}</span></h2>
 
-<p>{开篇一句话：这篇论文在什么背景下解决什么问题，一句话定位其贡献。}</p>
+<p><span data-zh>{开篇一句话：这篇论文在什么背景下解决什么问题，一句话定位其贡献。}</span><span data-en>{Opening line: what problem the paper solves in what context — position its contribution in one sentence.}</span></p>
 
 <div class="intuition">
-  <span class="tag">直观理解</span>
-  <h3 class="box-h">一句话概括</h3>
-  <p>{用一个生活化的类比，把论文的核心思想说清楚，避免任何公式。}</p>
-  <span class="src-ref">原文出处：{对应原论文章节，如「引言」}</span>
+  <span class="tag"><span data-zh>直观理解</span><span data-en>Intuition</span></span>
+  <h3 class="box-h"><span data-zh>一句话概括</span><span data-en>In One Sentence</span></h3>
+  <p><span data-zh>{用一个生活化的类比，把论文的核心思想说清楚，避免任何公式。}</span><span data-en>{Use an everyday analogy to convey the paper's core idea — avoid any formulas.}</span></p>
+  <span class="src-ref"><span data-zh>原文出处：{对应原论文章节，如「引言」}</span><span data-en>Source: {corresponding paper section, e.g., Introduction}</span></span>
 </div>
 
-<h3 id="sec-0-1">0.1 {第一个预备概念}</h3>
+<h3 id="sec-0-1"><span data-zh>0.1 {第一个预备概念}</span><span data-en>0.1 {Prerequisite concept 1}</span></h3>
 
 <div class="intuition">
-  <span class="tag">直观理解</span>
-  <p>{先用白话讲清楚这个概念是干什么的、为什么需要它。}</p>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="tag"><span data-zh>直观理解</span><span data-en>Intuition</span></span>
+  <p><span data-zh>{先用白话讲清楚这个概念是干什么的、为什么需要它。}</span><span data-en>{First explain in plain language what this concept does and why it is needed.}</span></p>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
 <div class="definition">
-  <span class="tag">正式定义</span>
-  <h3 class="box-h">{概念名（英文原文）}</h3>
-  <p>{精确定义。术语首次出现时附英文原文，如「孟德尔随机化（Mendelian Randomization, MR）」}</p>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="tag"><span data-zh>正式定义</span><span data-en>Formal Definition</span></span>
+  <h3 class="box-h"><span data-zh>{概念名（英文原文）}</span><span data-en>{Concept name (original English)}</span></h3>
+  <p><span data-zh>{精确定义。术语首次出现时附英文原文，如「孟德尔随机化（Mendelian Randomization, MR）」}</span><span data-en>{Precise definition. On first mention, append the original English term, e.g., “Mendelian Randomization (MR)”}</span></p>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
 <div class="example">
-  <span class="tag">具体示例</span>
-  <h3 class="box-h">{这个例子说明什么？}</h3>
-  <p>{一个低维数字演示 / 具体数据场景，把抽象概念落到实处。}</p>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="tag"><span data-zh>具体示例</span><span data-en>Concrete Example</span></span>
+  <h3 class="box-h"><span data-zh>{这个例子说明什么？}</span><span data-en>{What does this example show?}</span></h3>
+  <p><span data-zh>{一个低维数字演示 / 具体数据场景，把抽象概念落到实处。}</span><span data-en>{A low-dimensional numerical demo / concrete data scenario that grounds the abstract concept.}</span></p>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
 <!-- 交叉引用示例（仅在与已有论文强相关时插入）：
@@ -473,40 +476,40 @@
 -->
 
 <div class="summary">
-  <span class="tag">要点总结</span>
+  <span class="tag"><span data-zh>要点总结</span><span data-en>Key Takeaways</span></span>
   <ul>
-    <li>{本节核心结论 1}</li>
-    <li>{本节核心结论 2}</li>
+    <li><span data-zh>{本节核心结论 1}</span><span data-en>{Core conclusion of this section 1}</span></li>
+    <li><span data-zh>{本节核心结论 2}</span><span data-en>{Core conclusion of this section 2}</span></li>
   </ul>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
-<a class="back-top" href="#toc">↑ 返回目录</a>
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to Contents</span></a>
 </section>
 
 <!-- ==================== Section 1 ==================== -->
 <!-- 逐章详解：每节 = 动机(2-3句) → 直觉框 → 展开(交替标注盒) → 技术细节 → 总结框 → 过渡句 -->
 <section id="sec-1">
-<h2>1. {章节标题：背景与动机}</h2>
+<h2><span data-zh>1. {章节标题：背景与动机}</span><span data-en>1. {Section Title: Background and Motivation}</span></h2>
 
-<p>{2-3 句动机：这节解决什么问题？为什么存在？}</p>
+<p><span data-zh>{2-3 句动机：这节解决什么问题？为什么存在？}</span><span data-en>{2-3 sentences of motivation: what problem does this section solve? Why does it exist?}</span></p>
 
 <div class="intuition">
-  <span class="tag">直观理解</span>
-  <p>{核心思想的白话解释}</p>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="tag"><span data-zh>直观理解</span><span data-en>Intuition</span></span>
+  <p><span data-zh>{核心思想的白话解释}</span><span data-en>{Plain-language explanation of the core idea}</span></p>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
 <!-- 可继续插入 .definition / .example / .theorem / .algorithm / .warning 等 -->
 <!-- 数学公式示例：$e^{i\pi}+1=0$（行内）与 $$\hat{\beta}_{IVW} = \frac{\sum_j X_j Y_j}{\sum_j X_j^2}$$（块级） -->
 
 <div class="summary">
-  <span class="tag">要点总结</span>
-  <ul><li>{本节要点}</li></ul>
-  <span class="src-ref">原文出处：{对应章节}</span>
+  <span class="tag"><span data-zh>要点总结</span><span data-en>Key Takeaways</span></span>
+  <ul><li><span data-zh>{本节要点}</span><span data-en>{Key points of this section}</span></li></ul>
+  <span class="src-ref"><span data-zh>原文出处：{对应章节}</span><span data-en>Source: {corresponding section}</span></span>
 </div>
 
-<a class="back-top" href="#toc">↑ 返回目录</a>
+<a class="back-top" href="#toc"><span data-zh>↑ 返回目录</span><span data-en>↑ Back to Contents</span></a>
 </section>
 
 <!-- ==================== Section 2（其余章节按需复制 sec-1 结构） ==================== -->
@@ -522,16 +525,16 @@
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="related-bar">
-    <strong>相关资源：</strong>
+    <strong><span data-zh>相关资源：</span><span data-en>Related resources:</span></strong>
     <!-- 示例链接（预览可点）；实际使用时替换为真实论文文件名 -->
-    <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>{其他论文1简称} 详解</a>
-    <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>{其他论文2简称} 详解</a>
-    <a href="../knowledge_graph_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v6M15.5 7.5c-3 1.5-6.5 1.5-9.5 4.5"/></svg>{项目名} 知识图谱</a>
-    <a href="../nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>阅读路径</a>
-    <a href="../../{原始论文.pdf}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10.5l5 5 5-5M4.5 21h15"/></svg>原始 PDF</a>
+    <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg><span data-zh>{其他论文1简称} 详解</span><span data-en>{Other Paper 1 short name} Walkthrough</span></a>
+    <a href="paper_explainer_page_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg><span data-zh>{其他论文2简称} 详解</span><span data-en>{Other Paper 2 short name} Walkthrough</span></a>
+    <a href="../knowledge_graph_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 9v6M15.5 7.5c-3 1.5-6.5 1.5-9.5 4.5"/></svg><span data-zh>{项目名} 知识图谱</span><span data-en>{Project Name} Knowledge Graph</span></a>
+    <a href="../nav/reading_path_template.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+    <a href="../../{原始论文.pdf}"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10.5l5 5 5-5M4.5 21h15"/></svg><span data-zh>原始 PDF</span><span data-en>Original PDF</span></a>
   </div>
-  <p><strong>版权与来源：</strong>{图/表截图来源说明，如「原论文图表截图来自 Author et al., Journal (Year), CC BY 4.0」}</p>
-  <p style="font-size:.85em;color:var(--ink-3);">{项目名} · 解读生成于 {YYYY-MM-DD} · 最后更新：{YYYY-MM-DD}</p>
+  <p><strong><span data-zh>版权与来源：</span><span data-en>Copyright and Sources:</span></strong><span data-zh>{图/表截图来源说明，如「原论文图表截图来自 Author et al., Journal (Year), CC BY 4.0」}</span><span data-en>{Attribution for figure/table screenshots, e.g., “Figures from the original paper: Author et al., Journal (Year), CC BY 4.0”}</span></p>
+  <p style="font-size:.85em;color:var(--ink-3);"><span data-zh>{项目名} · 解读生成于 {YYYY-MM-DD} · 最后更新：{YYYY-MM-DD}</span><span data-en>{Project Name} · Walkthrough generated on {YYYY-MM-DD} · Last updated: {YYYY-MM-DD}</span></p>
 </footer>
 
 <!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
@@ -568,8 +571,8 @@
     var t = PACK.THEMES[i];
     html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
       + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
-      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
-      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+      + '<span class="ts-name"><span data-zh>' + t.name + '<span class="ts-en"> ' + t.en + '</span></span><span data-en>' + t.en + '</span></span>'
+      + '<span class="ts-mode"><span data-zh>' + (t.mode === 'dark' ? '暗' : '明') + '</span><span data-en>' + (t.mode === 'dark' ? 'Dark' : 'Light') + '</span></span></button>';
   }
   panel.innerHTML = html;
   document.body.appendChild(btn); document.body.appendChild(panel);

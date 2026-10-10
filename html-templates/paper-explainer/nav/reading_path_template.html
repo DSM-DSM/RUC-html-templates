@@ -43,7 +43,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{项目主题}阅读路径规划 · {项目名}</title>
   <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
-  <script src="../theme-pack.js"></script>
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
   <style>
     /* ====================================================================
        设计令牌 (Design Tokens) —— 默认主题「纸墨」，与知识图谱页、论文页同源；
@@ -253,48 +256,48 @@
 
 <!-- ============ HEADER ============ -->
 <header>
-  <h1>{项目主题}阅读路径规划</h1>
-  <div class="sub">{一句话副标题：从入门到前沿的渐进式学习路线，N 篇论文 + 基础知识的完整学习地图}</div>
-  <div class="mt">{项目名} 项目 · {YYYY-MM-DD} · 可根据需要选择 {2-6} 站阅读</div>
+  <h1><span data-zh>{项目主题}阅读路径规划</span><span data-en>{Project Topic} Reading Path</span></h1>
+  <div class="sub"><span data-zh>{一句话副标题：从入门到前沿的渐进式学习路线，N 篇论文 + 基础知识的完整学习地图}</span><span data-en>{One-line subtitle: a progressive learning route from basics to the frontier — a complete learning map of N papers + background knowledge}</span></div>
+  <div class="mt"><span data-zh>{项目名} 项目 · {YYYY-MM-DD} · 可根据需要选择 {2-6} 站阅读</span><span data-en>{Project Name} Project · {YYYY-MM-DD} · pick {2-6} stops to read as needed</span></div>
 </header>
 
 <!-- ============ 第零阶段：基础知识（可选） ============ -->
 <!-- 说明：阶段用 .phase 分隔；每站用 .step，内含 .goal(学什么) + .why(为何这站) + .links(跳转) -->
-<div class="phase"><h2>第零阶段：{基础预备知识}</h2></div>
+<div class="phase"><h2><span data-zh>第零阶段：{基础预备知识}</span><span data-en>Phase 0: {Prerequisite Background}</span></h2></div>
 
 <div class="step">
   <!-- 模板库暂无基础知识页模板，示例链接指向背景知识页（预览可点）；
        若项目有独立基础知识页，替换为实际文件名 -->
-  <h3><a href="knowledge_supplement_template.html">0. {基础知识概念速查}</a></h3>
-  <div class="goal">学习目标：{一句话，掌握哪些基础概念，建立怎样的知识体系}</div>
-  <div class="why">为什么是第零站：{一句话，为什么先学这些才能读懂后面的论文，避免被术语卡住}</div>
+  <h3><a href="knowledge_supplement_template.html"><span data-zh>0. {基础知识概念速查}</span><span data-en>0. {Quick Reference of Basic Concepts}</span></a></h3>
+  <div class="goal"><span data-zh>学习目标：{一句话，掌握哪些基础概念，建立怎样的知识体系}</span><span data-en>Learning goal: {one line — which basic concepts to master, and what knowledge system to build}</span></div>
+  <div class="why"><span data-zh>为什么是第零站：{一句话，为什么先学这些才能读懂后面的论文，避免被术语卡住}</span><span data-en>Why stop 0: {one line — why these must come first so the later papers read smoothly, without getting stuck on jargon}</span></div>
   <div class="links">
-    <a href="knowledge_supplement_template.html">快速导引</a>
-    <a href="knowledge_supplement_template.html">补充知识点</a>
+    <a href="knowledge_supplement_template.html"><span data-zh>快速导引</span><span data-en>Quick Guide</span></a>
+    <a href="knowledge_supplement_template.html"><span data-zh>补充知识点</span><span data-en>Background Knowledge</span></a>
   </div>
 </div>
 
 <!-- ============ 第一阶段：示例（复制此 .phase + .step 组合扩展） ============ -->
-<div class="phase"><h2>第一阶段：{主题一}</h2></div>
+<div class="phase"><h2><span data-zh>第一阶段：{主题一}</span><span data-en>Phase 1: {Topic 1}</span></h2></div>
 
 <div class="step">
   <!-- 论文链接为示例（指向论文模板文件，预览可点）；实际使用时替换为真实论文文件名 -->
-  <h3><a href="../papers/paper_explainer_page_template.html">1. {论文1简称/标题}</a></h3>
-  <div class="goal">学习目标：{一句话，这一站要掌握什么方法/概念}</div>
-  <div class="why">为什么是第一站：{一句话，为什么这个顺序，它与前后站的关系}</div>
+  <h3><a href="../papers/paper_explainer_page_template.html"><span data-zh>1. {论文1简称/标题}</span><span data-en>1. {Paper 1 short name / title}</span></a></h3>
+  <div class="goal"><span data-zh>学习目标：{一句话，这一站要掌握什么方法/概念}</span><span data-en>Learning goal: {one line — the method / concept to master at this stop}</span></div>
+  <div class="why"><span data-zh>为什么是第一站：{一句话，为什么这个顺序，它与前后站的关系}</span><span data-en>Why stop 1: {one line — why this order, and how it relates to the stops before and after}</span></div>
   <div class="links">
-    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
-    <a href="knowledge_supplement_template.html">补充知识点</a>
+    <a href="../papers/paper_explainer_page_template.html"><span data-zh>快速导引</span><span data-en>Quick Guide</span></a>
+    <a href="knowledge_supplement_template.html"><span data-zh>补充知识点</span><span data-en>Background Knowledge</span></a>
   </div>
 </div>
 
 <div class="step">
-  <h3><a href="../papers/paper_explainer_page_template.html">2. {论文2简称/标题}</a></h3>
-  <div class="goal">学习目标：{一句话}</div>
-  <div class="why">为什么是第二站：{一句话，与第一站如何衔接}</div>
+  <h3><a href="../papers/paper_explainer_page_template.html"><span data-zh>2. {论文2简称/标题}</span><span data-en>2. {Paper 2 short name / title}</span></a></h3>
+  <div class="goal"><span data-zh>学习目标：{一句话}</span><span data-en>Learning goal: {one line}</span></div>
+  <div class="why"><span data-zh>为什么是第二站：{一句话，与第一站如何衔接}</span><span data-en>Why stop 2: {one line — how it continues from stop 1}</span></div>
   <div class="links">
-    <a href="../papers/paper_explainer_page_template.html">快速导引</a>
-    <a href="knowledge_supplement_template.html">补充知识点</a>
+    <a href="../papers/paper_explainer_page_template.html"><span data-zh>快速导引</span><span data-en>Quick Guide</span></a>
+    <a href="knowledge_supplement_template.html"><span data-zh>补充知识点</span><span data-en>Background Knowledge</span></a>
   </div>
 </div>
 
@@ -305,24 +308,24 @@
   <h3><a href="../papers/paper_explainer_page_template.html">3. {论文3简称}</a></h3>
   <div class="goal">学习目标：{...}</div>
   <div class="why">为什么是这一站：{...}</div>
-  <div class="links"><a href="../papers/paper_explainer_page_template.html">快速导引</a> <a href="knowledge_supplement_template.html">补充知识点</a></div>
+  <div class="links"><a href="../papers/paper_explainer_page_template.html"><span data-zh>快速导引</span><span data-en>Quick Guide</span></a> <a href="knowledge_supplement_template.html"><span data-zh>补充知识点</span><span data-en>Background Knowledge</span></a></div>
 </div>
 -->
 
 <!-- ============ 补充提示 ============ -->
 <div class="supp">
-  <h3>需要补充背景知识？</h3>
-  <p>遇到不熟悉的概念（{如 IV 三大假设 / cis-pQTL / coloc 共定位 / LLM CoT 等}），请访问 <strong><a href="knowledge_supplement_template.html">需要补充的知识点</a></strong> 页面。</p>
+  <h3><span data-zh>需要补充背景知识？</span><span data-en>Need Some Background?</span></h3>
+  <p><span data-zh>遇到不熟悉的概念（{如 IV 三大假设 / cis-pQTL / coloc 共定位 / LLM CoT 等}），请访问</span><span data-en>If you run into unfamiliar concepts ({e.g., the three IV assumptions / cis-pQTL / coloc colocalization / LLM CoT}), visit the</span><strong><a href="knowledge_supplement_template.html"><span data-zh>需要补充的知识点</span><span data-en>Background Knowledge</span></a></strong><span data-zh>页面。</span><span data-en> page.</span></p>
 </div>
 
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="rb">
-    <strong>导航：</strong>
-    <a href="../knowledge_graph_template.html">知识图谱</a>
-    <a href="knowledge_supplement_template.html">补充知识点</a>
+    <strong><span data-zh>导航：</span><span data-en>Navigate:</span></strong>
+    <a href="../knowledge_graph_template.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+    <a href="knowledge_supplement_template.html"><span data-zh>补充知识点</span><span data-en>Background Knowledge</span></a>
   </div>
-  <p style="margin-top:12px;">{项目名} 项目 · {N} 篇论文 · {YYYY-MM-DD}</p>
+  <p style="margin-top:12px;"><span data-zh>{项目名} 项目 · {N} 篇论文 · {YYYY-MM-DD}</span><span data-en>{Project Name} Project · {N} papers · {YYYY-MM-DD}</span></p>
 </footer>
 
 <!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
@@ -359,8 +362,8 @@
     var t = PACK.THEMES[i];
     html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
       + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
-      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
-      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+      + '<span class="ts-name"><span data-zh>' + t.name + '<span class="ts-en"> ' + t.en + '</span></span><span data-en>' + t.en + '</span></span>'
+      + '<span class="ts-mode"><span data-zh>' + (t.mode === 'dark' ? '暗' : '明') + '</span><span data-en>' + (t.mode === 'dark' ? 'Dark' : 'Light') + '</span></span></button>';
   }
   panel.innerHTML = html;
   document.body.appendChild(btn); document.body.appendChild(panel);

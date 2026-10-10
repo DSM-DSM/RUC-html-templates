@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="俞锦越头像占位">
+  <!-- 头像占位：把自己的照片命名为 yujinyue.jpg 放到本目录并保持同名扩展名 .jpg/.png，
+       再把页脚 <img class="avatar"> 的 src 改指向它即可；本 SVG 为人大红姓氏字默认占位 -->
+  <circle cx="48" cy="48" r="47" fill="#971f30"/>
+  <circle cx="48" cy="48" r="43.5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1"/>
+  <text x="48" y="61" text-anchor="middle" font-family="Georgia, 'Songti SC', 'STZhongsong', SimSun, serif"
+        font-size="42" font-weight="600" fill="#ffffff">俞</text>
+</svg>

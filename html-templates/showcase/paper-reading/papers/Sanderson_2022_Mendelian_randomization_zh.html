@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>孟德尔随机化（Mendelian Randomization）—— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ==================== 顶部导航栏 ==================== -->
+<div class="top-nav-bar">
+<span class="current"><span data-zh>&#x1F4C4; MR Primer 详解</span><span data-en>&#x1F4C4; MR Primer Deep Dive</span></span>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">&#x1F4CB; STROBE-MR</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">&#x1F4C4; MR-CVD</a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>&#x1F4C4; 两步MR</span><span data-en>&#x1F4C4; Two-step MR</span></a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>&#x1F4C4; <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></span><span data-en>&#x1F4C4; Proteome MR for Stroke</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="../knowledge_graph.html"><span data-zh>&#x1F5FA; 知识图谱</span><span data-en>&#x1F5FA; Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">&#x1F4E5; <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<!-- ==================== Header ==================== -->
+<header>
+  <h1>孟德尔随机化（Mendelian Randomization）<br>—— 详细中文解读</h1>
+  <div class="meta">
+    <span><strong>作者：</strong>Eleanor Sanderson 等 14 人</span><br>
+    <span><strong>期刊：</strong>Nature Reviews Methods Primers</span>
+    <span><strong>卷期：</strong>(2022) 2:6</span><br>
+    <span><strong>DOI：</strong><a href="https://doi.org/10.1038/s43586-021-00092-5">10.1038/s43586-021-00092-5</a></span>
+    <span><strong>类型：</strong>Primer（方法学导引综述）</span>
+  </div>
+  <div class="abstract-box">
+    <strong>核心要义：</strong>孟德尔随机化（MR）利用遗传变异作为工具变量（Instrumental Variable, IV），在存在未观测混杂的情况下推断可改变暴露（如BMI、CRP水平、饮酒量）对健康结局（如冠心病、血压）的因果效应。MR的核心思想借鉴了孟德尔遗传定律——遗传变异在人群中近似随机分配，类似于随机对照试验（RCT）中的随机分组，从而天然规避了传统观察性研究中的混杂偏倚。
+  </div>
+</header>
+
+<!-- ==================== 目录 ==================== -->
+<nav class="toc">
+<details open>
+<summary><span data-zh>目录</span><span data-en>Contents</span></summary>
+<ol>
+  <li><a href="#sec-0">第0节 · 阅读导引</a> — 预备知识与符号约定</li>
+  <li><a href="#sec-1">第1节 · MR的核心思想与实验设计</a> — 为何遗传变异可以充当"自然随机化"</li>
+  <li><a href="#sec-2">第2节 · IV条件与识别</a> — 成为有效工具变量的四个条件</li>
+  <li><a href="#sec-3">第3节 · 个体水平数据的估计方法</a> — Wald ratio, 2SLS, allele scores</li>
+  <li><a href="#sec-4">第4节 · 汇总水平数据的估计方法</a> — IVW, MR-Egger, 加权中位数等</li>
+  <li><a href="#sec-5">第5节 · 多效性的处理</a> — 水平多效性、垂直多效性及敏感性分析</li>
+  <li><a href="#sec-6">第6节 · 数据来源与工具</a> — GWAS, OpenGWAS, TwoSampleMR</li>
+  <li><a href="#sec-7">第7节 · MR的应用场景</a> — 药物靶点验证、暴露因果性评估</li>
+  <li><a href="#sec-8">第8节 · 局限性与优化</a> — 弱工具、人群分层、选型交配等</li>
+  <li><a href="#sec-9">第9节 · 未来展望</a> — 多变量MR、双样本MR、非线MR</li>
+</ol>
+</details>
+</nav>
+
+<!-- ================================================================ -->
+<!-- 第0节 · 阅读导引 -->
+<!-- ================================================================ -->
+<section id="sec-0">
+<h2>第0节 · 阅读导引</h2>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>这篇论文在解决什么问题？</h4>
+<p>在医学和公共卫生研究中，我们常常想知道"X是否导致Y"——例如，<strong>高BMI是否导致冠心病？饮酒是否导致高血压？</strong>传统观察性研究容易受到混杂因素（confounders）的干扰（例如，运动习惯会同时影响BMI和冠心病风险）。随机对照试验（RCT）是因果推断的金标准，但很多问题无法用RCT回答——我们无法随机分配人们去"变胖"或"喝酒"。</p>
+<p>孟德尔随机化（Mendelian Randomization, MR）提供了一条巧妙的"捷径"：<strong>将遗传变异当作自然界的随机分配</strong>。因为你的基因型在你出生前就已确定，且在人群中近似随机分配，遗传变异可以作为"工具变量"（Instrumental Variable, IV）来估计暴露对结局的因果效应，而不受传统混杂因素干扰。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>符号约定</h4>
+<table>
+  <tr><th>符号</th><th>含义</th></tr>
+  <tr><td>$G$ 或 $G_l$</td><td>遗传变异（基因工具变量，通常为SNP）；$l$ 索引第 $l$ 个变异</td></tr>
+  <tr><td>$X$</td><td>暴露（exposure），即可改变的风险因素（如BMI、CRP水平）</td></tr>
+  <tr><td>$Y$</td><td>结局（outcome），即健康结果（如冠心病、血压）</td></tr>
+  <tr><td>$U$</td><td>未观测混杂因素（unobserved confounder）</td></tr>
+  <tr><td>$\beta$</td><td>暴露对结局的因果效应（核心估计目标）</td></tr>
+  <tr><td>$\Gamma_l$</td><td>SNP $l$ 对暴露的效应（基因-暴露关联）</td></tr>
+  <tr><td>$\gamma_l$</td><td>SNP $l$ 对结局的效应（基因-结局关联）</td></tr>
+  <tr><td>$\alpha_l$</td><td>SNP $l$ 对结局的直接效应（多效性效应，pleiotropic effect）</td></tr>
+  <tr><td>$\hat{\beta}_{IVW}$</td><td>逆方差加权（IVW）估计量</td></tr>
+  <tr><td>$L$</td><td>用作工具变量的遗传变异总数</td></tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<h4>阅读建议</h4>
+<ul>
+  <li><strong>如果你从未接触过MR：</strong>请按顺序阅读第1-4节，理解"遗传变异为何能充当工具变量"以及基本的估计方法。</li>
+  <li><strong>如果你已有MR基础：</strong>可以直接跳到第5-6节，了解多效性处理方法和最新的灵敏度分析工具。</li>
+  <li><strong>如果你在做MR分析：</strong>第4节的方法表格（Table 1）和第8节的偏倚来源是必读内容。</li>
+  <li><strong>公式密度控制：</strong>第0-2节以文字为主；第3-4节逐步增加公式；第5节为技术核心。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第1节 · MR的核心思想与实验设计 -->
+<!-- ================================================================ -->
+<section id="sec-1">
+<h2>第1节 · MR的核心思想与实验设计</h2>
+
+<h3>1.1 为什么观察性研究不够？</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>想象你想知道"喝咖啡是否导致肺癌"。你收集数据发现：喝咖啡多的人肺癌发病率更高。但这里有一个巨大的陷阱——<strong>喝咖啡多的人可能也更爱抽烟</strong>（抽烟是咖啡和肺癌的共同原因，即混杂因素）。如果你没有测量吸烟这个变量，你观察到的"咖啡→肺癌"关联其实是虚假的。</p>
+<p>这就是观察性研究的根本困境：<strong>你永远无法确定是否遗漏了某个重要的混杂变量</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>1.2 RCT的黄金标准与局限性</h3>
+<p>随机对照试验（RCT）通过<strong>随机分组</strong>来解决这个问题：既然分组是随机的，那么混杂因素在两组间的分布应该是均匀的。但RCT代价高昂，且有些暴露无法随机分配（如BMI、饮酒），有些甚至涉及伦理问题（如让一组人吸烟）。</p>
+
+<h3>1.3 孟德尔随机化的核心洞见</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>类比：基因 = 自然界的随机分组</h4>
+<p>MR的基本洞察来自<strong>孟德尔第一和第二遗传定律</strong>（Box 1）：</p>
+<ul>
+  <li><strong>分离定律：</strong>在每个常染色体位点上，后代从父母各随机获得一个等位基因。</li>
+  <li><strong>自由组合定律：</strong>不同染色体上的等位基因独立地传递给后代（除非位于连锁区域）。</li>
+</ul>
+<p>通俗地说，一个人"抽到了"某个与高BMI相关的基因变体，这在很大程度上是<strong>随机的</strong>（不受后天行为、社会经济地位等因素影响）。因此，比较携带不同基因变体的人群的平均结局差异，<strong>近似于比较RCT中随机分配的治疗组和对照组</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Figure 1 的完整总览图如下，可对照上文类比逐块阅读：</p>
+
+<img src="images/Sanderson/Sanderson_Fig1.jpg" alt="原论文Figure 1：MR研究总览——MR与RCT的平行对照">
+
+<p class="fig-caption"><strong>原论文 Figure 1：MR 研究总览。</strong>图左为 MR 列、右为 RCT 列，逐行平行对照两种设计的对应环节。<strong>第一行</strong>：MR 在"总体"（Population）层面比较，对应 RCT 在"样本"（Sample）层面比较；<strong>第二行</strong>（Randomization step）：MR 中减数分裂时<strong>等位基因的随机分离</strong>对应 RCT 中<strong>随机分配到各组</strong>——这是两种设计"去混杂"的共同核心；<strong>第三行</strong>：MR 比较携带"野生型等位基因 vs 变异"的个体，对应 RCT 的"对照组 vs 治疗组"；<strong>第四行</strong>：比较各组<strong>疾病结局</strong>（Disease outcomes）；<strong>第五行</strong>：以<strong>统计检验</strong>（Statistical tests）比较组间结局差异。图注进一步指出：这一平行关系源自孟德尔定律（尤其是同胞间等位基因的随机分配，见原文 Box 1），并依赖"基因-环境等价"假设——基因改变暴露对结局的影响，与后天环境因素改变暴露的影响相同。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>CRP与血压的例子</h4>
+<p>假设你想知道C反应蛋白（CRP，一种炎症标志物）是否导致血压升高。一个RCT的做法是：随机给一些人服用降CRP药物（治疗组），给另一些人安慰剂（对照组），然后比较两组的血压。MR的做法是：<strong>找一个已知影响CRP水平的基因变体（如CRP基因中的SNP），然后比较携带不同等位基因的人的平均血压</strong>。</p>
+<p>两者的逻辑结构完全相同（如图2所示）：</p>
+<div class="dag-box">
+RCT:  随机分组(G) → 药物服用 → CRP降低(X) → 血压变化(Y)
+                    (无混杂)
+
+MR:   基因型(G)   → CRP水平(X) → 血压(Y)
+                    (近似无混杂，因为基因型在出生时已随机分配)
+</div>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Figure 2 的对照示意图如下——RCT 与 MR 的因果结构几乎逐节点对应：</p>
+
+<img src="images/Sanderson/Sanderson_Fig2.jpg" alt="原论文Figure 2：RCT与工具变量估计的对比示意">
+
+<p class="fig-caption"><strong>原论文 Figure 2：随机对照研究与工具变量估计的示意。</strong>两个面板以同一个科学问题——"降低 CRP 是否降低收缩压 SBP"——为例，红色箭头即研究者关心的因果效应。(a) <strong>RCT</strong>：随机化至降 CRP 药物组使"分组"独立于混杂 $U$，从而可以估计 CRP($X$) 对 SBP($Y$) 的效应。(b) <strong>MR</strong>：以"与较低 CRP 相关的遗传变异 $G$"替代随机分组——$G$ 在减数分裂时近似随机分配，同样独立于 $U$，因此可用工具变量法估计 $X \to Y$ 的效应。两图结构同构，唯一差别在于"随机化的来源"：人为掷硬币（RCT）与等位基因的随机分离（MR）。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<h3>1.4 Intention-to-Treat 分析</h3>
+<p>在RCT中，最简单的分析是比较两组的结果均值（Intention-to-Treat, ITT）：</p>
+$$\Delta_1 = \mathbb{E}[\text{SBP} \mid G=1] - \mathbb{E}[\text{SBP} \mid G=0] \quad \text{(式1)}$$
+
+<p>但ITT分析<strong>只能告诉你"分组是否影响了结局"（即是否有因果效应），而不能告诉你"效应有多大"</strong>。要估计效应量，还需要考虑随机分组对暴露本身的影响程度——这就是工具变量分析的作用。</p>
+
+
+<div class="example">
+<span class="tag">典型示例</span>
+<h4>为什么 ITT 不够？—— 一个数值演示</h4>
+<p>假设一个 RCT 检验"多吃蔬菜对降低收缩压（SBP）"的效果。我们将 1000 名参与者<strong>随机分为两组</strong>：</p>
+<ul>
+  <li><strong>干预组</strong>（Z = 1）：每天提供额外 200g 蔬菜</li>
+  <li><strong>对照组</strong>（Z = 0）：维持原有饮食</li>
+</ul>
+<p>6 个月后测量结果：</p>
+
+<table style="width:100%; margin:10px 0; font-size:0.92em;">
+  <tr><th style="background:#ebf5fb;">指标</th><th style="background:#ebf5fb;">干预组 (Z=1, n=500)</th><th style="background:#ebf5fb;">对照组 (Z=0, n=500)</th><th style="background:#ebf5fb;">差值 (Δ)</th></tr>
+  <tr><td>实际蔬菜摄入增量（暴露 X）</td><td>+150 g/天</td><td>+10 g/天</td><td><strong>140 g/天</strong></td></tr>
+  <tr><td>收缩压降幅（结局 Y）</td><td>-6.0 mmHg</td><td>-0.4 mmHg</td><td><strong>-5.6 mmHg</strong></td></tr>
+</table>
+
+<p>现在来看两种分析的区别：</p>
+
+<div style="background:#fafbfc; border:1px solid #d5dbdb; border-radius:6px; padding:14px 18px; margin:12px 0;">
+
+<p><strong>🔹 ITT 分析（比较结局均值）</strong></p>
+<p style="margin:4px 0 8px 0;">回答的问题是："随机分配到干预组，对血压有影响吗？"</p>
+<p style="text-align:center; font-size:1.05em;">
+  Δ<sub>ITT</sub> = SBP<sub>干预组</sub> - SBP<sub>对照组</sub> = -5.6 mmHg
+</p>
+<p style="color:#e74c3c; margin-top:6px;">
+  ⚠ ITT 只能告诉你"分组确实能降压"，但 -5.6 mmHg 这个数字不是你关心的——<strong>你关心的不是"被分配到多吃蔬菜"的效应，而是"每多吃 1g 蔬菜本身"的效应。</strong>
+</p>
+
+<p style="margin-top:14px;"><strong>🔹 IV 分析（Wald Ratio — 除以上游效应）</strong></p>
+<p style="margin:4px 0 8px 0;">回答的问题是："每多吃 1g 蔬菜，能降多少血压？"</p>
+<p style="text-align:center; font-size:1.05em;">
+  β<sub>IV</sub> = Δ<sub>Y</sub> / Δ<sub>X</sub> = (-5.6 mmHg) / (140 g/天) = <strong>-0.04 mmHg / (g/天)</strong>
+</p>
+<p style="color:#27ae60; margin-top:6px;">
+  ✓ 这就是蔬菜摄入对血压的<strong>因果效应大小</strong>——每多摄入 1g 蔬菜/天，收缩压降低 0.04 mmHg。如果你想通过蔬菜摄入将血压降低 5 mmHg，大约需要每天增加 125g 蔬菜摄入。
+</p>
+</div>
+
+<p><strong>为什么 IV 能给出效应量而 ITT 不能？</strong>关键在于 IV 做了"尺度换算"——<strong>用分组对暴露的影响力（分母）来"校准"分组对结局的影响力（分子）</strong>。这就好比你知道"用一把有刻度的量杯倒了水，水位上升了 2 厘米"，但如果不除以"量杯上 1 毫升对应多少厘米"，你就不知道到底倒了多少水——你只知道"倒了水确实能让水位上升"。</p>
+
+<p>将这个逻辑迁移到 MR：<strong>基因型 G 就是"随机分组 Z"的天然代理</strong>——一个 SNP 让你多吃蔬菜（影响暴露），另一个 SNP 没有这个效应，但两者在其他方面完全可比（因为从出生时就随机分配了）。这就是为什么 MR 被称为"自然随机对照试验"。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+
+<h3>1.5 从ITT到IV：Wald Ratio估计量</h3>
+<p>工具变量分析的简化形式是将"分组对结局的效应"除以"分组对暴露的效应"：</p>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>Wald Ratio 估计量</h4>
+$$\beta_1 = \frac{\mathbb{E}[\text{SBP} \mid G=1] - \mathbb{E}[\text{SBP} \mid G=0]}{\mathbb{E}[\text{CRP} \mid G=1] - \mathbb{E}[\text{CRP} \mid G=0]} \quad \text{(式3)}$$
+<p>分子是基因对结局的效应，分母是基因对暴露的效应。这个比值就是<strong>暴露对结局的因果效应估计</strong>。直觉：如果携带某个等位基因的人平均CRP低2个单位、血压低4 mmHg，那么每降低1单位CRP，血压降低约2 mmHg。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>MR与RCT的关键差异</h4>
+<ul>
+  <li><strong>时间尺度不同：</strong>RCT估计的是试验期间的治疗效果；MR估计的是遗传变异的<strong>终生效应</strong>（因为基因型从出生就固定）。</li>
+  <li><strong>人群层面的类比：</strong>大多数MR使用的是<strong>无亲缘关系个体的群体数据</strong>，而非家庭数据，因此等位基因组之间的可比性不如RCT有保证。</li>
+  <li><strong>人群分层风险：</strong>在群体层面，基因频率可能与祖先背景相关，从而导致虚假关联。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR将<strong>遗传变异</strong>作为自然随机化实验的工具变量。</li>
+  <li>MR的核心优势：<strong>规避未观测混杂</strong>——因为基因型在受精时就已确定，不受后天行为影响。</li>
+  <li>Wald Ratio是最简单的IV估计量：$\text{因果效应} = \frac{\text{基因→结局}}{\text{基因→暴露}}$。</li>
+  <li>ITT只能检验因果效应的<strong>存在性</strong>，IV估计才能给出<strong>效应大小</strong>。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第2节 · IV条件与识别 -->
+<!-- ================================================================ -->
+<section id="sec-2">
+<h2>第2节 · IV条件与识别</h2>
+
+<h3>2.1 三个核心IV条件（Box 2）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>不是随便找一个基因变异就能当工具变量的。它必须满足三个条件，就好比一个合格的"裁判"必须满足：(1) 与比赛有关系；(2) 不偏袒任何一方；(3) 只通过规则影响比赛结果。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>工具变量的三个核心条件</h4>
+<p><strong>IV1（相关性 Relevance）：</strong>遗传变异 $G$ 必须与暴露 $X$ 相关联。即 $G \not\perp X$。</p>
+<p><strong>IV2（独立性 Independence）：</strong>遗传变异 $G$ 必须与暴露-结局的混杂因素 $U$ 无关。即 $G \perp U$。</p>
+<p><strong>IV3（排他性 Exclusion Restriction）：</strong>遗传变异 $G$ 对结局 $Y$ 的影响<strong>完全通过</strong>暴露 $X$ 传递，没有其他通路。即 $G \perp Y \mid X, U$。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>三个条件的直观检验</h4>
+<p>以"CRP基因变异→CRP水平→血压"为例：</p>
+<ul>
+  <li><strong>IV1：</strong>该SNP是否确实影响CRP水平？→ 需要从GWAS中确证该SNP与CRP显著相关。</li>
+  <li><strong>IV2：</strong>该SNP是否独立于CRP和血压的共同混杂因素（如肥胖、吸烟）？→ 可检验该SNP是否与已知混杂因素在数据中相关。</li>
+  <li><strong>IV3：</strong>该SNP是否<strong>仅仅</strong>通过CRP影响血压，而不是通过其他通路（如同时影响肝功能）？→ 这是最难以完全验证的条件，需要生物学知识和敏感性分析。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>2.2 第四个条件：点估计识别条件（Box 3）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>前三个条件可以检验"是否<strong>存在</strong>因果效应"（零假设检验），但不足以得到效应的<strong>具体数值</strong>。这就像一个秤能告诉你"这个苹果比那个重"，但如果不校准砝码，给不出"重多少克"。第四个条件就是"校准砝码"。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>论文Box 3描述了<strong>四种最常用的点估计识别条件</strong>，它们对因果效应的解释有细微差异：</p>
+
+<table>
+  <tr><th>条件名称</th><th>核心内容</th><th>效应解释</th></tr>
+  <tr>
+    <td>同质性（Homogeneity）</td>
+    <td>因果效应在所有个体中相同</td>
+    <td>平均因果效应 = 个体因果效应</td>
+  </tr>
+  <tr>
+    <td>单调性（Monotonicity）</td>
+    <td>遗传变异对所有个体的暴露影响方向一致</td>
+    <td>估计的是"依从者平均因果效应"（LATE）</td>
+  </tr>
+  <tr>
+    <td>无效应修饰（No Effect Modification）</td>
+    <td>遗传变异不与效应修饰因子相关</td>
+    <td>估计的是暴露对结局的平均效应</td>
+  </tr>
+  <tr>
+    <td>无多效性（No Pleiotropy）</td>
+    <td>遗传变异对结局无直接效应（$\alpha_l = 0$）</td>
+    <td>IV估计量收敛于真实因果参数</td>
+  </tr>
+</table>
+
+<div class="warning">
+<span class="tag">关键问题</span>
+<h4>"基因-环境等效性"假设（Box 4）</h4>
+<p>MR隐含假定了<strong>通过遗传变异降低CRP与通过药物降低CRP对血压的效果相同</strong>。但基因变异从胚胎期就开始发挥作用，而药物治疗可能始于成年期。如果CRP在发育关键期的影响与成年期的影响不同，这一假设可能不成立。这就是"基因-环境等效性"（gene-environment equivalence）问题。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>IV1-IV3是检验<strong>因果效应是否存在</strong>的充分条件，IV4是估计<strong>效应大小</strong>的必要条件。</li>
+  <li>在实际研究中，IV2和IV3是最难验证的——IV2无法直接检验（因 $U$ 未观测），IV3需要通过敏感性分析间接评估。</li>
+  <li>MR效应的解释取决于所采用的点估计识别条件的版本。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>理解IV条件后，下一步是如何在论文中<strong>规范地报告</strong>这些假设及其验证过程。<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR 报告规范</a>的<strong>条目5（明确陈述假设）+ 条目7（描述假设评估方法）+ 条目8（敏感性分析）</strong>提供了完整的报告标准。MR Primer教方法，STROBE-MR教报告——两者配合使用，确保MR研究既做得好也写得清晰。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系1（互补）</a>。
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第3节 · 个体水平数据的估计方法 -->
+<!-- ================================================================ -->
+<section id="sec-3">
+<h2>第3节 · 个体水平数据（Individual-Level Data）的估计方法</h2>
+
+<h3>3.1 数据的两类形态</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>MR分析的数据有两种形态：(1) <strong>个体水平数据</strong>——每个参与者都有基因型、暴露和结局的个体记录；(2) <strong>汇总水平数据</strong>——只有每个SNP与暴露/结局的关联统计量（$\beta$系数和标准误）。两者使用的估计方法不同，但逻辑相通。</p>
+<p>汇总水平数据更常见，因为GWAS的汇总结果是公开发布的，研究者无需获取原始个体数据即可进行MR分析。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>3.2 两阶段最小二乘法（2SLS）</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>两阶段最小二乘（Two-Stage Least Squares, 2SLS）</h4>
+<p><strong>第一阶段：</strong>将暴露 $X$ 对工具变量 $G$（和协变量）回归，得到 $X$ 的预测值 $\hat{X}$：</p>
+$$X = \pi_0 + \pi_1 G + \varepsilon$$
+<p><strong>第二阶段：</strong>将结局 $Y$ 对 $\hat{X}$ 回归，得到因果效应估计 $\beta$：</p>
+$$Y = \beta_0 + \beta \hat{X} + \nu$$
+<p>$\beta$ 就是<strong>暴露对结局的因果效应</strong>。第一阶段确保只使用 $G$ 带来的暴露变异（外生部分），第二阶段估计该"净化后"的暴露对结局的影响。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>2SLS的直觉</h4>
+<p>2SLS本质上是在做一件事：<strong>分离出暴露中"干净"的部分</strong>。暴露的变异有两个来源——遗传（外生，干净）和环境/行为（内生，可能混杂）。第一阶段回归将暴露投影到遗传空间上，得到"仅由基因解释的暴露变异"$\hat{X}$；第二阶段只需要用$\hat{X}$去预测结局，就自动排除了混杂因素对暴露的影响。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>多基因工具变量的2SLS</h4>
+<p>实际应用中，单个SNP通常只能解释暴露变异的很小部分（如一个SNP可能只解释BMI变异的0.02%），导致"弱工具"问题。使用<strong>多个SNP</strong>作为工具变量可以提升统计效力。第一阶段的回归变为：</p>
+$$X = \pi_0 + \sum_{l=1}^{L} \pi_l G_l + \varepsilon$$
+<p>然后第二阶段的 $\hat{X}$ 是一个<strong>等位基因得分（allele score）</strong>——即多个SNP对暴露影响的加权和。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>3.3 弱工具问题与LIML</h3>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>弱工具偏倚（Weak Instrument Bias）</h4>
+<p>当遗传变异与暴露的关联很弱时（即IV1条件勉强满足），2SLS估计会偏向OLS估计（即偏向混杂的观察性关联），且置信区间可能过窄。判断标准：第一阶段回归的 <strong>$F$ 统计量 < 10</strong> 通常被视为弱工具的警示信号。</p>
+<p><strong>解决方法：</strong>使用有限信息最大似然（LIML）、等位基因得分法或稳健调整后的IVW方法。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>2SLS</strong>是最经典的个体水平MR估计方法，两步回归即可实现。</li>
+  <li><strong>等位基因得分法</strong>将多个SNP的信息压缩为一个得分，减少弱工具偏倚。</li>
+  <li><strong>$F > 10$</strong>是检验工具强度的经验性阈值。</li>
+  <li>汇总数据方法（第4节）是当今MR分析的主力，因为GWAS汇总统计数据广泛可得。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第4节 · 汇总水平数据的估计方法 -->
+<!-- ================================================================ -->
+<section id="sec-4">
+<h2>第4节 · 汇总水平数据的估计方法</h2>
+
+<h3>4.1 从个体水平到汇总水平</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>汇总水平MR的输入是：对于每个遗传变异 $l$，从GWAS中获得其对暴露的效应估计 $\hat{\Gamma}_l$（及标准误 $\sigma_{X,l}^2$）和对结局的效应估计 $\hat{\gamma}_l$（及标准误 $\sigma_{Y,l}^2$）。你不需要看到任何一个人的个体数据，只需要这些"基因→暴露"和"基因→结局"的汇总关联统计量。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>4.2 逆方差加权法（IVW）—— 汇总MR的基石</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>逆方差加权（Inverse-Variance Weighting, IVW）估计</h4>
+<p>每个遗传变异 $l$ 给出一个Wald Ratio：$\hat{\beta}_l = \frac{\hat{\gamma}_l}{\hat{\Gamma}_l}$。IVW估计量是这些单独估计的<strong>精度加权平均</strong>：</p>
+$$\hat{\beta}_{IVW} = \frac{\sum_{l=1}^{L} \hat{\Gamma}_l \hat{\gamma}_l \sigma_{Y,l}^{-2}}{\sum_{l=1}^{L} \hat{\Gamma}_l^2 \sigma_{Y,l}^{-2}}$$
+<p>等价于将 $\hat{\gamma}_l$ 对 $\hat{\Gamma}_l$ 回归（截距固定为零），权重为 $1/\sigma_{Y,l}^2$：</p>
+$$\hat{\gamma}_l = \beta_{IVW} \hat{\Gamma}_l + u_l, \quad u_l \sim N(0, 1), \quad \text{权重: } 1/\sigma_{Y,l}^2$$
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>IVW = 荟萃分析的思维</h4>
+<p>想象每个SNP是一个独立的"微型研究"，各自通过Wald Ratio给出一个因果效应估计。IVW就是把这些"微型研究"的结果进行荟萃分析——<strong>给精度高（标准误小）的SNP更大的权重，给精度低的SNP更小的权重</strong>。由于所有SNP估计的是同一个因果效应（在无多效性的假设下），这个加权平均就是最优的汇总估计。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>BMI → 冠心病的IVW分析（Fig. 4）</h4>
+<p>论文图4展示了BMI对冠心病的MR分析。散点图中每个点代表一个SNP：横坐标是SNP对BMI的效应（$\hat{\Gamma}_l$），纵坐标是SNP对冠心病的效应（$\hat{\gamma}_l$）。IVW拟合的直线斜率就是因果效应估计。如果所有SNP都是有效工具（无多效性），这些点应该随机散布在直线周围——偏离直线的点可能是多效性的信号。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>4.3 数据可视化方法</h3>
+<p>论文介绍了三种互补的可视化策略来评估MR分析的可靠性：</p>
+<ul>
+  <li><strong>传统散点图（Fig. 4a,b）：</strong>展示每个SNP的基因-暴露和基因-结局关联，叠加IVW、MR-Egger、加权中位数等拟合线。</li>
+  <li><strong>径向MR图（Radial MR, Fig. 4c）：</strong>将每个SNP的贡献投影到径向坐标上，<strong>更容易识别离群值</strong>（偏离径向参考线的点）。</li>
+  <li><strong>留一法分析（Leave-one-out, Fig. 4d）：</strong>每次移除一个SNP后重新估计IVW，观察是否有单个SNP过度影响整体结果。</li>
+</ul>
+
+<p>原论文 Figure 4 的四种可视化原图如下（示例数据为 BMI → 冠心病的真实汇总 MR 分析）：</p>
+
+<img src="images/Sanderson/Sanderson_Fig4.jpg" alt="原论文Figure 4：汇总数据MR分析的四种数据可视化">
+
+<p class="fig-caption"><strong>原论文 Figure 4：数据可视化。</strong>四面板展示同一项汇总数据 MR 分析（BMI → 冠心病）。(a) <strong>传统散点图</strong>：每个点是一个 SNP，横轴为该 SNP 对 BMI 的效应、纵轴为对冠心病的效应，误差棒为标准误；IVW 拟合线（Inverse variance weighted）的斜率即因果效应估计。(b) <strong>加入稳健方法的散点图</strong>：在 (a) 基础上叠加 MR-Egger、加权中位数、加权众数三条拟合线（加权中位数线被加权众数线遮挡）。注意横轴量程 0.02–0.08 远小于纵轴量程 −0.08–0.04——工具对暴露的效应远大于暴露对结局的效应，这是 MR 的典型形态。(c) <strong>径向 MR 图</strong>：横轴为每个 SNP 的权重 $W_j$，纵轴为权重乘以效应估计 $\hat{\beta}_j W_j$；偏离 IVW 参考线的点（图例 Outlier）即离群变异，比散点图更容易识别。(d) <strong>留一法敏感性分析</strong>：按 rsID 逐行列出每次移除一个 SNP 后重新估计的 IVW（点 + 置信区间），"All" 行是全部变异的总估计；若剔除某 SNP 后估计大幅移动，说明该 SNP 对整体结果影响过大。原图用 TwoSampleMR 与 RadialMR 两个 R 包绘制。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>IVW是汇总MR的<strong>默认方法</strong>——简单、高效、效力最强。</li>
+  <li>IVW的有效性前提：<strong>所有遗传变异都是有效IV</strong>（无多效性、无混杂）。</li>
+  <li>当该前提不满足时，需要第5节介绍的<strong>稳健方法</strong>。</li>
+  <li>SNP之间需独立（通常通过LD pruning确保）。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第5节 · 多效性的处理 -->
+<!-- ================================================================ -->
+<section id="sec-5">
+<h2>第5节 · 多效性的处理</h2>
+
+<h3>5.1 什么是多效性（Pleiotropy）？</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>多效性是一个基因影响多个性状的现象。就像一把钥匙可能打开多把锁——一个SNP可能不仅影响你的BMI，还直接影响你的血脂水平。在MR中，<strong>多效性是IV3（排他性限制）被违反的主要原因</strong>。</p>
+<p>但并非所有多效性都是坏事——关键区分在于多效性的"类型"。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>多效性的六种类型（Fig. 3）</h4>
+<table>
+  <tr><th>类型</th><th>机制</th><th>是否导致偏倚？</th></tr>
+  <tr>
+    <td>(a) 水平多效性<br>Horizontal pleiotropy</td>
+    <td>$G$ 通过非 $X$ 的通路影响 $Y$</td>
+    <td style="color:#e74c3c;"><strong>是 — 违反IV3</strong></td>
+  </tr>
+  <tr>
+    <td>(b) 无偏水平多效性</td>
+    <td>$G$ 影响的其他性状不在因果通路中</td>
+    <td style="color:#27ae60;">否 — 不影响MR估计</td>
+  </tr>
+  <tr>
+    <td>(c) LD混杂</td>
+    <td>$G_1$（工具）与 $G_2$（有水平多效性）处于LD</td>
+    <td style="color:#e74c3c;"><strong>是 — 与(a)不可区分</strong></td>
+  </tr>
+  <tr>
+    <td>(d) 垂直多效性<br>Vertical pleiotropy</td>
+    <td>$G \to X \to M \to Y$，中介在因果通路上</td>
+    <td style="color:#27ae60;">否 — 是因果机制的一部分</td>
+  </tr>
+  <tr>
+    <td>(e) 主表型误指定</td>
+    <td>$G$ 主要影响 $C$ 而非 $X$，但 $X$ 被误认为主表型</td>
+    <td style="color:#e74c3c;"><strong>是 — 偏倚由 $C \to Y$ 产生</strong></td>
+  </tr>
+  <tr>
+    <td>(f) 相关多效性<br>Correlated pleiotropy</td>
+    <td>$G$ 的多效性效应大小与 $G \to X$ 的效应大小相关</td>
+    <td style="color:#e74c3c;"><strong>是 — 极难检测</strong></td>
+  </tr>
+</table>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Figure 3 的六类型示意图如下，可与上表逐行对照：</p>
+
+<img src="images/Sanderson/Sanderson_Fig3.jpg" alt="原论文Figure 3：多效性的类型">
+
+<p class="fig-caption"><strong>原论文 Figure 3：多效性的类型。</strong>六个面板中 $G$（或 $G_1$、$G_2$）为遗传变异，$X$ 为暴露，$Y$ 为结局，$U$ 为未观测混杂，$C$ 为与 $G$ 关联的另一（可能未观测的）表型。(a) <strong>水平多效性（造成偏倚）</strong>：$G$ 有经由非 $X$ 的通路影响 $Y$，违反 IV3。(b) <strong>水平多效性（无偏倚）</strong>：$G$ 虽影响其他表型 $C$，但 $C$ 不在通向 $Y$ 的因果通路上，MR 估计不受污染。(c) <strong>LD 混杂</strong>：$G_2$ 有水平多效性，$G_1$ 与 $G_2$ 处于 LD，产生的偏倚与 (a) 不可区分。(d) <strong>垂直多效性</strong>：表型 $C$ 位于 $G \to X \to Y$ 通路之上（即中介），不偏倚 MR，还可用于阐明因果中介。(e) <strong>主表型误指定</strong>：变异实际主要影响 $C$，若误把 $X$ 定为主表型，$C \to Y$ 的替代通路会污染估计。(f) <strong>相关多效性</strong>：多效性效应的大小与 $G \to X$ 效应的大小相关，最难检测与校正。总规则：(b)(d) 两类不造成偏倚，其余四类均违反 IV2 或 IV3。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<h3>5.2 多效性稳健方法全景（Table 1）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>由于多效性普遍存在，研究者开发了大量"多效性稳健"的MR方法。这些方法可以归为三大类：<strong>离群值移除</strong>（把"坏"SNP扔掉）、<strong>离群值调整</strong>（降低"坏"SNP的权重）、<strong>全盘调整</strong>（假设所有SNP都有多效性但施加某种结构约束）。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Table 1 的完整方法目录原表如下——按"所放松的核心 IV 假设"分类，分个体水平与汇总水平两列，下文方法 A/B/C 即从此表归类而来：</p>
+
+<img src="images/Sanderson/Sanderson_Tab1.jpg" alt="原论文Table 1：MR估计方法目录">
+
+<p class="fig-caption"><strong>原论文 Table 1：MR 估计方法目录。</strong>表格第一列是<strong>方法类别</strong>（基础 MR 方法、弱工具稳健方法、离群值/变异选择与移除、离群值/变异调整、估计量调整、环境控制调整），第二列标明该类<strong>放松的核心 IV 假设</strong>（如"IV1；允许弱工具""IV3；允许平衡/稀疏多效性"），第三、四列分别列出<strong>个体水平数据</strong>与<strong>汇总水平数据</strong>可用的具体方法（最常用者以上标 a 标注：Wald ratio、2SLS、IVW、加权中位数、加权众数等）。表末脚注提醒：各类别并不互斥，每种方法都会对多效性的结构施加某种替代假设——没有任何方法对全部多效性稳健，这正是需要联合多种方法做敏感性分析的原因。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<h4>方法A：离群值移除类</h4>
+<table>
+  <tr><th>方法</th><th>核心思想</th><th>假设</th></tr>
+  <tr>
+    <td>加权中位数<br>Weighted median</td>
+    <td>取所有SNP Wald ratio的加权中位数，而非加权均值</td>
+    <td>至少50%的权重来自有效IV</td>
+  </tr>
+  <tr>
+    <td>加权众数<br>Weighted mode</td>
+    <td>取Wald ratio分布的众数（最多SNP支持的效应值）</td>
+    <td>最大的一组一致SNP是有效的（ZEMPA假设）</td>
+  </tr>
+  <tr>
+    <td>MR LASSO</td>
+    <td>用LASSO惩罚回归识别并剔除离群SNP</td>
+    <td>多效性是稀疏的（只有少数SNP有偏）</td>
+  </tr>
+</table>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>加权中位数的直觉</h4>
+<p>假设有10个SNP，其中7个是有效IV（一致估计BMI→冠心病效应为0.15），3个有严重多效性（给出-0.05、0.40、-0.30的奇怪估计）。IVW取均值会被这三个"坏"SNP拉偏，但<strong>加权中位数只看排序后位于50%位置的估计值</strong>——只要"坏"SNP不超过50%，中位数仍然接近0.15。这就是"多数决"的原则。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>方法B：离群值调整类</h4>
+<table>
+  <tr><th>方法</th><th>核心思想</th></tr>
+  <tr><td>MR PRESSO</td><td>检测并移除离群SNP后重新估计，通过残差平方和检验离群值</td></tr>
+  <tr><td>MR RAPS</td><td>使用稳健损失函数降低离群SNP对估计的影响</td></tr>
+  <tr><td>MR GRAPPLE</td><td>同时估计因果效应和每个SNP的多效性效应，用profile likelihood选择"干净"SNP</td></tr>
+  <tr><td>MR CAUSE</td><td>区分"相关多效性"和"不相关多效性"，通过贝叶斯模型比较来推断是否存在因果效应</td></tr>
+</table>
+
+<h4>方法C：全盘调整类（所有SNP都允许有多效性）</h4>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>MR-Egger回归</h4>
+<p>将 $\hat{\gamma}_l$ 对 $\hat{\Gamma}_l$ 回归时<strong>不强制截距为零</strong>：</p>
+$$\hat{\gamma}_l = \beta_{0E} + \beta_{1E} \hat{\Gamma}_l + \varepsilon_l, \quad \text{权重: } 1/\sigma_{Y,l}^2$$
+<p>截距 $\beta_{0E}$ 估计<strong>平均多效性效应</strong>，斜率 $\beta_{1E}$ 给出<strong>校正多效性后的因果效应</strong>。其核心假设是<strong>InSIDE假设</strong>（Instrument Strength Independent of Direct Effect）：SNP对暴露的效应强度与其多效性效应大小无关。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>InSIDE假设在相关多效性下不成立</h4>
+<p>MR-Egger的致命弱点是<strong>InSIDE假设在相关多效性（Fig. 3f）下被违反</strong>。如果SNP对暴露的效应越强，其多效性效应也越大，那么MR-Egger的估计也会有偏。更糟糕的是，MR-Egger通常<strong>统计效力远低于IVW</strong>，导致置信区间非常宽。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>多变量MR（Multivariable MR, MVMR）</h4>
+<p>当多效性通路通过<strong>已知的中间表型</strong>起作用时，可以将这些表型也纳入模型：</p>
+$$\hat{\gamma}_l = \beta_{X} \hat{\Gamma}_{X,l} + \beta_{C_1} \hat{\Gamma}_{C_1,l} + \beta_{C_2} \hat{\Gamma}_{C_2,l} + \varepsilon_l$$
+<p>其中 $\hat{\Gamma}_{C_1,l}$ 和 $\hat{\Gamma}_{C_2,l}$ 是SNP对已知多效性表型的效应。这样就<strong>显式建模了多效性通路</strong>，而非将其归入误差项。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Figure 5 的 MVMR 模型示意图如下，可直观对照上文的回归公式阅读：</p>
+
+<img src="images/Sanderson/Sanderson_Fig5.jpg" alt="原论文Figure 5：多变量孟德尔随机化模型示意图">
+
+<p class="fig-caption"><strong>原论文 Figure 5：多变量 MR（MVMR）模型示意图。</strong>图中为三个遗传变异 $G_1$、$G_2$、$G_3$、两个暴露 $X_1$、$X_2$ 与一个结局 $Y$ 的因果结构；$U_1$、$U_2$ 是假定未知的混杂。与单变量 MR 只有一个"暴露"不同，MVMR 同时把 $X_1$、$X_2$ 放进模型，估计的是每个暴露<strong>控制其他暴露之后</strong>的直接因果效应——只要变异的额外通路经过已知表型，其效应就被显式吸收，不再污染目标暴露的估计（这正是上文公式中同时纳入 $\hat{\Gamma}_{X,l}$ 与 $\hat{\Gamma}_{C,l}$ 的含义）。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<h3>5.3 敏感性分析策略</h3>
+
+<div class="algorithm">
+<span class="tag">算法</span>
+<h4>推荐的MR分析工作流</h4>
+<ol>
+  <li><strong>主分析：</strong>IVW —— 效力最强，是默认估计。</li>
+  <li><strong>离群值检测：</strong>径向MR + 留一法分析 —— 识别异常SNP。</li>
+  <li><strong>第一层敏感性：</strong>加权中位数 + 加权众数 —— 对最多50%的无效IV稳健。</li>
+  <li><strong>第二层敏感性：</strong>MR-Egger（检验截距是否显著非零）—— 评估平均方向性多效性。</li>
+  <li><strong>如果多效性通路已知：</strong>多变量MR —— 显式建模多效性通路。</li>
+  <li><strong>综合判断：</strong>如果多种方法方向一致、量级相近，结果更可信；如方向不一致，需探究原因。</li>
+</ol>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li><strong>水平多效性是MR的最大威胁</strong>，因为它违反IV3条件。</li>
+  <li>没有一种方法对所有类型的多效性稳健——<strong>多种方法联合使用</strong>是必然策略。</li>
+  <li>加权中位数和加权众数是"多数决原则"：即使部分SNP无效，只要多数有效就能正确估计。</li>
+  <li>MR-Egger允许所有SNP都有多效性，但依赖InSIDE假设，且效力低。</li>
+  <li>多变量MR是处理已知多效性通路的最优雅方法。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第6节 · 数据来源与工具 -->
+<!-- ================================================================ -->
+<section id="sec-6">
+<h2>第6节 · 数据来源与分析工具</h2>
+
+<h3>6.1 GWAS汇总数据的来源</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>双样本MR（two-sample MR）的流行得益于GWAS汇总统计数据的公开可用。研究者可以<strong>从不同的GWAS中提取暴露和结局的汇总数据</strong>，而无需拥有一份同时包含暴露、结局和基因型的大型个体水平数据集。这极大地降低了MR分析的门槛。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<table>
+  <tr><th>资源</th><th>描述</th></tr>
+  <tr><td>OpenGWAS / MR-Base</td><td>最大的GWAS汇总数据平台，包含数千个性状的GWAS结果，可通过API直接提取用于MR分析</td></tr>
+  <tr><td>UK Biobank</td><td>50万人队列，包含丰富表型和基因型数据，是许多GWAS的数据来源</td></tr>
+  <tr><td>FinnGen</td><td>芬兰人群的大规模生物银行-GWAS项目</td></tr>
+  <tr><td>GWAS Catalog</td><td>NHGRI-EBI维护的GWAS关联目录</td></tr>
+</table>
+
+<h3>6.2 分析软件</h3>
+<table>
+  <tr><th>软件/包</th><th>用途</th></tr>
+  <tr><td>TwoSampleMR (R)</td><td>双样本MR分析的完整工作流：数据提取、协调、分析、可视化</td></tr>
+  <tr><td>RadialMR (R)</td><td>径向MR可视化与离群值检测</td></tr>
+  <tr><td>MendelianRandomization (R)</td><td>多种MR估计方法的R包（IVW, MR-Egger, 加权中位数/众数等）</td></tr>
+  <tr><td>MR-PRESSO (R)</td><td>离群值检测与校正</td></tr>
+  <tr><td>MVMR (R)</td><td>多变量MR分析</td></tr>
+</table>
+
+<p>上表是常用工具的简化清单——原论文 Table 2 的完整软件目录原表如下（按个体水平数据与汇总水平数据两大板块编排，附各包的平台与功能说明）：</p>
+
+<img src="images/Sanderson/Sanderson_Tab2.jpg" alt="原论文Table 2：执行MR分析的精选软件包汇总">
+
+<p class="fig-caption"><strong>原论文 Table 2：执行 MR 分析的精选软件包汇总。</strong>表格分两大板块：<strong>个体水平数据</strong>（Individual-level data）列出 AER（R，2SLS 的 <em>ivreg</em> 函数）、OneSampleMR（R，含 Sanderson–Windmeijer $F$ 统计量）、ivmodel、ivtools、ivonesamplemr（Stata）、ivreg2（Stata）、ivregress（Stata）等；<strong>汇总水平数据</strong>（Summary-level data）列出 MendelianRandomization（R，可对接 PhenoScanner 数据库）、TwoSampleMR 与 MR-Base 应用（R/网页，对接 OpenGWAS 项目）、mrrobust（Stata）等。结合 6.1 的数据平台可以看出"数据（OpenGWAS）→ 方法（各 R/Stata 包）→ 可视化（RadialMR 等）"的完整工具链。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+
+<h3>6.3 数据协调（Data Harmonisation）</h3>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>等位基因方向协调是汇总MR的常见陷阱</h4>
+<p>不同GWAS可能使用不同的效应等位基因（effect allele）编码。在合并暴露和结局的汇总数据之前，必须确保：(1) <strong>效应等位基因一致</strong>；(2) 效应方向与同一等位基因对齐；(3) 对于回文SNP（palindromic SNPs，如A/T和C/G），需额外验证链方向。这一步的错误是最常见的MR分析失败原因之一。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>双样本MR因其数据可及性已成为MR研究的主流形式。</li>
+  <li>OpenGWAS平台和TwoSampleMR R包使得MR分析高度自动化。</li>
+  <li>数据协调是关键的质量控制步骤，等位基因方向错误将导致结果完全不可靠。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第7节 · MR的应用场景 -->
+<!-- ================================================================ -->
+<section id="sec-7">
+<h2>第7节 · MR的应用场景</h2>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>本节概述的MR应用场景在心血管疾病领域得到了最系统的实践。Larsson et al. (2023) 的 <a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR for CVD 综述</a>详细展示了BMI、血压、血脂、吸烟、饮酒等CVD危险因素的MR证据全景，是本节"三角验证"框架在临床领域的最佳案例。Yao et al. (2025) 的 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">蛋白组-卒中靶点研究</a>则展示了MR在药物靶点发现中的前沿应用（pQTL-MR + 跨血统验证 + 共定位分析）。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系卡片</a>。
+</div>
+
+<h3>7.1 五大应用类别</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>MR的应用远远超出了"X是否导致Y"的简单问答。论文总结了五大应用场景，从药物靶点验证到因果机制的三角验证。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<table>
+  <tr><th>应用类型</th><th>核心问题</th><th>典型案例</th></tr>
+  <tr>
+    <td><strong>1. 因果效应验证</strong></td>
+    <td>可改变暴露是否因果性地影响健康结局？</td>
+    <td>BMI → 冠心病；酒精摄入 → 心血管病</td>
+  </tr>
+  <tr>
+    <td><strong>2. 药物靶点验证</strong></td>
+    <td>调节某个基因/蛋白靶点是否会影响疾病风险？</td>
+    <td>PCSK9基因变异 → LDL-C降低 → 冠心病风险降低（验证了PCSK9抑制剂靶点）</td>
+  </tr>
+  <tr>
+    <td><strong>3. 因果中介分析</strong></td>
+    <td>暴露通过哪些中间通路影响结局？</td>
+    <td>教育 → 收入/生活方式 → 心血管健康（多变量MR拆解中介效应）</td>
+  </tr>
+  <tr>
+    <td><strong>DANDELION 中介式 DPG 定位</strong></td>
+    <td>GWAS 位点通过哪些中介基因影响疾病？</td>
+    <td>Salamone et al. (2026)：GWAS 位点(X) → 候选 DPG(M) → 哮喘(Y)，用 DACT 中介检验而非估计效应</td>
+  </tr>
+  <tr>
+    <td><strong>4. 双向MR</strong></td>
+    <td>X导致Y，还是Y导致X？</td>
+    <td>BMI ↔ 抑郁症（双向分析确定因果方向）</td>
+  </tr>
+  <tr>
+    <td><strong>5. 三角验证（Triangulation）</strong></td>
+    <td>多种因果推断方法的结论是否一致？</td>
+    <td>MR + 传统观察性研究 + RCT + 准实验设计的多元证据整合</td>
+  </tr>
+</table>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>这里的"因果中介分析"正是 <a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">Salamone et al. (2026) DANDELION</a> 的骨架：DANDELION 将 MR 的"暴露→结局"因果推断推广到"GWAS位点(X) → 候选DPG(M) → 疾病(Y)"的中介链，用 DACT 复合零假设检验筛选显著中介通路，从而在反式调控网络中定位疾病驱动基因。它与 MR 互补——MR 重在估计效应，DANDELION 重在筛选中介节点。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系卡片</a>。
+</div>
+
+<h3>7.2 三角验证 —— MR的终极价值</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>三角验证（Triangulation）框架</h4>
+<p>三角验证的核心理念是：<strong>不同研究方法有不同的偏倚来源，如果这些方法对同一问题给出相似答案，那么这个答案很可能反映了真实的因果效应</strong>。</p>
+<p>MR的独特价值在于：其偏倚来源（多效性、弱工具、人群分层）与常规观察性研究（混杂、反向因果、测量误差）<strong>几乎正交</strong>。当MR和调整充分的观察性研究指向同一方向时，结论的可信度大幅提升。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>药物靶点验证：PCSK9案例</h4>
+<p>PCSK9基因的功能缺失变异导致LDL胆固醇终生低水平，携带者冠心病风险显著降低。这一MR发现<strong>预测了PCSK9抑制剂药物的成功</strong>——后续RCT证实PCSK9抑制剂确实降低了心血管事件。这是MR在药物开发中"先于RCT验证靶点"的经典案例。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR最强大的应用之一是<strong>药物靶点验证</strong>——在投入数亿美元的临床试验之前，用MR检验调节某个靶点是否可能有效。</li>
+  <li><strong>三角验证</strong>是MR应用的终极框架——MR与其他方法互补而非替代。</li>
+  <li>MR的优势在于其偏倚来源<strong>正交于</strong>传统观察性研究的偏倚来源。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第8节 · 局限性与优化 -->
+<!-- ================================================================ -->
+<section id="sec-8">
+<h2>第8节 · 局限性与优化</h2>
+
+<h3>8.1 MR偏倚的六大来源</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>尽管MR的设计天然规避了传统混杂偏倚，但它引入了一系列<strong>独特的偏倚来源</strong>。理解这些偏倚对于负责任地解读MR结果至关重要。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<table>
+  <tr><th>偏倚来源</th><th>机制</th><th>当前解决方案</th></tr>
+  <tr>
+    <td><strong>1. 弱工具偏倚</strong><br>(Weak instrument bias)</td>
+    <td>遗传变异与暴露的关联太弱，估计向混杂的观察性关联偏倚</td>
+    <td>LIML；allele scores；F>10筛选；debiased IVW</td>
+  </tr>
+  <tr>
+    <td><strong>2. 水平多效性</strong><br>(Horizontal pleiotropy)</td>
+    <td>遗传变异通过非暴露通路影响结局</td>
+    <td>第5节的方法套件（加权中位数/众数、MR-Egger、MR-PRESSO等）</td>
+  </tr>
+  <tr>
+    <td><strong>3. 人群分层</strong><br>(Population stratification)</td>
+    <td>基因频率因祖先背景而异，祖先背景又与结局相关</td>
+    <td>在种族同质人群中进行GWAS；GWAS中校正主成分；家庭内MR</td>
+  </tr>
+  <tr>
+    <td><strong>4. 选型交配</strong><br>(Assortative mating)</td>
+    <td>伴侣选择基于可遗传性状，导致遗传关联被扭曲</td>
+    <td>家庭内MR设计；选型交配对多基因性状的MR偏倚呈中等程度</td>
+  </tr>
+  <tr>
+    <td><strong>5. 生存偏倚/选择偏倚</strong><br>(Survival/Collider bias)</td>
+    <td>遗传变异影响谁存活/参与研究，从而扭曲基因-结局关联</td>
+    <td>使用多个独立队列；敏感性分析；逆概率加权</td>
+  </tr>
+  <tr>
+    <td><strong>6. 传递比失真</strong><br>(Transmission ratio distortion)</td>
+    <td>等位基因从父母到后代的传递偏离50:50预期</td>
+    <td>使用亲代-子代三人组数据验证</td>
+  </tr>
+</table>
+
+<!-- ==================== 偏倚5详细展开 ==================== -->
+<h3>8.1.5 · 偏倚来源5 — 生存偏倚 / 选择偏倚（Collider Bias）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>什么是 Collider Bias？</h4>
+<p>想象你在一个健身房里做调查，问"体重和收入有没有关系？"你发现健身房里体重轻的人收入高。但这能说明"体重轻导致收入高"吗？<strong>不能——因为"进健身房"本身就是一个 collider（碰撞节点）</strong>：它同时受体重（想减肥的人进健身房）和收入（有钱人才办得起卡）的影响。你<strong>条件化在"在健身房里"</strong>这一状态上，就人为地在体重和收入之间制造了统计关联。</p>
+<p>在 MR 中，<strong>"参与研究"就是这个"健身房"</strong>——它不是随机的，而是由遗传、健康、社会经济地位、地理位置等多种因素共同决定的。当你只分析研究参与者时，就等价于条件化在一个 collider 上。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>Collider Bias 的 DAG 表示</h4>
+<p>令 $S$ 为"入选研究"的二值指示变量（$S=1$ 表示参与）。当以下条件同时满足时，选择偏倚发生：</p>
+<ol>
+  <li>遗传变异 $G$（或受 $G$ 影响的暴露 $X$）影响了 $S$</li>
+  <li>结局 $Y$（或其风险因子 $U$）也影响了 $S$</li>
+  <li>分析被限制在 $S=1$ 的子集（即仅分析参与者）</li>
+</ol>
+<figure style="margin:18px 0; padding:16px 12px 10px; background:#fff; border:1px solid #bdc3c7; border-radius:6px; text-align:center;">
+<svg viewBox="0 0 680 470" xmlns="http://www.w3.org/2000/svg" style="max-width:560px; width:100%; height:auto; font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+  <defs>
+    <marker id="dagArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2c3e50"/>
+    </marker>
+    <marker id="dagArrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+  </defs>
+
+  <!-- ===== 黑色实线：真实因果边 ===== -->
+  <line x1="140" y1="120" x2="288" y2="120" stroke="#2c3e50" stroke-width="2" marker-end="url(#dagArrow)"/>
+  <line x1="350" y1="120" x2="498" y2="120" stroke="#2c3e50" stroke-width="2.5" marker-end="url(#dagArrow)"/>
+  <text x="424" y="108" text-anchor="middle" font-size="16" font-style="italic" font-weight="700" fill="#1a5276">&#x03B2;</text>
+  <line x1="132" y1="146" x2="292" y2="272" stroke="#2c3e50" stroke-width="2" marker-end="url(#dagArrow)"/>
+  <line x1="500" y1="300" x2="352" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#dagArrow)"/>
+  <line x1="530" y1="270" x2="530" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#dagArrow)"/>
+
+  <!-- ===== 红色虚线：条件化诱导的虚假通路 G ⤳ U ===== -->
+  <path d="M 110 152 C 110 452, 530 452, 530 332" fill="none" stroke="#c0392b" stroke-width="2.2" stroke-dasharray="8,5" marker-end="url(#dagArrowRed)"/>
+  <text x="320" y="432" text-anchor="middle" font-size="13" fill="#c0392b" font-weight="600">条件化诱导的虚假关联 &#160;G &#x21C4; U</text>
+
+  <!-- ===== 节点 ===== -->
+  <circle cx="110" cy="120" r="30" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="110" y="120" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#1a5276">G</text>
+  <text x="110" y="170" text-anchor="middle" font-size="13" fill="#566573">遗传变异</text>
+
+  <circle cx="320" cy="120" r="30" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="320" y="120" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#1a5276">X</text>
+  <text x="320" y="170" text-anchor="middle" font-size="13" fill="#566573">暴露</text>
+
+  <circle cx="530" cy="120" r="30" fill="#eaf2f8" stroke="#1a5276" stroke-width="2"/>
+  <text x="530" y="120" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#1a5276">Y</text>
+  <text x="530" y="170" text-anchor="middle" font-size="13" fill="#566573">结局</text>
+
+  <circle cx="530" cy="300" r="30" fill="#fef9e7" stroke="#b7950b" stroke-width="2" stroke-dasharray="5,4"/>
+  <text x="530" y="300" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#7d6608">U</text>
+  <text x="530" y="350" text-anchor="middle" font-size="13" fill="#7d6608">未观测混杂</text>
+
+  <rect x="274" y="254" width="92" height="92" rx="6" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="290" y="270" width="60" height="60" rx="4" fill="#fdedec" stroke="#c0392b" stroke-width="2"/>
+  <text x="320" y="300" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="700" fill="#c0392b">S</text>
+  <text x="320" y="368" text-anchor="middle" font-size="13" fill="#c0392b">选择 / 存活 collider</text>
+  <text x="320" y="386" text-anchor="middle" font-size="12" fill="#c0392b">（条件化 S = 1）</text>
+</svg>
+<figcaption style="font-size:13px; color:#566573; line-height:1.7; text-align:left; margin:8px 14px 4px;">
+<strong>读图：</strong>黑色实线为真实因果边（G→X→Y 为主链，β 为待估因果效应；U→Y 为混杂，U→S、G→S 为对选择节点的输入）。<strong>U 用虚线圆圈</strong>表示未观测；<strong>S 用红色方形</strong>表示 collider，外层虚线方框表示对其<strong>条件化</strong>（仅纳入 S=1 个体）。条件化在 collider S 上会打开 G→S←U 通路，<strong>红色虚线</strong>即由此新诱导的 G ⤳ U 关联——原本 MR 假设 G ⊥ U 被打破，虚假通路 G ⤳ U → Y 同时污染 Wald Ratio 的分子 γ̂ 与分母 Γ̂，且偏倚方向不可预测。
+</figcaption>
+</figure>
+<p>在数学上，即便 $G \perp U$ 在人群中成立，在 $S=1$ 子集中 $G \not\perp U \mid S=1$，从而 $\hat{\beta}_{IV} \ne \beta$。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>三种典型子场景</h4>
+<table>
+  <tr><th>子类型</th><th>机制</th><th>典型例子</th><th>偏倚方向</th></tr>
+  <tr>
+    <td><strong>1. 生存偏倚</strong><br>(Survivorship / Neyman bias)</td>
+    <td>高遗传风险的个体在达到研究年龄前死亡，导致病例组中低风险个体富集</td>
+    <td>APOE-ε4 携带者（高阿尔茨海默风险）在 70+ 岁队列中系统性缺失 → ε4 对认知衰退的效应被低估</td>
+    <td style="color:#e74c3c;">通常向零偏倚（效应被低估）</td>
+  </tr>
+  <tr>
+    <td><strong>2. 健康志愿者偏倚</strong><br>(Healthy volunteer bias)</td>
+    <td>参与生物银行的个体更健康、受教育程度更高、更富有；若 G 与参与倾向相关则产生偏倚</td>
+    <td>UK Biobank 参与率仅 ~5.5%；携带"高教育多基因得分"的个体参与概率更高 → 教育相关 MR 的 G-X 和 G-Y 关联均可能被扭曲</td>
+    <td style="color:#e74c3c;">方向不可预测（取决于 G 与参与倾向的关系）</td>
+  </tr>
+  <tr>
+    <td><strong>3. 指标事件偏倚</strong><br>(Index event bias)</td>
+    <td>研究疾病进展时，所有被试都"已有首次发病"——条件化在 index event 上引入了 collider</td>
+    <td>研究卒中复发 → 所有被试都"已经卒中过一次"；首次卒中的发生同时受 G 和其他风险因子（U）影响 → 条件化在"首次卒中"上诱导 G 与 U 的虚假关联</td>
+    <td style="color:#e74c3c;">方向不可预测；可能产生虚假保护效应</td>
+  </tr>
+</table>
+
+<div class="example">
+<span class="tag">数值演示</span>
+<h4>生存偏倚如何扭曲 MR 估计</h4>
+<p>假设一个与冠心病强相关的 SNP（效应等位基因频率 30%），研究目标是 SBP → 冠心病：</p>
+<table style="font-size:0.92em;">
+  <tr><th></th><th>一般人群（50岁）</th><th>研究样本（60-75岁，幸存者）</th></tr>
+  <tr><td>SNP 效应等位基因频率</td><td>30%</td><td><strong>22%</strong>（28%的携带者已死于冠心病，未入组）</td></tr>
+  <tr><td>SNP → SBP 关联（Γ̂）</td><td>β = 1.2 mmHg/等位基因</td><td>β = 1.0（衰减，因为幸存者中 G→SBP 通路被选择性削弱）</td></tr>
+  <tr><td>SNP → 冠心病 关联（γ̂）</td><td>OR = 1.15</td><td>OR = 1.05（向零偏倚，因为"高遗传风险+存活"的是特殊人群）</td></tr>
+  <tr><td style="color:#e74c3c;"><strong>Wald Ratio</strong></td><td style="color:#e74c3c;"><strong>真实的 β</strong></td><td style="color:#e74c3c;"><strong>同时受 Γ̂ 和 γ̂ 的双重扭曲 → 偏倚不可预测</strong></td></tr>
+</table>
+<p>注意：这里不仅是 γ̂（SNP→结局）有偏——Γ̂（SNP→暴露）也可能有偏，因为存活状态同时与 SBP 和 SNP 相关。两条通路同时受 collider 影响，使得<strong>MR 的分子和分母都不可靠</strong>。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="warning">
+<span class="tag">关键警示</span>
+<h4>Collider Bias 与其他偏倚的本质区别</h4>
+<p>弱工具偏倚（偏倚1）的方向是确定的——总是<strong>向观察性关联偏倚</strong>。但 collider bias 的<strong>方向和量级均不可预测</strong>：它可能夸大、缩小甚至逆转因果效应。这意味着：</p>
+<ul>
+  <li>敏感性分析（如 MR-Egger）<strong>无法检测 collider bias</strong>——它们是为多效性设计的</li>
+  <li>即使多种 MR 方法结果一致，<strong>一致性不能排除 collider bias</strong>——因为所有方法都被同样的样本选择所污染</li>
+  <li><strong>唯一的可靠防御是外部验证</strong>——在不同年龄结构、不同招募策略的多个队列中复现</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>当前应对手段</h4>
+<table>
+  <tr><th>方法</th><th>原理</th><th>局限性</th></tr>
+  <tr>
+    <td><strong>多队列交叉验证</strong></td>
+    <td>在不同年龄结构、地域、招募策略的独立队列中复现；若效应一致则 collider bias 可能性低</td>
+    <td>如果所有队列都有相似的参与偏倚（如都来自生物银行），交叉验证无法排除</td>
+  </tr>
+  <tr>
+    <td><strong>逆概率加权（IPW）</strong></td>
+    <td>用参与概率模型（logistic 回归：年龄、性别、SES、健康状况 → 参与与否）构造权重，使加权样本更接近目标人群</td>
+    <td>依赖"参与概率模型正确指定"的假设；需要非参与者的外部信息（通常不可得）</td>
+  </tr>
+  <tr>
+    <td><strong>Heckman 选择模型</strong></td>
+    <td>显式建模两个方程——选择方程（什么决定了参与）和结局方程（暴露对结局的效应）——用两阶段法联合估计</td>
+    <td>需要有效的"排除限制"（至少一个变量只影响选择而不影响结局），实践中很难找到</td>
+  </tr>
+  <tr>
+    <td><strong>Manski 边界分析</strong></td>
+    <td>不用点估计，而用非参部分识别方法推导效应的可能范围（最坏/最好情形）</td>
+    <td>边界通常太宽以至于无信息量</td>
+  </tr>
+  <tr>
+    <td><strong>家庭内 MR</strong></td>
+    <td>在兄弟姐妹内部比较而非人群层面——兄弟姐妹的出生队列、家庭环境等天然匹配，从机制上减少选择偏倚</td>
+    <td>需要家庭数据；统计效力低于人群层面 MR</td>
+  </tr>
+</table>
+
+<!-- ==================== 偏倚6详细展开 ==================== -->
+<h3>8.1.6 · 偏倚来源6 — 传递比失真（Transmission Ratio Distortion, TRD）</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>当孟德尔定律被打破</h4>
+<p>孟德尔第一定律断言：杂合子父母（基因型 Aa）的两个等位基因以<strong>恰好 50:50</strong> 的比例随机传递给子代。但在生物学现实中，这个比例<strong>可以偏离 50:50</strong>——就像一枚"不公平硬币"，某些等位基因以 >50% 的概率被传递。这就是传递比失真（TRD）。</p>
+<p>TRD 对 MR 的杀伤力在于：<strong>它直接攻击了 MR 的逻辑根基</strong>。MR 把遗传变异当作"自然界的随机化"，但如果等位基因的传递本身不是随机的，那"随机化"的类比就从根本上崩溃了。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>传递比失真（TRD）</h4>
+<p>对于一个杂合子亲代（基因型 Aa），子代获得等位基因 A 的概率 $p$ 偏离 0.5：</p>
+$$H_0: p = 0.5 \quad \text{vs} \quad H_1: p \neq 0.5$$
+<p>TRD 的程度通常用<strong>传递比</strong> $k = p/(1-p)$ 量化。$k=1$ 表示无失真；$k>1$ 表示 A 被优先传递；$k<1$ 表示 A 传递不足。</p>
+<p>在人群层面，即使每个家庭内 TRD 的程度很小（如 $p=0.51$），经过多代累积后，等位基因频率也会显著偏离 Hardy-Weinberg 平衡的预期值。更关键的是，基因型与暴露/结局的关联也会被扭曲——因为人群中观察到的 G-X 关联不再纯粹反映 G 对 X 的因果效应，还掺杂了 TRD 带来的"非随机 G 分布"。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>TRD 的三种生物学机制</h4>
+<table>
+  <tr><th>机制</th><th>发生层面</th><th>典型例子</th><th>TRD 强度</th></tr>
+  <tr>
+    <td><strong>1. 减数分裂驱动</strong><br>(Meiotic drive)</td>
+    <td>配子形成（减数分裂）过程中</td>
+    <td>小鼠 t-单倍型（t-haplotype）：杂合子雄性以 >90% 概率传递 t 等位基因（而非正常的 50%）——是目前已知最强的 TRD 案例。人类中，某些着丝粒区域的 TRD 达 55:45</td>
+    <td>中等至强（k = 1.2–10⁺）</td>
+  </tr>
+  <tr>
+    <td><strong>2. 配子选择</strong><br>(Gametic selection)</td>
+    <td>受精前（精子/卵子竞争）</td>
+    <td>若某个等位基因使精子游动更快或寿命更长，则该等位基因在受精池中过度出现；精子发生基因（如 <em>DAZ</em> 家族）的变异可能导致此类 TRD</td>
+    <td>弱至中等（k = 1.02–1.3）</td>
+  </tr>
+  <tr>
+    <td><strong>3. 合子后选择</strong><br>(Post-zygotic selection)</td>
+    <td>受精后（胚胎存活/流产）</td>
+    <td>纯合致死性变异：杂合子父母有 2/3（而非 1/2）存活子代携带正常等位基因（因为纯合子致死胚胎在观察到之前被淘汰）。发育关键基因（如 <em>NOTCH1</em>）的功能丧失变异常出现此现象</td>
+    <td>中等至极端（致死性变异 p ≈ 0.67 的"表观"传递率）</td>
+  </tr>
+</table>
+
+<div class="example">
+<span class="tag">数值演示</span>
+<h4>TRD 如何扭曲 MR —— 简化数值例</h4>
+<p>假设一个 SNP 的效应等位基因（A）有 TRD：杂合子传递 A 的概率 $p=0.55$（而非 0.50）。在 MR 分析中：</p>
+<ol>
+  <li><strong>基因频率偏离 HWE：</strong>经多代累积，A 的频率会高于无 TRD 预期。如果 TRD 在不同亚群中程度不同，基因频率将与人群子结构相关。</li>
+  <li><strong>G-X 关联被污染：</strong>假设 A 不影响暴露 X，但由于 A 基因频率在 TRD 亚群中较高，而该亚群恰好有不同的 X 水平（如因文化/地理因素），则会出现虚假的 G-X 关联 → 第一阶段的 Γ̂ 被污染。</li>
+  <li><strong>G-Y 关联同样被污染：</strong>同样机制导致第二阶段的 Wald Ratio 不可靠。</li>
+</ol>
+<p style="font-size:0.92em; background:#fef9e7; padding:8px 12px; border-radius:4px;">
+<strong>关键洞察：</strong>TRD 并不直接违反 IV3（排他性限制）——它违反的是<strong>更深层的前提：基因型的随机分配</strong>。这比多效性更难通过敏感性分析修复，因为它攻击的是 MR 推理的根基而非某一特定假设。
+</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>TRD 在常见 SNP vs 罕见变异中的差异</h4>
+<table>
+  <tr><th></th><th>常见 SNP（MAF ≥ 1%）</th><th>罕见变异（MAF < 1%）</th></tr>
+  <tr><td>TRD 效应强度</td><td>通常非常弱（p ≈ 0.5001–0.505），在大样本中被对冲</td><td>可能较强——单个罕见变异的 TRD 不被大样本对冲（因为携带者太少）</td></tr>
+  <tr><td>对 MR 的影响</td><td>在样本量 N > 10,000 时通常可忽略</td><td><strong>更令人担忧</strong>——尤其是基于全基因组测序（WGS）的新型 MR 正越来越多使用罕见变异作为工具</td></tr>
+  <tr><td>检测难度</td><td>需要极大的三人组样本量才能检出</td><td>即使有三人组数据，也需要大量杂合子亲代才能检定（而罕见变异的杂合子本就稀少）</td></tr>
+</table>
+
+<div class="warning">
+<span class="tag">关键警示</span>
+<h4>TRD 在罕见变异 MR 中的特殊威胁</h4>
+<p>随着全基因组测序的普及，越来越多的 MR 研究使用<strong>罕见功能丧失变异</strong>（如 PCSK9 的功能丧失突变）作为工具变量。这类变异的优势是效应量大、多效性低——但它们恰恰是 TRD 的高风险区：</p>
+<ul>
+  <li>功能丧失变异可能在纯合状态下是胚胎致死的 → 观察到的"传递率"偏离 50:50（仅杂合子存活）</li>
+  <li>罕见变异的 TRD 不能用大样本对冲——因为携带者本来就少，每个携带者的数据权重高</li>
+  <li>如果 TRD 与结局相关（如 TRD 的区域恰好与疾病基因重叠），偏倚方向不可预测</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>当前检测与应对手段</h4>
+<table>
+  <tr><th>方法</th><th>原理</th><th>局限性</th></tr>
+  <tr>
+    <td><strong>亲代-子代三人组验证</strong></td>
+    <td>在有 mother-father-child trio 的数据中，直接统计杂合子亲代的等位基因传递比例，做二项检验 H₀: p=0.5</td>
+    <td>需要三人组数据（昂贵且稀缺）；对弱 TRD 的检验效力不足</td>
+  </tr>
+  <tr>
+    <td><strong>传递不平衡检验（TDT）</strong></td>
+    <td>比较"传递"vs"未传递"的等位基因频率——在存在关联和连锁的家庭数据中，TDT 对 TRD 和人群分层同时稳健</td>
+    <td>仅检验关联的存在性，不直接量化 TRD 对 MR 估计的偏倚量</td>
+  </tr>
+  <tr>
+    <td><strong>家庭内 MR</strong></td>
+    <td>利用兄弟姐妹间（within-sibship）的遗传差异做 MR——兄弟姐妹共享相同的父母等位基因传递过程，因此 TRD 的影响在家庭内分析中被自然控制</td>
+    <td>需要家庭数据；效力低（因为 siblings 之间的遗传差异远小于人群间的差异）</td>
+  </tr>
+  <tr>
+    <td><strong>HWE 偏离检测</strong></td>
+    <td>在人群数据中检测基因型频率是否偏离 Hardy-Weinberg 平衡——严重的 TRD 会导致可检测的 HWE 偏离</td>
+    <td>HWE 偏离也可能是基因分型错误、人群分层等原因；且弱 TRD 在 HWE 检验中不可检测</td>
+  </tr>
+  <tr>
+    <td><strong>跨群体验证</strong></td>
+    <td>在不同人群（如欧洲、东亚、非洲）中验证关联——若 TRD 是主因，不同人群的 TRD 程度应有差异（因为驱动 TRD 的机制常有群体特异性）</td>
+    <td>间接；需要多人群 GWAS 数据</td>
+  </tr>
+</table>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>偏倚5（Collider bias）在 CVD 相关 MR 中尤为突出。Larsson et al. (2023) 的 <a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR for CVD 综述</a>中讨论的 BMI→冠心病分析，就面临着"肥胖者早逝→老年队列中肥胖遗传风险被低估"的生存偏倚。Yao et al. (2025) 的 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">蛋白组-卒中靶点研究</a>也面临 index event bias（研究卒中复发时条件化在首次卒中上）。偏倚6（TRD）则是 Yoshiji et al. (2025) <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">两步MR</a>中使用罕见蛋白变异作为工具时需要特别关注的问题。详见 <a href="../knowledge_graph.html">知识图谱 → 偏倚方法论子图</a>。
+</div>
+
+<h3>8.2 样本重叠问题</h3>
+
+<div class="warning">
+<span class="tag">注意事项</span>
+<h4>双样本MR中的样本重叠偏倚</h4>
+<p>理想的双样本MR要求暴露GWAS和结局GWAS来自<strong>完全不重叠的样本</strong>。如果两者有重叠，IVW估计会<strong>向暴露-结局的观察性关联偏倚</strong>（类似弱工具偏倚的方向）。当重叠很大时，双样本MR方法收敛于单样本MR（有混杂偏倚）的结果。</p>
+<p>解决方法：使用不重叠的GWAS；或在重叠存在时使用专门的方法校正。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h3>8.3 非线性和基因-环境交互</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>大多数MR方法假设暴露对结局的效应是<strong>线性</strong>的（或至少是单调的）。但如果真实关系是U型（如BMI与死亡率——过轻和过重都不好），线性MR可能给出接近零的估计，因为正面效应和负面效应相互抵消。非线性MR方法仍处于发展早期。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR虽然规避了传统混杂，但有其<strong>独特的偏倚结构</strong>，需要专门的诊断手段。</li>
+  <li><strong>弱工具</strong>和<strong>水平多效性</strong>是最常见的两个偏倚来源。</li>
+  <li>双样本MR中若暴露和结局GWAS样本重叠，会引入混杂偏倚。</li>
+  <li>大多数MR假设<strong>线性效应</strong>——非线性暴露-结局关系的检测需要专门方法。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<p>原论文 Figure 6 完整原图如下——LD 中的相邻变异与共定位分析检出的"共享因果变异"，正是 IV2 假设与多效性偏倚在基因组物理结构层面的具体化，可与第 5 节 Fig. 3 的 LD 混杂（panel c）互相对照：</p>
+
+<img src="images/Sanderson/Sanderson_Fig6.jpg" alt="原论文Figure 6：连锁不平衡变异与共定位识别的共享因果变异">
+
+<p class="fig-caption"><strong>原论文 Figure 6：LD 中的变异与共定位识别的共享因果变异。</strong>三个面板中 $G_1$、$G_2$ 为两个遗传变异，$X$、$Y$ 为暴露与结局，$U$ 为未观测混杂。(a) <strong>不同的因果变异（违反 IV2）</strong>：$G_1$ 与 $G_2$ 处于 LD（两者之间的无方向连线即 LD），$G_2$ 通过不经由 $X$ 的通路影响 $Y$，产生的偏倚与 Fig. 3a 的水平多效性无法区分——这正是单变异 MR 研究需要警惕的情形。(b) <strong>共享因果变异 + 水平多效性（违反 IV2）</strong>：同一个变异 $G$ 既经由 $X$ 又经由水平通路影响 $Y$，共定位分析检出的"共享变异"在这里对应一个有偏的多效性工具。(c) <strong>共享因果变异 + 垂直多效性（满足 IV 假设）</strong>：$G$ 只通过 $X \to Y$ 的通路影响结局，共定位检出的共享变异是真正干净的因果信号。含义：共定位本身不区分 (b) 与 (c)，需结合多效性稳健方法综合判断。<br>图源：Sanderson et al., <em>Nature Reviews Methods Primers</em> (2022)。</p>
+</section>
+
+<!-- ================================================================ -->
+<!-- 第9节 · 未来展望 -->
+<!-- ================================================================ -->
+<section id="sec-9">
+<h2>第9节 · 未来展望</h2>
+
+<h3>9.1 MR方法学的发展方向</h3>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<p>MR是当前发展最快的统计遗传学方法领域之一。论文从数据、方法、应用三个维度勾勒了未来方向。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<h4>数据层面</h4>
+<ul>
+  <li><strong>更大更多样的GWAS：</strong>非欧洲祖先人群的GWAS正在快速增长，将改善MR在不同人群中的可移植性。</li>
+  <li><strong>全基因组测序数据：</strong>罕见变异（MAF < 0.01）为MR提供了新的工具变量来源，罕见变异的多效性可能较低。</li>
+  <li><strong>家庭数据：</strong>父母-子代三人组数据可以进行家庭内MR，天然排除人群分层和选型交配的偏倚。</li>
+</ul>
+
+<h4>方法层面</h4>
+<ul>
+  <li><strong>非线性MR：</strong>允许暴露-结局关系为非单调函数（如U型曲线）。</li>
+  <li><strong>年龄时变MR：</strong>估计暴露在不同生命阶段的因果效应（如儿童期BMI vs 成年期BMI对疾病的影响）。</li>
+  <li><strong>双向MR的系统化：</strong>同时估计两个方向的因果效应，区分因果方向。</li>
+  <li><strong>药物靶点MR的标准化：</strong>为药物开发提供更规范、更可靠的靶点验证框架。</li>
+  <li><strong>跨祖先MR：</strong>利用不同人群的遗传结构差异增强工具变量和评估可移植性。</li>
+</ul>
+
+<h4>应用层面</h4>
+<ul>
+  <li><strong>药物再利用（Drug repurposing）：</strong>用MR系统筛选已有药物的新适应症。</li>
+  <li><strong>临床决策支持：</strong>将MR证据纳入临床指南的因果证据等级体系。</li>
+  <li><strong>多组学整合：</strong>将基因表达（eQTL）、蛋白水平（pQTL）、代谢物（mQTL）的MR与疾病结局连接，构建从DNA到疾病的完整因果链。</li>
+</ul>
+
+<h3>9.2 开放科学与可重复性</h3>
+
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>MR研究的报告规范（STROBE-MR）</h4>
+<p>论文强调MR研究需要遵循<strong>STROBE-MR报告指南</strong>（STrengthening the Reporting of OBservational studies in Epidemiology using Mendelian Randomization），确保方法、假设检验和敏感性分析的完整透明报告。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<ul>
+  <li>MR方法学仍在快速演进，<strong>非线性MR</strong>、<strong>家庭内MR</strong>和<strong>跨祖先MR</strong>是三个主要前沿方向。</li>
+  <li>数据多样性的提升（非欧洲人群、罕见变异、家庭数据）将大幅扩展MR的适用范围和可靠性。</li>
+  <li><strong>药物靶点验证</strong>是MR最有转化价值的应用方向。</li>
+  <li>遵循<strong>STROBE-MR报告规范</strong>是确保MR研究质量和可重复性的关键。</li>
+</ul>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- 附录：论文结构总览 -->
+<!-- ================================================================ -->
+<section id="sec-appendix">
+<h2>附录 · 论文结构总览</h2>
+
+<table>
+  <tr><th>论文章节</th><th>核心内容</th><th>本文对应章节</th></tr>
+  <tr><td>Abstract</td><td>MR的定义、原理和范围</td><td>Header</td></tr>
+  <tr><td>Introduction</td><td>MR的历史、动机、与RCT的类比</td><td>第1节</td></tr>
+  <tr><td>Experimentation</td><td>IV条件（Box 1-4）；MR与RCT的DAG对比</td><td>第1-2节</td></tr>
+  <tr><td>Results — Data</td><td>个体水平与汇总水平数据的特征与获取</td><td>第3节、第6节</td></tr>
+  <tr><td>Results — Individual-level estimation</td><td>Wald ratio、2SLS、LIML、allele score</td><td>第3节</td></tr>
+  <tr><td>Results — Summary-level estimation</td><td>IVW、多效性稳健方法（Table 1）、可视化</td><td>第4-5节</td></tr>
+  <tr><td>Applications</td><td>药物靶点、三角验证、双向MR等</td><td>第7节</td></tr>
+  <tr><td>Limitations and optimizations</td><td>六大偏倚来源和解决方案</td><td>第8节</td></tr>
+  <tr><td>Outlook</td><td>方法学前沿、开放科学</td><td>第9节</td></tr>
+</table>
+
+<div class="intuition">
+<span class="tag">直观理解</span>
+<h4>论文与本文的对应关系</h4>
+<p>本解读按照"动机→原理→方法→应用→局限→展望"的逻辑重组织了论文内容，将原文分布在多个章节的相关内容（如多效性在原文多处出现）整合到统一的专题中，更便于学习理解。</p>
+<span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+</section>
+
+<!-- ==================== Footer ==================== -->
+<footer>
+  <div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📄 本文：MR Primer 详解</a>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">📋 STROBE-MR 报告规范</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📈 MR for CVD 综述</a>
+<a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>📄 两步MR</span><span data-en>📄 Two-step MR</span></a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html">🧬 蛋白组-卒中靶点</a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+  <p style="margin-top: 16px;"><span data-zh>翻译与解读力求准确，但如有疑问请以原始英文论文为准。</span><span data-en>Translation and interpretation aim for accuracy; when in doubt, please refer to the original English paper.</span><br>
+    Generated: 2026-08-14 · <span data-zh>原始论文：</span><span data-en>Original paper: </span>Sanderson et al., Nature Reviews Methods Primers (2022) 2:6
+  </p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

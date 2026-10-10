@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/svg+xml" href="../assets/ruc-logo.svg">
+    <title>实验 Tricks 汇总 — 换头/融合/课程/分组等结构创新</title>
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']],
+                processEscapes: false,
+                packages: {'[+]': ['ams', 'newcommand', 'configMacros']},
+                macros: {
+                    R: '\\mathbb{R}', Hcal: '\\mathcal{H}', Lcal: '\\mathcal{L}',
+                    Ecal: '\\mathcal{E}', Pcal: '\\mathcal{P}',
+                    bce: '\\mathrm{BCE}', fbce: '\\mathrm{FBCE}',
+                    hlcp: '\\mathrm{HLCP}', hlup: '\\mathrm{HLUP}',
+                    VR: '\\mathrm{VR}', CE: '\\mathrm{CE}', LSE: '\\mathrm{LSE}',
+                    AUROC: '\\mathrm{AUROC}', TPR: '\\mathrm{TPR}', FPR: '\\mathrm{FPR}',
+                    ReLU: '\\mathrm{ReLU}', softmax: '\\mathrm{softmax}',
+                    given: '\\mathrel{|}', ind: '\\mathbb{1}',
+                }
+            },
+            chtml: { scale: 0.95 }
+        };
+    </script>
+    <script async id="MathJax-script" src="../assets/mathjax/tex-mml-chtml.js"></script>
+    <script>
+        /* 契约: 动画须有理由 + prefers-reduced-motion 降级 */
+        window.SCROLL_BEHAVIOR = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+    </script>
+
+
+    <style>
+        :root {
+            --bg: #f8f9fa; --card-bg: #ffffff; --card-radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.06);
+            --shadow-hover: 0 4px 12px rgba(0,0,0,0.1),0 2px 4px rgba(0,0,0,0.06);
+            --primary: #3b82f6; --primary-light: #eff6ff; --primary-dark: #1d4ed8;
+            --accent: #06b6d4; --accent-light: #ecfeff;
+            --success: #10b981; --success-bg: #ecfdf5;
+            --warning: #f59e0b; --warning-bg: #fffbeb;
+            --danger: #ef4444; --danger-bg: #fef2f2;
+            --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280;
+            --gray-600: #4b5563; --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --sidebar-width: 240px; --header-height: 48px;
+            --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            --font-mono: "SF Mono","Cascadia Code","Consolas",monospace;
+            --transition: 0.2s ease;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px}
+        body{font-family:var(--font-sans);background:var(--bg);color:var(--gray-800);line-height:1.6;overflow:hidden;height:100vh}
+        a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
+
+        #app{display:grid;grid-template-rows:var(--header-height) 1fr;grid-template-columns:var(--sidebar-width) 1fr;grid-template-areas:"header header" "sidebar content";height:100vh;max-width:1500px;margin:0 auto}
+
+        #header{grid-area:header;background:var(--card-bg);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:10}
+        #header h1{font-size:1.15rem;font-weight:700;color:var(--gray-900);display:flex;align-items:center;gap:6px}
+        .header-links{display:flex;align-items:center;gap:6px;font-size:0.875rem}
+        .header-links a{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;border:1px solid var(--gray-200);color:var(--gray-600);transition:var(--transition);font-weight:500;white-space:nowrap}
+        .header-links a:hover{background:var(--gray-50);text-decoration:none;border-color:var(--gray-300)}
+
+        #sidebar{grid-area:sidebar;background:var(--card-bg);border-right:1px solid var(--gray-200);overflow-y:auto;padding:8px 0;min-height:0}
+        .sidebar-section{margin-bottom:2px}
+        .sidebar-parent{display:flex;align-items:center;gap:6px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:0.875rem;color:var(--gray-700);border-left:3px solid transparent;transition:var(--transition);user-select:none}
+        .sidebar-parent:hover{background:var(--gray-50)}
+        .sidebar-parent .arrow{font-size:0.75rem;transition:transform 0.2s;margin-left:auto;color:var(--gray-400)}
+        .sidebar-parent.expanded .arrow{transform:rotate(90deg)}
+        .sidebar-children{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+        .sidebar-children.open{max-height:none}
+        .sidebar-child{display:flex;align-items:center;gap:6px;padding:6px 14px 6px 30px;cursor:pointer;font-size:0.875rem;color:var(--gray-600);border-left:3px solid transparent;transition:var(--transition)}
+        .sidebar-child:hover{background:var(--gray-50);text-decoration:none}
+        .sidebar-child .badge{margin-left:auto;font-size:0.75rem;padding:1px 6px;border-radius:10px;font-weight:500}
+        .badge-ok{background:var(--success-bg);color:var(--success)}
+        .badge-warn{background:var(--warning-bg);color:var(--warning)}
+        .badge-danger{background:var(--danger-bg);color:var(--danger)}
+        .badge-new{background:var(--gray-100);color:var(--gray-500)}
+
+        #content{grid-area:content;overflow-y:auto;padding:16px 20px 60px;scroll-behavior:smooth}
+
+        .card{background:var(--card-bg);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:var(--transition)}
+        .card:hover{box-shadow:var(--shadow-hover)}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+        .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
+
+        .status-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.8125rem;font-weight:600}
+        .status-new{background:var(--gray-100);color:var(--gray-500)}
+        .status-ok{background:var(--success-bg);color:var(--success)}
+        .status-warn{background:var(--warning-bg);color:var(--warning)}
+        .status-danger{background:var(--danger-bg);color:var(--danger)}
+
+        .data-table{width:100%;border-collapse:collapse;font-size:0.875rem}
+        .data-table thead th{background:var(--gray-50);padding:7px 9px;text-align:center;font-weight:600;color:var(--gray-600);font-size:0.8125rem;letter-spacing:0.03em;border-bottom:2px solid var(--gray-200)}
+        .data-table tbody td{text-align:center;padding:6px 9px;border-bottom:1px solid var(--gray-100)}
+        .data-table tbody tr:hover{background:var(--gray-50)}
+        .data-table .num{font-family:var(--font-mono);text-align:center}
+        .data-table .highlight{font-weight:700;color:var(--primary-dark)}
+        .data-table .up{color:var(--success);font-weight:600}
+        .data-table .down{color:var(--danger);font-weight:600}
+        .data-table .warn-cell{color:var(--warning);font-weight:600}
+        .head-arch-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+        .tk{margin:2px 0 10px;padding:6px 12px;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:4px;font-size:1rem;line-height:1.6;}
+        .info-box{padding:10px 14px;border-radius:8px;font-size:0.875rem;margin:8px 0;line-height:1.6}
+        .info-box.info{background:var(--primary-light);border-left:4px solid var(--primary)}
+        .info-box.success{background:var(--success-bg);border-left:4px solid var(--success)}
+        .info-box.warn{background:var(--warning-bg);border-left:4px solid var(--warning)}
+        .info-box.danger{background:var(--danger-bg);border-left:4px solid var(--danger)}
+
+        .source-line{font-size:0.8125rem;color:var(--gray-400);margin-top:8px}
+
+                @media (prefers-reduced-motion: reduce){
+            html,#content{scroll-behavior:auto!important}
+            *,*::before,*::after{transition:none!important;animation:none!important}
+        }
+        @media(max-width:768px){
+            #app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
+            #sidebar{display:none}
+            #content{padding:12px}
+            .head-arch-grid{grid-template-columns:1fr}
+        }
+        @media print{
+            html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+            #app{display:block!important;height:auto!important;max-width:100%!important}
+            #sidebar,#header{display:none!important}
+            #content{overflow:visible!important;height:auto!important;padding:0!important}
+            .card{box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;border:1px solid var(--gray-200)}
+            .card:hover{box-shadow:none!important}
+            a{color:var(--gray-800)!important;text-decoration:none!important}
+            .data-table{font-size:0.75rem!important}
+        }
+    
+        /* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+        .theme-switcher{position:relative}
+        .ts-btn{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.78rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .ts-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .ts-btn:active{transform:scale(0.97)}
+        .ts-panel{
+            /* fixed 定位（JS 打开时按按钮位置设置 top/right）：
+               脱离 header/nav-links 的 overflow 裁剪域，可覆盖任何内容 */
+            position:fixed;z-index:60;
+            width:250px;max-height:60vh;overflow-y:auto;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-radius:12px;
+            box-shadow:var(--shadow-hover);padding:8px;
+            display:flex;flex-direction:column;gap:2px;
+        }
+        .ts-panel[hidden]{display:none}
+        .ts-opt{
+            display:flex;align-items:center;gap:8px;
+            padding:7px 10px;border-radius:8px;border:none;background:transparent;
+            font-size:0.8rem;color:var(--gray-700);cursor:pointer;text-align:left;
+            font-family:inherit;
+        }
+        .ts-opt:hover{background:var(--gray-100)}
+        .ts-opt.sel{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .ts-opt .ts-dots{display:flex;gap:4px;flex-shrink:0}
+        .ts-opt .ts-dots i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);display:inline-block}
+        .ts-opt .ts-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ts-opt .ts-check{margin-left:auto;flex-shrink:0;visibility:hidden;font-size:0.9em}
+        .ts-opt.sel .ts-check{visibility:visible}
+
+        /* ═══════ 性能优化（M29）═══════
+           1) content-visibility 让视口外的卡片跳过布局与绘制（长页面滚动/锚点跳转的关键优化）
+           2) contain 把重排/重绘限制在卡片与表格行内部，折叠展开时不再牵动整页 */
+        .card{content-visibility:auto;contain-intrinsic-size:auto 900px;contain:layout style}
+        .fold-body{contain:layout paint}
+        .data-table tbody tr{contain:layout style}
+        .data-table{contain:layout}
+        @media print{.card{content-visibility:visible;contain:none}}
+
+    /* ═══════ M29 三段式（图表介绍 + Takeaway 框）═══════ */
+        .fig-intro{font-size:0.875rem;color:var(--gray-600);margin:2px 0 8px;line-height:1.65}
+        .fig-intro strong{color:var(--gray-800)}
+        .takeaway{display:block;margin:10px 0 4px;padding:8px 14px;background:var(--success-bg);
+                  border-left:3px solid var(--success);border-radius:4px;font-size:0.9rem;line-height:1.7}
+        .takeaway .tk-label{font-weight:700;color:var(--success);margin-right:2px}
+        .takeaway.warn{background:var(--warning-bg);border-left-color:var(--warning)}
+        .takeaway.warn .tk-label{color:var(--warning)}
+        .takeaway.danger{background:var(--danger-bg);border-left-color:var(--danger)}
+        .takeaway.danger .tk-label{color:var(--danger)}
+        .takeaway ul{margin:4px 0 0 18px}
+        
+/* ═══════ 折叠组件（R11 修复轮补注入：开合样式缺失致全站折叠失效） ═══════ */
+.fold{margin:10px 0}
+        .fold-head{
+            display:flex;align-items:center;gap:8px;width:100%;
+            padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;
+            background:var(--gray-50);cursor:pointer;font:inherit;
+            font-size:0.8rem;font-weight:600;color:var(--gray-700);text-align:left;
+            transition:var(--transition);
+        }
+        .fold-head:hover{background:var(--gray-100);color:var(--gray-900)}
+        .fold-head .fold-chevron{transition:transform .25s ease;color:var(--gray-400);font-size:0.7em}
+        .fold.open .fold-head .fold-chevron{transform:rotate(180deg)}
+        .fold-head .fold-hint{margin-left:auto;font-size:0.7rem;font-weight:400;color:var(--gray-400)}
+        .fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+        .fold.open .fold-body{grid-template-rows:1fr}
+        .fold-inner{overflow:hidden;min-height:0}
+        .fold-inner .fold-pad{padding-top:8px}
+</style>
+    <style id="baked-theme">
+        /* ═══════ 内联默认主题 · 人大红 Beamer ═══════
+           烘焙在页内 ⇒ 首帧即按人大红渲染，无需等 theme-pack.js 注入覆盖层（消除主题闪烁）。
+           运行时切到其他主题时，applyTheme 会把本 style 置 disabled，改由主题包覆盖层接管。 */
+        /* ═══════ 主题覆盖层 · 人大红 Beamer ═══════ */
+        :root {
+            --bg:#fdf8f8; --card-bg:#ffffff; --card-radius:8px;
+            --line:rgba(151,31,48,0.12);
+            --shadow:0 1px 2px rgba(151,31,48,0.05),0 2px 6px rgba(151,31,48,0.06);
+            --shadow-hover:0 4px 12px rgba(151,31,48,0.10),0 6px 16px rgba(151,31,48,0.08);
+            /* 校徽红 #971f30（RenminUniv.sty tsinghua RGB 151,31,48） */
+            --primary:#971f30; --primary-light:#f9eef0; --primary-dark:#6e1623;
+            --accent:#b83047; --accent-light:#fdf0f2;
+            --success:#1a7f37; --success-bg:#eef7f0;
+            --warning:#9a6700; --warning-bg:#faf4e3;
+            --danger:#c8372f; --danger-bg:#fbefee;
+            /* LaTeX beamer 衬线感：宋体 + Georgia */
+            --font-sans:"Songti SC","STSong","SimSun","Georgia","PingFang SC","Microsoft YaHei",serif;
+        }
+        /* 背景水印：beamer background.pdf 低透明度铺底（白色膜压淡） */
+        body{background:
+            linear-gradient(rgba(253,248,248,0.88),rgba(253,248,248,0.88)),
+            url(../assets/ruc-bg.png) center 30%/55% no-repeat,
+            var(--bg);}
+        ::selection{background:rgba(151,31,48,0.22);color:var(--gray-900)}
+        /* ── 顶导：校徽红底白字（beamer frametitle）── */
+        #header{background:var(--primary);border-bottom:1px solid rgba(255,255,255,0.25)}
+        #header .nav-brand{color:#ffffff}
+        #header .nav-brand a,#header .nav-brand span{color:#ffffff}
+        .nav-links a{color:rgba(255,255,255,0.85)}
+        .nav-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;text-decoration:none}
+        .nav-links a.active{background:rgba(255,255,255,0.24);color:#ffffff;font-weight:600}
+        .nav-links a:active{transform:scale(0.97)}
+        #header .header-right{color:rgba(255,255,255,0.8)}
+        .countdown{background:rgba(255,255,255,0.18);color:#ffffff}
+        .ts-btn{background:transparent;border-color:rgba(255,255,255,0.4);color:#ffffff}
+        .ts-btn:hover{border-color:#ffffff;color:#ffffff}
+        /* ── 底栏：白底 + 校徽红分隔线；logo 在 X 轴最右、Y 轴中心（基座 flex 布局） ── */
+        #footer{background:#ffffff;color:var(--gray-500);border-top:1px solid rgba(151,31,48,0.3)}
+        #footer .footer-meta strong{color:var(--primary-dark)}
+        #footer .footer-meta .sep{color:var(--gray-300)}
+        /* 校徽：底部声明栏右侧 logo（素材 assets/ruc-logo-1.png）；去占位虚线边框 */
+        #footer .footer-logo .logo-slot{
+            display:inline-block;width:140px;height:26px;
+            background:url(../assets/ruc-logo-1.png) center/contain no-repeat;
+            border:none;border-radius:0;padding:0;
+            color:transparent;font-size:0;
+            transform:translateY(-3px);   /* 整体上移，避开底缘裁切感 */
+        }
+        /* ── 侧边栏 ── */
+        #sidebar{border-right:1px solid rgba(151,31,48,0.15)}
+        .sidebar-parent:hover{background:#fdf3f4}
+        .sidebar-child:hover{background:#fdf3f4}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary-dark)}
+        /* ── 卡片与分节（beamer separation line 红细线）── */
+        .card{border-radius:8px;position:relative}
+        /* 背景图按左侧导引标签的模块粒度，铺在每个卡片右侧作淡背景 */
+        .card::after{
+            content:"";position:absolute;right:0;bottom:0;
+            width:100%;height:100%;
+            /* contain：图片按区域等比缩放、完整显示（绝不裁切）；
+               元素高度跟随卡片实时变化（折叠开合），背景尺寸随之自动重算，
+               纯 CSS 即动态适配，无需 JS 计算 */
+            background:url(../assets/ruc-bg.png) right bottom/contain no-repeat;
+            opacity:0.6;mix-blend-mode:multiply;
+            pointer-events:none;z-index:0;
+        }
+        .card>*{position:relative;z-index:1}
+        .card:hover{border-color:rgba(151,31,48,0.3)}
+        .card-header{border-bottom:1px solid rgba(151,31,48,0.25)}
+        .section-h4{border-bottom:2px solid var(--primary);padding-bottom:6px}
+        .section-h4.c-primary{border-bottom-color:var(--primary)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .info-box.info{border-color:rgba(151,31,48,0.3)}
+        .info-box.info::before{background:var(--primary)}
+        .info-box.info strong{color:var(--primary-dark)}
+        .data-table thead th{background:#fdf3f4;color:var(--primary-dark);border-bottom:2px solid rgba(151,31,48,0.35)}
+        .timeline::before{background:rgba(151,31,48,0.3)}
+        /* 图标容器：校徽红浅底 */
+        .quick-link-card .ql-icon{background:var(--primary-light);color:var(--primary-dark);border-radius:8px}
+        .quick-link-card:hover .ql-icon{background:var(--primary);color:#ffffff}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:#e3c8cd}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+        /* ── 兼容 week_report 页面结构：品牌区为 <h1>、导航为 .header-links ──
+           （模板结构用 .nav-brand/.nav-links；本主题顶栏为深色，文字统一白字保证对比度） */
+        #header h1{color:#ffffff}
+        #header h1 a{color:#ffffff}
+        #header .header-links a{color:rgba(255,255,255,0.88);border-color:rgba(255,255,255,0.28)}
+        #header .header-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;border-color:rgba(255,255,255,0.42)}
+        #header .header-right{color:rgba(255,255,255,0.82)}
+        #header .countdown{color:rgba(255,255,255,0.9)}
+        #header .ts-btn{color:#ffffff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.12)}
+        #header .ts-btn:hover{border-color:rgba(255,255,255,0.6);color:#ffffff}
+        #header .ts-cur{color:#ffffff}
+    </style>
+<script>window.A4R={mode:1,lang:1,themeKey:'labmeeting-theme',lightId:'11_ruc_beamer',darkId:'02_wwdc_dark'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+</head>
+<body data-default-theme="11_ruc_beamer" data-asset-prefix="../">
+
+<div id="app">
+
+<header id="header">
+    <h1><span data-zh>🧪 实验 Tricks 汇总 — 换头 / 换骨 / 模态融合 / 课程 / 分组专家（非 HBCE·HLUP 主线的结构创新）</span><span data-en>🧪 Experiment Tricks Roundup — Head swaps / backbone swaps / modality fusion / curricula / grouped experts (structural innovations outside the HBCE·HLUP mainline)</span></h1>
+    <div class="header-links">
+        <a href="../index.html"><span data-zh>← 返回总览</span><span data-en>← Back to Overview</span></a>
+    
+        <span style="background:#b45309;color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;padding:3px 11px;border-radius:999px;white-space:nowrap;margin-right:10px;"><span data-zh>演示数据</span><span data-en>Demo data</span></span>
+                <div class="theme-switcher" id="theme-switcher">
+                    <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                        <span class="ic ic-palette"></span><span class="ts-cur"><span data-zh>主题</span><span data-en>Theme</span></span>
+                    </button>
+                    <div class="ts-panel" id="ts-panel" hidden></div>
+                </div>
+    </div>
+</header>
+
+<nav id="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-parent expanded" onclick="this.classList.toggle('expanded');document.getElementById('children-nav').classList.toggle('open')"><span data-zh>📄 导航</span><span data-en>📄 Navigation</span><span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-nav">
+            <a class="sidebar-child" href="../index.html"><span data-zh>← 返回总览</span><span data-en>← Back to Overview</span></a>
+            <a class="sidebar-child" href="../01_mdsed_paper/index.html"><span data-zh>📋 MDS-ED 论文详解</span><span data-en>📋 MDS-ED Paper Deep Dive</span></a>
+            <a class="sidebar-child active" href="index.html"><span data-zh>🧪 实验 Tricks 汇总</span><span data-en>🧪 Experiment Tricks Roundup</span></a>
+        </div>
+    </div>
+    <div class="sidebar-section" id="sidebar-inpage" style="display:none;">
+        <div class="sidebar-parent expanded" onclick="this.classList.toggle('expanded');document.getElementById('children-inpage').classList.toggle('open')"><span data-zh>📑 页内导航</span><span data-en>📑 On This Page</span><span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-inpage"></div>
+    </div>
+</nav>
+
+<main id="content">
+
+<div class="card" id="sec-takeaway" style="border:2px solid var(--primary);">
+    <div class="card-header">
+        <div class="card-title">🎯 一句话结论（Takeaways）</div>
+        <span class="status-tag status-ok">组会速览</span>
+    </div>
+    <ul style="margin:4px 0 0 20px;font-size:1rem;line-height:1.9;">
+        <li><strong>换头（LabelAttention）涨 +0.54pp，但加深层数不行</strong>——增益来自每个标签的独立容量，不是标签间交互。</li>
+        <li><strong>换骨（ECG-CPC 权重）掉 1.78pp</strong>——原 MDS-ED 骨架不可替代，换骨方向关闭。</li>
+        <li>模态消融：<strong>只给表格就追平 baseline，只给 ECG 掉 6pp</strong>——表格信息是主力，ECG 是补充。</li>
+        <li>融合方式：<strong>注意力 skip 底座优于拼接</strong>（+0.5pp）；再叠 HBCE 违反率→0.01% 且不掉点。</li>
+        <li>缺失值填充：<strong>学习式填充无增益</strong>（三套独立实现都 ≈0），但「<strong>标记出哪里缺</strong>」这个动作本身值 +0.86pp。</li>
+        <li>按疾病章分组训练标签专家：<strong>全部变体掉点</strong>——分组不如不分组，方向止损。</li>
+        <li>分层训练：<strong>课程 × HBCE 拿到家族最高 0.8442 / VR 0.008%</strong>；冻结上层 / 加长到 100 轮 / invpref 分配全都无效。</li>
+    </ul>
+</div>
+
+
+<div class="card" id="sec-tricks-overview">
+    <div class="card-header">
+        <div class="card-title">🧪 实验 Tricks 汇总概览</div>
+        <span class="status-tag status-ok">✅ 7 个方向（自总览页移植，2026-09-11）</span>
+    </div>
+    <div style="font-size:1rem;line-height:1.8;">
+        <p><strong>本页定位：</strong>总览页瘦身后，与 HBCE（方法1）或二阶段预训练微调（方法2 HLCP/HLUP）主线无关的<strong>结构创新/训练技巧类实验</strong>集中于此——共 7 个方向：预测头架构（M6）、换骨（M13）、输入模态消融、多模态融合（M14）、tabular 缺失值填充（M20）、按疾病分组的标签专家（M22）、分层训练（M18）。</p>
+        <p><strong>共同脉络：</strong>除 M6（换头 +0.54pp 成功）外，其余方向的结论多为<strong>否定/止损</strong>（换骨关闭、M22 分组止损）或<strong>有界收益</strong>（M14 融合 +0.2pp 内、M18 课程×HBCE 需 3 种子）——结构创新的探索已基本收敛，主线聚焦于「HBCE 层级约束」与「HLUP 链式校准」。</p>
+    </div>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：方向总览表（本页全部方向）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;margin-top:8px;">
+    <thead><tr><th>方向</th><th>卡片</th><th>核心结论</th></tr></thead>
+    <tbody>
+        <tr><td>M6 预测头架构</td><td>换头 LabelAttention +0.54pp</td><td class="num">✅ 成功（per-label 容量机制，M16 五臂裁决 + Q2 归因）</td></tr>
+        <tr><td>M13 换骨（ECG-CPC）</td><td>权重迁移 −1.78pp</td><td class="num down">❌ 关闭（SDS 主线 = 原始 MDS-ED + I2 换头）</td></tr>
+        <tr><td>输入模态消融</td><td>tabular-only / signal-only</td><td class="num">tabular 追平 baseline；signal-only 差 −6pp（模态互补证据）</td></tr>
+        <tr><td>M14 多模态融合</td><td>F0-F5 五形态</td><td class="num">F3 skip 点估计最优（+0.6pp 内，⚠️单次运行）</td></tr>
+        <tr><td>M20 tabular 填充</td><td>五臂阶梯 + 三套实现</td><td class="num">填充器效应量 ≈ 0（三套合并）；值信息≫缺失模式；09-15 mask 回注核验通过（改进轮待租卡）</td></tr>
+        <tr><td>M22 分组标签专家</td><td>三探针 + 路径 B + OTH</td><td class="num down">⛔ 彻底关闭（Q1/Q2 双否 + 路径 B 探针否决 + OTH 兜底证伪，2026-09-11）</td></tr>
+        <tr><td>M18 分层训练</td><td>13 臂全链</td><td class="num">✅ s1c（课程×HBCE）终态（agg1 全家族最高，⚠️待 3 种子）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+</div>
+
+<!-- ═══ M6: 预测头架构改进 ═══ -->
+<div class="card" id="sec-m6" style="border:2px solid var(--accent);">
+    <div class="card-header">
+        <div class="card-title">🧠 M6: 预测头架构改进 — LabelAttention Head (+0.54pp)</div>
+        <span class="status-tag status-ok">✅ Step 1 + D1/D2 + n_layers + M16 五臂裁决</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>当前 head.linear（单层 Linear，512→1428）容量不足——HBCE 24 组实验全低于 baseline、HMLC 0718 加载即崩溃，两条独立实验线指向同一根因：<strong>预测头表达能力的瓶颈限制了损失函数改进的空间</strong>。M6 尝试将单层线性 head 替换为三种更复杂的架构（MLP / ResNet / LabelAttention），在纯 BCE_focal 下验证"换头能否涨点"。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 核心指标：四组 Head 对比（Step 1: BCE_focal，20 epochs，从头训练）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>LabelAttention 头是唯一过门槛的换头方案（+0.54pp）</strong>；MLP +0.28pp 方向对但不足，ResNet 不涨反跌 −0.20pp。</p>
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin:-4px 0 6px;">⚠️ 口径（2026-08-14 修正）：本表为 <strong>val 集 (agg0)</strong> 口径——agg0=val 集 / agg1=test 集；数值不变，仅标签更正。test 侧 [95% CI] 仅 LabelAttention 与 Control 两行有（来源手稿 Table 2「Attention-mask intervention series」的 Full (LA) / Linear head 行，内置 B=1000）；MLP / ResNet 手稿未做区间，故不标。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：四组 Head 核心指标表（Step 1: BCE_focal）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>Head</th><th>Val Macro AUROC (agg0) [95% CI]</th><th>Test Macro AUROC (agg1)</th><th>Δ val (pp)</th><th>Δ test (pp)</th><th>参数量</th><th>判定</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>LabelAttention Head</strong></td><td class="num highlight"><strong>0.8319 [0.8278, 0.8354]</strong></td><td class="num">0.8423 <span style="font-size:0.75rem;color:var(--gray-500);">[0.8389, 0.8457]</span></td><td class="num up"><strong>+0.54</strong></td><td class="num up"><strong>+0.67</strong></td><td class="num">~2.5M</td><td>🟡 0.5~1pp</td></tr>
+        <tr><td>MLP Head</td><td class="num">0.8293 [0.8256, 0.8328]</td><td class="num">0.8354</td><td class="num up">+0.28</td><td class="num down">−0.02</td><td class="num">~2.7M</td><td>🟢 &lt;0.5pp</td></tr>
+        <tr><td>Control (Linear head)</td><td class="num">0.8264 [0.8225, 0.8304]</td><td class="num">0.8356 <span style="font-size:0.75rem;color:var(--gray-500);">[0.8323, 0.8388]</span></td><td class="num">0.00</td><td class="num">0.00</td><td class="num">0.92M</td><td>baseline</td></tr>
+        <tr><td>ResNet Head</td><td class="num down">0.8245 [0.8204, 0.8284]</td><td class="num down">0.8316</td><td class="num down">−0.20</td><td class="num down">−0.40</td><td class="num">~7.2M</td><td>🔴 下跌</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis/m6_head_macro_auroc.png" alt="M6 Head Macro AUROC"
+         style="max-width:75%;height:auto;border-radius:8px;border:1px solid var(--gray-200);margin-top:8px;">
+
+    <div class="info-box success" style="margin-top:10px;">
+        <strong>📐 关键发现：</strong>LabelAttention Head 是唯一通过 Step 1 门槛的方案（CI 下界 0.8278 > baseline 点估计 0.8264），涨点 +0.54pp 具有统计可靠性。MLP 方向正确但涨幅有限（+0.28pp，CI 重叠）。ResNet 不涨反跌（−0.20pp）——残差连接的容量增益未转化为性能提升，7.2M 参数在 20 epoch 下陷入次优解。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">🔍 四种 Head 架构示意图（特点与区别）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 四架构沿「容量 × 归纳偏置」两轴展开——<strong>LA 是唯一引入 per-label query token 的方案</strong>。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        四种 head 共享相同的<strong>特征提取部分</strong>（ECG 波形 → TimeSeriesEncoder(S4) + 静态表格 → StaticEncoder(MLP) → 特征拼接），区别仅在<strong>融合特征 → 1428 维 logit</strong> 的映射层。按容量（参数量）与归纳偏置（是否引入标签间交互/残差结构）两条轴区分：
+    </p>
+    <div class="head-arch-grid" style="margin-top:8px;">
+        <div>
+            <img src="../../draw-io-img/01_baseline_architecture/01_baseline_architecture.png" alt="Baseline 架构（Linear Head）"
+                 style="width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <p style="font-size:0.8125rem;color:var(--gray-600);margin-top:4px;"><strong>① Baseline（Linear Head，0.92M）</strong>——融合特征经单层 <code>nn.Linear(512, 1428)</code> 直接映射，无激活函数、无标签间交互。1428 个标签的 logit 是输入特征的独立线性组合，层级关系只能靠权重向量"碰巧"呈现。这是所有换头实验的对照。</p>
+        </div>
+        <div>
+            <img src="../../draw-io-img/02_mlp_head/02_mlp_head.png" alt="MLP Head 架构"
+                 style="width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <p style="font-size:0.8125rem;color:var(--gray-600);margin-top:4px;"><strong>② MLP Head（~2.7M）</strong>——Linear → BN → ReLU → Dropout → Linear(hidden) → BN → ReLU → Linear(1428)。纯增加非线性层与宽度（hidden 1024→512），给每个标签更大的参数空间，但<strong>仍未引入标签间交互</strong>。结果 +0.28pp（CI 重叠，方向正确涨幅有限）。</p>
+        </div>
+        <div>
+            <img src="../../draw-io-img/03_resnet_head/03_resnet_head.png" alt="ResNet Head 架构"
+                 style="width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <p style="font-size:0.8125rem;color:var(--gray-600);margin-top:4px;"><strong>③ ResNet Head（~7.2M）</strong>——2 个残差块（Linear→BN→ReLU→Linear→BN→+input→ReLU），identity shortcut 保证"至少不比输入差"的信息流。但 512 维输入 → 1428 维输出的信息瓶颈未改善，7.2M 参数在 20 epoch 下陷入次优解，<strong>不涨反跌 −0.20pp</strong>。</p>
+        </div>
+        <div>
+            <img src="../../draw-io-img/04_label_attention_head/04_label_attention_head.png" alt="LabelAttention Head 架构"
+                 style="width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <p style="font-size:0.8125rem;color:var(--gray-600);margin-top:4px;"><strong>④ LabelAttention Head（~2.5M）</strong>——每个 ICD 标签一个<strong>独立可学习 query token</strong>（1428+CLS），经 self-attention 与上下文特征交互，实现 per-label 特征路由。注意力交互的主要作用是为不同标签关注特征空间的不同方向（<strong>而非标签间传播层级信息</strong>，见②消融）。+0.54pp 为四种方案最优。</p>
+        </div>
+    </div>
+    <p style="font-size:0.8125rem;color:var(--gray-400);margin-top:8px;">
+        架构图来源：<code>draw-io-img/{01_baseline_architecture,02_mlp_head,03_resnet_head,04_label_attention_head}/*.png</code>（draw.io 导出）
+    </p>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 消融分析：LabelAttention 的增益来源</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>增益来自 per-label 投影增强、不是层级传播</strong>（深度分层 Δ 无梯度、Spearman ρ≈0）。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        <strong>核心问题：</strong>+0.54pp 是因为 (a) label self-attention 传播了 ICD 层级信息，还是 (b) 每个标签的 query token 学到了更丰富的<strong>独立</strong>特征投影？
+    </p>
+    <div class="info-box info"><strong>📌 两种假设的可检验分歧：</strong>「层级传播」预测深层标签（有祖先可咨询）Δ 随深度递增、「独立投影」预测增益全域均匀无深度梯度——下表深度分层 Δ 即裁决判据。</div>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：LabelAttention 增益来源消融表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:780px;margin-top:8px;">
+    <thead><tr><th>维度</th><th>分组</th><th>N</th><th>mean Δ (pp)</th><th>改善率</th></tr></thead>
+    <tbody>
+        <tr><td rowspan="3">按深度</td><td>Depth 0 (root)</td><td class="num">450</td><td class="num">+0.43</td><td class="num">62.0%</td></tr>
+        <tr><td>Depth 1</td><td class="num">628</td><td class="num">+0.53</td><td class="num">61.0%</td></tr>
+        <tr><td>Depth 2 (最深)</td><td class="num">350</td><td class="num">+0.71</td><td class="num">63.1%</td></tr>
+        <tr><td rowspan="2">叶/内部</td><td>叶子节点</td><td class="num">861</td><td class="num">+0.49</td><td class="num">—</td></tr>
+        <tr><td>内部节点</td><td class="num">567</td><td class="num"><strong>+0.61</strong></td><td class="num">—</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:8px;"><strong>表格怎么读：</strong>mean Δ = 每标签「LabelAttention vs baseline」per-label AUROC 改善量（pp）按 ICD 层级分组均值——「层级传播」预测深层/内部节点受益更多、「独立投影」预测无深度梯度，此表即裁决判据。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:6px;">
+        <strong>实际数据与假设 (a) 的预测不符：</strong>三个深度桶的 Δ 几乎相同（+0.43 / +0.53 / +0.71，最大差距仅 0.28pp），改善率也都在 61~63% 之间——深层标签并未系统性获益更多。叶/内部对比中，内部节点仅比叶子多 0.12pp，效应量太小不足以支撑"层级传播"假说。作为对照，若假设 (a) 成立，预期应看到 Depth 2 桶显著高于 Depth 0 桶（例如 >1pp 的梯度），但数据完全没有这种形态。
+    </p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:6px;">
+        <strong>Spearman ρ(depth, Δ) = +0.0052 (p = 0.8513)</strong> — 这是对上述观察的定量检验：把 1428 个标签的深度（0/1/2）与各自 Δ 做秩相关，ρ 几乎为零且不显著，说明「标签越深改善越大」的趋势在统计上不存在。三个深度的 Δ 直方图几乎同分布（见下图）。
+    </p>
+    <div style="margin-top:8px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis/m6_ablation_depth_delta.png" alt="消融:深度分层Δ直方图"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;margin-bottom:10px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis/m6_ablation_depth_scatter.png" alt="消融:深度vsΔ散点图"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+
+    <div class="info-box success" style="margin-top:10px;">
+        <strong>📐 消融结论：增益来自"per-label 特征投影增强"，而非"层级信息传播"。</strong><br>
+        如果 self-attention 确实传播了层级信息，深层标签（有更多祖先可"咨询"）应系统性地受益更多——但 Spearman ρ 几乎为零，数据完全不支持。LabelAttention 的增益本质是：<strong>每个 ICD 标签拥有独立的可学习 query token（而非共享的线性投影），通过 attention 为每个标签学到更丰富的输入特征映射</strong>。这是 per-label parametrization enrichment，与 ICD 层级结构无关。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--danger);">③ D1/D2 干预实验：树结构 attention 证伪（08-12 掩码真激活重跑复现）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>树结构 attention 证伪</strong>：掩码真激活后仍无增益（+0.09pp）——D3/D4 不执行。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        消融分析是相关性证据——为获得<strong>因果性</strong>证据，执行了两组干预实验：<strong>D1</strong> 将全连接 self-attention（1429²≈2M 对）限制为仅祖先/子孙/自身（0.4% 非零对），若层级传播假说成立则性能应提升；<strong>D2</strong> 在 attention score 上叠加基于树距离的可学习偏置（6 个标量参数），软约束层级关系。若两者均无效，则层级假说在因果层面被证伪。<strong>08-12 对 D1 完成激活审计 + 掩码真激活重跑复现</strong>（原始 08-04 D1 掩码未激活，取证无效，见下方复现说明）。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：D1/D2 干预结果表（Head × agg0/agg1）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;margin-top:8px;">
+    <thead><tr><th>Head</th><th>Val Macro AUROC (agg0) [95% CI]</th><th>Test Macro AUROC (agg1)</th><th>micro (val)</th><th>Δ val vs LA (pp)</th><th>Δ test vs LA (pp)</th><th>判定</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>LabelAttention（原始，基准）</strong></td><td class="num highlight"><strong>0.8319 [0.8278, 0.8354]</strong></td><td class="num">0.8423 <span style="font-size:0.75rem;color:var(--gray-500);">[0.8389, 0.8457]</span></td><td class="num">0.9196</td><td class="num">0.00</td><td class="num">0.00</td><td>—</td></tr>
+        <tr style="background:var(--warning-bg);"><td>D1: Tree-Masked（08-12 重跑，掩码真激活）</td><td class="num">0.8328 [0.8291, 0.8366]</td><td class="num">0.8419 <span style="font-size:0.75rem;color:var(--gray-500);">[0.8386, 0.8452]</span></td><td class="num">0.9202</td><td class="num up">+0.09</td><td class="num down">−0.04</td><td>🟢 持平（CI 完全重叠）</td></tr>
+        <tr style="background:var(--warning-bg);"><td>D2: Ancestor-Bias</td><td class="num">0.8318 [0.8280, 0.8356]</td><td class="num">0.8405</td><td class="num">0.9198</td><td class="num">−0.003</td><td class="num down">−0.18</td><td>🟢 持平（CI 完全重叠）</td></tr>
+        <tr><td>Control (Linear head，参照)</td><td class="num">0.8264 [0.8225, 0.8304]</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td>baseline</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin:4px 0 6px;">test 侧 [95% CI] 仅 LabelAttention 与 D1 两行有（来源手稿 Table 2 的 Full (LA) / Tree 行，内置 B=1000）；D2（Ancestor-Bias 软偏置）与 Control 行手稿未做区间/未评估，故不标。</p>
+    <div style="margin-top:8px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_d1d2/m6_d1d2_macro_auroc.png" alt="M6 D1/D2 Macro AUROC"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;"><strong>🔬 08-12 重跑复现：</strong>原 D1 树掩码因 lbl_itos 注入缺失从未激活（0.8327 为无效取证）；修复设备 bug 后掩码真激活（仅 0.34% 祖先/子孙对放行），val 0.8328 [0.8291,0.8366]（+0.09pp）与对照 CI 完全重叠——激活前后几乎同分，树先验方向证伪结论维持。</div>
+
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:10px;">
+        <strong>完整 per-label 确认（08-12 重跑数据）：</strong>D1 改善 355 / 恶化 303 / 持平 770 个标签（mean Δ +0.09pp），Spearman ρ(depth, Δ)=+0.0036 (p=0.8999)；按深度分层 Depth0 +0.08pp (n=450) / Depth1 +0.17pp (n=628) / Depth2 −0.03pp (n=350)——<strong>无系统性深度相关</strong>，per-label 与层级两个层面都确认树掩码无系统增益。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：D1/D2 变体对照表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;margin-top:8px;">
+    <thead><tr><th>变体</th><th>改善</th><th>恶化</th><th>持平</th><th>mean Δ (pp)</th><th>Spearman ρ(depth, Δ)</th></tr></thead>
+    <tbody>
+        <tr><td>D1 Tree-Masked（重跑）</td><td class="num">355</td><td class="num">303</td><td class="num">770</td><td class="num">+0.09</td><td class="num">+0.0036 (p=0.8999)</td></tr>
+        <tr><td>D2 Ancestor-Bias</td><td class="num">342</td><td class="num">334</td><td class="num">752</td><td class="num">−0.00</td><td class="num">+0.0233 (p=0.3786)</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:8px;">
+        <strong>VR 层级一致性</strong>（重跑数据）：LA soft=13.44% / hard=0.0023%；D1 soft=12.81%（−0.63pp）/ hard=0.0017%；D2 soft=12.17%（−1.26pp）——树掩码略降违反率（attention 砍到祖先-后代 pair 后输出更贴合层级），但量级微小，不影响不涨点的核心结论。
+    </p>
+    <div style="margin-top:8px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_d1d2/m6_d1d2_per_label_delta_hist.png" alt="M6 D1/D2 per-label delta 直方图"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;"><strong>📐 D1/D2 结论：</strong>树结构 attention 方向整体放弃——D1 掩码真激活仅 +0.09pp、D2 −0.003pp 在噪声内；⚠️ 2026-08-27 复审：二者对照不构成严格单变量（D1 同时改稀疏度+偏置、D2 bias 初始≈0），证据链已由 M16 五臂掩码阶梯（单变量严格对照）重建，结论方向一致、证据等级升级。</div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--danger);">④ n_layers 扫描（2026-08-13）：加深注意力层数不涨点，n_layers=1 最优</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>n_layers = 1 最优</strong>；l2/l3 噪声内持平、<strong>l4/l5 崩塌 −13~−15pp</strong>（初期即崩 + 表征坍缩）。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        <strong>动机：</strong>§8.5 消融确认增益来自 per-label 特征投影增强——验证"更深 attention（增加 n_layers）能否增强该机制进一步涨点"。固定纯 BCE_focal，仅 <code>head.n_layers = 1/2/3/4/5</code> 变化（其余超参不变）。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：n_layers 扫描全表（1–5 × 双口径）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;margin-top:8px;">
+    <thead><tr><th>n_layers</th><th>val macro (agg0) [95% CI]</th><th>test macro (agg1)</th><th>Δ val vs l1 (pp)</th><th>Δ val vs control (pp)</th><th>Δ test vs control (pp)</th><th>val micro</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td><strong>1（默认）</strong></td><td class="num highlight"><strong>0.8324 [0.8286, 0.8357]</strong></td><td class="num">0.8411</td><td class="num">—</td><td class="num up"><strong>+0.60</strong></td><td class="num up"><strong>+0.55</strong></td><td class="num">0.9200</td></tr>
+        <tr><td>2</td><td class="num">0.8305 [0.8265, 0.8342]</td><td class="num">0.8411</td><td class="num">−0.19</td><td class="num up">+0.41</td><td class="num up">+0.55</td><td class="num">0.9191</td></tr>
+        <tr><td>3</td><td class="num">0.8331 [0.8296, 0.8368]</td><td class="num">0.8397</td><td class="num">+0.07</td><td class="num up">+0.67</td><td class="num up">+0.41</td><td class="num">0.9194</td></tr>
+        <tr style="background:var(--danger-bg);"><td>4</td><td class="num down">0.6956 [0.6902, 0.7083]</td><td class="num down">0.6992</td><td class="num down"><strong>−12.90</strong></td><td class="num down"><strong>−12.30</strong></td><td class="num down"><strong>−12.86</strong></td><td class="num">0.8703</td></tr>
+        <tr style="background:var(--danger-bg);"><td>5</td><td class="num down">0.6765 [0.6708, 0.6823]</td><td class="num down">0.6772</td><td class="num down"><strong>−14.81</strong></td><td class="num down"><strong>−14.21</strong></td><td class="num down"><strong>−15.06</strong></td><td class="num">0.8329</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_nlayers/m6_nlayers_macro_micro.png" alt="n_layers 扫描宏观指标"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_nlayers/m6_nlayers_delta_vs_l1.png" alt="Δ vs l1 条形图"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        <strong>批次一致性核验：</strong>l1 = 0.8324 与 §8.2 M6-C（0.8319）CI 完全重叠 ✓；scores pkl 与日志解析互证 diff ≤ 1e-6 ✓。<strong>浅层无增益：</strong>l2/l3 的 CI 与 l1 完全重叠，差异在训练噪声量级——该 head 的容量增益在单层已饱和（与 MLP 扩层经验一致）。
+    </p>
+
+    <div class="info-box warn" style="margin-top:10px;"><strong>📐 深度崩塌机理（l4/l5 −13~−15pp）：</strong>初始化后第一轮即学不动（ep0 即峰值后单调下滑）+ over-smoothing 表征坍缩（标签间输出方差缩水 4 倍 0.0024→0.0006、正负区分度 +0.19→+0.09）+ 深层标签受损更重（ρ(depth,Δ)=−0.134/−0.137，p&lt;0.001）；l5 soft VR 25.13% 是坍缩副产物而非独立原因。</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_nlayers/m6_nlayers_val_trajectory.png" alt="val 轨迹对比（初期即崩证据）"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        <img src="../../meeting_records/20260725/M6_预测头架构改进/analysis_nlayers/m6_nlayers_pred_degeneration.png" alt="输出退化对比（表征坍缩证据）"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+    </div>
+
+    <div class="info-box success" style="margin-top:10px;">
+        <strong>📐 结论：n_layers=1 即最优，LabelAttentionHead 默认配置确认。</strong><br>
+        增加层数不能提升性能：浅层（2-3 层）噪声内持平，深层（4-5 层）急剧崩塌（−13~−15pp，比 control 还差 12~14pp）。该结果界定了<strong>"容量增强"路线的收益边界（+0.5~0.6pp，容量≠深度）</strong>，可作为论文讨论章节素材。per-label 投影增强主线的其余选项（调大 <code>hidden_dim</code>、per-label FFN）仍待探索。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">⑤ M16 五臂掩码阶梯：干预级裁决（2026-08-28）——per-label 容量成立，交互零贡献</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>per-label 容量成立（H1）、标签间交互零贡献（H2/H3/H4 全排除）</strong>——五臂单变量干预级证据。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        <strong>背景：</strong>② 消融（ρ≈0）是观测证据、③ D1/D2 的对照不构成严格控制变量（见上方修正框）——为拿到干预级证据，M16 设计了<strong>五臂 attention 掩码阶梯</strong>（单变量严格对照）：M0 无掩码 / M1 只留自身+context（零标签间交互）/ M2 祖先-子孙（树）/ M3 随机 pair（与 M2 同密度，控制稀疏度变量）/ M4 全部除祖先-子孙（跨树）。同机 5090、评估 mode=none 同口径。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：M16 五臂掩码阶梯裁决表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;margin-top:8px;">
+    <thead><tr><th>臂</th><th>掩码</th><th>val (agg0) [95% CI]</th><th>test (agg1) [95% CI]</th><th>Δ val vs M0</th><th>Δ test vs M0</th><th>soft VR (test)</th></tr></thead>
+    <tbody>
+        <tr><td>M0 Full (LA)</td><td>无掩码（所有 pair）</td><td class="num">0.8319 [0.8278, 0.8354]</td><td class="num">0.8423</td><td class="num">—</td><td class="num">—</td><td class="num">13.44%</td></tr>
+        <tr style="background:var(--success-bg);"><td><strong>M1 Self-only（零交互）</strong></td><td>只允许自身 + context</td><td class="num highlight"><strong>0.8333 [0.8296, 0.8372]</strong></td><td class="num highlight"><strong>0.8433 [0.8400, 0.8470]</strong></td><td class="num up"><strong>+0.14pp</strong></td><td class="num up"><strong>+0.10pp</strong></td><td class="num up">12.89%</td></tr>
+        <tr><td>M2 Tree</td><td>祖先/子孙 + 自身（D1）</td><td class="num">0.8328 [0.8291, 0.8366]</td><td class="num">0.8419</td><td class="num up">+0.09pp</td><td class="num down">−0.04pp</td><td class="num up">12.81%</td></tr>
+        <tr><td>M3 Random</td><td>随机 pair（密度同 Tree）</td><td class="num">0.8336 [0.8296, 0.8372]</td><td class="num">0.8432 [0.8399, 0.8465]</td><td class="num up">+0.17pp</td><td class="num up">+0.09pp</td><td class="num down">14.26%</td></tr>
+        <tr><td>M4 Anti-tree</td><td>全部 pair 除祖先/子孙</td><td class="num">0.8326 [0.8290, 0.8364]</td><td class="num down">0.8407 [0.8373, 0.8442]</td><td class="num up">+0.07pp</td><td class="num down">−0.16pp</td><td class="num">12.67%</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        <strong>test 排名：M1 (0.8433) &gt; M3 (0.8432) &gt; M0 (0.8423) &gt; M2 (0.8419) &gt; M4 (0.8407)</strong>——全部高于 baseline 0.8356，CI 均重叠（差异在噪声量级），但方向信息明确。
+    </p>
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 四假设裁决：</strong>H1 容量 ✅ 成立（M1 切断交互不降反微升，LA +0.54pp 增益 100% 来自 per-label query token）；H2 层级交互 ❌ / H3 通用交互 ❌ / H4 跨树交互 ❌（M4 跨树 pair 最多却唯一偏负 −0.16pp = 交互是噪声）；VR 维度镜像解耦（M1 12.89% &lt; M0 13.44% &lt; M3 Random 14.26%）——交互抬 VR、树先验降 VR、容量不动 VR，「层级保证 × per-label 容量」正交叙事证据链完整。</div>
+    <div style="margin-top:8px;">
+        <img src="../../draw-io-img/16_mask_ladder_m0_m4/16_mask_ladder_m0_m4.png" alt="M16 五臂掩码阶梯示意图"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+    <div class="info-box info" style="margin-top:10px;">
+        <strong>📌 论文叙事定稿（M16 §3.2.1a）：</strong>LA 升级为 <strong>"1428 个独立分类器的共享 backbone 参数化，attention 可摘除"</strong>——判别性能 = per-label query token 容量（M1 已证明），交互零贡献（M2/M3/M4 均未超过 M1）；输出一致性 = 与交互负相关（M1&lt;M0&lt;M3），显式树先验（D1/D2）可机械改善。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">⑥ M16 Q2 疾病归因：LA 增益让哪些疾病受益（2026-09-02，M16 §3.3）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>增益全域弥漫、低频难标签受益最大（ρ=−0.190）、急性组弱</strong>（+0.08 vs 慢性 +0.58）——直接喂论文 Discussion。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);"><strong>动机：</strong>Q1 裁决后追问"哪些疾病受益"——对 1428 标签标注深度/频率/急慢性/章节做四假设检验；整体 mean Δ=+0.54pp、888 改善/540 恶化、Δ 范围 [−16.80,+13.85]pp。</p>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        <strong>Top-20 改善标签（Δ ≥ 8.0pp，多为慢性/表格优势类）：</strong>g510 +13.85（G 章）/ g51 +12.97 / g891 +12.44 / i80 +11.94（I 章）/ k81 +11.40（K 章）/ z8585 +11.16 / n289 +11.15 / i519 +10.76 / b9561 +10.72 / b954 +10.29 / m6283 +10.22 / z77 +9.36 / k2980 +9.33 / k298 +9.28 / z803 +8.66 / k529 +8.33 / j329 +8.31 / m100 +8.30 / z9641 +8.05（急性）/ z8505 +8.02。
+        <strong>Bottom-20 恶化标签（Δ ≤ −7.6pp）：</strong>g70 −16.80 / g44 −16.12 / s80 −15.00 / g894 −10.51 / s30 −10.06 / d59 −9.19 / t78 −8.96 / r1012 −8.69 / m940 −8.66 / m2556 −8.65 / e89 −8.37 / h90 −8.34 / t88 −8.30 / z8504 −8.25 / r1032 −8.17 / v180 −8.07 / g935 −8.04 / f13 −7.75 / i517 −7.65 / z88 −7.56。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Q2 疾病归因：假设裁决表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;margin-top:8px;">
+    <thead><tr><th>假设</th><th>检验</th><th>结果</th><th>结论</th></tr></thead>
+    <tbody>
+        <tr><td>H-A 章节集中性</td><td>各章 mean Δ</td><td class="num">全部章节 ∈ [0.29, 2.12]pp 均 &gt; 0（无整体负章节）；最高 B 1.86 / L 0.97 / N 0.92 / V 0.90 / Z 0.69 / J 0.66 / K 0.65 / M 0.64；最低 T 0.29 / F 0.44 / S 0.46（仍正）</td><td>❌ <strong>不集中在某个器官系统</strong>——提升是全书（24 章）分布的，各章节皆受益</td></tr>
+        <tr><td>H-B 急/慢性</td><td>三分组 mean Δ</td><td class="num">持平组 +0.63 / 慢性组 +0.58 / <strong>急性组仅 +0.08</strong></td><td>⚠️ <strong>急性组（ECG 优势标签）受益明显更弱</strong>——LA 对 ECG 原本擅长的急性事件增益最小</td></tr>
+        <tr><td>H-C 频率/难易度</td><td>Spearman ρ(baseline_auroc, Δ)</td><td class="num"><strong>−0.190 (p &lt; 0.001)</strong></td><td>✅ <strong>显著负相关</strong>——越难（低频/低 AUROC）的标签受益越大，验证"per-label query 为低频标签提供额外表达空间"</td></tr>
+        <tr><td>深度（沿用 M6 §8.5）</td><td>Spearman ρ(depth, Δ)</td><td class="num">+0.0052 (p=0.84)</td><td>＝ 与 M6 §8.5 完全一致——判别增益与层级深度无关（再次确认）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:8px;">
+        <strong>"越难受益越大"的分桶证据（分桶仅为说明工具，结论以整条 ρ = −0.190 为准）：</strong>按 baseline（线性头）per-label AUROC 分五桶，Δ 呈强单调递减——
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Q2 疾病归因：难度桶增益表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:620px;margin-top:6px;">
+    <thead><tr><th>baseline 难度桶</th><th>标签数</th><th>mean Δ (pp)</th></tr></thead>
+    <tbody>
+        <tr><td>[0, 0.5) 最难（≈瞎猜）</td><td class="num">2</td><td class="num"><strong>+12.04</strong></td></tr>
+        <tr><td>[0.5, 0.6)</td><td class="num">24</td><td class="num">+3.89</td></tr>
+        <tr><td>[0.6, 0.7)</td><td class="num">125</td><td class="num">+2.09</td></tr>
+        <tr><td>[0.7, 0.8)</td><td class="num">399</td><td class="num">+0.51</td></tr>
+        <tr><td>[0.8, 1] 最容易</td><td class="num">878</td><td class="num">+0.22</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        最难桶仅 2 个标签（`g510` +13.85pp / `m6283` +10.22pp），最陡提升由 2–23 个标签驱动、易受噪声影响；真正的统计证据是整条单调递减关系（ρ = −0.190, p &lt; 0.001, n=1428）。机制呼应 Q1 容量解释：高频易标签的共享线性投影已近饱和、LA 增量空间小；低频难标签的共享投影根本不够用、独立参数空间边际价值最大。
+    </p>
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 Q2 综合解读（三问闭环）：</strong>LA 增益全域弥漫（1428 标签 888 改善、24 章全正）且低频/难标签受益最大（ρ=−0.19, p&lt;0.001）；急性组（ECG 优势）增益弱（+0.08 vs 慢性 +0.58）——容量优先分配给低频/慢性标签，非"帮助某类疾病"；⚠️ 单次运行，bootstrap 后方可作统计表述；论文素材 =「全域分布、偏重低频难标签、急性组弱」。</div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--success);">⑦ 论文叙事修正</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>论文叙事从「标签间信息传播」修正为「per-label parametrization」</strong>——贡献归属从层级约束改为预测头容量。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：论文叙事修正对照表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th></th><th>修改前（错误假设）</th><th>修改后</th></tr></thead>
+    <tbody>
+        <tr><td><strong>机制解释</strong></td><td>LabelAttention 让标签间互相"看到"，模型自己发现 ICD 层级结构</td><td>LabelAttention 为每个标签提供<strong>独立的 query token</strong>，通过 attention 为每个标签学习更丰富的输入特征投影</td></tr>
+        <tr><td><strong>贡献归属</strong></td><td>属于"层级约束"方向</td><td>属于<strong>"预测头容量"方向</strong>——与 MLP/ResNet 同类但更有效</td></tr>
+        <tr><td><strong>论文亮点</strong></td><td>标签间信息传播</td><td><strong>per-label parametrization via learned query tokens</strong>——最小参数量增长（~2.5M）获最大性能提升（+0.54pp）</td></tr>
+        <tr><td><strong>验证方式</strong></td><td>仅消融分析（相关性）</td><td><strong>观测消融（ρ≈0）+ M16 五臂掩码阶梯（单变量严格对照，干预级）</strong>——D1/D2 因对照不严格降级为旁证（树先验只改一致性，见 ⑤ 节）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ 定位修正：</strong>LabelAttention 未达到 §4.1 预期的 >1pp（实际 +0.54pp，属中间地带 0.5~1pp），具备写入论文的潜力但需进一步验证。观测消融（Spearman ρ≈0）+ <strong>M16 五臂掩码阶梯（干预级）</strong>确认增益 100% 来自 per-label 投影增强、交互零贡献——这<strong>加强了 M6 核心叙事</strong>：问题确实是"预测头容量不足"，LabelAttention 是在同等参数量下最有效的容量增强方式。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">⑧ 后续行动</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 深度维度已闭环（n_layers 无效）；<strong>主线转向宽度维度（hidden_dim / per-label FFN）</strong>。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：后续行动表（Head 对比）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td>✅ 已闭环</td><td><s>per-label 投影增强：n_layers 扫描</s></td><td><strong>已完成（08-13）：n_layers=1 即最优</strong>——l2/l3 噪声内持平，l4/l5 崩塌 −13~−15pp（初期即崩 + 表征坍缩）。深度维度无效，见 §10</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>⭐ 主线</strong></td><td><strong>hidden_dim / per-label FFN</strong></td><td>消融指向的真正增益来源——per-label 投影的<strong>宽度</strong>维度（而非深度）：调大 hidden_dim、为每个标签引入独立 FFN</td></tr>
+        <tr><td>M2 叠加</td><td>LabelAttention + Linear Prob</td><td>优先级提高——per-label 投影的半监督初始化（S0 冻结→S1 解冻→S2 全参数）可能进一步释放容量增益</td></tr>
+        <tr><td>✅ M16 Q1/Q3</td><td><s>五臂掩码阶梯裁决</s></td><td><strong>已完成（2026-08-28）</strong>——H1 容量成立，H2/H3/H4 排除（见 ⑤ 节）</td></tr>
+        <tr><td>Phase 2</td><td>LabelAttention + HBCE</td><td>验证容量增强与层级约束的独立叠加效果——M6 与 HBCE/HMLC 是两个正交贡献</td></tr>
+        <tr style="background:var(--success-bg);"><td>✅ M16 Q2</td><td><s>per-label 疾病归因（分层表）</s></td><td><strong>已完成（09-02，见 ⑥ 节）</strong>——各章节均正（H-A ❌ 不集中）、急性组弱（+0.08 vs 慢性 +0.58）、低频难标签受益最大（ρ=−0.19, p&lt;0.001）——三条带数据的分层证据直接喂论文 Discussion，避免"只帮心血管"误导叙事</td></tr>
+        <tr><td>Label embedding</td><td>parent-child cosine similarity 分析</td><td>提取 label_embeddings（1428×512），计算 parent-child cosine similarity vs random——最终确认 embedding 是否隐式习得层级结构</td></tr>
+        <tr><td>论文写作</td><td>按 M16 新叙事写 LA 章节</td><td>"1428 个独立分类器的共享 backbone 参数化，attention 可摘除"（Q1）+ "全域分布/低频难标签受益最大/急性组弱"（Q2）——最小机制图 = M0 判别不优于 M1；树先验只改一致性</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    
+</div>
+
+<!-- ═══ M13: ECG-CPC 换骨研究方向 ═══ -->
+<div class="card" id="sec-m13" style="border:2px solid var(--danger);">
+    <div class="card-header">
+        <div class="card-title">🧪 M13: ECG-CPC 换骨 — 超参重调优与模型设定适配</div>
+        <span class="status-tag status-ok">✅ 完整闭环（Phase 0/1/2/A）</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>08-08 组会 合作导师 提出<strong>超参失效假设</strong>——SDS 优化链路中模型 scale、数据、任务都发生了变化（S1-S5），沿用旧场景最优超参可能造成"方法有效但被超参掩盖"的假阴性。M13 以 ECG-CPC 换骨（千万级预训练权重换入 ECG encoder）为对象系统性验证：换骨后追不平 baseline，到底是<strong>超参不匹配</strong>、<strong>架构替换代价</strong>、还是<strong>预训练权重本身有害</strong>。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 三方案换骨总览（A/B/C，Phase A 收口 2026-08-20）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>ECG-CPC 换骨三方案全部关闭</strong>（A −1.29pp / B −1.78pp / C=baseline）——权重域失配（240Hz→100Hz）。</p>
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin:-4px 0 6px;">
+        ⚠️ 口径约定：val (agg0) 为诊断口径、test (agg1) 并列给出；Δ 单位 pp；baseline = 原始 MDS-ED <strong>0.8257 (agg0) / 0.8342 (agg1)</strong>。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：三方案换骨总览表（A/B/C）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>方案</th><th>配置</th><th>val (agg0) [95% CI]</th><th>test (agg1)</th><th>Δ vs baseline</th><th>判定</th></tr></thead>
+    <tbody>
+        <tr><td><strong>C</strong></td><td>baseline（原始 MDS-ED）</td><td class="num highlight">0.8257 [0.8216, 0.8295]</td><td class="num">0.8342</td><td class="num">—</td><td>基准</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>A</strong></td><td>全量权重 + causal（因果 S4）</td><td class="num down">0.8128 [0.8087, 0.8169]</td><td class="num down">0.8235</td><td class="num down"><strong>−1.29</strong></td><td>🔴 关闭</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>B</strong></td><td>encoder 权重 + bidirectional（lr=1e-3）</td><td class="num down">0.8079 [0.8034, 0.8120]</td><td class="num down">0.8137</td><td class="num down"><strong>−1.78</strong></td><td>🔴 关闭</td></tr>
+        <tr><td>A 对照</td><td>随机 + causal（无权重）</td><td class="num">0.8259 [0.8219, 0.8300]</td><td class="num">0.8358</td><td class="num up">+0.03</td><td>追平（噪声内）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 归因诊断 4 实验（Phase 2，2026-08-19 裁决）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>4 个归因实验钉死根因</strong>：随机初始化追平 baseline（−0.01pp）且反超权重版——结构失配是主因、BN stats 非主因。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：归因诊断 4 实验表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>实验</th><th>val (agg0) [95% CI]</th><th>test (agg1)</th><th>关键对比</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>m13-diag-rand</strong>（随机初始化）</td><td class="num highlight">0.8256 [0.8213, 0.8295]</td><td class="num">0.8350</td><td><strong>追平 baseline（Δ=−0.01pp）；反超权重版 +1.77pp</strong></td></tr>
+        <tr><td>m13-diag-bnreset（权重+BN 重置）</td><td class="num">0.8065 [0.8026, 0.8104]</td><td class="num">0.8126</td><td>≈权重版（−0.14pp）→ BN stats 非主因</td></tr>
+        <tr style="background:var(--accent-light);"><td><strong>m13-diag-stride1</strong>（随机+无下采样）</td><td class="num">0.8268 [0.8230, 0.8305]</td><td class="num">0.8368</td><td>略超 baseline +0.11pp（下采样代价仅 −0.13pp）</td></tr>
+        <tr><td>m13-lr-3e-3</td><td class="num">0.8113 [0.8073, 0.8154]</td><td class="num">0.8190</td><td>vs 1e-3 权重版 +0.34pp（lr 余量很小）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <div class="info-box" style="background:var(--danger-bg);border-left:4px solid var(--danger);margin-top:10px;"><strong>📐 最终裁决（三重证据坐实「无深入价值」）：</strong>随机版 0.8256 追平 baseline ⇒ 下降 100% 来自 ECG-CPC 预训练权重（240Hz 域 conv 表征锁死 100Hz 域适应）；失配在 conv 权重本身而非 BN stats（重置无效 0.8065）；causal/bidirectional 均掉到 ~0.80；per-label 均匀恶化（62-71%）——域失配是全局稳定特征、与方向无关。</div>
+
+    <div class="info-box success">
+        <strong>📐 结论：M13 换骨路线彻底关闭，SDS 主线 = 原始 MDS-ED + I2 换头。</strong>LabelAttention 换头（M6 已证 +0.54pp → 0.8319）是唯一有正收益的改进方向；I3（ECG-CPC 权重 + 换头）不再推荐——权重本身 −1.78pp，换头填不平。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">③ 后续行动</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>主线 = 原骨架 + 换头（I2 复现）</strong>；stride=1 随机版 0.8268（+0.11pp）待 3 种子确认。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：后续行动表（换骨）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td>✅ 已闭环</td><td><s>ECG-CPC 换骨三方案（A/B/C）</s></td><td><strong>A −1.29pp / B −1.78pp / C=baseline 全部关闭</strong>——权重域失配（240Hz→100Hz），勿再碰换骨</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>⭐ 主线</strong></td><td><strong>I2 换头复现</strong></td><td>NoEncoder + LabelAttention 同机复现对齐 0.8319（M6 +0.54pp）</td></tr>
+        <tr><td>baseline 候选</td><td>stride=1 随机版多种子确认</td><td>0.8268（+0.11pp）需 3 种子确认是否超噪声，通过则作 baseline 微改进</td></tr>
+        <tr><td>基线修正</td><td>baseline early stopping / EMA</td><td>baseline argmax@ep8 后回撤 −0.54pp（训过状态）→ 基线可能上修 0.3-0.5pp，抬高所有 M 系列对比基准</td></tr>
+        <tr><td>模态消融</td><td>三模态消融第三臂（signal-only）</td><td>tabular-only ep100 已追平 multimodal（0.8257）；等 signal-only 三角定位 ECG 边际贡献</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    
+</div>
+
+<!-- ═══ 输入模态消融：signal-only / tabular-only / multimodal ═══ -->
+<div class="card" id="sec-modality">
+    <div class="card-header">
+        <div class="card-title">🧬 输入模态消融：tabular-only / signal-only / multimodal（M13 延伸）</div>
+        <span class="status-tag status-ok">✅ 三臂完成（2026-08-21）</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>MDS-ED 是 ECG + 表格双输入，但两个模态各自贡献多少、融合是增益还是拖累从未量化。三臂消融（只 ECG / 只表格 / 双输入）同 epoch（ep100）、同数据切分（train 116433 / val 24740 / test 25756）对比，量化各模态边际贡献与融合机制。tabular-only 为零代码改动——框架内置（<code>head=none + static=mlp</code> 自动建 184K 线性头）。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 三模态消融全景（ep100，双口径含 95% CI）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>tabular-only 仅 344K 参数就追平 multimodal 3.2M</strong>；signal-only 掉 5.9pp 且 ep10 即饱和——表格是主承载。</p>
+    <p style="font-size:0.8125rem;color:var(--gray-500);margin:-4px 0 6px;">
+        ⚠️ 口径约定：agg0 = val split 宏平均（主诊断口径）、agg1 = test split；Δ 单位 pp。CI 已逐位对过日志 <code>test_auroc_macro_agg1_high/low</code> 行核验。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：三模态消融全景表（ep100 双口径含 95% CI）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>档</th><th>val (agg0) [95% CI]</th><th>test (agg1) [95% CI]</th><th>参数量</th><th>best ep</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--danger-bg);"><td><strong>signal-only</strong>（只 ECG）</td><td class="num down">0.76639 [0.76214, 0.77054]</td><td class="num down">0.77270 [0.76864, 0.77674]</td><td class="num">2.9M</td><td class="num">ep10</td></tr>
+        <tr style="background:var(--accent-light);"><td><strong>tabular-only</strong>（只表格）</td><td class="num highlight"><strong>0.82570 [0.82153, 0.82977]</strong></td><td class="num">0.83293 [0.82925, 0.83652]</td><td class="num">344K</td><td class="num">ep61</td></tr>
+        <tr><td>multimodal（baseline）</td><td class="num">0.82568 [0.82155, 0.82951]</td><td class="num highlight">0.83420 [0.83099, 0.83739]</td><td class="num">3.2M</td><td class="num">—</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        <strong>CI 判读：</strong>signal-only 与另两档在双口径上 CI 均不重叠（统计显著，−5.9pp）；tabular-only 与 multimodal 双口径 CI 高度重合（<strong>不可分辨</strong>，Δ=+0.00002）。tabular ep50→ep100：0.82429→0.82570（+0.0014，延长训练有真实增益；best@ep61 后 39 ep 无刷新 = 平台确认）。
+    </p>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 核心发现：融合是双刃剑</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>ECG 的独特信息只在 144/1428 标签（I 类心血管优势）</strong>——互补信息存在，但没能变成整体涨点。</p>
+    <div class="info-box success" style="margin-top:10px;">
+        <ol style="margin:6px 0 0 16px;font-size:0.875rem;line-height:1.8;">
+        <li><strong>表格是主承载：</strong>tabular-only 仅 344K 参数（vs multimodal 3.2M）就追平 multimodal（+0.00002）——1428 疾病的宏观 AUROC 几乎全部由表格特征决定。</li>
+        <li><strong>ECG 单独弱且快饱和：</strong>signal-only 2.9M 参数仅 0.76639（−5.9pp），best@ep10 之后 89 ep 无刷新——ECG 只覆盖少数标签的信息，且收敛极快。</li>
+        <li><strong>ECG 独特信息 = 心血管类：</strong>144/1428 标签上 ECG 优于表格（Δ&gt;0.02），ICD I 类 55 个主导（I45 右束支传导阻滞、I44.7 左束支、I82.4Z 下肢深静脉血栓、Z45.02 AICD、Z95.81 起搏器）——与 tabular-only 分析中 ECG 缺失亏损榜（急性/心血管/神经类）双向印证。</li>
+        <li><strong>融合双刃剑（核心机制）：</strong>ECG 优势标签上 baseline≈signal（0.8469 vs 0.8491，融合成功吸收 ECG，比 tabular 高 +5.7pp）；但表格优势标签（1035 个）上 baseline 比 tabular <strong>−1.2pp</strong>（被 ECG 分支拖累）——两类效应抵消 → 整体≈tabular。<strong>瓶颈在融合机制，不是数据。</strong></li>
+        </ol>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+        <img src="../../src/analysis/signal-only/figs/fig_signal_vs_tabular.png" alt="signal vs tabular per-label 对比"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        <img src="../../src/analysis/signal-only/figs/fig_fusion_double_edge.png" alt="融合双刃剑示意"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ mac 平均稀释陷阱：</strong>10% 标签的 +5.7pp 增益被 72% 标签的 −1.2pp 损失抵消 → 整体持平 ≠ 无信息。按 ICD 类别分组重算宏平均（而非 Δ&gt;0.02 粗分割）才能严谨量化 ECG 的真实贡献。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">③ 未来方向：按诊断类别模态路由</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 方向 = <strong>按诊断类别做模态路由</strong>——让心血管类标签更多消费 ECG 信息。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：模态路由未来方向表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--danger-bg);"><td><strong>⭐ 主线</strong></td><td><strong>模态路由实验</strong>（最高价值，未开工）</td><td>心血管类标签强制/加权走 ECG 分支，其余走表格分支——理论上可同时保住两类优势，超越所有单模态。三条路径：(a) concat 权重 per-label 类别加权 (b) 双分支独立预测 + 类别路由门控 (c) 先按 ICD 类别分组量化再定粒度（当前 lean：b 最贴合双刃剑机制）</td></tr>
+        <tr><td>量化</td><td>按 ICD 类别分组重算三档宏平均</td><td>比 Δ&gt;0.02 粗分割更严谨，确认心血管 vs 消化/代谢的真实贡献差</td></tr>
+        <tr><td>训练策略</td><td>ECG 分支短训 + 表格长训</td><td>signal-only ep10 即饱和 → 路由实验中 ECG 分支 ~20ep 足够，表格分支照常 100ep</td></tr>
+        <tr><td>决策参考</td><td>纯表格模型替代可行性</td><td>若目标病种不含心血管急症 → 纯表格模型（344K）可替代多模态，参数降 9 倍</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    
+</div>
+
+<!-- ═══ M14: 融合机制 F0-F6 ═══ -->
+<div class="card" id="sec-m14" style="border:2px solid var(--accent);">
+    <div class="card-header">
+        <div class="card-title">🔀 M14: 多模态融合机制对比（F0-F6 收口）</div>
+        <span class="status-tag status-ok">✅ F6 三方法裁决完成（单次运行待多种子）</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>三模态消融已证「融合是双刃剑」（ECG 信息被表格优势标签拖累）。M14 探索：<strong>四类融合机制</strong>（masked / embedding / skip / 模态 attention）能否让 tabular+signal 实现真正的优势互补、超过 tabular-only 单模态？在 LabelAttention 底座上实现了 6 种融合模式（F0 concat 对照 / F1 硬结构分离 / F2 可学习模态标识 / F3 双 context 直达 attention / F4 双路独立打分 + 标量门 / F5 解耦交叉注意力）。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 六实验核心指标（val agg0 / test agg1 双口径含 95% CI）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>F3 skip 点估计最优（+0.60pp）但全部单次运行</strong>——F0-F5 差异都在种子方差（±2pp）内。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：六实验核心指标表（val agg0 / test agg1 双口径 CI）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:1000px;">
+    <thead><tr><th>实验</th><th>val agg0 [95% CI]</th><th>test agg1 [95% CI]</th><th>vs F0 Δ (agg0 / agg1)</th><th>标签级配对 Δ (95% CI)</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>F0 concat</strong>（对照）</td><td class="num highlight"><strong>0.83159</strong> [0.82806, 0.83514]</td><td class="num highlight"><strong>0.84065</strong> [0.83732, 0.84394]</td><td class="num">—</td><td class="num">—</td></tr>
+        <tr><td>F1 masked（硬结构分离）</td><td class="num">0.83047 [0.82672, 0.83423]</td><td class="num">0.84017 [0.83676, 0.84332]</td><td class="num down">−0.11pp / −0.05pp</td><td class="num">−0.00113 [−0.00232, −0.00006] 排除 0</td></tr>
+        <tr><td>F2 emb（可学习标识）</td><td class="num">0.82941 [0.82546, 0.83297]</td><td class="num">0.83980 [0.83613, 0.84309]</td><td class="num down">−0.22pp / −0.09pp</td><td class="num">−0.00219 [−0.00331, −0.00109] 排除 0</td></tr>
+        <tr style="background:var(--success-bg);"><td><strong>F3 skip</strong>（双 context 直达）</td><td class="num highlight up">0.83283 [0.82901, 0.83634]</td><td class="num highlight up">0.84164 [0.83826, 0.84504]</td><td class="num up"><strong>+0.12pp / +0.10pp</strong></td><td class="num up">+0.00124 [+0.00000, +0.00240] 排除 0</td></tr>
+        <tr><td>F4 attn（双路独立 + 标量门）</td><td class="num">0.83160 [0.82767, 0.83500]</td><td class="num up">0.84169 [0.83824, 0.84498]</td><td class="num up">+0.00pp / +0.10pp</td><td class="num">+0.00001 [−0.00140, +0.00141]</td></tr>
+        <tr><td>F5 decoupled（解耦交叉注意力）</td><td class="num up">0.83257 [0.82921, 0.83621]</td><td class="num">0.84028 [0.83693, 0.84328]</td><td class="num up">+0.10pp / −0.04pp</td><td class="num">+0.00098 [−0.00009, +0.00209]</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;">
+        <img src="../../meeting_records/20260822/M14_多模态优势互补融合机制/figs/fig1_overall.png" alt="F系列六实验 agg0 对比"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+        <img src="../../meeting_records/20260822/M14_多模态优势互补融合机制/figs/fig2_perlabel_delta.png" alt="F1-F5 per-label Δ 分布"
+             style="max-width:48%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+    </div>
+
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);margin-top:10px;">
+        <strong>架构示意图（draw.io）：</strong>F0 先融合后编码（两模态拼接 640 维统一投影）；F1 硬结构分离（各自 <code>Linear→BN→ReLU</code> 后加和，致效点在非线性边界）；F2 在 F1 上加每模态可学习偏移（BN 后 ReLU 前注入）。F3/F4 共享 F1 的双分支投影骨架，差异在注意力层组织方式——F3 双 context token 直达共享 softmax，F4 双路独立注意力 + 可学习标量门。
+    </p>
+    <div style="margin-top:8px;">
+        <img src="../../draw-io-img/12_fusion_modes_f0_f1_f2/12_fusion_modes_f0_f1_f2.png" alt="F0/F1/F2 融合模式对比（draw.io）"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;margin-bottom:10px;">
+        <img src="../../draw-io-img/15_skip_vs_attn_f3_f4/15_skip_vs_attn_f3_f4.png" alt="F3 skip vs F4 attn 融合模式对比（draw.io）"
+             style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 关键发现：</strong>F3（skip）点估计最高（+0.12/+0.10pp，标签级配对 CI 排除 0）——双 context token 让单模态信息直达注意力层；F4/F5 方向性弱于 F3；三者均优于 F1/F2 ⇒ 注意力层组织方式才是关键：问题不在特征来源，在融合方式是否允许注意力灵活分配。</div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 层级违反率（VR）：AUROC 换层级一致性的权衡</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>F3/F4 的 AUROC 最高但 VR 也最高（+0.77/+0.68pp）</strong>——「注意力灵活分配」的代价；VR 与 AUROC 是两条独立轴。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：VR 权衡表（层级违反率 × AUROC）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:600px;margin-top:8px;">
+    <thead><tr><th>实验</th><th>VR%</th><th>vs F0</th></tr></thead>
+    <tbody>
+        <tr><td>F0（concat）</td><td class="num">14.55%</td><td class="num">—</td></tr>
+        <tr><td>F1（masked）</td><td class="num">14.87%</td><td class="num">+0.32pp</td></tr>
+        <tr><td>F2（emb）</td><td class="num">14.60%</td><td class="num">+0.05pp</td></tr>
+        <tr style="background:var(--warning-bg);"><td>F3（skip）</td><td class="num warn-cell">15.32%</td><td class="num warn-cell"><strong>+0.77pp</strong></td></tr>
+        <tr style="background:var(--warning-bg);"><td>F4（attn）</td><td class="num warn-cell">15.23%</td><td class="num warn-cell"><strong>+0.68pp</strong></td></tr>
+        <tr><td>F5（decoupled）</td><td class="num">15.01%</td><td class="num">+0.46pp</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <img src="../../meeting_records/20260822/M14_多模态优势互补融合机制/figs/fig5_vr.png" alt="F0-F5 层级违反率对比"
+         style="max-width:75%;height:auto;border-radius:8px;border:1px solid var(--gray-200);margin-top:8px;display:block;">
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>📐 VR 权衡解读：</strong><strong>F3/F4 的 VR 最高（+0.77pp/+0.68pp）但 AUROC 也最高</strong>——"注意力层灵活分配"的代价是牺牲部分层级一致性；F0/F1/F2 静态机制对层级结构影响小（14.55~14.87%）。<strong>这是「注意力 × ICD 层级结构结合」科研方向的动机桥</strong>：若层级一致性是硬约束（ICD 编码规范），需引入层级损失（HBCE / roll-up）来回补，有望同时提升 AUROC 和 VR。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">③ 后续行动</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>最高优先 = F0-F5 多种子复现</strong>；方向设计 = VR × 层级结构结合（F6）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：后续行动表（VR）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:880px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--danger-bg);"><td><strong>⭐ 最高优先</strong></td><td><strong>F0-F5 多种子复现</strong>（3 种子）</td><td>所有"单次运行"结论转正的前提——种子方差 ±2pp 量级 &gt; 各变体差异（§警示框）；<strong>F3/F0 优先</strong>（F3 点估计最高的转正关键）；脚本需加 <code>PL_GLOBAL_SEED</code> env 注入</td></tr>
+        <tr><td>方向设计</td><td>VR × 层级结构结合（可作 F6）</td><td>F3/F4 × (HBCE / roll_up) 组合——注意力机制（增 AUROC）× 层级结构先验（降 VR）双赢设计；与 M15 A2 独立（F6 是融合层改造，M15 是专家塔架构）</td></tr>
+        <tr><td>交叉验证</td><td>F5 交叉注意力权重探针</td><td>初始平均 [0.495, 0.505] 均匀；若复现后偏好仍≈常数 → M15 标签级 MoE 预期收益下调</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ 单次运行统计显著性警示（2026-08-23 自省）：</strong>F1-F5 结论均来自<strong>一次运行</strong>。LA 换头随机初始化种子方差约 <strong>±2pp</strong>——F1/F2 的 −0.11pp/−0.22pp、F3 的 +0.12pp、F4/F5 的 +0.00~+0.10pp <strong>全部在种子方差量级之内</strong>。标签级配对 CI 排除 0 仅说明"这一次运行中标签层面平均差稳定"，<strong>不构成跨种子统计显著性证据</strong>。所有"排除 0"表述须伴本警示。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--success);">④ F6 收官：注意力底座 × 层级结构三方法裁决（2026-09-02）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>HBCE-squared（skip λ∈{5,10}）以「AUROC 不降 + VR≈0 + 成本 1/4」战胜 HMLC 三阶段链</strong>——层级一致性主推。</p>
+    <p style="font-size:0.875rem;line-height:1.7;color:var(--gray-700);">
+        <strong>问题：</strong>F3/F4 的 VR 权衡（AUROC 最高但 VR 也最高）指向两条路线——<strong>HBCE 惩罚</strong>（单阶段，层级 loss 叠加注意力底座）vs <strong>HMLC 链式法则</strong>（S0→S1→S2 三阶段）。F6 以同机对照裁决谁该成为主线。squared 6 变体 + HMLC 2 臂全部在 <strong>服务器A（RTX 5090）同机</strong>完成，直接可比（linear 4 变体在 服务器B PRO 6000，带 ⚠️跨机）。
+    </p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：F6 三方法裁决路线表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:1000px;margin-top:8px;">
+    <thead><tr><th>路线</th><th>配置</th><th>agg0 (val)</th><th>Δagg0 (pp)</th><th>agg1 (test)</th><th>Δagg1 (pp)</th><th>VR test%</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td rowspan="2"><strong>HBCE-squared</strong>（单阶段 ~10h）</td><td><strong>skip λ10（主推）</strong></td><td class="num highlight"><strong>0.83411</strong></td><td class="num up"><strong>+0.25</strong></td><td class="num">0.84261</td><td class="num up">+0.20</td><td class="num up">0.0109%</td></tr>
+        <tr style="background:var(--success-bg);"><td>skip λ5（agg1 最优）</td><td class="num">0.83400</td><td class="num up">+0.24</td><td class="num highlight"><strong>0.84284</strong></td><td class="num up"><strong>+0.22</strong></td><td class="num up">0.0153%</td></tr>
+        <tr><td>F0 参照</td><td>concat + LA（无层级约束）</td><td class="num">0.83159</td><td class="num">—</td><td class="num">0.84065</td><td class="num">—</td><td class="num warn-cell">14.55%</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div style="margin-top:8px;">
+        <img src="../../meeting_records/20260822/M14_多模态优势互补融合机制/figs/fig9_f6_final_three_way.png" alt="F6 收官三方法对比"
+             style="max-width:75%;height:auto;border-radius:8px;border:1px solid var(--gray-200);display:block;">
+    </div>
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 HBCE 侧裁决（同机）：</strong>squared skip λ10 agg0 0.83411（+0.25pp）/ λ5 agg1 0.84284（+0.22pp）双口径超 F0，VR 14.55%→0.011~0.015%；推荐配置 skip 底座 + squared λ∈{5,10}；HMLC 两臂与三方法裁决已移 03 页；⚠️ 单次运行，差异在种子方差 ±2pp 内。</div>
+    <div class="info-box info" style="margin-top:10px;">
+        <strong>📌 λ 剂量响应（同机可信）：</strong>skip 底座 λ1→λ5→λ10 <strong>单调升</strong>（0.83321→0.83400→0.83411）；attn 底座 λ5 有浅坑（0.83134）但 λ10 收复（0.83347）——<strong>大剂量 λ=10 在双底座都是最优或次优</strong>。VR 随 λ 单调降（λ1 0.073% → λ5 0.015% → λ10 0.011%），与早期 HBCE 连续批（无 attention，squared 最优 λ=10）剂量结论一致。
+    </div>
+
+    
+</div>
+
+<!-- ═══ M20: tabular 填充阶梯 ═══ -->
+<div class="card" id="sec-m20" style="border:2px solid var(--warning);">
+    <div class="card-header">
+        <div class="card-title">🧩 M20: tabular 内部机制与缺失值填充 — Phase 1 五臂裁决 + 09-15 校验</div>
+        <span class="status-tag status-warn">⚠️ 填充器效应量 ≈ 0（三套实现合并）· 改进轮待租卡</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>ECG→tabular 路线被系统性否定后（同学A两三周探索），导师裁决转向 <strong>tabular 内部机制</strong>。M20 Phase 1 = 填充阶梯五臂（服务器B 5090 同机同批，各 ep20 单种子），回答两个问题：<strong>Q2 信息饱和</strong>——tabular 威力来自观测值还是缺失模式？<strong>填充器验证</strong>——师姐 +0.27pp 能否迁移到 S4 强底座、attention 核是否有额外增益？
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 五臂裁决表（test agg1 为主指标，bootstrap CI 1000 次）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>值信息 ≫ 缺失模式</strong>（P1A−P2 = 4.76pp）——tabular 威力主要来自观测值本身。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：五臂裁决表（test agg1 + bootstrap CI 1000 次）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>臂</th><th>配置</th><th>test agg1 [95% CI]</th><th>Δagg1 (pp)</th><th>test agg0</th><th>Δagg0 (pp)</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--accent-light);"><td><strong>P1A 锚点</strong></td><td>值 + 缺失指示位（历史基线口径）</td><td class="num highlight"><strong>0.8349 [0.8315, 0.8379]</strong></td><td class="num">—</td><td class="num highlight"><strong>0.8264</strong></td><td class="num">—</td></tr>
+        <tr><td>P1B mask→cat</td><td>mask 改 categorical embedding</td><td class="num">0.8332 [0.8298, 0.8367]</td><td class="num down">−0.17</td><td class="num">0.8263</td><td class="num down">−0.01</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>P2 mask-only</strong></td><td><strong>只缺失模式，抹掉观测值</strong></td><td class="num down"><strong>0.7874 [0.7830, 0.7914]</strong></td><td class="num down"><strong>−4.76</strong></td><td class="num down">0.7818</td><td class="num down">−4.45</td></tr>
+        <tr><td>P3 MLP 填充</td><td>学习式填充（MLP 核）</td><td class="num down">0.8318 [0.8285, 0.8350]</td><td class="num down">−0.31</td><td class="num">0.8238</td><td class="num down">−0.26</td></tr>
+        <tr><td>P4 注意力填充</td><td>学习式填充（attention 核，YJY 构想）</td><td class="num down">0.8324 [0.8289, 0.8357]</td><td class="num down">−0.25</td><td class="num">0.8250</td><td class="num down">−0.14</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        <strong>锚点复现：</strong>P1A 与历史 with_nan_mask 基线（0.8264/0.8356，不同机）几乎逐位一致——同机锚点可信。
+    </p>
+
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 四条裁决：</strong>值信息边际 4.76pp ≫ 缺失模式 +0.86pp（"信息饱和"担忧不成立）；填充器 v1 判据未达标（P4 vs P1A −0.25pp，要求 ≥+0.3pp）；attention 增量 +0.06pp 无有意义增益；mask 编码形态不敏感（P1B −0.17pp）——均在单种子噪声内。</div>
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ 组级方向性信号（单种子，方向性参考）：</strong>ICD 前缀组配对（1428 节点）：P3 更差 849/更好 580（p=1.9e-11）、P4 更差 799/更好 630（p=1.6e-05）——填充器 v1 在多数组上轻微变差，指向"λ=1.0 干扰诊断端"或"早期随机填充拖累"。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">② 三套独立实现合并判读（2026-09-15 更新：俞复现版并入）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>填充器效应量 ≈ 0</strong>（师姐 +0.27 / 我们 −0.3 / 俞复现 ≈0）；唯一三源钉死的是「<strong>缺失指示 +0.86pp</strong>」。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：三套独立实现合并判读表<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:960px;">
+    <thead><tr><th>阶梯位置</th><th>师姐代码库（ECG+tabular）</th><th>本仓库 S4 底座</th><th>俞独立复现版</th><th>合并判读</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td>P0 → P1（加缺失指示位）</td><td class="num">+0.85pp（0.8232→0.8317）</td><td class="num">+0.86pp（历史 +0.87）</td><td class="num">—</td><td>✅ <strong>三源稳定复现，全方向最可靠效应</strong></td></tr>
+        <tr style="background:var(--warning-bg);"><td>P1 → 学习式填充</td><td class="num">+0.27pp（0.8317→0.8344，无 CI）</td><td class="num down">−0.31/−0.25pp（P3/P4）</td><td class="num down">≈ 0（几乎无提升）<br><small>方法学同向证据†</small></td><td>⚠️ <strong>三套合并效应量 ≈ 0</strong></td></tr>
+        <tr><td>网络结构差异</td><td class="num">attention 核</td><td class="num">attention vs MLP 仅 <strong>+0.06pp</strong>（同机实测）</td><td class="num">—</td><td>✅ <strong>结构差异已排除</strong>——不是"换核"能解释的</td></tr>
+        <tr><td>ECG 参与填充</td><td class="num">+0.02pp（无增益）</td><td class="num">未做（路线已关闭）</td><td class="num">—</td><td>✅ 三源一致</td></tr>
+        <tr><td>值信息 vs 缺失模式</td><td class="num">未做 mask-only 消融</td><td class="num down">P2：−4.76pp（值主导）</td><td class="num">—</td><td>本仓库独有证据</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div class="info-box info" style="margin-top:10px;"><strong>📌 三套实现合并判读（2026-09-15 修正）：</strong>师姐 +0.27pp / 我们 −0.3pp / 俞版 ≈0 ⇒ 学习式填充效应量 ≈0（均在 ±2pp 种子方差内，统计不可区分）；网络结构差异已由同机实测排除（attention vs MLP 仅 +0.06pp）；缺失指示 +0.86pp 是唯一三源钉死效应、永久保留；† 俞版配置"不可核实"，以方法学同向证据入档、不进正式裁决。</div>
+    <div class="info-box danger">
+        <strong>🚨 混淆警示（曾发生一次，已修正）：</strong>俞曾在本地确认 <code>imputer.py :214-218</code> 有 <code>cat([z_diag, m_real])</code>——<strong>那是我们 M20 的实现</strong>（已三点取证），<strong>不是他实验的代码</strong>。引用时勿把"他看到的我们的代码"当成"他实验的配置证据"。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">③ 09-15 校验：⓪ 号 Mask 回注核验已通过（M20 无需重跑）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>⓪ 号 mask 回注核验通过</strong>（三点取证 + 参数量对账）——本仓库无此问题、无需重跑。</p>
+    <div class="info-box success">
+        <strong>✅ 三点取证 + 参数量对账，全通过：</strong>M20 的 P3/P4 诊断端 <strong>mask 已正确回注</strong>——① <code>hparams keep_mask_in_diag: True</code>；② inner 首层 <code>Linear(974 = 48 + 926)</code>（含 926 维 mask 拼入）；③ 前向实测输入宽度 <strong>926</strong>；④ <strong>参数量 974,799 与服务器日志逐位一致</strong>。<br>
+        <strong>⚠️ 归属澄清（别混为一谈）：</strong>同学A的 mask 质疑对象是<strong>俞锦越按 PDF 独立复现的实现</strong>，不是本仓库 <code>imputer.py</code>——本仓库版本无此问题、无需重跑。
+    </div>
+    <div class="info-box warn">
+        <strong>⚠️ 数值巧合警示：</strong>09-15 会议里提到的「0.832」= <strong>俞无-mask 版他自己的结果</strong>，与 M20 P3 的 0.8318 <strong>纯属巧合、无任何关系</strong>——引用时勿混淆。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">④ 下一步梯队（改进轮，需租卡/开机——服务器B 已关机）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 改进轮待租卡：<strong>λ 剂量网格 {0, 0.5, 2.0}（6 臂 ≈18h）→ median init + 残差</strong>。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：下一步梯队表（改进轮）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>优先级</th><th>任务</th><th>说明</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--gray-50);"><td>~~前置~~</td><td><s>俞自查 mask 回注</s>（四检查点）</td><td>❌ <strong>已定案"不可核实"</strong>（09-15 晚：实例释放 + 会话记录丢失）——不再追根因，其结论以「方法学同向证据」入档；自查清单（§9.1.1）存档备查</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>⭐ 首选</strong></td><td><strong>λ 剂量网格 {0, 0.5, 2.0}</strong></td><td><strong>6 臂 ≈ 18h</strong>（<strong>成本修正：单臂实测 2.8–3.3h，不是 1.5h</strong>），不用改代码——−0.3pp 的第一嫌疑是 λ=1.0 干扰诊断端；<code>ARMS="p3 p4" LAMBDA=0|0.5|2.0 bash run_mdsed_m20_fill_ladder.sh</code></td></tr>
+        <tr><td>②</td><td>median init + 残差</td><td>ẑ = ĉ + Δ（<code>out_proj</code> bias 初始化为批内 ĉ）——消除早期随机填充拖累，~3h/臂</td></tr>
+        <tr><td>③</td><td>art_mask_p / 深度超参</td><td>前两轮无改善再上</td></tr>
+        <tr><td>纪律</td><td>任何正结论须 3 种子复现</td><td>单种子只谈方向性；两轮后仍无增益 → 关闭性能线、P4 注意力 dump 转 Q1 结构分析、M20 主线转 Q5 有创分半 + Q3 字段归因</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div class="info-box info">
+        <strong>📌 算力状态：</strong>服务器B 已关机（09-15 实测 Connection refused），下一轮实验需<strong>重新租卡或开机</strong>；另有渠道线索 = 同学A可协助申请外组合作老师算力（09-15 会议）——若落实，λ 网格可大 batch。
+    </div>
+
+    
+</div>
+
+<!-- ═══ M22: 按疾病分组的标签专家 ═══ -->
+<div class="card" id="sec-m22" style="border:2px solid var(--danger);">
+    <div class="card-header">
+        <div class="card-title">🧱 M22: 按疾病分组的标签专家与章级稀疏化标签头 — 方向彻底关闭（全链否定）</div>
+        <span class="status-tag status-danger">⛔ 彻底关闭（2026-09-11 全链终结：Q1/Q2 + 路径 B + OTH 全否决）</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>M16 裁决"标签间 attention 交互在判别维度零贡献、一致性维度净负"后，自然的推广是<strong>按章（ICD 首字母 24 章）稀疏化标签交互、甚至每章独立专家头</strong>。M22 = 三探针递进路线（P1 章内 mask → P2 分组头 → P3 完整方案），预注册止损判据写在动手前：<strong>Q1</strong> 章间交互切除是否<strong>判别无损且 VR 更低</strong>；<strong>Q2</strong> 分组头各章组内宏 AUROC 是否显著高于全标签模型（分组涨点的唯一机理来源）。<strong>任一证伪即止损，P3 不启动</strong>。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① 四臂汇总（test agg1 为主指标）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>方向止损</strong>：Q1 不成立（判别无损但 VR 不降反升）+ Q2 证伪（组内稳健 21 章 0 升 15 降）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：四臂汇总表（test agg1）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>臂</th><th>val 宏 (agg0)</th><th>test 宏 (agg1)</th><th>test 95% CI</th><th>Δ test vs M0</th><th>VR soft (test)</th><th>机器</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--gray-50);"><td><strong>M0 Full</strong>（全标签 LA，参照）</td><td class="num">0.8319</td><td class="num highlight">0.8423</td><td class="num">[0.8389, 0.8457]</td><td class="num">—</td><td class="num">13.4373%</td><td class="num">租卡平台</td></tr>
+        <tr><td>P1 chapter ep20</td><td class="num">0.8323</td><td class="num">0.8430</td><td class="num">[0.8394, 0.8462]</td><td class="num up">+0.07pp</td><td class="num down">14.5638%</td><td class="num">RUC V100</td></tr>
+        <tr><td>P1 chapter ep100</td><td class="num">0.8328</td><td class="num">0.8419</td><td class="num">[0.8386, 0.8452]</td><td class="num down">−0.04pp</td><td class="num down">14.0576%</td><td class="num">RUC 5090</td></tr>
+        <tr style="background:var(--danger-bg);"><td><strong>P2 grouped ep20</strong></td><td class="num down">0.8236</td><td class="num down"><strong>0.8330</strong></td><td class="num">[0.8294, 0.8362]</td><td class="num down"><strong>−0.93pp</strong></td><td class="num down">14.6368%</td><td class="num">RUC V100</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        P1 两档与 M0 几乎重合（±0.1pp 内）；P2 明显更低（−0.93pp）；三臂 VR 一致地<strong>高于</strong> M0。
+    </p>
+
+    <div class="info-box danger" style="margin-top:10px;">
+        <strong>📐 两条裁决（预注册判据，动手前写死）：</strong><br>
+        <strong>① Q1 不成立</strong>——判别无损 ✓（ep20 +0.07pp / ep100 −0.04pp，CI 全与 M0 重叠，<strong>M16「交互判别零贡献」在章级推广成立</strong>）但 <strong>VR 不降反升 ✗</strong>（ep20 +1.13pp / ep100 +0.62pp，均高于 M0 13.44%），两条件只满足其一；<br>
+        <strong>② Q2 证伪</strong>——组内 per-chapter 标签级配对 bootstrap（B=10000）：稳健 21 章 <strong>0 升 15 降</strong>（判据要求 &gt;半数显著升），组间表示冲突不存在（方向还相反）。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--danger);">② Q2 的四个归因维度逐一排除（该下降是真实效应）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 组内下降是真实效应：排除跨机/容量/口径后，<strong>主因 = 分组切断了训练信号</strong>（spearman(章标签数, Δ)=+0.796）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Q2 归因排除表（四维度逐一排除）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>嫌疑</th><th>排除证据</th></tr></thead>
+    <tbody>
+        <tr><td>不是跨机</td><td>同机同卡对照（P2 vs P1 chapter ep20，同在 gpu-v100，唯一变量 = 头实现）P2 落后 <strong>1.00pp</strong>（test）/ 0.87pp（val）——远超 P1 两档钉死的跨机偏移标尺 <strong>≈±0.1pp</strong></td></tr>
+        <tr><td>不是容量不足</td><td>P2 头 <strong>33.9M</strong> = LA 头 2.1M 的 <strong>16.1 倍</strong>——参数更多反而更差</td></tr>
+        <tr><td>不是评估口径</td><td>preds 落盘 σ 概率口径经审计（全部 in [0,1]）；组内宏用 nanmean 且回报 n_valid</td></tr>
+        <tr><td>剩下的归因推测</td><td>每章独立 FF 参数暴增 + 每组仅 ~60 标签的训练信号 → 过拟合/优化困难。旁证：大章（I:181/Z:166）Δ≈−0.3~−0.5pp 而中小章（B/H/T/V，24-71 标签）Δ 达 −2~−5pp；<code>spearman(章标签数, P2 Δ) = +0.796 (p&lt;0.0001)</code>（大章 −0.38 / 中 −1.44 / 小 −2.30pp）→ <strong>分组损失的主因是训练信号被切断</strong></td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        整体指标<strong>双输</strong>：宏 AUROC −0.93pp、VR +1.20pp——连 M16 预测的"VR/计算白赚"也未实现。唯一"显著提升"的 O 章仅 3 个标签（小章 CI 退化典型假阳性）。
+    </p>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--accent);">③ 反哺 M16：切交互对 VR 的影响由掩码结构决定</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>切交互对 VR 的影响由掩码结构决定</strong>——树对保留降 VR、章内全开块状稀疏化不降（M16 结论限于树级掩码）。</p>
+    <div style="font-size:0.875rem;line-height:1.8;">
+        chapter mask 的 VR（14.56%/14.06%）落在 <strong>M3 Random 一侧</strong>（14.26% 高于 M0），而非 M1 Self-only（12.89%）/ M4 Anti-tree（12.67%）的"低于 M0"一侧。结论：<strong>树对保留的稀疏化（tree/self_only/anti_tree）降 VR，章内全开的块状稀疏化不降</strong>——M16 的"交互一致性净负"结论<strong>限于树级掩码结构，不能泛化到任意稀疏化方式</strong>（⚠️ 该对照中 M0 与三臂跨机，绝对量须同机复现后定论；但 M16 批内部的 M1/M4 vs M3 同机差异已足以支撑"结构决定方向"）。
+    </div>
+
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ 结论限定（引用必带）：</strong>P2 实现是「<strong>每章完整 mini-LA</strong>」≠ 立项 §1.4 设想的「共享 attn/FF + 仅按章 label_embeddings」等价重构——<strong>否定限于该实现</strong>，不能推广为"标签分组理念被证伪"。复活后手 = 两条方向相反的路径：<strong>A</strong> 共享权重消融臂 / <strong>B</strong> 不共享骨架的章级专家塔。
+    </div>
+    <div class="info-box danger" style="margin-top:8px;"><strong>📌 路径 B 子集 LA 探针（已否决，2026-09-11）：</strong>三判据 1/3 通过——判据 1 组内提升 0/3 ❌（C_I −0.51pp 显著负）、判据 3 拼回全维 −1.20pp ❌；唯一正信号 = 判据 2 章结构优于随机划分（+0.39~+3.17pp）；OTH 兜底组 −1.26pp [−1.67,−0.87] 显著负 ⇒ 合并质量 &gt; 合并规模，方向止损。</div>
+    <div class="info-box warn" style="margin-top:8px;">
+        <strong>📐 总裁决（2026-09-11）：M22 方向彻底关闭。</strong>四条证据链全部否定——P1 章内 mask（Q1 不成立）、P2 分组头（Q2 证伪）、路径 B 全变体（单章/相关合并/全兜底/共现聚类均无前景）、OTH 兜底——<strong>「按疾病分组各自训练」在 MDS-ED 数据上无前景</strong>。路径 A（共享权重消融）是唯一未实验入口（我倾向不做：四条证据链全否，理论存活概率低）。文献锚点：Blanco 2020（专科模型组内赢/整体输）、Gatto 2025 + IEEE 2021（随机划分竞争力）——已入方向文档 §1.5。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--warning);">④ 方法学沉淀（迁移到其他章级/组级分析）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 三条方法学沉淀：<strong>多重比较算术（54 格 → 2.7 期望假阳性）/ 前提须先检验 / 深度定义换档即换层</strong>。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：方法学沉淀表（章级/组级分析迁移）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>发现</th><th>内容</th></tr></thead>
+    <tbody>
+        <tr><td>多重比较算术</td><td>24 章 × 3 层 = <strong>54 个有效格点</strong> ⇒ 54×5% ≈ <strong>2.7 个期望假阳性</strong>；实测 P1 显著提升 3~4 格 = 噪声量级，<strong>不构成证据</strong></td></tr>
+        <tr><td>前提检验纪律</td><td>本数据 M0 宏 AUROC 随深度<strong>上升</strong>（d0 0.8205 / d1 0.8476 / d2 0.8610）→「深层叶节点更难」是<strong>伪前提</strong></td></tr>
+        <tr><td>深度定义换档</td><td><code>build_prefix_parent_indices(min_prefix_len)</code> 取 2/3 → 同为 3 层 [450,628,350]；<strong>取 4 会静默塌成 2 层</strong></td></tr>
+        <tr><td>P1 逐章分解</td><td>24 章各仅 2 章显著提升、1~4 章下降，且无共同特征——落在噪声量级（vs P2 的 15/24 章系统性下降）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    
+</div>
+
+<!-- ═══ M18: 分层训练与方差校准 ═══ -->
+<div class="card" id="sec-m18" style="border:2px solid var(--success);">
+    <div class="card-header">
+        <div class="card-title">📚 M18: 分层训练与方差校准 — 全链收口，最终形态 s1c（课程×HBCE）定稿</div>
+        <span class="status-tag status-ok">✅ 13 训练臂 + 5 零训练全部裁决（2026-09-10）</span>
+    </div>
+    
+
+    <div class="info-box info">
+        <strong>📌 问题：</strong>HBCE×LA「1+1 只到 1.8 未达 2」的反思——HBCE 压的是预测<strong>位置</strong>还是<strong>方差</strong>？F1 为何极低？分层训练构想（逐层课程/深度调度）能否在不增 VR 的前提下提升排序质量？M18 = 全链五阶段：<strong>Phase 0 诊断（零训练）→ 六臂阶梯 → stage 四格消融 → ①②③ 终态候选 → s1ci 假设臂</strong>。
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--primary);">① Phase 0 诊断五项（零训练，2026-09-03 当日完成）——四项判定三项反转</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>Phase 0 四项判定三项反转</strong>：HBCE 压的是位置不是方差；<strong>F1 低的真根因 = 低发生率 × 固定 0.5 阈值</strong>。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：Phase 0 诊断五项表（零训练）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:920px;">
+    <thead><tr><th>#</th><th>分析</th><th>核心结果</th><th>裁决</th></tr></thead>
+    <tbody>
+        <tr><td>D1-1</td><td>H-A 深度分层方差（子/父方差比）</td><td class="num">全部 &gt;1（F0 1.07 / F6sq5 1.30），λ↑ 比↑</td><td>❌ <strong>证伪</strong>——HBCE 压的是预测均值位置（子标签概率压向 0），不是方差</td></tr>
+        <tr><td>D1-2</td><td>H-B 全局分布（核实口述值）</td><td class="num">logit std 0.85~1.21（非 0.02）；概率 mean 0.10 / p95 0.26</td><td>❌ <strong>证伪</strong>——口述口径不明，但「概率整体偏小」方向正确</td></tr>
+        <tr><td>D1-3</td><td>H-C F1 根因</td><td class="num">95% 低发标签 F1@0.5=0；<strong>per-label 最优阈值 → F1 ×10</strong>（0.013→0.121+）</td><td>✅ <strong>新根因实锤</strong>——低发生率×固定 0.5 阈值结构性失效，杠杆在评估侧</td></tr>
+        <tr><td>D1-4</td><td>H-D 温度缩放（校准）</td><td class="num">T*=0.40 → ECE 0.094→0.002 但 F1 +0.0000</td><td>🔄 <strong>反转</strong>——校准修好概率可信度，修不了「低发标签概率天然 &lt;0.5」</td></tr>
+        <tr><td>D1-5</td><td>深度双口径实测</td><td class="num">原始数据 15197 码 = 5 层；训练标签集 1428 码 = 3 层</td><td>双口径并存；训练实验用 3 层；深码留作外延</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--success);">② 训练臂总表（六臂 + 四格三新臂 + ①②③ + s1ci）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>s1c（逐层课程 × HBCE）是最终推荐形态</strong>：agg1 0.84415 全家族最高 + VR 0.0076% + bootstrap 排除 0。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：训练臂总表（六臂 + 四格三新臂 + ①②③ + s1ci，13 行）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:960px;">
+    <thead><tr><th>臂</th><th>机制</th><th>机器</th><th class="num">agg0</th><th class="num">agg1</th><th class="num">VR%</th><th class="num">F1@optT</th><th>裁决</th></tr></thead>
+    <tbody>
+        <tr><td>F0</td><td>无干预基线</td><td class="num">5090</td><td class="num">0.83355</td><td class="num">0.84222</td><td class="num">14.71</td><td class="num">0.1233</td><td>参照</td></tr>
+        <tr><td>A0</td><td>HBCE sq λ5</td><td class="num">5090</td><td class="num">0.83272</td><td class="num">0.84230</td><td class="num up"><strong>0.0088</strong></td><td class="num">0.1258</td><td>参照（VR 杀手，AUROC 中性）</td></tr>
+        <tr><td>S2a</td><td>深度调度（无 HBCE）</td><td class="num">5090</td><td class="num">0.83372</td><td class="num">0.84285</td><td class="num">13.93</td><td class="num">0.1263</td><td>❌ VR 不控</td></tr>
+        <tr><td>S2b</td><td>调度×HBCE（方案二主线）</td><td class="num">5090</td><td class="num">0.83378</td><td class="num">0.84246</td><td class="num">0.0219</td><td class="num">0.1269</td><td>✅ 主判通过（深度增量 d2&gt;d1&gt;d0）</td></tr>
+        <tr><td>S1a</td><td>逐层·上层在动（uniform ep50）</td><td class="num">4090D</td><td class="num">0.83274</td><td class="num">0.84315</td><td class="num down">17.79</td><td class="num">0.1255</td><td>✅ 有效但 VR 需兜底（⚠️跨机）</td></tr>
+        <tr><td>S1b</td><td>逐层·上层冻结</td><td class="num">4090D</td><td class="num down">0.82905</td><td class="num down">0.83864</td><td class="num down">31.95</td><td class="num">—</td><td>❌ Q2：冻结有害（CI 排除 0）</td></tr>
+        <tr><td>s1af</td><td>stage∝发生率（freq）</td><td class="num">4090D</td><td class="num">0.83284</td><td class="num">0.84151</td><td class="num">16.79</td><td class="num">0.1252</td><td>❌ 假说被否定</td></tr>
+        <tr><td>s1an</td><td>stage∝标签数（nlabels）</td><td class="num">4090D</td><td class="num">0.83116</td><td class="num">0.84289</td><td class="num">16.16</td><td class="num">0.1268</td><td>≈ 双口径略降</td></tr>
+        <tr><td>s1ai</td><td>stage∝1/发生率（invpref）</td><td class="num">4090D</td><td class="num up"><strong>0.83455</strong></td><td class="num">0.84300</td><td class="num up"><strong>14.44</strong></td><td class="num">0.1243</td><td>⭐ 唯一正向（agg0 +0.18 + VR 最优；值 3 种子确认）</td></tr>
+        <tr style="background:var(--success-bg);"><td><strong>s1c</strong></td><td><strong>S1a 课程 × HBCE（①）</strong></td><td class="num">4090D</td><td class="num">0.83287</td><td class="num highlight"><strong>0.84415</strong></td><td class="num up"><strong>0.0076</strong></td><td class="num">0.1261</td><td>✅✅ <strong>双目标双赢 + bootstrap 排除 0 = 最终推荐形态</strong></td></tr>
+        <tr><td>s1r</td><td>S1a + 阶段切换 reset（②）</td><td class="num">4090D</td><td class="num">0.83275</td><td class="num">0.84206</td><td class="num">14.70</td><td class="num">0.1262</td><td>≈ 中性（reset 无可见收益）</td></tr>
+        <tr><td>s1a100</td><td>S1a ep100（③欠训检查）</td><td class="num">4090D</td><td class="num down">0.82835</td><td class="num down">0.83646</td><td class="num down">20.91</td><td class="num">0.1251</td><td>❌ 过拟合（ep50 非欠训）</td></tr>
+        <tr><td>s1ci</td><td>invpref 课程 × HBCE（§7.9.5 假设）</td><td class="num">4090D</td><td class="num">0.83369</td><td class="num">0.84325</td><td class="num">0.0186</td><td class="num up">0.1280</td><td>❌ 假设证伪（vs s1c −0.03/−0.09pp）</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <p style="font-size:0.875rem;color:var(--gray-600);margin-top:6px;">
+        ⚠️ 机器列：4090D = 训练机A（S1 系全部同机），5090 = 服务器B——S1 系 vs A0/S2b 的 Δ 为跨机（±0.1pp 系统偏移）只作方向性。全部单种子（±2pp 种子方差），显著表述须 3 种子。
+    </p>
+
+    <div class="info-box success" style="margin-top:10px;"><strong>📐 全方向最终认知（五条）：</strong>① F1 低真根因 = 低发生率 × 固定 0.5 阈值（评估侧 per-label 阈值即可 ×10，非 HBCE 压方差）；② 正确组合 = s1c（课程×HBCE）：agg1 0.84415 全家族最高 + 补 VR 短板 + bootstrap 排除 0；③ 课程真实改变学习动态（S2b 深度增量 d2&gt;d1&gt;d0、S1b 冻结伤根层 −0.77pp、s1ai 根层 +0.34pp）；④ 关闭路线 = S1b 冻结 / ep100 / reset / freq-nlabels / 方案二 tuning；⑤ 待办 = 3 种子确认 + 降阈值纳入 6-7 字符深码。</div>
+
+    <h4 style="font-size:1rem;color:var(--gray-800);margin:18px 0 8px;padding-bottom:5px;border-bottom:2px solid var(--danger);">③ s1ci 假设臂裁决（2026-09-09 用户提出 → 09-10 证伪）</h4>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>invpref × HBCE 证伪（−0.03/−0.09pp）</strong>——invpref 增益在 HBCE 下消失（机制同通道不叠加）。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：s1ci 假设臂裁决表（09-09 提出 → 09-10 证伪）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:760px;">
+    <thead><tr><th>臂</th><th class="num">agg0</th><th class="num">agg1</th><th class="num">VR%</th><th class="num">F1@optT</th></tr></thead>
+    <tbody>
+        <tr style="background:var(--success-bg);"><td><strong>s1c</strong>（uniform×HBCE, 终态）</td><td class="num">0.83287</td><td class="num highlight"><strong>0.84415</strong></td><td class="num up"><strong>0.0076</strong></td><td class="num">0.1261</td></tr>
+        <tr><td>s1ci（invpref×HBCE, 新假设）</td><td class="num">0.83369</td><td class="num">0.84325</td><td class="num">0.0186</td><td class="num up">0.1280</td></tr>
+        <tr><td>s1a（纯课程）</td><td class="num">0.83274</td><td class="num">0.84315</td><td class="num down">17.79</td><td class="num">0.1255</td></tr>
+    </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div class="info-box warn" style="margin-top:10px;"><strong>📐 s1ci 裁决：</strong>假说证伪、s1c 保持终态——双口径负向（agg0 −0.03pp / agg1 −0.09pp）+ VR +0.011pp、bootstrap 含 0；机制 = invpref（叶层多训补偿）与 HBCE（叶层压向父层）作用于同一信号通道、功能重叠非正交，两机制不叠加。</div>
+
+    
+</div>
+
+</main>
+</div>
+
+<script>
+function buildInpageNav() {
+    const section = document.getElementById('sidebar-inpage');
+    if (!section) return;
+    section.style.display = 'block';
+
+    const groups = [
+        {label: '🔌 M13: ECG-CPC 换骨', selector: '#sec-m13'},
+        {label: '🔀 M14: 多模态融合 F0-F6', selector: '#sec-m14'},
+        {label: '🧩 M20: tabular 填充阶梯', selector: '#sec-m20'},
+    ];
+
+    // 构建 sidebar HTML：一级项可折叠/展开其子项（与 02-05 页同一套实现）
+    const container = document.getElementById('children-inpage');
+    let html = '';
+    groups.forEach((g, gi) => {
+        const targetId = g.selector ? g.selector.replace('#', '') : '';
+        const el = targetId ? document.getElementById(targetId) : null;
+        if (!el) return;
+
+        let childHtml = '';
+        if (g.children && g.children.length > 0) {
+            const heads = el.querySelectorAll('h4, h5');
+            g.children.forEach((ch, ci) => {
+                let hEl = null;
+                if (ch.idx != null) { hEl = heads[ch.idx] || null; }
+                else { heads.forEach(h => { if (!hEl && h.textContent.includes(ch.h4)) hEl = h; }); }
+                if (!hEl) return;
+                if (!hEl.id) hEl.id = 'inpage-head-' + gi + '-' + ci;
+                childHtml += `<div class="sidebar-child" onclick="document.getElementById('${hEl.id}').scrollIntoView({behavior:window.SCROLL_BEHAVIOR,block:'start'})" style="padding-left:42px;">${ch.label}</div>`;
+            });
+        }
+
+        if (childHtml) {
+            const parentId = 'inpage-parent-' + gi;
+            html += `<div class="sidebar-child" onclick="var p=document.getElementById('${parentId}');var a=this.querySelector('.arrow-inpage');var isHidden=p.style.display==='none';p.style.display=isHidden?'block':'none';a.style.transform=isHidden?'rotate(0deg)':'rotate(90deg)';document.getElementById('${targetId}').scrollIntoView({behavior:window.SCROLL_BEHAVIOR,block:'start'});" style="font-weight:600;display:flex;align-items:center;">${g.label}<span class="arrow-inpage" style="font-size:0.75rem;color:var(--gray-400);margin-left:auto;transition:transform 0.2s;">▼</span></div>`;
+            html += `<div id="${parentId}" style="display:block;">${childHtml}</div>`;
+        } else {
+            html += `<div class="sidebar-child" onclick="document.getElementById('${targetId}').scrollIntoView({behavior:window.SCROLL_BEHAVIOR,block:'start'})">${g.label}</div>`;
+        }
+    });
+    container.innerHTML = html;
+}
+document.addEventListener('DOMContentLoaded', buildInpageNav);
+</script>
+
+<script src="../theme-pack.js"></script>
+<script>
+/* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+(function initThemeSwitcher() {
+    if (!window.THEME_PACK || !THEME_PACK.length) return;
+    const KEY = 'labmeeting-theme';
+    const defTheme = document.body.dataset.defaultTheme || 'default';
+    const sw = document.getElementById('theme-switcher');
+    if (!sw) return;
+    const btn = sw.querySelector('.ts-btn');
+    const panel = document.getElementById('ts-panel');
+    const curLabel = sw.querySelector('.ts-cur');
+
+    // 面板：默认蓝系 + 10 个主题
+    // 本页内联样式已是「人大红 Beamer」（默认主题），故面板不再放虚拟的「默认蓝系」项
+    const opts = THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch }));
+    panel.innerHTML = opts.map(o =>
+        `<button class="ts-opt" type="button" data-theme="${o.id}">
+            <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
+            <span class="ts-name">${o.name}</span>
+            <span class="ts-check ic ic-check"></span>
+        </button>`).join('');
+
+    // 主题字体（webfont）：按需注入/替换 <link id="theme-fonts">；
+    // 加载失败或主题无字体时自动回退主题 CSS 里的系统字体栈
+    function applyFonts(t) {
+        let link = document.getElementById('theme-fonts');
+        if (!t || !t.fonts) { if (link) link.remove(); return; }
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-fonts';
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute('href') !== t.fonts) link.setAttribute('href', t.fonts);
+    }
+    function applyTheme(id) {
+        let el = document.getElementById('theme-overlay');
+        if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
+        const t = THEME_PACK.find(x => x.id === id);
+        // 内联默认主题（人大红）随选择启停：选其他主题时禁用，否则它的直接规则
+        //（如 #header{background:var(--primary)}）会压过主题包仅改 :root 令牌的覆盖方式
+        const baked = document.getElementById('baked-theme');
+        if (baked) baked.disabled = (id !== defTheme);
+        // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
+        let css = (t && id !== defTheme) ? t.css : '';
+        // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
+        const prefix = document.body.dataset.assetPrefix || '';
+        if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
+        el.textContent = css;
+        applyFonts(t);
+        try { localStorage.setItem(KEY, id); } catch (e) {}
+        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
+    }
+
+    // 恢复：localStorage 优先，其次页面默认主题
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    // 存量 'default'（旧默认主题 id）视为未选择——它已不在主题包中，回落新默认（人大红）；
+    // 仅当 saved 命中主题包里的真实主题才沿用（尊重用户显式选择）
+    applyTheme((saved && THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+
+    // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
+    function openPanel() {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = Math.min(r.bottom + 8, window.innerHeight - 260) + 'px';
+        panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+        panel.hidden = false;
+    }
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = panel.hidden;
+        if (open) openPanel(); else panel.hidden = true;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', e => {
+        const opt = e.target.closest('.ts-opt');
+        if (!opt) return;
+        applyTheme(opt.dataset.theme);
+        panel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+})();
+</script>
+<script>
+/* ═══════ 折叠组件（移植自 lab-meeting 模板；本页为单栏流式，无右栏联动） ═══════ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fold-head').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var f = btn.closest('.fold');
+            f.classList.toggle('open');
+            btn.setAttribute('aria-expanded', f.classList.contains('open'));
+        });
+    });
+});
+</script>
+<script>/* 脱敏展示版：外链图表/PDF 不随库分发，加载失败以占位块呈现 */
+document.querySelectorAll('img').forEach(function(im){function ph(){var d=document.createElement("div");d.style.cssText="border:1px dashed rgba(128,118,105,.55);border-radius:8px;padding:16px;margin:10px 0;font-size:13px;opacity:.75;text-align:center";d.textContent="🖼 该配图未随展示库分发（展示版已脱敏）";im.replaceWith(d);}
+if(im.complete&&im.naturalWidth===0){ph();return;}
+im.addEventListener('error',ph);});</script>
+</body>
+</html>

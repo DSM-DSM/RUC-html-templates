@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COL6A3-Endotrophin 介导肥胖→CAD —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="top-nav-bar">
+<span class="current"><span data-zh>← 当前论文</span><span data-en>← Current paper</span></span>
+<span class="sep">|</span>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">📄 STROBE-MR</a>
+<span class="sep">|</span>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📄 MR Primer</a>
+<span class="sep">|</span>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR-CVD</a>
+<span class="sep">|</span>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>📄 <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></span><span data-en>📄 Proteome MR for Stroke</span></a>
+<span class="sep">|</span>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<span class="sep">|</span>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+
+<header>
+  <h1>整合蛋白基因组学分析鉴定 COL6A3 来源的 Endotrophin 作为肥胖对冠心病的中介因子</h1>
+  <div class="meta">
+    <span>📖 Nature Genetics. 2025;57:345–357</span>
+    <span>🔖 DOI: 10.1038/s41588-024-02052-7</span>
+  </div>
+  <div class="meta">
+    <span>✍️ Satoshi Yoshiji, Tianyuan Lu, Guillaume Butler-Laporte 等（35位作者）</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <h3>📑 <span data-zh>目录</span><span data-en>Contents</span></h3>
+  <ol>
+    <li><a href="#sec-0">阅读导引</a></li>
+    <li><a href="#sec-1">第1节：研究背景与科学问题</a></li>
+    <li><a href="#sec-2">第2节：两步孟德尔随机化方法详解</a></li>
+    <li><a href="#sec-3">第3节：Step 1 — BMI对血浆蛋白的因果效应</a></li>
+    <li><a href="#sec-4">第4节：Step 2 — BMI驱动蛋白对心血管代谢疾病的因果效应</a></li>
+    <li><a href="#sec-5">第5节：COL6A3 的深度追踪分析</a></li>
+    <li><a href="#sec-6">第6节：Endotrophin 的因果结构域与生物学机制</a></li>
+    <li><a href="#sec-7">第7节：可操作性评估——能否转化为临床干预？</a></li>
+    <li><a href="#sec-8">第8节：讨论与展望</a></li>
+    <li><a href="#sec-9">要点总结</a></li>
+  </ol>
+</nav>
+
+<!-- ===== SEC 0: 阅读导引 ===== -->
+<section id="sec-0">
+  <h2>0. 阅读导引</h2>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>肥胖为什么会导致心脏病和糖尿病？科学界知道两者强相关，但中间的"桥梁"——<strong>到底是什么生物分子在传递肥胖的危害信号</strong>——一直不清楚。这篇论文的核心思路是：用<strong>基因作为"自然随机化实验"的工具</strong>，在约5000个血液蛋白质中逐一排查，找出那些被肥胖水平升高、同时又直接增加冠心病风险的蛋白质。最终锁定了一个关键分子：<strong>COL6A3蛋白的C端裂解产物——Endotrophin</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>论文与其他论文的关系</h3>
+  <table class="data">
+    <tr><th>维度</th><th>Yoshiji et al. (2025)</th><th>STROBE-MR (JAMA 2021)</th></tr>
+    <tr>
+      <td><strong>性质</strong></td>
+      <td>MR 应用研究（蛋白中介发现）</td>
+      <td>MR 报告规范（检查清单）</td>
+    </tr>
+    <tr>
+      <td><strong>关系</strong></td>
+      <td style="color:var(--green);"><strong>互补（Complements）</strong></td>
+      <td style="color:var(--green);"><strong>互补（Complements）</strong></td>
+    </tr>
+    <tr>
+      <td><strong>共享概念</strong></td>
+      <td colspan="2">双样本MR、IV三大假设、水平多效性检验、敏感性分析、逆方差加权法、共定位分析</td>
+    </tr>
+    <tr>
+      <td><strong>Yoshiji 独有</strong></td>
+      <td colspan="1">两步MR中介分析、蛋白组范围MR (proteome-wide MR)、pQTL工具变量、cis/trans-pQTL、结构域感知MR、多变量MR脂肪/瘦体质量分离</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><strong>如何配合阅读</strong></td>
+      <td colspan="2">先读 STROBE-MR 理解 MR 研究的基本框架和报告要求，再用本文看一个高标准 MR 中介分析的实际范例</td>
+    </tr>
+  </table>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>Yoshiji et al. 的实施完美体现了 STROBE-MR 的许多报告条目要求——包括清晰的暴露/结局定义（条目4-7）、敏感性分析的完整报告（条目8,13）、以及因果语言的审慎使用（条目16b）。这是一个将报告规范落实到高水平研究的典范。详见 <a href="../knowledge_graph.html">知识图谱 → 关系1</a>。
+  </div>
+
+  <h3>符号约定</h3>
+  <table class="data">
+    <tr><th>符号/缩写</th><th>含义</th></tr>
+    <tr><td>MR</td><td>Mendelian Randomization，孟德尔随机化</td></tr>
+    <tr><td>BMI</td><td>Body Mass Index，身体质量指数（肥胖的代理指标）</td></tr>
+    <tr><td>IVW</td><td>Inverse-Variance Weighted，逆方差加权法（MR主分析方法）</td></tr>
+    <tr><td>pQTL</td><td>Protein Quantitative Trait Loci，蛋白数量性状位点（影响蛋白水平的遗传变异）</td></tr>
+    <tr><td>cis-pQTL</td><td>位于编码基因转录起始位点 ±1Mb 范围内的 pQTL</td></tr>
+    <tr><td>trans-pQTL</td><td>位于编码基因远端（>1Mb）的 pQTL</td></tr>
+    <tr><td>CAD</td><td>Coronary Artery Disease，冠心病</td></tr>
+    <tr><td>T2D</td><td>Type 2 Diabetes，2型糖尿病</td></tr>
+    <tr><td>COL6A3</td><td>Collagen Type VI Alpha 3，VI型胶原蛋白α3链</td></tr>
+    <tr><td>OR</td><td>Odds Ratio，比值比</td></tr>
+    <tr><td>PP.H4</td><td>共定位分析中共享因果变异的后验概率</td></tr>
+    <tr><td>GWAS</td><td>Genome-Wide Association Study，全基因组关联研究</td></tr>
+  </table>
+</section>
+
+<!-- ===== SEC 1: 研究背景 ===== -->
+<section id="sec-1">
+  <h2>1. 研究背景与科学问题</h2>
+
+  <h3>1.1 肥胖-心血管代谢疾病的"黑箱"</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>全世界有超过19亿人超重或肥胖。肥胖是冠心病、脑卒中和2型糖尿病的强烈风险因素——这已经是常识。但问题是：<strong>肥胖通过什么中间分子来损害心血管？</strong>这就像一个黑箱：一头输入肥胖，另一头输出心脏病，中间发生了什么我们不清楚。如果找到这些"中间信使"，我们就可能通过药物来阻断这条损害链路。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <p>具体而言，论文提出的核心科学问题是：</p>
+  <ol>
+    <li><strong>哪些循环血浆蛋白被肥胖水平因果性地改变？</strong>（Step 1）</li>
+    <li><strong>这些被肥胖改变的蛋白中，哪些又因果性地影响心血管代谢疾病风险？</strong>（Step 2）</li>
+    <li><strong>这些中介蛋白是否有潜力成为药物靶点？</strong>（可操作性评估）</li>
+  </ol>
+
+  <h3>1.2 为什么选择血液蛋白作为中介候选？</h3>
+
+  <p>选择血浆蛋白作为"中间信使"的候选有四个理由：</p>
+  <ul>
+    <li><strong>肥胖广泛影响循环蛋白水平</strong>——大规模的蛋白组学GWAS已经证明这一点</li>
+    <li><strong>循环蛋白可测量</strong>——现代蛋白组学技术（SomaScan、Olink等）可同时测定数千种蛋白</li>
+    <li><strong>循环蛋白可被干预</strong>——许多已有药物就是以循环蛋白为靶点（如PCSK9抑制剂）</li>
+    <li><strong>有人类遗传学证据支持的药物靶点</strong>在临床试验中成功概率更高（约2倍）</li>
+  </ul>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>本文使用的 pQTL 工具变量选择策略，与 STROBE-MR 条目6-7 的要求一致——明确报告每个遗传变异的选择依据（生物学功能导向 vs. 全基因组显著导向）。Yoshiji 在这里使用了<strong>生物学功能导向</strong>（cis-pQTL ±1Mb的TSS区域），以最大限度减少水平多效性风险。详见 <a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR 详解 → 条目6-7</a>。
+  </div>
+
+  <h3>1.3 两篇奠基性前期工作</h3>
+  <p>本研究建立在以下关键数据资源之上：</p>
+  <ul>
+    <li><strong>Ferkingstad et al. (Nat Genet 2021)</strong>：deCODE 队列在35,559名冰岛人中测量了4,907种血浆蛋白的pQTL——这是当时最大规模的蛋白组学GWAS</li>
+    <li><strong>Yoshiji et al. (既往研究)</strong>：同一团队曾用类似方法鉴定出 nephronectin（肾连蛋白）介导肥胖对COVID-19严重程度的影响——验证了两步MR框架的可行性</li>
+  </ul>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>研究的核心逻辑链：<strong>肥胖 → [血液蛋白变化] → 心血管代谢疾病</strong>。目标是用人类遗传学数据找到方括号中的关键蛋白，并评估其作为药物靶点的潜力。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ===== SEC 2: 两步MR方法详解 ===== -->
+<section id="sec-2">
+  <h2>2. 两步孟德尔随机化方法详解</h2>
+
+  <h3>2.1 核心方法论：MR作为"自然RCT"</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>孟德尔随机化的核心类比是：基因的随机分配就像随机对照试验（RCT）中的随机分组。一个人的基因型在受精时就确定了，不受后天混杂因素（饮食、运动、社会经济状态）的影响，也不会被疾病"反向改变"。因此，如果我们找到影响BMI的基因变异，再看携带不同变异的人是否在蛋白水平和疾病风险上有差异，就能推断出因果链条。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>2.2 两步MR框架</h3>
+
+  <p>在进入逐节拆解之前，先看原论文 Figure 1——它是整项研究的"路线图"：从科学问题到两步 MR 设计，再到 COL6A3 的深度追踪与可操作性评估，一图囊括；后续各节的讲解均可对照本图定位。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig1.jpg" alt="原论文Figure 1：研究设计总览——两步MR流程图与Endotrophin机制示意">
+
+  <p class="fig-caption"><strong>原论文 Figure 1：研究设计总览与结果摘要。</strong>整图自上而下分四层。最上层为研究目标（Objective）与方法-结果摘要栏。第二层是两步 MR 主体：Step 1 用双样本 MR 评估 BMI 对 4,907 种血浆蛋白的因果效应，经 Bonferroni 校正与敏感性分析筛出 1,213 种"BMI 驱动蛋白"；Step 2 再评估这些蛋白对 CAD、缺血性卒中、心源性卒中与 2 型糖尿病风险的因果效应，最终锁定 5 种蛋白、6 个蛋白-疾病关联。第三层是围绕 C-COL6A3 的追踪分析（跨队列复制、观察性验证、因果结构域定位、体脂区室分析、单细胞测序），对应本文第 5–6 节。底层机制图点明核心结论：肥胖上调 COL6A3，其 C 端被酶切释放 Endotrophin 进入血流，进而升高 CAD 风险；最末两栏展示可操作性评估（多变量 MR 分离脂肪/瘦体质量效应、PheWAS 安全性筛查），对应第 7 节。图中箭头方向即因果作用方向，与 2.2 节文字描述的流程完全对应。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>Step 1 MR：BMI → 蛋白</h4>
+    <p>使用BMI的GWAS（n=681,275）作为暴露数据，deCODE蛋白GWAS（n=35,559）作为结局数据，估计BMI对每种蛋白水平的因果效应。使用逆方差加权法（IVW）进行主分析，Bonferroni校正阈值 $P < 1.0 \times 10^{-5}$。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>Step 2 MR：蛋白 → 疾病</h4>
+    <p>将Step 1中通过显著性检验的蛋白（BMI-driven proteins）作为暴露，以冠心病（CAD, 181,522例/1,165,690对照）、缺血性脑卒中（62,100例）、心源性脑卒中（10,804例）和2型糖尿病（80,154例）作为结局，评估每种蛋白对疾病的因果效应。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="algorithm">
+    <span class="tag">算法</span>
+    <h4>两步MR筛选流程</h4>
+    <ol>
+      <li><strong>Step 1 筛选：</strong>4,907种蛋白 → IVW + Bonferroni + 5项敏感性分析 → <strong>1,213种 BMI-driven 蛋白</strong></li>
+      <li><strong>cis-pQTL 限制：</strong>仅保留在编码基因 TSS ±1Mb 内有至少1个cis-pQTL的蛋白 → <strong>最多350种蛋白</strong></li>
+      <li><strong>Step 2 MR：</strong>IVW + Bonferroni（按每种结局的测试数校正）→ 初步显著关联</li>
+      <li><strong>敏感性分析：</strong>加权中位数、MR-Egger、MR-PRESSO → 排除多效性</li>
+      <li><strong>共定位分析（Colocalization）：</strong>PP.H4 > 0.8 → 确认pQTL与疾病共享同一因果变异</li>
+      <li><strong>方向一致性过滤：</strong>β<sub>BMI→蛋白</sub> × β<sub>蛋白→疾病</sub> > 0</li>
+    </ol>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>2.3 关键创新：为什么使用cis-pQTL而非trans-pQTL？</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>遗传变异影响蛋白水平有两条路：<strong>近距离（cis）</strong>和<strong>远距离（trans）</strong>。cis-pQTL 位于编码该蛋白的基因附近（±1Mb），它们直接影响该基因的表达或蛋白结构。trans-pQTL 位于基因组的远端——可能是通过调控其他基因来间接影响——更容易存在水平多效性（即通过无关途径影响疾病）。因此，本研究<strong>严格限制在cis-pQTL</strong>，以最大限度保证MR的"排他性"假设（工具变量仅通过暴露影响结局）。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>这里涉及的 IV 三大假设（相关性、独立性、排他性）和水平多效性检验方法（MR-Egger, MR-PRESSO）是 STROBE-MR 条目8 的核心内容。STROBE-MR 要求研究者<strong>明确报告并讨论</strong>这些假设的满足情况，而 Yoshiji et al. 通过严格的 cis-pQTL 限制和完善的敏感性分析套件为假设验证提供了范例。详见 <a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR 详解 → 条目8</a>。
+  </div>
+</section>
+
+<!-- ===== SEC 3: Step 1结果 ===== -->
+<section id="sec-3">
+  <h2>3. Step 1：BMI对血浆蛋白的因果效应</h2>
+
+  <h3>3.1 核心发现</h3>
+
+  <p>原论文 Figure 2 把 Step 1 的分析流程和代表性结果浓缩为四个面板——它是本节（3.1–3.3）所有关键数字的原始出处。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig2.jpg" alt="原论文Figure 2：Step 1 MR——流程图、火山图、COL6A3散点图与体脂百分比方向一致性">
+
+  <p class="fig-caption"><strong>原论文 Figure 2：Step 1 MR——BMI 对血浆蛋白水平的因果效应。</strong>(a) Step 1 流程图：以 BMI 为暴露、4,907 种血浆蛋白为结局，IVW 主分析并配套异质性、水平多效性、离群稳健估计、反向因果与体脂百分比方向一致性五类检验，筛出 1,213 种 BMI 驱动蛋白。(b) 火山图：横轴为 IVW 效应估计 β，纵轴为 −log10(P)；红点为通过全部检验的蛋白（Bonferroni 阈值 P < 0.05/4,907），灰点为任一检验未通过的蛋白——右上角的 LEP（瘦素）等已知肥胖相关蛋白即方法学阳性对照。(c) MR 散点图（以 C 端 COL6A3 为例）：每个点为一个遗传变异对 BMI 与蛋白水平的效应，三条回归线分别为 IVW（红）、加权中位数（蓝）与 MR-Egger（紫），斜率即因果效应估计。(d) 方向一致性检验：横轴为 BMI 对各蛋白的 MR 效应，纵轴为体脂百分比对同一蛋白的 MR 效应，两者高度相关（r=0.92, P<2.2×10⁻¹⁶）——说明结果并非 BMI 这一个肥胖指标的偶然产物。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <p>在对4,907种血浆蛋白进行MR分析后，发现<strong>BMI因果性地影响了1,213种蛋白的水平</strong>（占总数的24.7%），全部通过了Bonferroni校正和敏感性分析。</p>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>关键蛋白：COL6A3 的 C端 vs N端</h4>
+    <p>SomaScan v4 平台上有两种不同的适配体（aptamers）分别靶向 COL6A3 蛋白的C端和N端区域。MR Step 1 的结果显示：</p>
+    <ul>
+      <li><strong>C-terminal COL6A3：</strong>BMI 每增加 1 SD，蛋白水平显著升高（β 为正值，P 远小于 Bonferroni 阈值）</li>
+      <li><strong>N-terminal COL6A3：</strong>BMI 的影响显著弱于C端</li>
+    </ul>
+    <p>这个差异暗示，COL6A3的活性形式可能主要来自其C端裂解产物。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>3.2 敏感性分析套件</h3>
+  <p>为保证Step 1 MR结果的可靠性，对每个蛋白的MR结果进行了5项敏感性检验：</p>
+  <ul>
+    <li><strong>异质性检验（Cochran's Q）：</strong>检查不同遗传变异给出的效应估计是否一致</li>
+    <li><strong>水平多效性检验（MR-Egger截距）：</strong>偏离零则提示定向多效性</li>
+    <li><strong>MR-PRESSO：</strong>识别并移除外围遗传变异</li>
+    <li><strong>反向因果检验（Steiger方向性）：</strong>确认因果方向是 BMI→蛋白，而非蛋白→BMI</li>
+    <li><strong>体脂百分比方向一致性：</strong>用体脂百分比替代BMI作为暴露，检验效应的方向一致性（r=0.92, P<2.2×10⁻¹⁶）</li>
+  </ul>
+
+  <h3>3.3 弱工具变量评估</h3>
+  <p>本研究中所有工具变量的F统计量均>10（常规阈值），且大多数远高于此值，排除了弱工具变量偏倚的可能。</p>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>Step 1 确认了<strong>1,213种被BMI因果性调控的血浆蛋白</strong>，覆盖了代谢、炎症、细胞外基质等多种生物学通路。其中，LEP（瘦素）作为阳性对照（已知肥胖上调瘦素），从侧面验证了方法学的可靠性。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ===== SEC 4: Step 2结果 ===== -->
+<section id="sec-4">
+  <h2>4. Step 2：BMI驱动蛋白对心血管代谢疾病的因果效应</h2>
+
+  <h3>4.1 主要发现</h3>
+
+  <p>Step 2 将1,213种BMI驱动蛋白限制为<strong>有cis-pQTL数据可用的最多350种蛋白</strong>，然后对每种疾病结局分别进行MR分析。经过MR+敏感性分析+共定位分析（PP.H4>0.8），最终鉴定出<strong>9个蛋白-疾病关联</strong>（涉及5种不同的蛋白）。</p>
+
+  <p>Step 2 的完整流程与全部核心结果汇总在原论文 Figure 3 中——本节（4.1–4.3）的讲解均围绕这张图展开。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig3.jpg" alt="原论文Figure 3：Step 2 MR流程图、四种心血管代谢疾病的森林图与COL6A3-CAD共定位图">
+
+  <p class="fig-caption"><strong>原论文 Figure 3：Step 2 MR——BMI 驱动蛋白对心血管代谢疾病的因果效应。</strong>(a) Step 2 流程图：将 1,213 种 BMI 驱动蛋白经 cis-pQTL 检索与数据协调后最多保留 350 种，逐一做 MR + 敏感性分析 + 共定位分析。(b) 森林图：展示通过全部检验的蛋白对四种结局——CAD、缺血性卒中、心源性卒中与 2 型糖尿病——的效应（每个结局使用当时最大规模 GWAS，样本量见图中标注）；C-COL6A3 升高 CAD 风险（OR 1.47, 95% CI 1.26–1.70, P=4.46×10⁻⁷, PP.H4>0.99）、PCSK9 升高 CAD 风险（PP.H4=1.00）、F11 升高缺血性卒中（OR 1.14）与心源性卒中（OR 1.29）风险、SPATA20 升高 2 型糖尿病风险（PP.H4=0.85）；误差线为 95% CI（随机效应 IVW 双侧检验）。(c) LocusZoom 共定位图：lead cis-pQTL rs11677932 周围 500-kb 区域内，C 端 COL6A3 的 pQTL 信号（左）与 CAD 的 GWAS 信号（右）峰形重合，共享因果变异的后验概率 PP.H4 > 0.99——4.2 节表格中"共定位 PP.H4"一栏即来源于此。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <h3>4.2 五个关键中介蛋白</h3>
+
+  <table class="data">
+    <tr><th>蛋白</th><th>疾病结局</th><th>OR (每1 SD增加)</th><th>P值</th><th>共定位 PP.H4</th></tr>
+    <tr>
+      <td><strong>C-COL6A3</strong></td><td>冠心病 (CAD)</td>
+      <td><strong>1.47 (1.26–1.70)</strong></td>
+      <td>4.46×10⁻⁷</td>
+      <td>>0.99</td>
+    </tr>
+    <tr>
+      <td><strong>PCSK9</strong></td><td>冠心病 (CAD)</td>
+      <td>1.26 (1.14–1.40)</td>
+      <td>5.1×10⁻⁶</td>
+      <td>>0.99</td>
+    </tr>
+    <tr>
+      <td><strong>F11</strong></td><td>缺血性脑卒中</td>
+      <td>1.14 (1.10–1.18)</td>
+      <td>2.73×10⁻¹⁵</td>
+      <td>>0.99</td>
+    </tr>
+    <tr>
+      <td><strong>F11</strong></td><td>心源性脑卒中</td>
+      <td>1.29 (1.20–1.39)</td>
+      <td>7.59×10⁻¹²</td>
+      <td>0.99</td>
+    </tr>
+    <tr>
+      <td><strong>SPATA20</strong></td><td>2型糖尿病</td>
+      <td>1.12 (1.07–1.17)</td>
+      <td>1.1×10⁻⁶</td>
+      <td>>0.99</td>
+    </tr>
+  </table>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>为何PCSK9是"阳性对照"？</h4>
+    <p>PCSK9（前蛋白转化酶枯草溶菌素9）是一个已经被临床验证的冠心病药物靶点——PCSK9抑制剂（evolocumab, alirocumab）已获批用于降低LDL-C和预防心血管事件。本研究鉴定出BMI → PCSK9 ↑ → CAD风险 ↑ 的因果链路，与已知的药理学机制完全吻合，为整个方法学框架提供了强有力的阳性对照验证。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>4.3 方向一致性过滤</h3>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <p>由于BMI对心血管代谢疾病的总体效应是<strong>增加风险</strong>（BMI→CAD: OR=1.47; BMI→卒中: OR=1.19-1.21; BMI→T2D: OR=2.58），因此合理的中介蛋白应满足：<strong>BMI升高该蛋白，且该蛋白升高疾病风险</strong>——即 β<sub>BMI→蛋白</sub> × β<sub>蛋白→疾病</sub> > 0。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <p>在9个蛋白-疾病关联中，<strong>6个</strong>（包括COL6A3→CAD、PCSK9→CAD、F11→两种卒中、SPATA20→T2D等）满足方向一致性条件。</p>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>在所有中介蛋白中，<strong>C-COL6A3对CAD的效应最强</strong>（OR=1.47），超过了阳性对照PCSK9（OR=1.26）。而且C-COL6A3被BMI上调的幅度远大于N-COL6A3——这暗示C-COL6A3的裂解产物（endotrophin）可能是真正的效应分子。</p>
+  <span class="src-ref">
+
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="crossref">
+<strong>&#x1F4CE; 知识链接：</strong>两步MR（BMI → 蛋白 → CAD）与 <a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">Salamone et al. (2026) DANDELION</a> 共享"两步中介"的思想骨架：DANDELION 同样沿 X→M→Y 链，用反式调控关联（XM）+ WES负担检验（MY）两步组合证据，并以 DACT p 值排序做基因组范围扫描。区别在于：本文用 pQTL 估计中介效应大小，DANDELION 只做 p 值显著性筛选来定位 DPG。
+详见 <a href="../knowledge_graph.html">知识图谱 → 关系卡片</a>。
+</div>
+</section>
+
+<!-- ===== SEC 5: COL6A3深度追踪 ===== -->
+<section id="sec-5">
+  <h2>5. COL6A3 的深度追踪分析</h2>
+
+  <h3>5.1 跨队列复制验证</h3>
+
+  <p>为确认COL6A3的发现不是deCODE数据的统计偶然，研究团队在三个独立队列中进行了复制：</p>
+
+  <table class="data">
+    <tr><th>分析</th><th>复制队列</th><th>平台</th><th>结果</th></tr>
+    <tr>
+      <td><strong>Step 1 复制</strong><br>(BMI→COL6A3)</td>
+      <td>UK Biobank (n=35,571)、Fenland (n=12,084)</td>
+      <td>Olink Explore 3072</td>
+      <td>两者均成功复制，效应方向一致</td>
+    </tr>
+    <tr>
+      <td><strong>Step 2 复制</strong><br>(COL6A3→CAD)</td>
+      <td>UK Biobank、Fenland、ARIC (n=7,213)</td>
+      <td>Olink + SomaScan</td>
+      <td>三个队列全部复制，效应方向一致</td>
+    </tr>
+  </table>
+
+  <h3>5.2 观察性验证：EPIC-Norfolk 和 UK Biobank</h3>
+
+  <p>在EPIC-Norfolk前瞻性队列（n=872，含207例CAD）和UK Biobank（n=38,361，10年随访）中：</p>
+  <ul>
+    <li>BMI与C-COL6A3水平呈正相关</li>
+    <li>基线C-COL6A3水平越高，随访期间CAD累积发病率越高</li>
+  </ul>
+
+  <p>原论文 Figure 4 把 UK Biobank 这条观察性证据画成了分位数生存曲线——基线 C-COL6A3 越高，CAD 累积发病率越高，一眼可辨。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig4.jpg" alt="原论文Figure 4：UK Biobank基线COL6A3四分位组的CAD累积发病率曲线">
+
+  <p class="fig-caption"><strong>原论文 Figure 4：基线 COL6A3 水平与 CAD 累积发病率（UK Biobank 观察性分析）。</strong>38,361 人（2,969 例 CAD、32,131 例对照）按基线血浆 C-COL6A3 水平分为四组：Q1（蓝，最低 25%）、Q2（绿，26–50%）、Q3（橙，51–75%）、Q4（红，最高分位组，76–100%）。纵轴为 CAD 累积发病率，横轴为随访年数；中心线为各组效应估计，阴影带为 95% CI。Q4 组发病率最高、Q1 组最低（log-rank 检验 P<2.2×10⁻¹⁶），且多变量 Cox 回归显示 C-COL6A3 每升高 1 SD，CAD 风险增加 40%（HR 1.40, 95% CI 1.35–1.45）——即 5.2 节引述的观察性证据。需要强调：这是观察性关联，本身不能证明因果，其价值在于与两步 MR 的因果估计方向一致，构成三角互证。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <h3>5.3 表观基因组学分析</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>找到遗传变异只是第一步。接下来要追问：这个变异<strong>通过什么分子机制</strong>影响COL6A3的水平？这就像不光知道开关在哪，还要搞清楚里面的电路是怎么接的。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <p>对C-COL6A3的lead cis-pQTL（rs11677932）周围的表观基因组学分析发现：</p>
+  <ul>
+    <li><strong>ATAC-seq</strong>（检测开放染色质区域）：该区域在脂肪组织、冠状动脉、主动脉中呈开放状态</li>
+    <li><strong>ChIP-seq</strong>：H3K4me3（活性启动子标记）和H3K27ac（活性增强子标记）在脂肪和动脉组织中高度富集</li>
+    <li><strong>转录因子结合预测</strong>：rs11677932 可能影响转录因子 <strong>MEF2B</strong> 的结合——MEF2家族在肌肉和脂肪细胞分化中起关键作用</li>
+  </ul>
+
+  <p>上面这三层证据——开放染色质、活性组蛋白标记、转录因子结合——的原始数据全部来自原论文 Figure 6。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig6.jpg" alt="原论文Figure 6：lead cis-pQTL rs11677932的表观基因组学画像——LocusZoom、ATAC-seq与组蛋白修饰轨道、MEF2B结合预测">
+
+  <p class="fig-caption"><strong>原论文 Figure 6：lead cis-pQTL（rs11677932）的表观基因组学画像。</strong>(a) LocusZoom 图：rs11677932 周围 1-Mb 区域内 C 端 COL6A3 的 pQTL 信号（deCODE 数据），纵轴为 −log10(P)（双侧 Z 检验），点色代表与 lead 变异的 LD（r²）；黄色阴影区即 (b) 的放大区间。(b) 染色质状态轨道（chr2:237,305,312–237,325,312, GRCh38）：红色为 ATAC-seq（开放染色质），蓝色为 H3K4me3、绿色为 H3K27ac ChIP-seq；自上而下依次为脂肪组织、冠状动脉、主动脉、胸动脉与胫动脉——可见 rs11677932 在脂肪与动脉组织中处于开放染色质且携带活性启动子/增强子标记，这是"该变异位于功能性调控元件内"的直接证据。(c) 转录因子结合预测：rs11677932 落在 MEF2B 的结合模体中，等位基因变化可能改变 MEF2B 的结合亲和力（ENCODE 编号 ENCSR782UOT）。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+<div class="definition">
+<span class="tag">正式定义</span>
+<h4>表观基因组学分析的三层递进逻辑</h4>
+<p>表观基因组学分析不是从单个实验得出"这个 SNP 调控 COL6A3"的结论，而是通过三层独立证据链逐步收敛：</p>
+<ol>
+  <li><strong>ATAC-seq</strong>（Assay for Transposase-Accessible Chromatin using sequencing）：用 Tn5 转座酶"标记"基因组中开放的染色质区域——开放的 DNA 才能被转录因子和 RNA 聚合酶机器结合。如果 SNP 所在的区域在脂肪/动脉组织中 ATAC-seq 信号高，说明该区域在<strong>这些组织中是可调控的</strong>，而非被压缩在无活性的异染色质里。</li>
+  <li><strong>ChIP-seq</strong>（Chromatin Immunoprecipitation Sequencing）：用特定组蛋白修饰的抗体把 DNA 片段"拉下来"，测序看哪些基因组区域富集了哪种组蛋白修饰。H3K4me3 = 活性启动子标记（基因"开始转录"的地方）、H3K27ac = 活性增强子标记（远程调控元件在"工作"）。如果 SNP 区域的两种修饰都富集，说明它是<strong>一个有功能的调控元件</strong>。</li>
+  <li><strong>转录因子结合预测</strong>：SNP 改变了 DNA 的碱基序列，如果这个碱基恰好位于某个转录因子的结合模体（motif）中，那么 SNP 的等位基因变化就可能<strong>增强或削弱转录因子的结合亲和力</strong>，进而改变下游基因（COL6A3）的转录速率。</li>
+</ol>
+<p><strong>关键逻辑链：</strong>如果三层证据在<strong>同一组织、同一方向</strong>上都指向 COL6A3，那么这个 SNP 就不仅是一个"统计学上显著"的变异——它有一个可解释的、可验证的分子机制。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="example">
+<span class="tag">具体示例</span>
+<h4>从"统计学 pQTL"到"有分子机制的调控变异"：rs11677932 的五步证据链</h4>
+
+<table style="width:100%; margin:10px 0; font-size:0.92em;">
+  <tr><th style="background:#1a5276;color:#fff;width:8%;">步骤</th><th style="background:#1a5276;color:#fff;width:20%;">实验/数据</th><th style="background:#1a5276;color:#fff;width:22%;">发现</th><th style="background:#1a5276;color:#fff;width:50%;">生物学含义</th></tr>
+
+  <tr>
+    <td style="text-align:center;font-weight:700;">1</td>
+    <td>GWAS cis-pQTL 定位</td>
+    <td>rs11677932 是 C-COL6A3 的 lead SNP（P 值最显著的变异）</td>
+    <td>rs11677932 所在的基因组区域与 COL6A3 蛋白水平在统计上显著关联——<strong>但此时我们不知道它是否"有功能"还是仅仅是 LD 的"搭车者"</strong></td>
+  </tr>
+
+  <tr style="background:#f0f7fb;">
+    <td style="text-align:center;font-weight:700;">2</td>
+    <td>ATAC-seq（开放染色质检测）</td>
+    <td>该区域在脂肪组织、冠状动脉、主动脉中呈开放状态</td>
+    <td>rs11677932 所在的 DNA 区域在这些代谢和心血管组织中<strong>物理上可被调控机器访问</strong>——如果它在所有组织中都处于关闭状态，它就不太可能具有功能性调控作用。脂肪组织和动脉组织的开放性特别重要，因为 COL6A3/endotrophin 在这些组织中活跃表达</td>
+  </tr>
+
+  <tr>
+    <td style="text-align:center;font-weight:700;">3</td>
+    <td>ChIP-seq（组蛋白修饰图谱）</td>
+    <td>H3K4me3（活性启动子）和 H3K27ac（活性增强子）在脂肪和动脉组织中高度富集</td>
+    <td><strong>双重标记</strong>：H3K4me3 标记提示这是一个"准备启动"的区域（启动子）；H3K27ac 标记提示这是一个"正在被调控"的区域（增强子）。两个标记同时存在 = 这个位点是一个<strong>活跃的功能性调控元件</strong>，而不仅仅是基因组中的"背景噪音"</td>
+  </tr>
+
+  <tr style="background:#f0f7fb;">
+    <td style="text-align:center;font-weight:700;">4</td>
+    <td>转录因子结合预测（in silico）</td>
+    <td>rs11677932 可能影响转录因子 MEF2B 的结合</td>
+    <td>SNP 的参考等位基因和替代等位基因可能对 MEF2B 的 DNA 结合亲和力不同——<strong>这为"为什么 A 等位基因的人 COL6A3 水平高于 G 等位基因的人"提供了分子解释</strong>。MEF2 家族已知在肌肉分化、脂肪细胞分化和心血管发育中发挥核心转录调控作用。如果 MEF2B 在该位点结合并调控 COL6A3 表达，这条通路就是"上游 TF → 增强子 SNP → 下游蛋白表达"的完整因果链</td>
+  </tr>
+
+  <tr>
+    <td style="text-align:center;font-weight:700;">5</td>
+    <td>整合结论</td>
+    <td>rs11677932 → COL6A3 水平的变化 具有表观基因组学上的分子机制支持</td>
+    <td>这条 SNP 不是"随机的统计学噪音"——它在代谢相关组织中处于开放染色质区域，带有活性增强子标记，且可能通过 MEF2 转录因子调控 COL6A3 表达。<strong>这使得后续两步 MR 的因果结论更加可信：SNP → 蛋白 → 疾病 的逻辑链不仅统计学上成立，分子生物学上也可解释</strong></td>
+  </tr>
+</table>
+
+<p style="margin-top:12px;">这五步构成了一个<strong>"统计显著 → 染色质可调控 → 活性调控元件 → 转录因子机制 → 因果解释"</strong>的完整证据闭环。在审稿和评估 MR 研究时，这种多层次的机制证据是区分"稳健发现"和"可能假阳性"的关键标准。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+<div class="summary">
+<span class="tag">要点总结</span>
+<p>5.3 节的表观基因组学分析回答了"为什么是 rs11677932？"这个深层问题。GWAS 只告诉你"这个 SNP 与 COL6A3 水平有关"（统计学显著），表观基因组学分析进一步告诉你"<strong>因为这个 SNP 位于一个有活跃调控功能的基因组区域，可能通过 MEF2B 转录因子调控基因表达</strong>"（生物学可解释）。在 MR 研究中，统计学证据（Wald ratio 的 p 值）和生物学证据（表观基因组学）的交叉验证，是因果推断最强的论证形式。</p>
+<span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+
+
+  <h3>5.4 单细胞RNA测序</h3>
+
+  <p>COL6A3 究竟在哪些细胞类型里表达？原论文 Figure 7 给出了这一节结论的原始证据——脂肪组织与冠状动脉的单细胞图谱。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig7.jpg" alt="原论文Figure 7：COL6A3在脂肪组织和冠状动脉中的单细胞表达UMAP图">
+
+  <p class="fig-caption"><strong>原论文 Figure 7：COL6A3 的单细胞测序分析。</strong>(a) 脂肪组织与 (b) 冠状动脉的单细胞 UMAP 图；每一行左列为按 COL6A3 表达水平着色的 UMAP（暖色表示高表达），右列为按细胞类型注释着色的 UMAP。(a) 中 COL6A3 在脂肪干细胞与前体细胞（ASPC）及成纤维细胞中显著高表达——它们是脂肪组织纤维化的关键驱动者；(b) 中 COL6A3 富集于平滑肌细胞与成纤维细胞——它们是动脉粥样硬化斑块形成的关键执行者。这说明 COL6A3 在"肥胖→脂肪组织纤维化→代谢紊乱"与"血管纤维化→斑块"两条通路上都有表达基础，与 5.4 节正文的解读一致。数据来源：脂肪组织取自 SCP1376（Broad 单细胞门户），冠状动脉取自 GSE131780（GEO 数据库）。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>COL6A3 在哪些细胞中表达？</h4>
+    <p>利用公开的单细胞RNA-seq数据（Nathan et al., SCP498），分析发现：</p>
+    <ul>
+      <li><strong>脂肪组织：</strong>COL6A3在脂肪前体细胞（ASPC, Adipose Stem and Precursor Cells）和<strong>成纤维细胞</strong>中高表达——这些细胞是纤维化的关键驱动者</li>
+      <li><strong>冠状动脉：</strong>COL6A3在<strong>平滑肌细胞</strong>和<strong>成纤维细胞</strong>中高表达（Wirka et al., GSE131780）——这些细胞参与动脉粥样硬化斑块形成</li>
+    </ul>
+    <p>这意味着COL6A3在"肥胖→脂肪组织纤维化→系统性代谢紊乱"和"血管纤维化→动脉粥样硬化"两条通路中都扮演关键角色。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>通过<strong>跨队列MR复制、观察性验证、表观基因组学、单细胞RNA测序</strong>四个层次的正交证据，COL6A3（尤其是其C端区域）被牢牢锁定为肥胖→CAD通路中的关键中介分子。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ===== SEC 6: Endotrophin ===== -->
+<section id="sec-6">
+  <h2>6. Endotrophin：确定因果效应结构域</h2>
+
+  <p>本节要回答的问题是：COL6A3 的致病效应究竟落在哪个结构域？原论文 Figure 5 用五个面板给出完整答案——从蛋白结构域图谱到结构域特异 MR，再到体脂区室定位，一图到底，可与 6.1–6.3 节的讲解逐段对照。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig5.jpg" alt="原论文Figure 5：COL6A3的追踪分析——Endotrophin机制示意、结构域图谱与结构域感知MR森林图">
+
+  <p class="fig-caption"><strong>原论文 Figure 5：COL6A3 的追踪分析——从结构域到体脂区室。</strong>(a) 机制示意：肥胖促使 COL6A3 生成增多，其 C 端被酶切为活性片段 Endotrophin 进入血流，进而升高 CAD 风险。(b) COL6A3（UniProt P12111）结构域图谱：N 端含 N1–N10 十个 von Willebrand factor A 型模块，C 端含 C1–C2 模块及 COL6A3 独有的 C3–C5 结构域，最末端的 C5 被切下即形成可溶性 Endotrophin；SomaScan 的两个适配体分别靶向 N 端（氨基酸 26–1,036，未被切割的部分）与 C 端（氨基酸 3,108–3,165，被切割的部分）——这也是"两种 COL6A3"测量值的由来。(c) 结构域感知 MR：C 端 COL6A3 每升高 1 SD，CAD 风险升高 47%（OR 1.47, 95% CI 1.26–1.70, P=4.5×10⁻⁷），而 N 端完全无效应（OR 1.00, 95% CI 0.87–1.14, P=0.98）——致病效应集中且仅集中在 C 端。(d) BMI 与体脂百分比对 C/N 端 COL6A3 的 MR：两者对 C 端的效应（BMI β=0.32；体脂百分比 β=0.38）均远强于对 N 端的效应（β=0.10 与 0.14）。(e) 体脂区室分析：仅腹部皮下脂肪组织显著升高 C 端 COL6A3（β=0.52, 95% CI 0.35–0.69），内脏与臀股部脂肪组织均无显著效应——与 6.3 节"苹果型肥胖更危险"的结论直接对应。误差线为 95% CI，P 值来自随机效应 IVW 双侧检验。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <h3>6.1 结构域感知MR（Domain-Aware MR）</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>COL6A3是一个大蛋白，全长3,177个氨基酸。它被分泌后会在体内被切割成不同片段。SomaScan平台上有两种适配体分别靶向C端和N端。既然C-COL6A3的MR效应显著强于N-COL6A3，那真正有害的是C端被切下来的那个片段——<strong>Endotrophin（内皮营养素）</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>6.2 COL6A3 的分子生物学</h3>
+
+  <p>VI型胶原蛋白（Collagen VI）由三条α链（α1, α2, α3）组成异源三聚体。其中COL6A3（α3链）最大，包含多个结构域：</p>
+  <ul>
+    <li>N端：7个 von Willebrand factor A (vWA) 结构域</li>
+    <li>中间：三螺旋胶原结构域</li>
+    <li><strong>C端：包含fibronectin type III结构域和Kunitz型蛋白酶抑制剂结构域——被切割后释放 Endotrophin</strong></li>
+  </ul>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>Endotrophin</h4>
+    <p>Endotrophin是COL6A3的C端裂解产物（约76kDa），由基质金属蛋白酶（MMP）或骨形态发生蛋白1（BMP-1）在细胞外切割COL6A3产生。已有文献报道Endotrophin在肥胖相关的脂肪组织纤维化、胰岛素抵抗和肿瘤进展中发挥重要作用。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>为什么Endotrophin特异性地驱动CAD风险？</h4>
+    <p>Endotrophin通过以下多种机制促进动脉粥样硬化：</p>
+    <ol>
+      <li><strong>促进纤维化：</strong>激活TGF-β信号通路，刺激成纤维细胞增殖和胶原沉积</li>
+      <li><strong>诱导炎症：</strong>募集巨噬细胞并促进其向促炎M1表型极化</li>
+      <li><strong>内皮功能障碍：</strong>抑制内皮型一氧化氮合酶（eNOS）活性，减少NO生成</li>
+      <li><strong>代谢紊乱：</strong>加重脂肪组织胰岛素抵抗，促进脂毒性</li>
+    </ol>
+    <p>这就像一个"多重打击"模型——Endotrophin同时从纤维化、炎症、内皮功能和代谢四个维度推动冠状动脉粥样硬化的进展。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>6.3 特定体脂区室分析</h3>
+
+  <p>有趣的是，并非所有身体部位的脂肪都同等增加COL6A3水平。通过脂肪分布特异性的MR分析：</p>
+  <ul>
+    <li><strong>腹部皮下脂肪（abdominal SAT）增加</strong> → COL6A3 ↑（显著）</li>
+    <li><strong>内脏脂肪（visceral AT）</strong> → 对COL6A3无显著影响</li>
+    <li><strong>臀股部脂肪（gluteofemoral AT）</strong> → 对COL6A3无显著影响</li>
+  </ul>
+  <p>这表明<strong>腹部皮下脂肪组织是Endotrophin的主要来源</strong>，与临床观察一致——中心性肥胖（"苹果型"）比下半身肥胖（"梨型"）心血管风险更高。</p>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>Domain-aware MR 精准锁定了COL6A3的<strong>C端裂解产物Endotrophin</strong>为真正的致病分子。这为药物开发提供了明确的靶点方向——不是要去抑制整个COL6A3蛋白（可能会影响正常的细胞外基质功能），而是<strong>特异性地阻断Endotrophin的产生或其下游信号</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ===== SEC 7: 可操作性 ===== -->
+<section id="sec-7">
+  <h2>7. 可操作性评估——能否转化为临床干预？</h2>
+
+  <h3>7.1 减少脂肪质量能否降低Endotrophin？</h3>
+
+  <div class="intuition">
+    <span class="tag">直观理解</span>
+    <p>如果我们发现Endotrophin是肥胖伤害心脏的"中间信使"，下一个问题自然是：<strong>减肥能降低Endotrophin水平吗？</strong>研究团队使用多变量MR（MVMR）来回答这个问题。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="definition">
+    <span class="tag">正式定义</span>
+    <h4>多变量MR（MVMR）</h4>
+    <p>在标准单变量MR中，我们只能一次估计一个暴露对结局的因果效应。MVMR允许同时将<strong>多个相关的暴露</strong>（如脂肪质量和瘦体质量）纳入同一个模型，从而估计<strong>每个暴露在控制其他暴露后的独立因果效应</strong>。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <p>MVMR分析结果显示：</p>
+  <ul>
+    <li><strong>脂肪质量（fat mass）增加</strong> → 提高所有5种中介蛋白（包括endotrophin）的水平 + 增加心血管代谢疾病风险</li>
+    <li><strong>瘦体质量（fat-free mass）增加</strong> → 对中介蛋白和疾病风险无显著独立效应</li>
+    <li>这意味着<strong>减脂（而非减肌）</strong>可以同时降低Endotrophin水平和其他中介蛋白，从而降低心血管代谢疾病风险</li>
+  </ul>
+
+  <p>原论文 Figure 8 正是这组多变量 MR 的森林图汇总——左半张是脂肪质量的效应，右半张是瘦体质量的效应，对比之下"减脂而非减肌"的结论一目了然。</p>
+
+  <img src="images/Yoshiji/Yoshiji_Fig8.jpg" alt="原论文Figure 8：脂肪质量与瘦体质量对中介蛋白和心血管代谢疾病的多变量MR森林图">
+
+  <p class="fig-caption"><strong>原论文 Figure 8：脂肪质量与瘦体质量对中介蛋白和心血管代谢疾病的多变量 MR。</strong>(a) 以脂肪质量（左）与瘦体质量（右）为暴露、7 种中介蛋白为结局：脂肪质量显著升高全部中介蛋白（C-COL6A3 β=0.32、F11 β=0.31、PCSK9 β=0.23、C1R β=0.19、SPATA20 β=0.17，均为每 1 SD 脂肪质量的效应），瘦体质量则降低其中若干蛋白（F11 β=−0.26、PCSK9 β=−0.11、C1R β=−0.14、SPATA20 β=−0.19）且对 C-COL6A3 无效（β=0.004, P=0.94）。(b) 以疾病为结局：脂肪质量升高 2 型糖尿病（OR 3.04）、CAD（OR 1.64）与缺血性卒中（OR 1.29）风险，瘦体质量则降低这些风险（T2D OR 0.63、CAD OR 0.72、缺血性卒中 OR 0.82）。两张图合并读出同一个结论：驱动蛋白中介与疾病风险的是脂肪而非瘦体质量——减脂即可同时下调中介蛋白水平与心血管代谢疾病风险。误差线为 95% CI，P 值来自随机效应 IVW 双侧检验。<br>图源：Yoshiji et al., <em>Nature Genetics</em> (2025)。</p>
+
+  <h3>7.2 表型组范围关联分析（PheWAS）：Endotrophin 是否安全？</h3>
+
+  <div class="example">
+    <span class="tag">具体示例</span>
+    <h4>药物靶点的安全性评估</h4>
+    <p>一个好的药物靶点不仅要有疗效，更重要的是<strong>安全</strong>——抑制它不能引起严重的副作用。研究团队用genetically proxied Endotrophin降低来模拟"药物抑制Endotrophin"的效果，然后在数千种表型中排查潜在的不良反应。</p>
+    <p>结果令人振奋：<strong>降低Endotrophin水平在PheWAS中没有与任何不良健康结局显著关联</strong>。这意味着靶向Endotrophin的药物可能具有良好的安全性。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <h3>7.3 与已有药物靶点的比较</h3>
+
+  <p>Endotrophin 作为潜在的药物靶点具有几个优势：</p>
+  <ul>
+    <li><strong>人类遗传学证据强：</strong>cis-pQTL → colocalization 的证据链完整</li>
+    <li><strong>通路新颖：</strong>与现有降脂药（他汀、PCSK9i）机制不同——靶向的是脂肪组织-血管的纤维化-炎症轴</li>
+    <li><strong>可监测性：</strong>Endotrophin可在血液中测量，便于临床试验中的靶点结合和药效学生物标志物监测</li>
+    <li><strong>安全窗口大：</strong>PheWAS未发现显著安全问题</li>
+  </ul>
+
+  <div class="warning">
+    <span class="tag">注意事项</span>
+    <p>尽管MR结果令人鼓舞，但从遗传关联到临床药物还有很长的路要走。主要的局限性包括：(1) 遗传预测的"终身效应"可能不等于药物短期抑制的效应；(2) COL6A3的完全敲除可能导致肌肉营养不良（已知COL6A3突变导致Bethlem肌病和Ullrich先天性肌营养不良），因此需要<strong>部分抑制</strong>或特异性阻断Endotrophin的释放；(3) MR分析限于欧洲血统人群，在其他血统中的推广性有待验证。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <p>可操作性评估表明：(1) 减脂可降低所有蛋白中介水平，(2) 降低Endotrophin可能是安全有效的CAD预防策略，(3) Endotrophin满足了人类遗传学验证药物靶点的多项标准。</p>
+  <span class="src-ref">
+    
+📖 原文出处：阅读导引
+</span>
+</div>
+</section>
+
+<!-- ===== SEC 8: 讨论 ===== -->
+<section id="sec-8">
+  <h2>8. 讨论与展望</h2>
+
+  <h3>8.1 研究的主要贡献</h3>
+  <ol>
+    <li><strong>系统性发现：</strong>首次在蛋白组范围内系统鉴定出5种介导肥胖→心血管代谢疾病的中介蛋白</li>
+    <li><strong>方法学严谨：</strong>两步MR + cis-pQTL限制 + colocalization + 多队列复制 + 表观基因组学 + 单细胞测序的多层次正交证据链</li>
+    <li><strong>转化价值：</strong>为Endotrophin作为CAD治疗靶点提供了完整的人类遗传学证据</li>
+  </ol>
+
+  <h3>8.2 局限性</h3>
+  <ul>
+    <li><strong>人群限制：</strong>所有数据来自欧洲血统人群，在非洲和亚洲人群中的推广性未知</li>
+    <li><strong>检测范围限制：</strong>SomaScan v4最高覆盖4,907个蛋白靶点（实际更多），并非完整蛋白组</li>
+    <li><strong>cis-pQTL限制的代价：</strong>从1,213种蛋白锐减到350种，可能漏掉了一些真正重要的但缺乏强cis-pQTL的中介蛋白</li>
+    <li><strong>非线性关系：</strong>MR假设线性因果效应，但BMI与蛋白/疾病的关系可能非线性</li>
+    <li><strong>组织特异性：</strong>尽管scRNA-seq提示了COL6A3来源，但循环Endotrophin的确切组织来源仍需实验验证</li>
+  </ul>
+
+  <h3>8.3 未来方向</h3>
+  <ul>
+    <li><strong>药物开发：</strong>开发Endotrophin中和抗体或BMP-1/MMP抑制剂以阻断COL6A3的C端切割</li>
+    <li><strong>跨血统验证：</strong>在非洲和亚洲血统的蛋白组学GWAS中进行复制</li>
+    <li><strong>更大蛋白组覆盖：</strong>Olink Explore（3,072蛋白）和即将出现的10,000+蛋白平台将扩展搜索范围</li>
+    <li><strong>临床试验：</strong>减重干预试验中测量Endotrophin变化，验证MR预测</li>
+  </ul>
+</section>
+
+<!-- ===== SEC 9: 总结 ===== -->
+<section id="sec-9">
+  <h2>9. 全文要点总结</h2>
+
+  <div class="summary">
+    <span class="tag">要点总结</span>
+    <h4>核心发现一句话</h4>
+    <p><strong>肥胖通过升高 COL6A3 的C端裂解产物 Endotrophin 来增加冠心病风险，而减脂可以降低Endotrophin水平，为心血管疾病的预防和治疗提供了新的可成药靶点。</strong></p>
+  <span class="src-ref">
+    
+📖 原文出处：原文相关章节
+</span>
+</div>
+
+  <h3>关键数字</h3>
+  <table class="data">
+    <tr><th>数字</th><th>含义</th></tr>
+    <tr><td>4,907</td><td>MR Step 1 检测的血浆蛋白总数</td></tr>
+    <tr><td>1,213</td><td>被BMI因果性调控的蛋白数（BMI-driven proteins）</td></tr>
+    <tr><td>~350</td><td>有可用的cis-pQTL用于Step 2 MR的蛋白数</td></tr>
+    <tr><td>5</td><td>最终鉴定的中介蛋白数（6个蛋白-疾病关联）</td></tr>
+    <tr><td>OR=1.47</td><td>C-COL6A3每增加1 SD对CAD的比值比（效应最强）</td></tr>
+    <tr><td>94.7%</td><td>BMI与体脂百分比在蛋白效应方向上的吻合率（r=0.92）</td></tr>
+    <tr><td>>0.99</td><td>COL6A3-CAD共定位分析的后验概率（PP.H4）</td></tr>
+  </table>
+
+  <h3>方法论启示</h3>
+  <p>这篇论文是<strong>蛋白组范围MR研究的方法学范本</strong>，值得学习的设计要素包括：</p>
+  <ol>
+    <li>两步MR框架：清晰分离"暴露→中介"和"中介→结局"两个因果步骤</li>
+    <li>cis-pQTL优先策略：最大化工具变量的生物学有效性</li>
+    <li>共定位分析作为必要条件：排除LD混杂</li>
+    <li>方向一致性过滤：确保中介效应在生物学上有意义</li>
+    <li>多层次验证：MR + 观察性研究 + 表观基因组学 + 单细胞转录组学形成完整证据链</li>
+  </ol>
+
+  <div class="crossref">
+    <strong>📎 知识链接：</strong>本论文是 STROBE-MR 报告规范的<strong>应用范例（Application）</strong>——它将 STROBE-MR 中的20条报告建议落实到了实际研究中。读者可以通过对比两篇文献来理解"好的MR研究报告应该包含什么"和"如何在复杂MR设计中实现透明报告"。详见 <a href="../knowledge_graph.html">知识图谱 → 关系1</a>。
+  </div>
+
+  <p class="back-top"><a href="#"><span data-zh>↑ 回到顶部</span><span data-en>↑ Back to top</span></a></p>
+</section>
+
+<footer>
+  <div class="related-bar">
+<strong>📚 相关资源：</strong>
+<a href="Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">📄 STROBE-MR</a>
+<a href="Sanderson_2022_Mendelian_randomization_zh.html">📄 MR Primer</a>
+<a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">📄 MR-CVD</a>
+<a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>📄 <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></span><span data-en>📄 Proteome MR for Stroke</span></a>
+<a href="Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">🔍 PISA</a>
+<a href="Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">🔍 DANDELION</a>
+<a href="../nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="../nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+<a href="../knowledge_graph.html"><span data-zh>🗺️ 知识图谱</span><span data-en>🗺️ Knowledge Graph</span></a>
+<a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索">📥 <span data-zh>原始PDF</span><span data-en>Original PDF</span></a>
+</div>
+  <p><strong>引用：</strong>Yoshiji S, et al. Integrative proteogenomic analysis identifies COL6A3-derived endotrophin as a mediator of the effect of obesity on coronary artery disease. <em>Nature Genetics</em>. 2025;57:345–357. doi:10.1038/s41588-024-02052-7</p>
+  <p style="font-size:0.85em;"><span data-zh>AI4Research 文献精读项目 · 生成于 2026-08-14 · </span><span data-en>AI4Research Literature Project · Generated 2026-08-14 · </span><a href="https://github.com/satoshi-yoshiji/cardiometab_proteogenomics"><span data-zh>论文代码仓库</span><span data-en>Paper code repository</span></a></p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

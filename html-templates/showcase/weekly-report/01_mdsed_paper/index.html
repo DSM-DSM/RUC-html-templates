@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link rel="icon" type="image/svg+xml" href="../assets/ruc-logo.svg">
+    <title>MDS-ED 原始论文详解</title>
+
+    <!-- MathJax -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: false,
+                packages: {'[+]': ['ams', 'newcommand', 'configMacros']},
+                macros: {
+                    R: '\\mathbb{R}',
+                    Hcal: '\\mathcal{H}',
+                    Lcal: '\\mathcal{L}',
+                    Ecal: '\\mathcal{E}',
+                    Pcal: '\\mathcal{P}',
+                    bce: '\\mathrm{BCE}',
+                    fbce: '\\mathrm{FBCE}',
+                    hlcp: '\\mathrm{HLCP}',
+                    hlup: '\\mathrm{HLUP}',
+                    VR: '\\mathrm{VR}',
+                    CE: '\\mathrm{CE}',
+                    LSE: '\\mathrm{LSE}',
+                    AUROC: '\\mathrm{AUROC}',
+                    TPR: '\\mathrm{TPR}',
+                    FPR: '\\mathrm{FPR}',
+                    ReLU: '\\mathrm{ReLU}',
+                    softmax: '\\mathrm{softmax}',
+                    given: '\\mathrel{|}',
+                    ind: '\\mathbb{1}',
+                }
+            },
+            chtml: {
+                scale: 0.95,
+            }
+        };
+    </script>
+    <script async id="MathJax-script" src="../assets/mathjax/tex-mml-chtml.js"></script>
+    <script>
+        /* 契约: 动画须有理由 + prefers-reduced-motion 降级 */
+        window.SCROLL_BEHAVIOR = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? 'auto' : 'smooth';
+    </script>
+
+
+    <style>
+        :root {
+            --bg:#f8f9fa;--card-bg:#fff;--card-radius:12px;
+            --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+            --shadow-hover:0 4px 12px rgba(0,0,0,.1),0 2px 4px rgba(0,0,0,.06);
+            --primary:#3b82f6;--primary-light:#eff6ff;--primary-dark:#1d4ed8;
+            --accent:#06b6d4;--accent-light:#ecfeff;
+            --success:#10b981;--success-bg:#ecfdf5;
+            --warning:#f59e0b;--warning-bg:#fffbeb;
+            --danger:#ef4444;--danger-bg:#fef2f2;
+            --gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;
+            --gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;
+            --gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;
+            --sidebar-width:240px;--header-height:48px;
+            --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+            --font-mono:"SF Mono","Cascadia Code","Consolas",monospace;
+            --transition:0.2s ease;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;font-size:16px}
+        body{font-family:var(--font-sans);background:var(--bg);color:var(--gray-800);line-height:1.6;overflow:hidden;height:100vh}
+        a{color:var(--primary);text-decoration:none}a:hover{text-decoration:underline}
+
+        #app{display:grid;grid-template-rows:var(--header-height) 1fr;grid-template-columns:var(--sidebar-width) 1fr;grid-template-areas:"header header" "sidebar content";height:100vh;max-width:1500px;margin:0 auto}
+        #header{grid-area:header;background:var(--card-bg);border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:10}
+        #header h1{font-size:1.15rem;font-weight:700;color:var(--gray-900);display:flex;align-items:center;gap:6px}
+        .header-links{display:flex;align-items:center;gap:6px;font-size:0.875rem}
+        .header-links a{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;border:1px solid var(--gray-200);color:var(--gray-600);transition:var(--transition);font-weight:500;white-space:nowrap}
+        .header-links a:hover{background:var(--gray-50);text-decoration:none;border-color:var(--gray-300)}
+        .header-links a .icon-pdf{color:var(--danger);font-size:1rem}
+        .header-links a .icon-gh{font-size:1rem}
+
+        #sidebar{grid-area:sidebar;background:var(--card-bg);border-right:1px solid var(--gray-200);overflow-y:auto;padding:8px 0;min-height:0}
+        .sidebar-section{margin-bottom:2px}
+        .sidebar-parent{display:flex;align-items:center;gap:6px;padding:9px 14px;cursor:pointer;font-weight:600;font-size:0.875rem;color:var(--gray-700);border-left:3px solid transparent;transition:var(--transition);user-select:none}
+        .sidebar-parent:hover{background:var(--gray-50)}
+        .sidebar-parent .arrow{font-size:0.75rem;transition:transform .2s;margin-left:auto;color:var(--gray-400)}
+        .sidebar-parent.expanded .arrow{transform:rotate(90deg)}
+        .sidebar-children{max-height:0;overflow:hidden;transition:max-height .3s ease}
+        .sidebar-children.open{max-height:none}
+        .sidebar-child{display:flex;align-items:center;gap:6px;padding:6px 14px 6px 30px;cursor:pointer;font-size:0.875rem;color:var(--gray-600);border-left:3px solid transparent;transition:var(--transition)}
+        .sidebar-child:hover{background:var(--gray-50);text-decoration:none}
+        .sidebar-child .badge{margin-left:auto;font-size:0.75rem;padding:1px 6px;border-radius:10px;font-weight:500}
+        .badge-ok{background:var(--success-bg);color:var(--success)}
+        .badge-warn{background:var(--warning-bg);color:var(--warning)}
+        .badge-new{background:var(--gray-100);color:var(--gray-500)}
+
+        #content{grid-area:content;overflow-y:auto;padding:16px 20px 60px;scroll-behavior:smooth}
+
+        .card{background:var(--card-bg);border-radius:var(--card-radius);box-shadow:var(--shadow);padding:18px 22px;margin-bottom:14px;transition:var(--transition)}
+        .card:hover{box-shadow:var(--shadow-hover)}
+        .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+        .card-title{font-size:1rem;font-weight:700;color:var(--gray-800);display:flex;align-items:center;gap:6px}
+
+        .status-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:0.8125rem;font-weight:600}
+        .status-ok{background:var(--success-bg);color:var(--success)}
+        .status-warn{background:var(--warning-bg);color:var(--warning)}
+        .status-danger{background:var(--danger-bg);color:var(--danger)}
+
+        .data-table{width:100%;border-collapse:collapse;font-size:0.875rem}
+        .data-table thead th{background:var(--gray-50);padding:7px 9px;text-align:center;font-weight:600;color:var(--gray-600);font-size:0.8125rem;letter-spacing:.03em;border-bottom:2px solid var(--gray-200)}
+        .data-table tbody td{text-align:center;padding:6px 9px;border-bottom:1px solid var(--gray-100)}
+        .data-table tbody tr:hover{background:var(--gray-50)}
+        .data-table .num{font-family:var(--font-mono);text-align:center}
+        .data-table .highlight{font-weight:700;color:var(--primary-dark)}
+        .data-table .down{color:var(--danger)}.data-table .up{color:var(--success)}
+
+        .metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+        .metric-card{background:var(--card-bg);border:1px solid var(--gray-200);border-radius:10px;padding:12px;text-align:center}
+        .metric-card .metric-value{font-size:1.5rem;font-weight:800;font-family:var(--font-mono)}
+        .metric-card .metric-label{font-size:0.8125rem;color:var(--gray-500);margin-top:3px}
+        .metric-card .metric-detail{font-size:0.8125rem;color:var(--gray-500);margin-top:3px}
+
+        .formula-card{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:12px 14px;margin:6px 0;overflow-x:auto}
+        .formula-label{font-size:0.8125rem;color:var(--gray-500);margin-bottom:3px;font-weight:600}
+
+        .arch-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;flex-wrap:wrap}
+        .arch-block{background:var(--card-bg);border:2px solid var(--gray-200);border-radius:10px;padding:10px 14px;text-align:center;font-size:0.875rem;font-weight:600;min-width:90px}
+        .arch-block.wave{border-color:var(--primary);background:var(--primary-light)}
+        .arch-block.tab{border-color:var(--accent);background:var(--accent-light)}
+        .arch-block.fusion{border-color:var(--warning);background:var(--warning-bg)}
+        .arch-block.output{border-color:var(--gray-400);background:var(--gray-50)}
+        .arch-arrow{font-size:1.4rem;color:var(--gray-400)}
+
+        .tk{margin:2px 0 10px;padding:6px 12px;background:var(--primary-light);border-left:3px solid var(--primary);border-radius:4px;font-size:1rem;line-height:1.6;}
+        .info-box{padding:10px 14px;border-radius:8px;font-size:0.875rem;margin:8px 0;line-height:1.6}
+        .info-box.warn{background:var(--warning-bg);border-left:4px solid var(--warning)}
+        .info-box.danger{background:var(--danger-bg);border-left:4px solid var(--danger)}
+        .info-box.info{background:var(--primary-light);border-left:4px solid var(--primary)}
+        .info-box.success{background:var(--success-bg);border-left:4px solid var(--success)}
+
+                @media (prefers-reduced-motion: reduce){
+            html,#content{scroll-behavior:auto!important}
+            *,*::before,*::after{transition:none!important;animation:none!important}
+        }
+        @media(max-width:768px){
+            #app{grid-template-columns:1fr;grid-template-areas:"header" "content"}
+            #sidebar{display:none}
+            #content{padding:12px}
+        }
+        @media print{
+            html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+            #app{display:block!important;height:auto!important;max-width:100%!important}
+            #sidebar,#header{display:none!important}
+            #content{overflow:visible!important;height:auto!important;padding:0!important}
+            .card{box-shadow:none!important;break-inside:avoid;page-break-inside:avoid;border:1px solid var(--gray-200)}
+            .card:hover{box-shadow:none!important}
+            a{color:var(--gray-800)!important;text-decoration:none!important}
+            .data-table{font-size:0.75rem!important}
+        }
+    
+        /* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+        .theme-switcher{position:relative}
+        .ts-btn{
+            display:inline-flex;align-items:center;gap:6px;
+            padding:4px 12px;border-radius:20px;border:1px solid var(--gray-200);
+            background:var(--card-bg);color:var(--gray-600);font-size:0.78rem;font-weight:600;
+            cursor:pointer;white-space:nowrap;font-family:inherit;
+            transition:border-color var(--transition),color var(--transition);
+        }
+        .ts-btn:hover{border-color:var(--primary);color:var(--primary-dark)}
+        .ts-btn:active{transform:scale(0.97)}
+        .ts-panel{
+            /* fixed 定位（JS 打开时按按钮位置设置 top/right）：
+               脱离 header/nav-links 的 overflow 裁剪域，可覆盖任何内容 */
+            position:fixed;z-index:60;
+            width:250px;max-height:60vh;overflow-y:auto;
+            background:var(--card-bg);border:1px solid var(--gray-200);border-radius:12px;
+            box-shadow:var(--shadow-hover);padding:8px;
+            display:flex;flex-direction:column;gap:2px;
+        }
+        .ts-panel[hidden]{display:none}
+        .ts-opt{
+            display:flex;align-items:center;gap:8px;
+            padding:7px 10px;border-radius:8px;border:none;background:transparent;
+            font-size:0.8rem;color:var(--gray-700);cursor:pointer;text-align:left;
+            font-family:inherit;
+        }
+        .ts-opt:hover{background:var(--gray-100)}
+        .ts-opt.sel{background:var(--primary-light);color:var(--primary-dark);font-weight:600}
+        .ts-opt .ts-dots{display:flex;gap:4px;flex-shrink:0}
+        .ts-opt .ts-dots i{width:10px;height:10px;border-radius:50%;border:1px solid rgba(0,0,0,0.15);display:inline-block}
+        .ts-opt .ts-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ts-opt .ts-check{margin-left:auto;flex-shrink:0;visibility:hidden;font-size:0.9em}
+        .ts-opt.sel .ts-check{visibility:visible}
+
+        /* ═══════ 性能优化（M29）═══════
+           1) content-visibility 让视口外的卡片跳过布局与绘制（长页面滚动/锚点跳转的关键优化）
+           2) contain 把重排/重绘限制在卡片与表格行内部，折叠展开时不再牵动整页 */
+        .card{content-visibility:auto;contain-intrinsic-size:auto 900px;contain:layout style}
+        .fold-body{contain:layout paint}
+        .data-table tbody tr{contain:layout style}
+        .data-table{contain:layout}
+        @media print{.card{content-visibility:visible;contain:none}}
+
+    /* ═══════ M29 三段式（图表介绍 + Takeaway 框）═══════ */
+        .fig-intro{font-size:0.875rem;color:var(--gray-600);margin:2px 0 8px;line-height:1.65}
+        .fig-intro strong{color:var(--gray-800)}
+        .takeaway{display:block;margin:10px 0 4px;padding:8px 14px;background:var(--success-bg);
+                  border-left:3px solid var(--success);border-radius:4px;font-size:0.9rem;line-height:1.7}
+        .takeaway .tk-label{font-weight:700;color:var(--success);margin-right:2px}
+        .takeaway.warn{background:var(--warning-bg);border-left-color:var(--warning)}
+        .takeaway.warn .tk-label{color:var(--warning)}
+        .takeaway.danger{background:var(--danger-bg);border-left-color:var(--danger)}
+        .takeaway.danger .tk-label{color:var(--danger)}
+        .takeaway ul{margin:4px 0 0 18px}
+        
+/* ═══════ 折叠组件（R11 修复轮补注入：开合样式缺失致全站折叠失效） ═══════ */
+.fold{margin:10px 0}
+        .fold-head{
+            display:flex;align-items:center;gap:8px;width:100%;
+            padding:8px 12px;border:1px solid var(--gray-200);border-radius:8px;
+            background:var(--gray-50);cursor:pointer;font:inherit;
+            font-size:0.8rem;font-weight:600;color:var(--gray-700);text-align:left;
+            transition:var(--transition);
+        }
+        .fold-head:hover{background:var(--gray-100);color:var(--gray-900)}
+        .fold-head .fold-chevron{transition:transform .25s ease;color:var(--gray-400);font-size:0.7em}
+        .fold.open .fold-head .fold-chevron{transform:rotate(180deg)}
+        .fold-head .fold-hint{margin-left:auto;font-size:0.7rem;font-weight:400;color:var(--gray-400)}
+        .fold-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+        .fold.open .fold-body{grid-template-rows:1fr}
+        .fold-inner{overflow:hidden;min-height:0}
+        .fold-inner .fold-pad{padding-top:8px}
+</style>
+    <style id="baked-theme">
+        /* ═══════ 内联默认主题 · 人大红 Beamer ═══════
+           烘焙在页内 ⇒ 首帧即按人大红渲染，无需等 theme-pack.js 注入覆盖层（消除主题闪烁）。
+           运行时切到其他主题时，applyTheme 会把本 style 置 disabled，改由主题包覆盖层接管。 */
+        /* ═══════ 主题覆盖层 · 人大红 Beamer ═══════ */
+        :root {
+            --bg:#fdf8f8; --card-bg:#ffffff; --card-radius:8px;
+            --line:rgba(151,31,48,0.12);
+            --shadow:0 1px 2px rgba(151,31,48,0.05),0 2px 6px rgba(151,31,48,0.06);
+            --shadow-hover:0 4px 12px rgba(151,31,48,0.10),0 6px 16px rgba(151,31,48,0.08);
+            /* 校徽红 #971f30（RenminUniv.sty tsinghua RGB 151,31,48） */
+            --primary:#971f30; --primary-light:#f9eef0; --primary-dark:#6e1623;
+            --accent:#b83047; --accent-light:#fdf0f2;
+            --success:#1a7f37; --success-bg:#eef7f0;
+            --warning:#9a6700; --warning-bg:#faf4e3;
+            --danger:#c8372f; --danger-bg:#fbefee;
+            /* LaTeX beamer 衬线感：宋体 + Georgia */
+            --font-sans:"Songti SC","STSong","SimSun","Georgia","PingFang SC","Microsoft YaHei",serif;
+        }
+        /* 背景水印：beamer background.pdf 低透明度铺底（白色膜压淡） */
+        body{background:
+            linear-gradient(rgba(253,248,248,0.88),rgba(253,248,248,0.88)),
+            url(../assets/ruc-bg.png) center 30%/55% no-repeat,
+            var(--bg);}
+        ::selection{background:rgba(151,31,48,0.22);color:var(--gray-900)}
+        /* ── 顶导：校徽红底白字（beamer frametitle）── */
+        #header{background:var(--primary);border-bottom:1px solid rgba(255,255,255,0.25)}
+        #header .nav-brand{color:#ffffff}
+        #header .nav-brand a,#header .nav-brand span{color:#ffffff}
+        .nav-links a{color:rgba(255,255,255,0.85)}
+        .nav-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;text-decoration:none}
+        .nav-links a.active{background:rgba(255,255,255,0.24);color:#ffffff;font-weight:600}
+        .nav-links a:active{transform:scale(0.97)}
+        #header .header-right{color:rgba(255,255,255,0.8)}
+        .countdown{background:rgba(255,255,255,0.18);color:#ffffff}
+        .ts-btn{background:transparent;border-color:rgba(255,255,255,0.4);color:#ffffff}
+        .ts-btn:hover{border-color:#ffffff;color:#ffffff}
+        /* ── 底栏：白底 + 校徽红分隔线；logo 在 X 轴最右、Y 轴中心（基座 flex 布局） ── */
+        #footer{background:#ffffff;color:var(--gray-500);border-top:1px solid rgba(151,31,48,0.3)}
+        #footer .footer-meta strong{color:var(--primary-dark)}
+        #footer .footer-meta .sep{color:var(--gray-300)}
+        /* 校徽：底部声明栏右侧 logo（素材 assets/ruc-logo-1.png）；去占位虚线边框 */
+        #footer .footer-logo .logo-slot{
+            display:inline-block;width:140px;height:26px;
+            background:url(../assets/ruc-logo-1.png) center/contain no-repeat;
+            border:none;border-radius:0;padding:0;
+            color:transparent;font-size:0;
+            transform:translateY(-3px);   /* 整体上移，避开底缘裁切感 */
+        }
+        /* ── 侧边栏 ── */
+        #sidebar{border-right:1px solid rgba(151,31,48,0.15)}
+        .sidebar-parent:hover{background:#fdf3f4}
+        .sidebar-child:hover{background:#fdf3f4}
+        .sidebar-child.active{background:var(--primary-light);color:var(--primary-dark)}
+        /* ── 卡片与分节（beamer separation line 红细线）── */
+        .card{border-radius:8px;position:relative}
+        /* 背景图按左侧导引标签的模块粒度，铺在每个卡片右侧作淡背景 */
+        .card::after{
+            content:"";position:absolute;right:0;bottom:0;
+            width:100%;height:100%;
+            /* contain：图片按区域等比缩放、完整显示（绝不裁切）；
+               元素高度跟随卡片实时变化（折叠开合），背景尺寸随之自动重算，
+               纯 CSS 即动态适配，无需 JS 计算 */
+            background:url(../assets/ruc-bg.png) right bottom/contain no-repeat;
+            opacity:0.6;mix-blend-mode:multiply;
+            pointer-events:none;z-index:0;
+        }
+        .card>*{position:relative;z-index:1}
+        .card:hover{border-color:rgba(151,31,48,0.3)}
+        .card-header{border-bottom:1px solid rgba(151,31,48,0.25)}
+        .section-h4{border-bottom:2px solid var(--primary);padding-bottom:6px}
+        .section-h4.c-primary{border-bottom-color:var(--primary)}
+        .section-h4.c-accent{border-bottom-color:var(--accent)}
+        .info-box.info{border-color:rgba(151,31,48,0.3)}
+        .info-box.info::before{background:var(--primary)}
+        .info-box.info strong{color:var(--primary-dark)}
+        .data-table thead th{background:#fdf3f4;color:var(--primary-dark);border-bottom:2px solid rgba(151,31,48,0.35)}
+        .timeline::before{background:rgba(151,31,48,0.3)}
+        /* 图标容器：校徽红浅底 */
+        .quick-link-card .ql-icon{background:var(--primary-light);color:var(--primary-dark);border-radius:8px}
+        .quick-link-card:hover .ql-icon{background:var(--primary);color:#ffffff}
+        #content::-webkit-scrollbar-thumb,#sidebar::-webkit-scrollbar-thumb{background:#e3c8cd}
+        #content::-webkit-scrollbar-thumb:hover,#sidebar::-webkit-scrollbar-thumb:hover{background:var(--primary)}
+
+        /* ── 兼容 week_report 页面结构：品牌区为 <h1>、导航为 .header-links ──
+           （模板结构用 .nav-brand/.nav-links；本主题顶栏为深色，文字统一白字保证对比度） */
+        #header h1{color:#ffffff}
+        #header h1 a{color:#ffffff}
+        #header .header-links a{color:rgba(255,255,255,0.88);border-color:rgba(255,255,255,0.28)}
+        #header .header-links a:hover{background:rgba(255,255,255,0.16);color:#ffffff;border-color:rgba(255,255,255,0.42)}
+        #header .header-right{color:rgba(255,255,255,0.82)}
+        #header .countdown{color:rgba(255,255,255,0.9)}
+        #header .ts-btn{color:#ffffff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.12)}
+        #header .ts-btn:hover{border-color:rgba(255,255,255,0.6);color:#ffffff}
+        #header .ts-cur{color:#ffffff}
+    </style>
+<script>window.A4R={mode:1,lang:1,themeKey:'labmeeting-theme',lightId:'11_ruc_beamer',darkId:'02_wwdc_dark'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+</head>
+<body data-default-theme="11_ruc_beamer" data-asset-prefix="../">
+
+<div id="app">
+
+<header id="header">
+    <h1><span data-zh>📄 MDS-ED 原始论文详解</span><span data-en>📄 MDS-ED Original Paper Deep Dive</span></h1>
+    <div class="header-links">
+        <a class="pdf-na" title="原论文 PDF 未随展示库分发，可按论文名检索"><span class="icon-pdf">📕</span> PDF</a>
+        <span style="background:#b45309;color:#fff;font-size:.72rem;font-weight:600;letter-spacing:.06em;padding:3px 11px;border-radius:999px;white-space:nowrap;margin-right:10px;"><span data-zh>演示数据</span><span data-en>Demo data</span></span>
+                <div class="theme-switcher" id="theme-switcher">
+                    <button class="ts-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                        <span class="ic ic-palette"></span><span class="ts-cur"><span data-zh>主题</span><span data-en>Theme</span></span>
+                    </button>
+                    <div class="ts-panel" id="ts-panel" hidden></div>
+                </div>
+    </div>
+</header>
+
+<nav id="sidebar">
+    <div class="sidebar-section">
+        <div class="sidebar-parent expanded" onclick="this.classList.toggle('expanded');document.getElementById('children-nav').classList.toggle('open')"><span data-zh>📄 导航</span><span data-en>📄 Navigation</span><span class="arrow">▶</span>
+        </div>
+        <div class="sidebar-children open" id="children-nav">
+            <a class="sidebar-child" href="../index.html"><span data-zh>← 返回总览</span><span data-en>← Back to Overview</span></a>
+            <a class="sidebar-child active" href="index.html"><span data-zh>📋 MDS-ED 论文详解</span><span data-en>📋 MDS-ED Paper Deep Dive</span></a>
+            <a class="sidebar-child" href="../06_tricks_experiments/index.html"><span data-zh>🧪 实验 Tricks 汇总</span><span data-en>🧪 Experiment Tricks Roundup</span></a>
+        </div>
+    </div>
+</nav>
+
+<!-- ═══════ CONTENT ═══════ -->
+<main id="content">
+
+<div class="card" id="sec-takeaway" style="border:2px solid var(--primary);">
+    <div class="card-header">
+        <div class="card-title">🎯 一句话结论（Takeaways）</div>
+        <span class="status-tag status-ok">组会速览</span>
+    </div>
+    <ul style="margin:4px 0 0 20px;font-size:1rem;line-height:1.9;">
+        <li><strong>MDS-ED = 急诊多模态（ECG + 表格）→ 1428 个 ICD 标签的公开 benchmark</strong>，论文给出骨架与基线宏 AUROC 0.834。</li>
+        <li>后续所有改进（换头 / 层级惩罚 / 链式训练）都是在这个骨架上的<strong>增量</strong>——只在 head 与 loss 层动手，主干不变。</li>
+    </ul>
+</div>
+
+
+<!-- ═══ SECTION: Overview & Architecture ═══ -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📋 论文概览</div>
+    </div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>MDS-ED = 急诊多模态（ECG + 表格）→ 1428 个 ICD 标签</strong>的公开 benchmark，立框架、给基线。</p>
+    <p style="font-size:1rem;line-height:1.8;"><strong>论文</strong>：Enhancing Clinical Decision Support with Physiological Waveforms — A Multimodal Benchmark in Emergency Care（Lopez Alcaraz, Bouma, Strodthoff, Univ. Oldenburg）——提出 MDS-ED 基准：急诊场景多模态 ICD 诊断编码（1428 个 ICD-10-CM）+患者恶化（15 指标）预测；模态=12 导联 ECG@100Hz（S4 编码）+470 维表格特征（3 层 MLP）+临床文本（本实验配置未启用）；129,057 样本/71,098 患者（MIMIC-IV-ED）；论文声称多模态 macro-AUROC 0.8334 [0.8300, 0.8366]。</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">🏗️ 模型架构 (S4 + MLP + Concat Fusion)</div>
+    </div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 骨架 = <strong>S4 时序编码器 + MLP 静态编码器 + Concat 融合 + 线性预测头</strong>——后续所有改进只动 head 与 loss。</p>
+    <div class="arch-diagram">
+        <div class="arch-block wave">📈 Waveform<br><small>12-lead ECG<br>S4 × 4 layers<br>state_dim=8<br>dim=512</small>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-block tab">📊 Tabular<br><small>Cat(3×Emb16)<br>+ Cont(470)<br>MLP × 3 layers<br>[128,128,128]</small>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-block fusion">🔀 Fusion<br><small>Concat<br>Multi-modal<br>Features</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-block output">🏷️ Classifier<br><small>Multi-Label<br>Sigmoid<br>1428 ICD
+            codes</small></div>
+    </div>
+    <p style="text-align:center;font-size:0.875rem;color:var(--gray-500);margin-top:10px;">
+        三模态输入 → 独立编码器 → 拼接融合特征 → 多标签Sigmoid分类
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+        <div style="text-align:center;">
+            <img alt="MDS-ED Clinical Pipeline" src="../../literature_output/images/mdsed/fig1_pipeline.jpg"
+                 style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <small style="color:var(--gray-500);display:block;margin-top:4px;">Fig. 1 — MDS-ED 临床工作流Pipeline
+                (来源: 论文)</small>
+        </div>
+        <div style="text-align:center;">
+            <img alt="MDS-ED Dataset Creation"
+                 src="../../literature_output/images/mdsed/fig2_dataset_creation.jpg"
+                 style="max-width:100%;height:auto;border-radius:8px;border:1px solid var(--gray-200);">
+            <small style="color:var(--gray-500);display:block;margin-top:4px;">Fig. 2 — 数据集创建流程 (来源:
+                论文)</small>
+        </div>
+    </div>
+    <div style="margin-top:12px;font-size:0.875rem;">
+        <strong>训练配置：</strong> AdamW (lr=0.001, weight_decay=0.001), batch_size=64, epochs=20, constant
+        LR schedule<br>
+        <strong>损失函数：</strong> Binary Cross-Entropy (多标签)<br>
+        <strong>评估指标：</strong> Macro-AUROC + Bootstrap 95% CI (N=1000)<br>
+        <strong>数据划分：</strong> 18:1:1 (Train:Val:Test), stratified by gender, age bins, discharge
+        diagnoses<br>
+        <strong>预处理：</strong> Median imputation + binary mask columns for imputed values; 2.5s ECG window
+        (input_size=250 @ 100Hz)<br>
+        <strong>论文图表：</strong> Fig.1 (Pipeline), Fig.2 (Dataset creation), Table 2 (AUROC per model),
+        Table 3 (Per-ICD chapter AUROC)
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📊 论文核心结果 (Table 2: Multi-modal vs Uni-modal)</div>
+    </div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>多模态 > 单模态</strong>——ECG 与表格的融合在论文基准上带来最优宏 AUROC。</p>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：论文核心结果表（Table 2：多模态 vs 单模态 AUROC）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:750px;">
+        <thead>
+        <tr>
+            <th>模型</th>
+            <th>Diagnoses macro-AUROC</th>
+            <th>Deterioration macro-AUROC</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Clinical routine data (XGBoost)</td>
+            <td class="num">0.7551 (0.7537–0.7562)</td>
+            <td class="num">0.8443 (0.8257–0.8624)</td>
+        </tr>
+        <tr>
+            <td>ECG features only (XGBoost)</td>
+            <td class="num">0.6366 (0.6352–0.6374)</td>
+            <td class="num">0.7463 (0.7192–0.7666)</td>
+        </tr>
+        <tr>
+            <td>ECG waveforms only (S4)</td>
+            <td class="num">0.7756 (0.7714–0.7796)</td>
+            <td class="num">0.8643 (0.8488–0.8785)</td>
+        </tr>
+        <tr>
+            <td>ECG features + Clinical (XGBoost)</td>
+            <td class="num">0.7763 (0.7754–0.7783)</td>
+            <td class="num">0.8734 (0.8576–0.8908)</td>
+        </tr>
+        <tr style="background:var(--primary-light);font-weight:700;">
+            <td>ECG waveforms + Clinical (S4+MLP)</td>
+            <td class="num highlight">0.8334 (0.8300–0.8366)</td>
+            <td class="num highlight">0.9193 (0.9069–0.9300)</td>
+        </tr>
+        </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <small style="color:var(--gray-500);">来源: 论文 Table 2。括号内为 95% Bootstrap
+        CI。多模态(Waveform+Tabular)显著优于所有单模态和树模型。</small>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📊 关键发现：<code>introduce_nan_columns</code> 对AUROC的显著影响</div>
+        <span class="status-tag status-warn">⚠️ 重要</span></div>
+    <div class="info-box info">
+        <strong>🔬 发现时间：</strong>2026年6月23日<br>
+        <strong>问题描述：</strong> MDS-ED数据集中某些tabular列存在于训练集但完全缺失于验证/测试集（如某些实验室检验项目仅对特定病人群体做）。<code>introduce_nan_columns=True</code>
+        时显式引入NaN列让模型感知缺失模式 → 训练更鲁棒。
+    </div>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：introduce_nan_columns 消融结果表（配置 × AUROC）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:700px;">
+        <thead>
+        <tr>
+            <th>配置</th>
+            <th>introduce_nan_columns</th>
+            <th>input_channels_cont</th>
+            <th>验证集 macro-AUROC (agg0)</th>
+            <th>测试集 macro-AUROC (agg1)</th>
+            <th>Δ val</th>
+            <th>Δ test</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Baseline (原始)</td>
+            <td>False</td>
+            <td class="num">463</td>
+            <td class="num highlight">0.8187</td>
+            <td class="num">0.8270</td>
+            <td class="num">—</td>
+            <td class="num">—</td>
+        </tr>
+        <tr>
+            <td>Baseline w/ NaN Mask</td>
+            <td><strong>True</strong></td>
+            <td class="num"><strong>926</strong></td>
+            <td class="num highlight up">0.8264</td>
+            <td class="num up">0.8356</td>
+            <td class="num up">+0.0077</td>
+            <td class="num up">+0.0086</td>
+        </tr>
+        </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div class="info-box warn" style="margin-top:10px;">
+        <strong>⚠️ 影响：</strong> 方法1和方法2的所有实验均在 <code>introduce_nan_columns=False</code>
+        下运行，需要在 <code>True</code> 下重新运行以获得公平对比。（<strong>对比时应使用 0.8264 而非 0.8187
+        作为baseline</strong>）
+    </div>
+</div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>显式引入 NaN 指示列显著提升 AUROC</strong>——「哪里缺失」本身就是强特征（后续 M20 三源复现 +0.86pp）。</p>
+
+<!-- ═══ SECTION: Dataset & Baseline ═══ -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📦 数据集统计与基线指标</div>
+    </div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 <strong>129,057 样本 / 1428 标签 / baseline 宏 AUROC 0.834</strong>——这是全项目所有实验的对照原点。</p>
+    <div class="metric-grid" id="baseline-grid">
+        <div class="metric-card"><div class="metric-label">Baseline val AUROC (agg0)</div><div class="metric-value" style="color:var(--primary);" id="bl-agg0">—</div></div>
+        <div class="metric-card"><div class="metric-label">Baseline test AUROC (agg1)</div><div class="metric-value" style="color:var(--primary);" id="bl-agg1">—</div></div>
+        <div class="metric-card"><div class="metric-label">Baseline w/ NaN Mask val (agg0)</div><div class="metric-value" style="color:var(--success);" id="bl-nan-agg0">—</div></div>
+        <div class="metric-card"><div class="metric-label">Baseline w/ NaN Mask test (agg1)</div><div class="metric-value" style="color:var(--accent);" id="bl-nan-agg1">—</div></div>
+        <div class="metric-card" style="border:2px solid var(--primary);"><div class="metric-label">📄 论文声称 macro-AUROC</div><div class="metric-value" style="color:var(--primary);">0.8334</div><div class="metric-detail">95% CI: 0.8300–0.8366</div></div>
+        <div class="metric-card"><div class="metric-label">复现 vs 论文差距</div><div class="metric-value" style="color:var(--warning);" id="bl-gap">—</div><div class="metric-detail">可能原因: 特征维度差异(470 vs 463/926)</div></div>
+    </div>
+    <br>
+    <div class="fold">
+    <button class="fold-head" type="button" aria-expanded="false">📖 展开：数据集统计与基线参数表（10 行）<span class="fold-chevron">▾</span><span class="fold-hint">点击展开 / 收起</span></button>
+    <div class="fold-body"><div class="fold-inner"><div class="fold-pad">
+        <table class="data-table" style="max-width:600px;">
+        <thead>
+        <tr><th>参数</th><th>数值</th></tr>
+        </thead>
+        <tbody>
+        <tr><td>数据集</td><td>MIMIC-IV-ED</td></tr>
+        <tr><td>ICD编码数</td><td id="n-icd">1428</td></tr>
+        <tr><td>父子标签对数</td><td>978</td></tr>
+        <tr><td>Test样本数</td><td>25,756</td></tr>
+        <tr><td>ECG导联</td><td>12 (input_channels=12)</td></tr>
+        <tr><td>采样率</td><td>100 Hz (input_size=250 = 2.5s)</td></tr>
+        <tr><td>Batch Size / Epochs</td><td>64 / 20</td></tr>
+        <tr><td>Tabular 分类特征</td><td>3 (vocab_sizes: [2,5,5])</td></tr>
+        <tr><td>Tabular 连续特征</td><td>463 (False) / 926 (True)</td></tr>
+        <tr style="background:var(--success-bg);">
+            <td>标签预处理</td>
+            <td>前缀闭包（prefix closure）：child=1 ⇒ parent≡1</td>
+        </tr>
+        <tr style="background:var(--success-bg);">
+            <td>真实标签父子违反</td>
+            <td><strong style="color:var(--success);">0</strong> / 978 对（129,057 样本 × 1,454,036 次 child=1 事件，全量验证）</td>
+        </tr>
+        </tbody>
+    </table>
+    </div></div></div>
+    </div>
+    <div class="info-box info" style="margin-top:10px;font-size:0.875rem;line-height:1.6;"><strong>📌 agg0/agg1 与 VR 约定（代码层，2026-08-14 修正）：</strong>⚠️ pkl 文件名与内容相反——agg0=验证集 macro-AUROC（存于 scores_test.pkl）、agg1=测试集 macro-AUROC（存于 scores_val.pkl，键名仍为 test_auroc_macro_agg1；已按 test_dataloader 顺序+key_postfix 双重证据更正，数值不变）；VR=层次违反率；已修正词表列序 bug，baseline VR=11.77%（非此前误报的 63.46%）。</div>
+</div>
+
+<!-- ═══ SECTION: Key Formulas ═══ -->
+<div class="card">
+    <div class="card-header">
+        <div class="card-title">📐 关键数学公式</div>
+    </div>
+    <p class="tk"><strong>Takeaway</strong> 🎯 核心公式汇总：<strong>BCE 主项 + 层级约束 + 链式法则</strong>——MDS-ED 及其三个改进方向的数学基础。</p>
+
+    <div class="formula-card mathjax-process">
+        <div class="formula-label">1. Binary Cross Entropy Loss (多标签基础损失)</div>
+        \[
+        \Lcal_{\bce} = -\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{C}
+        \Bigl[ y_{ij} \log\sigma(\hat{y}_{ij}) + (1-y_{ij})\log\bigl(1-\sigma(\hat{y}_{ij})\bigr) \Bigr]
+        \]
+        <small>其中 \(C=1428\) 为ICD编码总数，\(\sigma(x)=1/(1+e^{-x})\) 为sigmoid函数，\(\hat{y}_{ij}\)
+            为模型输出logits</small>
+    </div>
+
+    <div class="formula-card mathjax-process">
+        <div class="formula-label">2. Focal BCE Loss (处理类别不平衡)</div>
+        \[
+        \Lcal_{\fbce} = -\frac{1}{N}\sum_{i=1}^{N}\sum_{j=1}^{C}
+        (1-p_{t,ij})^{\gamma} \cdot \bce(y_{ij}, \hat{y}_{ij})
+        \]
+        \[
+        p_{t,ij} = \sigma(\hat{y}_{ij})\cdot y_{ij} + \bigl(1-\sigma(\hat{y}_{ij})\bigr)\cdot(1-y_{ij})
+        \]
+        <small>\(\gamma=2\) 降低易分样本权重，聚焦难分样本。\(p_{t,ij}\) 为"真实类别置信度"</small>
+    </div>
+
+    <div class="formula-card mathjax-process">
+        <div class="formula-label">3. Macro-AUROC (主评估指标，Bootstrap N=1000)</div>
+        \[
+        \AUROC_{\mathrm{macro}} = \frac{1}{C}\sum_{j=1}^{C}\AUROC_j
+        = \frac{1}{C}\sum_{j=1}^{C}\int_{0}^{1}\TPR_j\bigl(\FPR_j^{-1}(t)\bigr)\,dt
+        \]
+        <small>对每个ICD编码独立计算AUROC后取平均。论文还报告micro-AUROC和95% Bootstrap置信区间</small>
+    </div>
+
+    <div class="formula-card mathjax-process">
+        <div class="formula-label">4. S4 结构化状态空间模型 (Waveform Encoder)</div>
+        \[
+        \begin{aligned}
+        \dot{x}(t) &= \mathbf{A}\,x(t) + \mathbf{B}\,u(t) \\
+        y(t) &= \mathbf{C}\,x(t) + \mathbf{D}\,u(t)
+        \end{aligned}
+        \]
+        <small>HiPPO矩阵初始化 \(\mathbf{A}\)，通过结构化卷积核加速长序列建模。配置：4层S4, state_dim=8,
+            model_dim=512</small>
+    </div>
+
+    <div class="formula-card mathjax-process">
+        <div class="formula-label">5. 多模态融合 (Concat Fusion)</div>
+        \[
+        \mathbf{h}_{\mathrm{fused}} = \bigl[\,\mathbf{h}_{\mathrm{waveform}} \;\|\;
+        \mathbf{h}_{\mathrm{tabular}}\,\bigr]
+        \]
+        \[
+        \hat{\mathbf{y}} = \sigma\bigl(\mathbf{W}_{\mathrm{out}}\,\mathbf{h}_{\mathrm{fused}} +
+        \mathbf{b}_{\mathrm{out}}\bigr) \in [0,1]^{1428}
+        \]
+        <small>S4编码器输出(512维) + 3层MLP编码器输出 → 拼接 → 线性分类头(1428维) → Sigmoid</small>
+    </div>
+</div>
+
+</main>
+</div>
+
+<script>
+async function loadData() {
+    try {
+        const resp = await fetch('../../report_data.json');
+        if (!resp.ok) throw new Error('report_data.json 加载失败');
+        const D = await resp.json();
+        const bl = D.baseline;
+        document.getElementById('bl-agg0').textContent = bl.original.test_auroc_macro_agg0?.toFixed(4) || '—';
+        document.getElementById('bl-agg1').textContent = bl.original.test_auroc_macro_agg1?.toFixed(4) || '—';
+        document.getElementById('bl-nan-agg0').textContent = bl.with_nan_mask.test_auroc_macro_agg0?.toFixed(4) || '—';
+        document.getElementById('bl-nan-agg1').textContent = bl.with_nan_mask.test_auroc_macro_agg1?.toFixed(4) || '—';
+        const gap = bl.with_nan_mask.test_auroc_macro_agg0 ? (0.8334 - bl.with_nan_mask.test_auroc_macro_agg0).toFixed(4) : '—';
+        document.getElementById('bl-gap').textContent = gap;
+    } catch (err) {
+        console.error('数据加载失败:', err);
+    }
+}
+document.addEventListener('DOMContentLoaded', loadData);
+</script>
+
+<script src="../theme-pack.js"></script>
+<script>
+/* ═══════ 主题一键切换器（移植自 lab-meeting 模板） ═══════ */
+(function initThemeSwitcher() {
+    if (!window.THEME_PACK || !THEME_PACK.length) return;
+    const KEY = 'labmeeting-theme';
+    const defTheme = document.body.dataset.defaultTheme || 'default';
+    const sw = document.getElementById('theme-switcher');
+    if (!sw) return;
+    const btn = sw.querySelector('.ts-btn');
+    const panel = document.getElementById('ts-panel');
+    const curLabel = sw.querySelector('.ts-cur');
+
+    // 面板：默认蓝系 + 10 个主题
+    // 本页内联样式已是「人大红 Beamer」（默认主题），故面板不再放虚拟的「默认蓝系」项
+    const opts = THEME_PACK.map(t => ({ id: t.id, name: t.name, swatch: t.swatch }));
+    panel.innerHTML = opts.map(o =>
+        `<button class="ts-opt" type="button" data-theme="${o.id}">
+            <span class="ts-dots">${o.swatch.map(c => `<i style="background:${c};"></i>`).join('')}</span>
+            <span class="ts-name">${o.name}</span>
+            <span class="ts-check ic ic-check"></span>
+        </button>`).join('');
+
+    // 主题字体（webfont）：按需注入/替换 <link id="theme-fonts">；
+    // 加载失败或主题无字体时自动回退主题 CSS 里的系统字体栈
+    function applyFonts(t) {
+        let link = document.getElementById('theme-fonts');
+        if (!t || !t.fonts) { if (link) link.remove(); return; }
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'theme-fonts';
+            document.head.appendChild(link);
+        }
+        if (link.getAttribute('href') !== t.fonts) link.setAttribute('href', t.fonts);
+    }
+    function applyTheme(id) {
+        let el = document.getElementById('theme-overlay');
+        if (!el) { el = document.createElement('style'); el.id = 'theme-overlay'; document.head.appendChild(el); }
+        const t = THEME_PACK.find(x => x.id === id);
+        // 内联默认主题（人大红）随选择启停：选其他主题时禁用，否则它的直接规则
+        //（如 #header{background:var(--primary)}）会压过主题包仅改 :root 令牌的覆盖方式
+        const baked = document.getElementById('baked-theme');
+        if (baked) baked.disabled = (id !== defTheme);
+        // 选回本页默认主题时清空 overlay（用页面内联覆盖层，避免重复注入）
+        let css = (t && id !== defTheme) ? t.css : '';
+        // 子目录页面（子页面/变体）运行时切换：主题素材 url 按 body 资产前缀拼接
+        const prefix = document.body.dataset.assetPrefix || '';
+        if (css && prefix) css = css.split('url(assets/').join('url(' + prefix + 'assets/');
+        el.textContent = css;
+        applyFonts(t);
+        try { localStorage.setItem(KEY, id); } catch (e) {}
+        curLabel.textContent = (opts.find(o => o.id === id) || { name: '主题' }).name;
+        panel.querySelectorAll('.ts-opt').forEach(b => b.classList.toggle('sel', b.dataset.theme === id));
+    }
+
+    // 恢复：localStorage 优先，其次页面默认主题
+    let saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    // 存量 'default'（旧默认主题 id）视为未选择——它已不在主题包中，回落新默认（人大红）；
+    // 仅当 saved 命中主题包里的真实主题才沿用（尊重用户显式选择）
+    applyTheme((saved && THEME_PACK.some(t => t.id === saved)) ? saved : defTheme);
+
+    // 交互：开合面板 + 点选切换 + 外部点击 / ESC 关闭
+    function openPanel() {
+        const r = btn.getBoundingClientRect();
+        panel.style.top = Math.min(r.bottom + 8, window.innerHeight - 260) + 'px';
+        panel.style.right = Math.max(8, window.innerWidth - r.right) + 'px';
+        panel.hidden = false;
+    }
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const open = panel.hidden;
+        if (open) openPanel(); else panel.hidden = true;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', e => {
+        const opt = e.target.closest('.ts-opt');
+        if (!opt) return;
+        applyTheme(opt.dataset.theme);
+        panel.hidden = true;
+        btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+    });
+})();
+</script>
+<script>
+/* ═══════ 折叠组件（移植自 lab-meeting 模板；本页为单栏流式，无右栏联动） ═══════ */
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.fold-head').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var f = btn.closest('.fold');
+            f.classList.toggle('open');
+            btn.setAttribute('aria-expanded', f.classList.contains('open'));
+        });
+    });
+});
+</script>
+<script>/* 脱敏展示版：外链图表/PDF 不随库分发，加载失败以占位块呈现 */
+document.querySelectorAll('img').forEach(function(im){function ph(){var d=document.createElement("div");d.style.cssText="border:1px dashed rgba(128,118,105,.55);border-radius:8px;padding:16px;margin:10px 0;font-size:13px;opacity:.75;text-align:center";d.textContent="🖼 该配图未随展示库分发（展示版已脱敏）";im.replaceWith(d);}
+if(im.complete&&im.naturalWidth===0){ph();return;}
+im.addEventListener('error',ph);});</script>
+</body>
+</html>

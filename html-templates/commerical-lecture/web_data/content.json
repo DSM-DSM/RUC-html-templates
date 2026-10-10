@@ -1,58 +1,90 @@
 {
  "meta": {
   "brand": "AI × 科研",
+  "brand_en": "AI × Research",
   "title_line1": "从个人到团队：",
+  "title_line1_en": "From individual to team:",
   "title_line2": "<span class=\"hl\">AI 驱动</span>的科研实践",
+  "title_line2_en": "<span class=\"hl\">AI-driven</span> research practice",
   "subtitle": "一个人用 AI 的能力，如何生长为一支团队的生产力——三条叙事线，一个终点。（占位文案：见 README「替换清单」第 1 条）",
+  "subtitle_en": "How one person's AI capability grows into a team's productivity — three narrative threads, one destination. (Placeholder copy: see README, replacement checklist item 1.)",
   "presenter": "占位·汇报人",
+  "presenter_en": "Placeholder · Presenter",
   "institution": "占位·课题组 / 机构",
+  "institution_en": "Placeholder · Research group / institution",
   "date": "2026",
-  "hero_cta": "开始演示"
+  "hero_cta": "开始演示",
+  "hero_cta_en": "Start presentation"
  },
  "overview": {
   "heading": "三条线，一个终点",
+  "heading_en": "Three threads, one destination",
   "lede": "以下三条叙事线，分别对应一段真实的 AI 使用经验。每一条线都包含所使用的 skill、skill 产出的产品，以及 skill 如何被构建。（占位文案：见 README「替换清单」第 2 条）",
+  "lede_en": "The three narrative threads below each correspond to a real experience of working with AI. Every thread covers the skills used, the products those skills produced, and how the skills were built. (Placeholder copy: see README, replacement checklist item 2.)",
   "metrics": [
    {
     "value": "—",
-    "label": "沉淀技能（占位）"
+    "label": "沉淀技能（占位）",
+    "label_en": "Skills distilled (placeholder)"
    },
    {
     "value": "—",
-    "label": "产出项目（占位）"
+    "label": "产出项目（占位）",
+    "label_en": "Projects shipped (placeholder)"
    },
    {
     "value": "—",
-    "label": "协作人次（占位）"
+    "label": "协作人次（占位）",
+    "label_en": "Collaborations (placeholder)"
    }
   ],
-  "metrics_note": "以上数据为占位，待替换为真实指标（替换方法见 web_data/schema.md）。"
+  "metrics_note": "以上数据为占位，待替换为真实指标（替换方法见 web_data/schema.md）。",
+  "metrics_note_en": "All figures above are placeholders, to be replaced with real metrics (see web_data/schema.md for how)."
  },
  "lines": [
   {
    "no": "01",
    "title": "个人科研开展",
+   "title_en": "Personal research",
    "theme": "一个人如何用 AI 提速自己的研究。（占位：一句话主题）",
+   "theme_en": "How one person uses AI to accelerate their own research. (Placeholder: one-line theme)",
    "intro": "这条线讲个人科研中的 AI 实践：独立完成的研究任务如何被 skill 加速，从想法的提出到结论的落地。（占位文案）",
+   "intro_en": "This thread covers AI in personal research: how independently completed tasks get accelerated by skills, from idea to landed conclusion. (Placeholder copy)",
    "skills": [
     {
      "name": "Skill ①（占位）",
+     "name_en": "Skill ① (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     },
     {
      "name": "Skill ②（占位）",
+     "name_en": "Skill ② (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     }
    ],
@@ -60,55 +92,75 @@
     "products": [
      {
       "name": "产品 A（占位）",
+      "name_en": "Product A (placeholder)",
       "desc": "skill 产出的第一个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The first product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 A（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 A（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product A (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 A（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 A（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product A (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 A（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 A（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product A (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 A（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 A（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product A (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      },
      {
       "name": "产品 B（占位）",
+      "name_en": "Product B (placeholder)",
       "desc": "skill 产出的第二个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The second product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 B（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 B（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product B (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 B（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 B（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product B (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 B（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 B（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product B (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 B（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 B（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product B (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      }
@@ -116,33 +168,43 @@
     "metrics": [
      {
       "value": "—",
-      "label": "产出指标一（占位）"
+      "label": "产出指标一（占位）",
+      "label_en": "Outcome metric 1 (placeholder)"
      },
      {
       "value": "—",
-      "label": "产出指标二（占位）"
+      "label": "产出指标二（占位）",
+      "label_en": "Outcome metric 2 (placeholder)"
      }
     ],
     "build": [
      {
       "step": "01",
       "title": "识别重复（占位）",
-      "desc": "先找出研究中反复出现的手工环节，明确自动化目标。（占位）"
+      "title_en": "Spot repetition (placeholder)",
+      "desc": "先找出研究中反复出现的手工环节，明确自动化目标。（占位）",
+      "desc_en": "Identify the manual steps that keep recurring in research and define automation targets. (Placeholder)"
      },
      {
       "step": "02",
       "title": "定义规范（占位）",
-      "desc": "把经验固化成可复用的规则与知识库。（占位）"
+      "title_en": "Define conventions (placeholder)",
+      "desc": "把经验固化成可复用的规则与知识库。（占位）",
+      "desc_en": "Distill experience into reusable rules and a knowledge base. (Placeholder)"
      },
      {
       "step": "03",
       "title": "封装 Skill（占位）",
-      "desc": "以提示词与工具组合封装为可调用的 skill。（占位）"
+      "title_en": "Package the skill (placeholder)",
+      "desc": "以提示词与工具组合封装为可调用的 skill。（占位）",
+      "desc_en": "Wrap prompts and tools into an invocable skill. (Placeholder)"
      },
      {
       "step": "04",
       "title": "迭代验证（占位）",
-      "desc": "在真实任务上反复使用并修订，直到产出稳定。（占位）"
+      "title_en": "Iterate & validate (placeholder)",
+      "desc": "在真实任务上反复使用并修订，直到产出稳定。（占位）",
+      "desc_en": "Use and revise it on real tasks until the output stabilizes. (Placeholder)"
      }
     ]
    }
@@ -150,27 +212,46 @@
   {
    "no": "02",
    "title": "团队科研协作",
+   "title_en": "Team research collaboration",
    "theme": "一群人如何用 AI 对齐工作方式。（占位：一句话主题）",
+   "theme_en": "How a team uses AI to align the way it works. (Placeholder: one-line theme)",
    "intro": "这条线讲团队协作中的 AI 实践：多人参与的标注、会议与交接场景，如何通过 skill 统一口径、减少返工。（占位文案）",
+   "intro_en": "This thread covers AI in team collaboration: how multi-person annotation, meetings, and handovers are unified by skills — one standard, less rework. (Placeholder copy)",
    "skills": [
     {
      "name": "Skill ③（占位）",
+     "name_en": "Skill ③ (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     },
     {
      "name": "Skill ④（占位）",
+     "name_en": "Skill ④ (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     }
    ],
@@ -178,55 +259,75 @@
     "products": [
      {
       "name": "产品 C（占位）",
+      "name_en": "Product C (placeholder)",
       "desc": "skill 产出的第一个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The first product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 C（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 C（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product C (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 C（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 C（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product C (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 C（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 C（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product C (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 C（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 C（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product C (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      },
      {
       "name": "产品 D（占位）",
+      "name_en": "Product D (placeholder)",
       "desc": "skill 产出的第二个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The second product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 D（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 D（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product D (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 D（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 D（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product D (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 D（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 D（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product D (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 D（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 D（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product D (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      }
@@ -234,33 +335,43 @@
     "metrics": [
      {
       "value": "—",
-      "label": "产出指标一（占位）"
+      "label": "产出指标一（占位）",
+      "label_en": "Outcome metric 1 (placeholder)"
      },
      {
       "value": "—",
-      "label": "产出指标二（占位）"
+      "label": "产出指标二（占位）",
+      "label_en": "Outcome metric 2 (placeholder)"
      }
     ],
     "build": [
      {
       "step": "01",
       "title": "识别分歧（占位）",
-      "desc": "找出协作中口径不一、反复沟通的环节。（占位）"
+      "title_en": "Spot divergence (placeholder)",
+      "desc": "找出协作中口径不一、反复沟通的环节。（占位）",
+      "desc_en": "Find the steps where conventions clash and communication loops. (Placeholder)"
      },
      {
       "step": "02",
       "title": "约定规则（占位）",
-      "desc": "与团队共同确认裁决规则与优先级。（占位）"
+      "title_en": "Agree on rules (placeholder)",
+      "desc": "与团队共同确认裁决规则与优先级。（占位）",
+      "desc_en": "Confirm adjudication rules and priorities together with the team. (Placeholder)"
      },
      {
       "step": "03",
       "title": "封装 Skill（占位）",
-      "desc": "把规则封装为团队共享的 skill 与手册。（占位）"
+      "title_en": "Package the skill (placeholder)",
+      "desc": "把规则封装为团队共享的 skill 与手册。（占位）",
+      "desc_en": "Package the rules as a team-shared skill and handbook. (Placeholder)"
      },
      {
       "step": "04",
       "title": "交接扩展（占位）",
-      "desc": "通过交接机制让新成员快速上手。（占位）"
+      "title_en": "Hand over & extend (placeholder)",
+      "desc": "通过交接机制让新成员快速上手。（占位）",
+      "desc_en": "Use handover mechanisms to get new members up to speed fast. (Placeholder)"
      }
     ]
    }
@@ -268,27 +379,46 @@
   {
    "no": "03",
    "title": "从个人到团队",
+   "title_en": "From individual to team",
    "theme": "个人沉淀的能力，如何成为团队的基础设施。（占位：一句话主题）",
+   "theme_en": "How individually distilled capability becomes team infrastructure. (Placeholder: one-line theme)",
    "intro": "这条线讲两条线之间的联结：个人科研中打磨出的 skill 与产品，如何转化为团队协作的公共工具，反之亦然。（占位文案）",
+   "intro_en": "This thread links the first two: how skills and products honed in personal research become shared team tools — and how team use flows back. (Placeholder copy)",
    "skills": [
     {
      "name": "Skill ⑤（占位）",
+     "name_en": "Skill ⑤ (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     },
     {
      "name": "Skill ⑥（占位）",
+     "name_en": "Skill ⑥ (placeholder)",
      "tagline": "一句话定义这个 skill 是什么。（占位）",
+     "tagline_en": "A one-sentence definition of what this skill is. (Placeholder)",
      "purpose": "它解决什么问题：在什么场景下、替代了什么样的重复劳动、最终节省了多少时间。（占位）",
+     "purpose_en": "The problem it solves: in which scenarios, what repetitive work it replaces, and how much time it saves. (Placeholder)",
      "capabilities": [
       "核心能力一：具体能做什么。（占位）",
       "核心能力二：具体能做什么。（占位）",
       "核心能力三：具体能做什么。（占位）"
+     ],
+     "capabilities_en": [
+      "Core capability 1: what it can specifically do. (Placeholder)",
+      "Core capability 2: what it can specifically do. (Placeholder)",
+      "Core capability 3: what it can specifically do. (Placeholder)"
      ]
     }
    ],
@@ -296,55 +426,75 @@
     "products": [
      {
       "name": "产品 E（占位）",
+      "name_en": "Product E (placeholder)",
       "desc": "skill 产出的第一个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The first product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 E（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 E（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product E (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 E（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 E（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product E (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 E（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 E（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product E (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 E（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 E（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product E (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      },
      {
       "name": "产品 F（占位）",
+      "name_en": "Product F (placeholder)",
       "desc": "skill 产出的第二个产品，一句话说明它是什么、给谁用。（占位）",
+      "desc_en": "The second product of this skill — one sentence on what it is and who it is for. (Placeholder)",
       "shot": "",
       "build": [
        {
         "step": "01",
         "title": "步骤一（占位）",
-        "desc": "产品 F（占位） 构建过程第 1 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 1 (placeholder)",
+        "desc": "产品 F（占位） 构建过程第 1 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product F (placeholder), build step 1: replace with this product's real build notes."
        },
        {
         "step": "02",
         "title": "步骤二（占位）",
-        "desc": "产品 F（占位） 构建过程第 2 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 2 (placeholder)",
+        "desc": "产品 F（占位） 构建过程第 2 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product F (placeholder), build step 2: replace with this product's real build notes."
        },
        {
         "step": "03",
         "title": "步骤三（占位）",
-        "desc": "产品 F（占位） 构建过程第 3 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 3 (placeholder)",
+        "desc": "产品 F（占位） 构建过程第 3 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product F (placeholder), build step 3: replace with this product's real build notes."
        },
        {
         "step": "04",
         "title": "步骤四（占位）",
-        "desc": "产品 F（占位） 构建过程第 4 步：替换为该产品真实的构建说明。"
+        "title_en": "Step 4 (placeholder)",
+        "desc": "产品 F（占位） 构建过程第 4 步：替换为该产品真实的构建说明。",
+        "desc_en": "Product F (placeholder), build step 4: replace with this product's real build notes."
        }
       ]
      }
@@ -352,33 +502,43 @@
     "metrics": [
      {
       "value": "—",
-      "label": "产出指标一（占位）"
+      "label": "产出指标一（占位）",
+      "label_en": "Outcome metric 1 (placeholder)"
      },
      {
       "value": "—",
-      "label": "产出指标二（占位）"
+      "label": "产出指标二（占位）",
+      "label_en": "Outcome metric 2 (placeholder)"
      }
     ],
     "build": [
      {
       "step": "01",
       "title": "沉淀复用（占位）",
-      "desc": "把个人工具中可复用的部分抽取为公共资产。（占位）"
+      "title_en": "Distill for reuse (placeholder)",
+      "desc": "把个人工具中可复用的部分抽取为公共资产。（占位）",
+      "desc_en": "Extract the reusable parts of personal tools into shared assets. (Placeholder)"
      },
      {
       "step": "02",
       "title": "面向协作重构（占位）",
-      "desc": "按团队使用习惯调整接口与文档。（占位）"
+      "title_en": "Refactor for collaboration (placeholder)",
+      "desc": "按团队使用习惯调整接口与文档。（占位）",
+      "desc_en": "Adapt interfaces and docs to the team's habits. (Placeholder)"
      },
      {
       "step": "03",
       "title": "封装 Skill（占位）",
-      "desc": "以团队场景为基准重新封装与验证。（占位）"
+      "title_en": "Package the skill (placeholder)",
+      "desc": "以团队场景为基准重新封装与验证。（占位）",
+      "desc_en": "Re-package and validate against real team scenarios. (Placeholder)"
      },
      {
       "step": "04",
       "title": "回流个人（占位）",
-      "desc": "团队使用中产生的新需求回流到个人工具链。（占位）"
+      "title_en": "Flow back to the individual (placeholder)",
+      "desc": "团队使用中产生的新需求回流到个人工具链。（占位）",
+      "desc_en": "New needs discovered by the team flow back into personal toolchains. (Placeholder)"
      }
     ]
    }
@@ -386,9 +546,14 @@
  ],
  "closing": {
   "heading": "三条线，汇于一处",
+  "heading_en": "Three threads, one convergence",
   "text": "个人科研中的 AI 能力，经由团队协作被放大；团队协作的公共工具，反过来滋养每个人的研究。如果这套实践与贵司的业务场景有交汇之处，期待进一步沟通。（占位文案：见 README「替换清单」第 3 条）",
+  "text_en": "AI capability from personal research is amplified through team collaboration; the team's shared tools in turn nourish everyone's research. If this practice intersects with your business, we would love to talk further. (Placeholder copy: see README, replacement checklist item 3.)",
   "cta_primary": "进一步沟通（占位）",
+  "cta_primary_en": "Get in touch (placeholder)",
   "cta_secondary": "浏览全部产出（占位）",
-  "foot_note": "本页为演示模板 · 全部内容为占位文案"
+  "cta_secondary_en": "Browse all outputs (placeholder)",
+  "foot_note": "本页为演示模板 · 全部内容为占位文案",
+  "foot_note_en": "Demo template · all copy is placeholder"
  }
 }

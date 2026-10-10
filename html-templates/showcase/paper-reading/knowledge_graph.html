@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MR 研究知识图谱 - AI4Research</title>
+<link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+<script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="theme-pack.js"></script>
+<style>
+/* ====================================================================
+   设计令牌 (Design Tokens) —— 默认主题「纸墨」，与论文详解页同源；
+   其余 7 套主题由 theme-pack.js 通过 <style id="theme-css"> 覆盖
+   ==================================================================== */
+:root {
+  color-scheme: light;
+  --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+  --bg: #f6f6f3; --surface: #ffffff; --surface-2: #fbfbf8;
+  --rule: #e4e3db; --rule-strong: #cfcec3;
+  --ink: #232a31; --ink-2: #5b6470; --ink-3: #5f6974;
+  --accent: #24547c; --accent-deep: #1a3d5c; --accent-soft: #e9eff5;
+  --on-accent: #ffffff; --link: #2a6298; --focus: #2a6298;
+  --radius: 10px; --radius-s: 7px;
+  --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+  --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+  --sel: rgba(36,84,124,.16); --scroll: #c9c8be; --progress: var(--accent);
+  /* 标签/徽章语义色（fg / bg / border） */
+  --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;
+  --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;
+  --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;
+  --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;
+  --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;
+  --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;
+  --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;
+  --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  font-size: 17px; line-height: 1.75; color: var(--ink);
+  background: var(--bg); max-width: 1000px; margin: 0 auto; padding: 26px 24px 60px;
+  transition: background-color .25s ease, color .25s ease;
+}
+a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+::selection { background: var(--sel); }
+html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+body::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+h2 {
+  font-family: var(--font-display); font-weight: 600; color: var(--ink);
+  font-size: 1.45em; line-height: 1.4; margin: 46px 0 16px; padding-bottom: 9px;
+  border-bottom: 1px solid var(--rule-strong); position: relative;
+}
+h2::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 56px; height: 2px; background: var(--accent); }
+h3 { color: var(--ink); font-size: 1.18em; font-weight: 600; margin: 30px 0 10px; }
+p { margin: 10px 0; }
+.ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 顶部阅读进度条 */
+.progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+  background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+}
+/* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+html.rv-on .rv.in {
+  opacity: 1; transform: translateY(0);
+  transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+  .progress { transition: none; }
+}
+
+/* 顶部导航栏 */
+.top-nav-bar {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+  gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+}
+.top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+.top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+.top-nav-bar .sep { color: var(--rule-strong); }
+
+/* ====================================================================
+   页眉（期刊刊头式：顶部粗规线 + 衬线标题 + 统计数字）
+   ==================================================================== */
+.kg-header { border-top: 2px solid var(--ink); padding: 24px 2px 20px; margin-bottom: 30px; border-bottom: 1px solid var(--rule-strong); }
+.kg-header h1 {
+  font-family: var(--font-display); font-weight: 600; color: var(--ink);
+  font-size: 1.66em; line-height: 1.4; letter-spacing: .01em; margin-bottom: 6px;
+}
+.kg-sub { font-size: .9em; color: var(--ink-2); }
+.kg-stats { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px 34px; }
+.kg-stat { display: flex; align-items: baseline; gap: 8px; }
+.kg-stat b {
+  font-family: var(--font-display); font-weight: 600; font-size: 1.7em; line-height: 1;
+  color: var(--accent); font-variant-numeric: tabular-nums;
+}
+.kg-stat span { font-size: .84em; color: var(--ink-2); }
+
+/* ====================================================================
+   板块 1：概念关联图谱 (.network-grid)
+   ==================================================================== */
+.network-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 20px 0; }
+@media (max-width: 700px) { .network-grid { grid-template-columns: 1fr; } }
+.paper-node {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 18px 20px; box-shadow: var(--shadow);
+  transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, border-color .15s ease, background-color .25s ease;
+}
+.paper-node:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--rule-strong); }
+.paper-node .node-title { font-size: 1.05em; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.paper-node .node-meta { font-size: .84em; color: var(--ink-3); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+.concept-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .78em; font-weight: 600; border: 1px solid transparent; }
+.tag.shared { background: var(--c-def-bg); color: var(--c-def-fg); border-color: var(--c-def-bd); }
+.tag.unique { background: var(--c-ex-bg);  color: var(--c-ex-fg);  border-color: var(--c-ex-bd); }
+.tag.bridge { background: var(--c-th-bg);  color: var(--c-th-fg);  border-color: var(--c-th-bd); }
+.tag.new    { background: var(--c-int-bg); color: var(--c-int-fg); border-color: var(--c-int-bd); }
+
+/* ====================================================================
+   板块 2：概念-论文对照矩阵 (table.matrix)
+   ==================================================================== */
+table.matrix { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .86em; font-variant-numeric: tabular-nums; }
+table.matrix th { background: var(--accent-deep); color: var(--on-accent); padding: 9px 10px; text-align: center; font-size: .9em; font-weight: 600; }
+table.matrix th:first-child { min-width: 160px; text-align: left; }
+table.matrix td { padding: 8px 10px; border-bottom: 1px solid var(--rule); text-align: center; vertical-align: middle; }
+table.matrix td:first-child { text-align: left; font-weight: 500; }
+table.matrix tr:nth-child(even) td { background: var(--surface-2); }
+/* 单元格标记：checkmark=核心/覆盖, partial=提及, cross=未涉及 */
+.checkmark { color: var(--c-int-fg); font-weight: 600; }
+.cross { color: var(--c-wa-fg); }
+.partial { color: var(--c-ex-fg); }
+
+/* ====================================================================
+   板块 3：论文间关系卡片 (.rel-card)
+   ==================================================================== */
+.rel-card {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+  padding: 16px 20px; margin: 12px 0; box-shadow: var(--shadow);
+  transition: transform .15s cubic-bezier(.2,.8,.2,1), box-shadow .15s ease, background-color .25s ease;
+}
+.rel-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+.rel-card h3 { margin: 0 0 6px; font-size: 1em; color: var(--ink); font-weight: 600; }
+.rel-type {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-size: .78em; font-weight: 600; margin-right: 8px; color: var(--rel-ink);
+}
+.rel-generalizes { background: var(--rel-gen); }    /* 推广/升级 */
+.rel-shares      { background: var(--rel-share); }  /* 共享基础 */
+.rel-complements { background: var(--rel-comp); }   /* 互补 */
+
+/* ====================================================================
+   板块 4：推荐阅读路径 (ol.roadmap-steps)
+   ==================================================================== */
+.roadmap-steps { list-style: none; padding: 0; counter-reset: step; }
+.roadmap-steps li {
+  background: var(--surface); border: 1px solid var(--rule); padding: 14px 18px;
+  margin: 10px 0; border-radius: var(--radius-s); counter-increment: step; box-shadow: var(--shadow);
+}
+.roadmap-steps li::before {
+  content: counter(step); display: inline-block; width: 26px; height: 26px;
+  line-height: 26px; text-align: center; border-radius: 50%;
+  background: var(--accent-deep); color: var(--on-accent);
+  font-family: var(--font-display); font-weight: 600; font-size: .9em; margin-right: 10px;
+}
+.roadmap-steps p { margin: 4px 0 0; font-size: .9em; color: var(--ink-2); }
+
+/* ====================================================================
+   板块 5：论文索引 (.paper-links)
+   ==================================================================== */
+.paper-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.paper-links a {
+  padding: 6px 14px; border-radius: 999px; border: 1px solid var(--rule);
+  background: var(--surface); font-size: .88em;
+  transition: border-color .12s ease, background-color .12s ease, transform .12s cubic-bezier(.2,.8,.2,1);
+}
+.paper-links a:hover { background: var(--accent-soft); border-color: var(--rule-strong); text-decoration: none; transform: translateY(-1px); }
+
+footer { margin-top: 52px; padding-top: 20px; border-top: 1px solid var(--rule-strong); font-size: .88em; color: var(--ink-2); }
+
+@media (max-width: 768px) {
+  body { font-size: 15px; padding: 14px 14px 48px; }
+  .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .kg-stats { gap: 10px 22px; }
+}
+@media print { .progress { display: none !important; } }
+</style>
+<style id="theme-css"></style>
+<!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+<style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+<script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<div class="top-nav-bar"><span class="current"><span data-zh>&#x2190; 知识图谱</span><span data-en>&#x2190; Knowledge Graph</span></span> <a href="papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR</a> <a href="papers/Sanderson_2022_Mendelian_randomization_zh.html">MR Primer</a> <a href="papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR-CVD</a> <a href="papers/Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a> <a href="papers/Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN</a>
+<a href="papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">两步MR</a>
+<a href="papers/Cui_2025_Multimodal_foundation_models_zh.html"><strong>MFM</strong> (Nature 2025)</a><a href="nav/mr_lecture.html"><span data-zh>MR讲演</span><span data-en>MR Lecture</span></a>
+<a href="papers/McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA</a>
+<a href="papers/Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">DANDELION</a>
+	<a href="nav/reading_path.html"><span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+<a href="nav/knowledge_supplement.html"><span data-zh>补充知识</span><span data-en>Background</span></a>
+</div>
+<div class="kg-header"><h1><span data-zh>&#x1F5FA;&#xFE0F; 孟德尔随机化（MR）研究知识图谱</span><span data-en>&#x1F5FA;&#xFE0F; Mendelian Randomization (MR) Research Knowledge Graph</span></h1>
+<div style="font-size:.9em;opacity:.85;margin-top:8px;"><span data-zh>项目：AI4Research · 最后更新：2026-08-14</span><span data-en>Project: AI4Research · Last updated: 2026-08-14</span></div>
+<div class="kg-stats"><div class="kg-stat"><span data-zh>&#x1F4C4; 论文数：10</span><span data-en>&#x1F4C4; Papers: 10</span></div><div class="kg-stat"><span data-zh>&#x1F3F7;&#xFE0F; 核心概念：45+</span><span data-en>&#x1F3F7;&#xFE0F; Core concepts: 45+</span></div><div class="kg-stat"><span data-zh>&#x1F517; 交叉关系：20+</span><span data-en>&#x1F517; Cross-links: 20+</span></div></div></div>
+<h2>1. 概念关联图谱</h2>
+<div class="network-grid">
+<div class="paper-node"><div class="node-title">STROBE-MR 声明</div><div class="node-meta">JAMA 2021 &middot; Skrivankova et al.</div><div class="concept-tags"><span class="tag unique">报告指南</span> <span class="tag unique">20条目检查清单</span> <span class="tag unique">EQUATOR框架</span></div><div class="concept-tags"><span class="tag shared">IV三大假设</span> <span class="tag shared">单/双样本MR</span> <span class="tag shared">水平多效性</span> <span class="tag shared">敏感性分析</span></div><div class="concept-tags"><span class="tag bridge">报告透明性</span> <span class="tag bridge">数据与代码共享</span></div></div>
+<div class="paper-node"><div class="node-title">MR 方法学 Primer</div><div class="node-meta">Nat Rev Methods Primers 2022 &middot; Sanderson et al.</div><div class="concept-tags"><span class="tag unique">MR方法学综述</span> <span class="tag unique">GWAS汇总数据</span> <span class="tag unique">因果图（DAG）</span></div><div class="concept-tags"><span class="tag shared">IV三大假设</span> <span class="tag shared">双样本MR</span> <span class="tag shared">水平多效性</span> <span class="tag shared">敏感性分析</span> <span class="tag shared">Wald ratio / IVW</span></div><div class="concept-tags"><span class="tag bridge">全现象组MR</span> <span class="tag bridge">药物靶点MR</span></div></div>
+<div class="paper-node"><div class="node-title">MR 与心血管疾病</div><div class="node-meta">EHJ 2023 &middot; Larsson et al.</div><div class="concept-tags"><span class="tag unique">心血管疾病应用</span> <span class="tag unique">102种暴露到6种CVD</span> <span class="tag unique">中介MR</span></div><div class="concept-tags"><span class="tag shared">双样本MR</span> <span class="tag shared">多效性检验</span> <span class="tag shared">敏感性分析</span> <span class="tag shared">药物靶点发现</span></div><div class="concept-tags"><span class="tag bridge">心血管风险因素</span> <span class="tag bridge">疾病因果通路</span></div></div>
+<div class="paper-node"><div class="node-title">卒中蛋白质组MR</div><div class="node-meta">Stroke 2025 &middot; Yao et al. (CKB)</div><div class="concept-tags"><span class="tag new">蛋白质组范围MR</span> <span class="tag new">2923蛋白 x 双种族</span> <span class="tag new">10种IS因果蛋白</span></div><div class="concept-tags"><span class="tag shared">双样本MR</span> <span class="tag shared">Wald ratio</span> <span class="tag shared">敏感性分析</span> <span class="tag shared">药物靶点发现</span></div><div class="concept-tags"><span class="tag bridge">共定位 (coloc+SuSiE)</span> <span class="tag bridge">中介分析</span> <span class="tag bridge">PheWAS下游验证</span> <span class="tag bridge">药物数据库查询</span></div></div>
+<div class="paper-node" style="grid-column: 1 / -1;"><div class="node-title">COL6A3-Endotrophin 介导肥胖到CAD</div><div class="node-meta">2025 &middot; Yoshiji et al. (Two-step MR)</div><div class="concept-tags"><span class="tag unique">两步MR (Two-step MR)</span> <span class="tag unique">BMI到蛋白到CAD</span> <span class="tag unique">COL6A3/Endotrophin</span></div><div class="concept-tags"><span class="tag shared">双样本MR</span> <span class="tag shared">药物靶点发现</span> <span class="tag shared">敏感性分析</span> <span class="tag shared">Wald ratio</span></div><div class="concept-tags"><span class="tag bridge">中介分析（与Larsson和Yao共享）</span> <span class="tag bridge">冠心病（互补于卒中靶点）</span></div></div>
+
+<div class="paper-node" style="grid-column: 1 / -1;">
+<div class="node-title">ROBIN: AI 多智能体科学发现</div>
+<div class="node-meta">arXiv 2025 &middot; Ghareeb, Chang, Mitchener et al. (FutureHouse)</div>
+<div class="concept-tags">
+<span class="tag new">LLM多智能体系统</span> <span class="tag new">闭环科学发现</span> <span class="tag new">药物重利用</span>
+</div>
+<div class="concept-tags">
+<span class="tag shared">药物靶点发现</span> <span class="tag shared">自动化分析流程</span>
+</div>
+<div class="concept-tags">
+<span class="tag bridge">AI驱动假设生成</span> <span class="tag bridge">实验-计算闭环</span> <span class="tag bridge">dAMD/Ripasudil</span>
+</div>
+</div>
+</div>
+
+	<div class="paper-node" style="grid-column: 1 / -1;">
+	<div class="node-title">&#x1F9EC; 多模态基础模型 (MFM) 愿景</div>
+	<div class="node-meta">Nature 2025 &middot; Cui, Tejada-Lapuerta, Brbi&#x107; et al. (Perspective)</div>
+	<div class="concept-tags">
+	<span class="tag new">Transformer+Attention</span> <span class="tag new">多组学Token化</span> <span class="tag new">多级注意力（模内+模间）</span> <span class="tag new">Lab-in-the-Loop</span>
+	</div>
+	<div class="concept-tags">
+	<span class="tag shared">AI驱动的科学发现</span> <span class="tag shared">计算生物学方法</span>
+	</div>
+	<div class="concept-tags">
+	<span class="tag bridge">预训练+迁移学习</span> <span class="tag bridge">实验-计算闭环（&#x2194;ROBIN）</span> <span class="tag bridge">in silico扰动预测</span>
+	</div>
+	</div>
+<div class="paper-node" style="grid-column: 1 / -1;">
+<div class="node-title">LyMOI: GCN+LLM 混合组学解读</div>
+<div class="node-meta">Nat Biomed Eng 2025 &middot; Tang, Zhang, Zhang et al. (HUST)</div>
+<div class="concept-tags">
+<span class="tag new">GCN+LLM混合架构</span> <span class="tag new">组学解读</span> <span class="tag new">自噬调控因子</span>
+</div>
+<div class="concept-tags">
+<span class="tag shared">药物重利用</span> <span class="tag shared">自动化分析</span>
+</div>
+<div class="concept-tags">
+<span class="tag bridge">DSF+Z-FY-CHO联合治疗</span> <span class="tag bridge">LGM大图模型</span> <span class="tag bridge">1.87亿PPI</span>
+</div>
+</div>
+
+<div class="paper-node" style="grid-column: 1 / -1;">
+<div class="node-title">&#x1F50D; PISA: 顺式调控密码与核小体深度学习解读</div>
+<div class="node-meta">Nat Commun 2026 &middot; McAnany, Weilert, Mehta et al. (Stowers/Stanford)</div>
+<div class="concept-tags">
+<span class="tag new">PISA二维归因</span> <span class="tag new">Sequence-to-function模型</span> <span class="tag new">核小体定位motif</span> <span class="tag new">染色质结构域边界</span> <span class="tag new">序列设计</span>
+</div>
+<div class="concept-tags">
+<span class="tag shared">深度学习可解释性</span> <span class="tag shared">AI驱动科学发现</span>
+</div>
+<div class="concept-tags">
+<span class="tag bridge">偏差校正（MNase-seq）</span> <span class="tag bridge">遗传算法序列工程</span> <span class="tag bridge">DeepSHAP归因</span>
+</div>
+</div>
+
+<div class="paper-node" style="grid-column: 1 / -1;">
+<div class="node-title">&#x1F9EA; DANDELION: 反式调控基因定位优先发现疾病驱动基因</div>
+<div class="node-meta">Cell 2026 &middot; Salamone, Tian, Qi, Zhonghua Liu, M.A. No&#769;brega, Xuanyao Liu et al. (UChicago/Columbia)</div>
+<div class="concept-tags">
+<span class="tag new">疾病近端基因(DPG)</span> <span class="tag new">反式调控网络</span> <span class="tag new">WES负担检验</span> <span class="tag new">DACT中介检验</span> <span class="tag new">蛋白质棕榈酰化</span>
+</div>
+<div class="concept-tags">
+<span class="tag shared">GWAS基因定位</span> <span class="tag shared">药物靶点发现</span> <span class="tag shared">CRISPR功能验证</span>
+</div>
+<div class="concept-tags">
+<span class="tag bridge">两步中介框架（&#x2194;两步MR）</span> <span class="tag bridge">cis调控 vs trans调控（&#x2194;PISA）</span> <span class="tag bridge">遗传靶点发现（&#x2194;卒中蛋白MR）</span>
+</div>
+</div>
+</div>
+
+<h2>2. 概念-论文对照矩阵</h2>
+<table class="matrix">
+<tr><th>核心概念</th><th>STROBE-MR</th><th>MR Primer</th><th>MR-CVD</th><th>卒中蛋白MR</th><th>两步MR</th>
+<th>ROBIN</th><th>PISA</th><th>DANDELION</th></tr>
+<tr><td>MR 报告标准 / 检查清单</td><td class="checkmark">核心</td><td class="partial">提及</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>IV 三大假设</td><td class="checkmark">规范</td><td class="checkmark">详细</td><td class="checkmark">应用</td><td class="checkmark">应用</td><td class="checkmark">应用</td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>双样本 MR（Wald ratio / IVW）</td><td class="checkmark">覆盖</td><td class="checkmark">详细</td><td class="checkmark">主要方法</td><td class="checkmark">主要方法</td><td class="checkmark">主要方法</td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>水平多效性及检验</td><td class="checkmark">要求</td><td class="checkmark">MR-Egger等</td><td class="checkmark">MR-Egger等</td><td class="checkmark">cis-pQTL优先</td><td class="checkmark">多种方法</td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>敏感性分析</td><td class="checkmark">条目8+13</td><td class="checkmark">多种方法</td><td class="checkmark">留一法等</td><td class="checkmark">种族间交叉</td><td class="checkmark">GWAS复制</td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>GWAS 汇总数据</td><td class="checkmark">条目4</td><td class="checkmark">核心输入</td><td class="checkmark">核心输入</td><td class="checkmark">cis-pQTL GWAS</td><td class="checkmark">BMI/CAD GWAS</td><td class="cross"></td><td class="cross"></td>
+<td class="checkmark">trans-eQTL</td></tr>
+<tr><td>药物靶点发现</td><td class="cross"></td><td class="partial">提及</td><td class="checkmark">应用方向</td><td class="checkmark">核心目标</td><td class="checkmark">核心目标</td><td class="checkmark">核心目标</td><td class="checkmark">核心目标</td>
+<td class="checkmark">核心目标</td></tr>
+<tr><td>共定位分析 (Colocalization)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">coloc+SuSiE</td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>PheWAS / 全表型组关联</td><td class="cross"></td><td class="partial">提及</td><td class="cross"></td><td class="checkmark">下游验证</td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>中介 MR 分析</td><td class="cross"></td><td class="partial">提及</td><td class="checkmark">核心方法</td><td class="checkmark">蛋白到SBP到卒中</td><td class="checkmark">BMI到蛋白到CAD</td><td class="cross"></td><td class="cross"></td>
+<td class="checkmark">DACT中介</td></tr>
+<tr><td>两步MR (Two-step MR)</td><td class="cross"></td><td class="cross"></td><td class="partial">中介MR</td><td class="partial">中介MR</td><td class="checkmark">核心方法</td><td class="cross"></td><td class="cross"></td>
+<td class="partial">trans+负担</td></tr>
+<tr><td>跨种族 / 多祖先 MR</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">EAS + EUR</td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>蛋白质组学平台 (Olink/SomaScan)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">Olink 3072</td><td class="checkmark">SomaScan</td><td class="cross"></td><td class="cross"></td>
+<td class="cross"></td></tr>
+<tr><td>反式调控网络 (trans-regulatory)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="partial">cis互补</td>
+<td class="checkmark">核心证据</td></tr>
+<tr><td>疾病近端基因定位 (DPG)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="checkmark">核心输出</td></tr>
+<tr><td>WES 负担检验 (burden test)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td>
+<td class="checkmark">核心证据</td></tr>
+<tr><td>CRISPR 功能验证</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">序列验证</td>
+<td class="checkmark">双细胞筛选</td></tr>
+<tr><td>深度学习序列模型 (Sequence-to-function)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">bpnet/bpreveal</td><td class="cross"></td></tr>
+<tr><td>归因/可解释性方法 (Attribution)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="partial">LLM可解释</td><td class="checkmark">PISA/DeepSHAP</td><td class="cross"></td></tr>
+<tr><td>核小体定位 (Nucleosome Positioning)</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">核心发现</td><td class="cross"></td></tr>
+<tr><td>染色质3D组织/结构域边界</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">de novo发现</td><td class="cross"></td></tr>
+<tr><td>序列设计与遗传算法</td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="cross"></td><td class="checkmark">CRISPR验证</td><td class="cross"></td></tr>
+</table>
+<h2>3. 论文间关系卡片</h2>
+<div class="rel-card"><h4><span class="rel-type rel-shares">共享基础</span> STROBE-MR / MR Primer</h4><p>STROBE-MR 定义了好的MR研究应该报告什么（规范性标准），MR Primer 解释了MR研究应该怎么做（方法论基础）。互补使用可获得MR研究的完整认知框架。</p></div>
+<div class="rel-card"><h4><span class="rel-type rel-complements">应用延伸</span> MR Primer / Larsson MR-CVD (EHJ 2023)</h4><p>MR Primer 提供了方法学全景，Larsson et al. 则将MR方法系统应用于心血管疾病领域——对102种暴露因子与6种CVD结局逐一进行MR分析，并引入中介MR来揭示因果通路。</p></div>
+<div class="rel-card"><h4><span class="rel-type rel-generalizes">技术升级</span> Larsson MR-CVD / Yao et al. (Stroke 2025)</h4><p>两篇均为心血管领域的MR应用研究，但 Yao et al. 实现了重大技术升级：(1)暴露从风险因素升级为2923种血浆蛋白；(2)工具变量升级为cis-pQTL；(3)引入共定位分析和SuSiE精细定位；(4)加入PheWAS、KO小鼠和药物数据库构成七重下游验证；(5)双种族设计实现种族间交叉验证。</p></div>
+<div class="rel-card"><h4><span class="rel-type rel-generalizes">方法学完整实现</span> MR Primer / Yao et al. (Stroke 2025)</h4><p>Yao et al. 的研究堪称 MR Primer 中描述的药物靶点MR范式的教科书级完整实现：从pQTL发现到两样本MR到共定位到中介分析到PheWAS到药物数据库查询。同时验证了多祖先研究的价值——ALDH2靶点仅在东亚人群变异存在的情况下被发现。</p></div>
+<div class="rel-card"><h4><span class="rel-type rel-complements">中介方法差异</span> Larsson MR-CVD / Yoshiji 两步MR</h4><p>两篇论文都使用中介MR方法，但方向相反：Larsson从暴露到中介再到结局，探索多通路（广度优先）；Yoshiji则聚焦于单一因果链BMI到COL6A3/endotrophin到CAD，使用两步MR精确量化中介效应（深度优先）。</p></div>
+<div class="rel-card"><h4><span class="rel-type rel-complements">蛋白靶点互补</span> Yao 卒中蛋白MR / Yoshiji 两步MR</h4><p>两篇论文都通过蛋白质组学发现心血管疾病药物靶点，但靶向不同疾病和通路：Yao鉴定了10种缺血性卒中因果蛋白（多种通路），Yoshiji聚焦于单一COL6A3/endotrophin到CAD通路。共同展示了蛋白质组MR在不同心血管疾病中的药物靶点发现潜力。</p></div>
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">AI+MR 互补</span> Yao 卒中蛋白MR / ROBIN</h4>
+<p>两篇论文都致力于药物靶点发现和重利用，但使用了完全互补的方法：Yao通过孟德尔随机化（遗传因果推断）筛选卒中靶点；ROBIN通过LLM多智能体系统综合文献推断dAMD候选药物。展示了"数据驱动"和"知识驱动"两种药物发现范式的互补性。</p>
+</div>
+<div class="rel-card">
+	<div class="rel-card">
+	<h4><span class="rel-type rel-complements">AI基础模型 ↔ AI多智能体</span> MFM (Cui 2025) / ROBIN (Ghareeb 2025)</h4>
+	<p>两篇均为2025年发表的AI赋能生物学的前沿论文。MFM从<strong>架构层面</strong>提出愿景（Transformer预训练于多组学数据），ROBIN从<strong>系统层面</strong>实现应用（LLM多智能体闭环发现）。共享"AI驱动科学发现"和"实验-计算闭环"的核心理念。</p>
+	</div>
+<h4><span class="rel-type rel-complements">自动化科研范式</span> 本项目MR体系 / ROBIN</h4>
+<p>本项目中的MR论文代表"人类科学家的系统研究方法论"——从STROBE-MR报告规范到具体的MR应用。ROBIN则代表"AI自动执行科学方法"的新范式——将文献综合、假设生成、实验设计和数据分析全部自动化。两者共同展示了科学发现从"纯手工"到"全自动"的演化光谱。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">AI科学发现互补</span> ROBIN / LyMOI</h4>
+<p>两篇论文都是AI驱动科学发现的前沿范例，但技术路线互补：ROBIN用LLM多智能体驱动文献检索和数据解释；LyMOI用GCN深度学习做定量预测+LLM做定性推理。ROBIN侧重"自动化科研流程"，LyMOI侧重"深度模型+语言模型融合"。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">基因组AI：可解释性基础设施</span> PISA (McAnany 2026) / MFM (Cui 2025)</h4>
+<p>MFM提出了多模态基础模型解读生物学的宏大愿景，PISA则提供了实现这一愿景的<b>关键基础设施</b>——让黑箱深度学习模型变得可解释。PISA的二维归因矩阵P<sub>ij</sub>可被视为基因组学中"注意力图"的对应物。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">AI科学发现：机制验证</span> PISA (McAnany 2026) / ROBIN (Ghareeb 2025)</h4>
+<p>共享AI驱动的科学发现范式。ROBIN侧重<b>假设生成</b>（自动文献综合和实验设计），PISA侧重<b>机制验证</b>（从模型中学到的序列规则推断调控机制并实验验证）。两者分别覆盖科学发现循环中的不同阶段。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">深度学习+组学解读</span> PISA (McAnany 2026) / LyMOI (Tang 2025)</h4>
+<p>两者都使用深度学习解读组学数据，但尺度互补：LyMOI用GCN+LLM做<b>基因功能层面的全局推断</b>（1.87亿PPI网络），PISA用CNN+归因做<b>碱基分辨率的局部调控解读</b>（单个增强子/启动子）。PISA的可解释性工具链可作为LyMOI等模型的下游分析工具。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-generalizes">基因定位范式升级</span> 卒中蛋白MR (Yao 2025) / DANDELION (Salamone 2026)</h4>
+<p>两者都是"遗传证据驱动的疾病驱动分子优先级排序"范式，但证据类型互补：Yao用cis-pQTL+MR在<b>蛋白层面</b>筛选卒中靶点（2923蛋白×双种族），DANDELION用trans调控+WES负担在<b>基因层面</b>筛选哮喘DPG。Yao侧重蛋白丰度的因果效应，DANDELION侧重反式调控网络的中心性——共同构成"cis蛋白"与"trans基因"两大靶点发现流派。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-shares">两步中介框架</span> 两步MR (Yoshiji 2025) / DANDELION (Salamone 2026)</h4>
+<p>两篇论文共享"两步中介"的思想骨架：两步MR精确量化X→M→Y单条中介通路（BMI→蛋白→CAD），DANDELION同样在基因层面做两步（trans关联XM + 负担检验MY），但通过DACT p值排序做基因组范围扫描，而不估计效应大小。DANDELION可视为两步中介思想在反式调控基因定位中的应用推广。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-shares">遗传变异因果推断</span> MR Primer (Sanderson 2022) / DANDELION (Salamone 2026)</h4>
+<p>两者都从遗传变异出发做因果推断。MR Primer系统讲授了IV选择、Wald ratio/IVW、多效性检验等MR方法学基础；DANDELION则将因果推断范式扩展到"变异→中介基因→疾病"的反式调控网络，用GWAS位点作暴露、全基因组基因作候选中介。DANDELION的中介检验（DACT）与MR中的中介分析一脉相承。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-shares">应用延伸：中介因果通路</span> MR-CVD (Larsson 2023) / DANDELION (Salamone 2026)</h4>
+<p>Larsson在心血管领域用中介MR系统性揭示暴露→中介→CVD的因果通路；DANDELION把中介推断范式应用到哮喘，并在实验端用CRISPR+小鼠模型闭环验证——展示了"统计中介→功能验证→机制通路"的完整链条。两者都强调识别位于疾病因果链"中间"的分子节点。</p>
+</div>
+
+<div class="rel-card">
+<h4><span class="rel-type rel-complements">cis vs trans 调控互补</span> PISA (McAnany 2026) / DANDELION (Salamone 2026)</h4>
+<p>两篇论文都研究基因调控与疾病，但视角互补：PISA解读<b>顺式</b>调控密码（局部序列→功能，碱基分辨率），DANDELION定位<b>反式</b>调控网络的中心节点（全基因组远距离调控）。一"cis"一"trans"，共同覆盖了调控基因组的两个正交维度，且两者都通过CRISPR实验验证计算预测。</p>
+</div>
+
+<h2>4. 推荐阅读路径</h2>
+<ol class="roadmap-steps">
+<li><strong>入门：理解 MR 报告标准</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html">STROBE-MR 详解</a> —— 从报告指南出发，理解 MR 研究的核心假设、常见陷阱和报告规范。</p></li>
+<li><strong>深入：掌握 MR 方法学体系</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Sanderson_2022_Mendelian_randomization_zh.html">MR 方法学 Primer 详解</a> —— 系统学习双样本MR、IV选择、多效性检验和敏感性分析。</p></li>
+<li><strong>应用（广度）：MR 如何系统评估心血管疾病风险因素</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR与心血管疾病 详解</a> —— 102种暴露x6种CVD结局，学习中介MR和因果通路识别。</p></li>
+<li><strong>应用（深度）：两步MR精确量化中介通路</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Ghareeb_2025_Multi_Agent_System_zh.html"><strong>ROBIN 多智能体</strong> (arXiv 2025)</a>
+<a href="papers/Tang_2025_Deep_learning_large_zh.html"><strong>LyMOI GCN+LLM</strong> (Nat BME 2025)</a>
+<a href="papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">两步MR 详解</a> —— 学习BMI到COL6A3/endotrophin到CAD的单通路精密中介分析。</p></li>
+<li><strong>前沿：蛋白质组范围MR与药物靶点发现</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Yao_2025_Proteome_Wide_Genetic_zh.html">卒中蛋白质组MR 详解</a> —— MR+共定位+多重下游验证药物靶点发现范式，双种族设计。</p></li>
+</ol>
+<li>
+<strong>跨界：AI 多智能体如何自动执行科学发现</strong>
+	<li>
+	<strong>前沿：AI基础模型如何变革分子生物学</strong>
+	<p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Cui_2025_Multimodal_foundation_models_zh.html">MFM 多模态基础模型 详解</a> —— 了解Transformer基础模型如何通过跨组学预训练实现虚拟细胞模拟、in silico扰动预测和实验闭环迭代。</p>
+	</li>
+<p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Ghareeb_2025_Multi_Agent_System_zh.html">ROBIN 详解</a> —— 了解LLM智能体如何整合文献检索、假设生成、实验设计和数据分析实现闭环科学发现。</p>
+</li>
+<li><strong>前沿(AI+DL)：GCN+LLM混合组学解读</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Tang_2025_Deep_learning_large_zh.html">LyMOI 详解</a> —— 了解图卷积网络与大语言模型如何深度融合，实现从多组学数据到机制解释的完整管道。</p></li>
+<li><strong>深入(AI+DL)：深度学习模型的可解释性与序列设计</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA 详解</a> —— 深入理解如何用二维归因矩阵解释sequence-to-function模型，从碱基分辨率解码顺式调控密码，并利用遗传算法设计改变核小体配置的DNA序列。</p></li>
+<li><strong>前沿(遗传定位)：反式调控基因定位发现疾病驱动基因</strong><p style="margin:4px 0 0;font-size:.9em;color:#555;"><a href="papers/Salamone_2026_Trans-Regulatory_gene_mapping_zh.html">DANDELION 详解</a> —— 学习如何整合反式调控信号与WES负担检验，用DACT中介检验定位疾病近端基因（DPG），并通过CRISPR筛选和小鼠模型验证蛋白质棕榈酰化这一哮喘新通路。</p></li>
+</ol>
+
+<h2>5. 论文索引</h2>
+<div class="paper-links">
+<a href="papers/Skrivankova_2021_Strengthening_Reporting_Observational_zh.html"><strong>STROBE-MR 声明 (JAMA 2021)</strong></a>
+<a href="papers/Sanderson_2022_Mendelian_randomization_zh.html"><strong>MR 方法学 Primer (Nat Rev 2022)</strong></a>
+<a href="papers/Larsson_2023_Mendelian_randomization_cardiovascular_zh.html"><strong>MR 与心血管疾病 (EHJ 2023)</strong></a>
+<a href="papers/Ghareeb_2025_Multi_Agent_System_zh.html"><strong>ROBIN 多智能体</strong> (arXiv 2025)</a>
+<a href="papers/Tang_2025_Deep_learning_large_zh.html"><strong>LyMOI GCN+LLM</strong> (Nat BME 2025)</a>
+<a href="papers/Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><strong>两步MR (2025)</strong></a>
+<a href="papers/Yao_2025_Proteome_Wide_Genetic_zh.html"><strong>卒中蛋白质组MR (Stroke 2025)</strong></a>
+	<a href="papers/Cui_2025_Multimodal_foundation_models_zh.html"><strong>&#x1F9EC; MFM 多模态基础模型 (Nature 2025)</strong></a>
+<a href="papers/Salamone_2026_Trans-Regulatory_gene_mapping_zh.html"><strong>&#x1F9EA; DANDELION 反式调控基因定位 (Cell 2026)</strong></a>
+</div>
+<footer><p><strong><span data-zh>知识图谱说明：</span><span data-en>About this graph: </span></strong><span data-zh>本图谱随项目论文数量的增加而动态更新。</span><span data-en>This graph is updated dynamically as papers are added to the project.</span></p><p style="font-size:.85em;color:#aaa;"><span data-zh>AI4Research 文献精读项目 · 最后更新：2026-08-14 · 论文数：10</span><span data-en>AI4Research Literature Project · Last updated: 2026-08-14 · Papers: 10</span></p></footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>

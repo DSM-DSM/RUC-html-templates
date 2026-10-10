@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="ruc">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DANDELION：反式调控基因定位优先发现哮喘疾病驱动基因 —— 详细中文解读</title>
+  <link rel="icon" type="image/svg+xml" href="ruc-mark.svg">
+  <script>window.A4R={mode:1,lang:1,themeKey:'paper-explainer-theme',lightId:'ruc',darkId:'ink-night'};</script>
+<script src="../../../a4r-bridge.js"></script>
+<style>html[data-lang="en"] [data-zh]{display:none!important}html[data-lang="zh"] [data-en]{display:none!important}</style>
+<script src="../theme-pack.js"></script>
+  <style>
+    /* ====================================================================
+       1. 设计令牌 (Design Tokens) —— 默认主题「纸墨」，其余 7 套由
+          theme-pack.js 通过 <style id="theme-css"> 覆盖这些变量
+       ==================================================================== */
+    :root {
+      color-scheme: light;
+      /* 字体：衬线标题（本地栈，零网络依赖）+ 系统无衬线正文 + 等宽 */
+      --font-display: Georgia, "Times New Roman", "Songti SC", "STSong", "SimSun", serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+      /* 表面与墨色 */
+      --bg: #f6f6f3;            /* 纸白页面底 */
+      --surface: #ffffff;       /* 卡片表面 */
+      --surface-2: #fbfbf8;     /* 次级表面（斑马纹/阶段条） */
+      --rule: #e4e3db;          /* 发丝线 */
+      --rule-strong: #cfcec3;   /* 强调线（标题横规） */
+      --ink: #232a31;           /* 正文墨色 */
+      --ink-2: #5b6470;         /* 次要文字 */
+      --ink-3: #5f6974;         /* 图注/边注 */
+      /* 主色（墨蓝） */
+      --accent: #24547c;
+      --accent-deep: #1a3d5c;
+      --accent-soft: #e9eff5;
+      --on-accent: #ffffff;     /* accent-deep 上的文字 */
+      --link: #2a6298;
+      --focus: #2a6298;
+      /* 圆角 / 阴影 / 其他 */
+      --radius: 10px;
+      --radius-s: 7px;
+      --shadow: 0 1px 2px rgba(22,26,31,.05), 0 4px 14px rgba(22,26,31,.04);
+      --shadow-hover: 0 2px 5px rgba(22,26,31,.08), 0 10px 24px rgba(22,26,31,.08);
+      --sel: rgba(36,84,124,.16);   /* 选区色 */
+      --scroll: #c9c8be;            /* 滚动条 */
+      --progress: var(--accent);    /* 顶部阅读进度 */
+      /* 七种标注盒语义色（fg / bg / border） */
+      --c-def-fg: #24547c; --c-def-bg: #edf2f7; --c-def-bd: #d5e0eb;  /* 定义 */
+      --c-int-fg: #2c7a4b; --c-int-bg: #ecf5ee; --c-int-bd: #d2e5d8;  /* 直觉 */
+      --c-ex-fg:  #916309; --c-ex-bg:  #faf3e0; --c-ex-bd:  #ecdcb2;  /* 示例 */
+      --c-th-fg:  #6b4a8e; --c-th-bg:  #f3eff8; --c-th-bd:  #e1d7ec;  /* 定理 */
+      --c-al-fg:  #5b6470; --c-al-bg:  #f2f3f0; --c-al-bd:  #dcded5;  /* 算法 */
+      --c-su-fg:  #2a5d8f; --c-su-bg:  #eaf1f8; --c-su-bd:  #d5e2ef;  /* 总结 */
+      --c-wa-fg:  #b03a32; --c-wa-bg:  #f9eeee; --c-wa-bd:  #edd0cc;  /* 警告 */
+      /* 关系徽章（知识图谱页复用） */
+      --rel-share: #24547c; --rel-comp: #2c7a4b; --rel-gen: #6b4a8e; --rel-ink: #ffffff;
+    }
+
+    /* ====================================================================
+       2. 基础排版（纸感阅读）
+       ==================================================================== */
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-body);
+      font-size: 17px; line-height: 1.75; color: var(--ink);
+      background: var(--bg); max-width: 920px; margin: 0 auto; padding: 26px 24px 60px;
+      transition: background-color .25s ease, color .25s ease;
+    }
+    h2 {
+      font-family: var(--font-display); font-weight: 600; color: var(--ink);
+      font-size: 1.5em; line-height: 1.4; margin: 52px 0 18px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-strong); position: relative;
+    }
+    h2::after {  /* 标题横规下的短墨线 —— 本书排版的签名细节 */
+      content: ""; position: absolute; left: 0; bottom: -1px; width: 64px; height: 2px;
+      background: var(--accent);
+    }
+    h3 { color: var(--ink); font-size: 1.22em; font-weight: 600; margin: 34px 0 12px; }
+    h4 { color: var(--ink); font-size: 1.05em; font-weight: 600; margin: 22px 0 8px; }
+    p { margin: 12px 0; }
+    a { color: var(--link); text-decoration: none; transition: color .12s ease; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+    ::selection { background: var(--sel); }
+    html { scrollbar-color: var(--scroll) transparent; scrollbar-width: thin; caret-color: var(--accent); }
+    body::-webkit-scrollbar { width: 10px; }
+    body::-webkit-scrollbar-thumb { background: var(--scroll); border-radius: 5px; border: 2px solid var(--bg); }
+    blockquote {
+      border-left: 1px solid var(--rule-strong); margin: 16px 0; padding: 4px 20px;
+      color: var(--ink-2); background: var(--surface);
+    }
+    ul, ol { padding-left: 26px; }
+    li { margin: 4px 0; }
+    code { font-family: var(--font-mono); font-size: .88em; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 4px; padding: 1px 5px; }
+
+    /* 顶部阅读进度条 */
+    .progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 1000;
+      background: var(--progress); transform: scaleX(0); transform-origin: 0 50%; pointer-events: none;
+    }
+
+    /* 入场渐显（JS 挂载；prefers-reduced-motion 下关闭） */
+    html.rv-on .rv { opacity: 0; transform: translateY(12px); }
+    html.rv-on .rv.in {
+      opacity: 1; transform: translateY(0);
+      transition: opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html.rv-on .rv { opacity: 1 !important; transform: none !important; }
+      .progress { transition: none; }
+    }
+
+    /* ====================================================================
+       3. 顶部导航栏 (top-nav-bar)
+       ==================================================================== */
+    .top-nav-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 18px; margin-bottom: 26px; display: flex; flex-wrap: wrap;
+      gap: 10px 20px; align-items: center; font-size: .92em; box-shadow: var(--shadow);
+    }
+    .top-nav-bar a { font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+    .top-nav-bar .current { color: var(--ink-2); font-weight: 600; }
+    .top-nav-bar .sep { color: var(--rule-strong); }
+    .ico { width: 14px; height: 14px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ====================================================================
+       4. 页眉 (header) —— 期刊刊头式：顶部粗规线 + 衬线标题
+       ==================================================================== */
+    header { margin-bottom: 28px; border-top: 2px solid var(--ink); padding-top: 22px; }
+    header h1 {
+      font-family: var(--font-display); font-weight: 600; font-size: 1.72em; color: var(--ink);
+      margin: 0 0 6px; line-height: 1.42; letter-spacing: .01em;
+    }
+    header .meta { color: var(--ink-2); font-size: .9em; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    header .meta span { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+
+    /* ====================================================================
+       5. 目录 (nav.toc)
+       ==================================================================== */
+    nav.toc {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 18px 26px; margin-bottom: 36px; box-shadow: var(--shadow);
+    }
+    nav.toc h2 {
+      margin: 0 0 10px; font-size: .82em; font-weight: 600; color: var(--ink-2);
+      letter-spacing: .04em; display: flex; align-items: center; gap: 7px;
+    }
+    nav.toc ol { margin: 0; padding-left: 22px; }
+    nav.toc li { margin: 5px 0; font-size: .96em; }
+    nav.toc li::marker { color: var(--accent); font-family: var(--font-display); }
+    nav.toc ol ol { font-size: .94em; }
+
+    /* ====================================================================
+       6. 七种标注盒 (Callout Boxes) —— 详解的核心教学工具
+          统一结构：淡色底 + 1px 同系细边 + 图标小标签
+       ==================================================================== */
+    .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning {
+      margin: 20px 0; padding: 16px 20px; border-radius: var(--radius-s);
+      border: 1px solid; position: relative;
+    }
+    .definition { background: var(--c-def-bg); border-color: var(--c-def-bd); }
+    .intuition  { background: var(--c-int-bg); border-color: var(--c-int-bd); }
+    .example    { background: var(--c-ex-bg);  border-color: var(--c-ex-bd); }
+    .theorem    { background: var(--c-th-bg);  border-color: var(--c-th-bd); }
+    .algorithm  { background: var(--c-al-bg);  border-color: var(--c-al-bd); font-family: var(--font-mono); font-size: .9em; }
+    .summary    { background: var(--c-su-bg);  border-color: var(--c-su-bd); }
+    .warning    { background: var(--c-wa-bg);  border-color: var(--c-wa-bd); }
+
+    /* 标注盒左上角的小标签（图标 = mask 渲染，吃 currentColor） */
+    .definition .tag, .intuition .tag, .example .tag, .theorem .tag,
+    .algorithm .tag, .summary .tag, .warning .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: .78em; font-weight: 600; letter-spacing: .03em; margin-bottom: 8px;
+    }
+    .definition .tag { color: var(--c-def-fg); }
+    .intuition  .tag { color: var(--c-int-fg); }
+    .example    .tag { color: var(--c-ex-fg); }
+    .theorem    .tag { color: var(--c-th-fg); }
+    .algorithm  .tag { color: var(--c-al-fg); }
+    .summary    .tag { color: var(--c-su-fg); }
+    .warning    .tag { color: var(--c-wa-fg); }
+    .definition .tag::before, .intuition .tag::before, .example .tag::before,
+    .theorem .tag::before, .algorithm .tag::before, .summary .tag::before, .warning .tag::before {
+      content: ""; width: 13px; height: 13px; flex: none; background: currentColor;
+      -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+    }
+    .definition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6.5C10 5 7.5 4.5 4 4.5v14c3.5 0 6 .5 8 2 2-1.5 4.5-2 8-2v-14c-3.5 0-6 .5-8 2v14'/%3E%3C/svg%3E"); }
+    .intuition .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4M12 3a6 6 0 0 0-3.9 10.6c.6.5.9 1.2.9 2V16h6v-.4c0-.8.3-1.5.9-2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E"); }
+    .example .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 3h4M10 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9'/%3E%3C/svg%3E"); }
+    .theorem .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7L12 3z'/%3E%3C/svg%3E"); }
+    .algorithm .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 17l6-5-6-5M12 19h8'/%3E%3C/svg%3E"); }
+    .summary .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9.5 6H20M9.5 12H20M9.5 18H20M4 6.5l1 1 2-2M4 12.5l1 1 2-2M4 18.5l1 1 2-2'/%3E%3C/svg%3E"); }
+    /* 标注盒内小标题（h3 语义、h4 视觉，避免标题层级跳跃） */
+    .definition .box-h, .intuition .box-h, .example .box-h, .theorem .box-h,
+    .algorithm .box-h, .summary .box-h, .warning .box-h { font-size: 1.05em; margin: 0 0 8px; }
+    .warning .tag::before { -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.5L2.8 20h18.4L12 4.5zM12 10.5v4M12 17.2v.6'/%3E%3C/svg%3E"); }
+
+    /* ====================================================================
+       7. 交叉引用块 (.crossref) —— 指向其他论文或知识图谱的「知识纽带」
+       ==================================================================== */
+    .crossref {
+      background: var(--c-ex-bg); border: 1px dashed var(--c-ex-bd); border-radius: var(--radius-s);
+      padding: 12px 16px; margin: 20px 0; font-size: .94em;
+    }
+    .crossref strong { color: var(--c-ex-fg); }
+
+    /* ====================================================================
+       8. 图 / 表（含原论文截图 + 逐面板图注）
+       ==================================================================== */
+    figure {
+      margin: 24px 0; text-align: center; background: var(--surface);
+      border: 1px solid var(--rule); border-radius: var(--radius); padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    figure figcaption { font-size: .88em; color: var(--ink-2); margin-top: 8px; }
+    img {
+      max-width: 100%; height: auto; border-radius: var(--radius-s);
+      display: block; margin: 0 auto;  /* 🔴 图片必须水平居中（窄图默认靠左会左偏） */
+    }
+    .fig-caption { font-size: 13px; color: var(--ink-3); text-align: center; margin-bottom: 16px; }
+
+    /* 数据表 */
+    table.data {
+      width: 100%; border-collapse: collapse; margin: 16px 0; font-size: .93em;
+      font-variant-numeric: tabular-nums;
+    }
+    table.data th {
+      background: var(--accent-deep); color: var(--on-accent); padding: 10px 12px; text-align: left; font-weight: 600;
+    }
+    table.data td { padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+    table.data tr:nth-child(even) td { background: var(--surface-2); }
+
+    /* ====================================================================
+       9. 原文出处边注 (.src-ref) —— 标注内容出自原论文哪个章节
+       ==================================================================== */
+    .src-ref {
+      font-size: .8em; color: var(--ink-3); display: block;
+      margin-top: 10px; padding-left: 14px; position: relative;
+    }
+    .src-ref::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 1px; background: var(--ink-3); }
+
+    /* ====================================================================
+       10. 返回目录 (.back-top)
+       ==================================================================== */
+    .back-top { display: block; text-align: right; font-size: .85em; margin-top: 12px; color: var(--ink-2); }
+    .back-top:hover { color: var(--link); }
+
+    /* ====================================================================
+       11. 页脚 (footer) + 相关资源栏 (.related-bar)
+       ==================================================================== */
+    footer {
+      margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--rule-strong);
+      font-size: .9em; color: var(--ink-2);
+    }
+    .related-bar {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 12px 18px; margin-bottom: 18px; display: flex; flex-wrap: wrap;
+      gap: 8px 18px; align-items: center; font-size: .93em; box-shadow: var(--shadow);
+    }
+    .related-bar strong { color: var(--ink); }
+    .related-bar a { display: inline-flex; align-items: center; gap: 5px; }
+
+    /* ====================================================================
+       12. 响应式
+       ==================================================================== */
+    @media (max-width: 768px) {
+      body { font-size: 15px; padding: 14px 14px 48px; }
+      .top-nav-bar { flex-direction: column; align-items: flex-start; gap: 6px; }
+      header .meta { flex-direction: column; gap: 4px; }
+    }
+    @media print { .progress { display: none !important; } }
+  </style>
+  <style id="theme-css"></style>
+  <!-- 切换方块样式（ts-css）—— 与其余三个模板逐字相同，独立于 theme-css，改一处须四处同步 -->
+  <style id="ts-css">
+  #ts-btn{position:fixed;right:18px;bottom:18px;z-index:999;width:42px;height:42px;border-radius:11px;
+    border:1px solid var(--rule);background:var(--surface);color:var(--ink-2);cursor:pointer;
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .15s,color .15s,border-color .15s,background-color .25s ease}
+  #ts-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover);color:var(--accent);border-color:var(--rule-strong)}
+  #ts-btn:active{transform:translateY(0) scale(.97)}
+  #ts-btn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #ts-panel{position:fixed;right:18px;bottom:70px;z-index:998;width:224px;max-height:min(430px,62vh);overflow:auto;
+    background:var(--surface);border:1px solid var(--rule);border-radius:13px;box-shadow:var(--shadow-hover);
+    padding:7px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;
+    transition:opacity .18s cubic-bezier(.2,.8,.2,1),transform .18s cubic-bezier(.2,.8,.2,1),background-color .25s ease}
+  #ts-panel.open{opacity:1;transform:none;pointer-events:auto}
+  .ts-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:0;border-radius:9px;
+    background:transparent;color:var(--ink);font:inherit;font-size:.88em;text-align:left;cursor:pointer;
+    transition:background-color .12s ease}
+  .ts-item:hover{background:var(--accent-soft)}
+  .ts-item.cur{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+  .ts-dot{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--rule-strong)}
+  .ts-name{flex:1;font-weight:500;white-space:nowrap}
+  .ts-en{font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+  .ts-mode{flex:none;font-size:11px;color:var(--ink-2);border:1px solid var(--rule);border-radius:999px;padding:1px 7px}
+  #ts-panel::-webkit-scrollbar{width:6px}
+  #ts-panel::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:3px}
+  @media (max-width:768px){#ts-panel{right:12px;width:204px}#ts-btn{right:12px;bottom:12px}}
+  @media print{#ts-btn,#ts-panel,.progress{display:none !important}}
+</style>
+  <script>
+  /* 首屏前恢复主题（防闪烁）—— 与其余三个模板逐字相同 */
+  (function () {
+    try {
+      var K = 'paper-explainer-theme', id = localStorage.getItem(K), P = window.PAPER_EXPLAINER_THEME_PACK;
+      if (!P) return;
+      if (!id) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME;
+      else if (id === P.DEFAULT_THEME) {
+        /* 旧版默认无主动选择标记(-set)时视为遗留记忆,按新默认(html[data-theme])渲染 */
+        try { if (!localStorage.getItem(K + '-set')) id = document.documentElement.getAttribute('data-theme') || P.DEFAULT_THEME; } catch (e) {}
+      }
+      for (var i = 0; i < P.THEMES.length; i++) {
+        var t = P.THEMES[i];
+        if (t.id === id) {
+          document.getElementById('theme-css').textContent = t.css;
+          document.documentElement.setAttribute('data-theme', t.id);
+          document.documentElement.style.colorScheme = t.mode;
+          break;
+        }
+      }
+    } catch (e) {}
+  })();
+</script>
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style id="compat-css">
+    /* —— v2.1 内容兼容层：旧标注盒 h4 对齐 .box-h + 旧页特有容器 —— */
+    .intuition h4, .definition h4, .example h4, .theorem h4, .algorithm h4,
+    .summary h4, .warning h4 { font-size: 1.05em; margin: 0 0 8px; font-weight: 600; color: var(--ink); }
+    .abstract-box { background: var(--surface-2); border: 1px solid var(--rule);
+      border-left: 3px solid var(--accent); border-radius: var(--radius-s);
+      padding: 14px 18px; margin: 16px 0 4px; font-size: .95em; color: var(--ink-2); line-height: 1.8; }
+    .toc details, .toc details summary { cursor: pointer; }
+    .toc details summary { font-family: var(--font-display); font-weight: 600; font-size: 1.12em; margin-bottom: .5em; display: block; }
+    .toc details ol { margin-left: 20px; }
+
+  </style>
+
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+
+<!-- ===== 顶部导航栏 ===== -->
+<div class="top-nav-bar">
+  <span class="nav-label"><span data-zh>📚 <span data-zh>导航：</span><span data-en>Navigate:</span></span><span data-en>📚 Navigate:</span></span>
+  <a href="../knowledge_graph.html"><span data-zh>🧠 知识图谱</span><span data-en>🧠 Knowledge Graph</span></a>
+  <a href="Sanderson_2022_Mendelian_randomization_zh.html"><span data-zh>MR方法学</span><span data-en>MR Methodology</span></a>
+  <a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">MR for CVD</a>
+  <a href="Yao_2025_Proteome_Wide_Genetic_zh.html"><span data-zh>蛋白组-卒中</span><span data-en>Proteome–Stroke</span></a>
+  <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html"><span data-zh>两步MR</span><span data-en>Two-step MR</span></a>
+  <a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">PISA</a>
+  <a href="../nav/reading_path.html">📖 <span data-zh>阅读路径</span><span data-en>Reading Path</span></a>
+</div>
+
+<!-- ===== Header ===== -->
+<header>
+  <h1>DANDELION：反式调控基因定位<br>优先发现哮喘疾病驱动基因</h1>
+  <p class="meta">
+    <strong>Trans-regulatory Gene Mapping Prioritizes Disease Drivers in Asthma</strong><br>
+    Salamone, I.M., Tian, P., Qi, Z., 等<br>
+    <em>Cell</em>, 2026, 189 &nbsp;|&nbsp;
+    DOI: <a href="https://doi.org/10.1016/j.cell.2026.07.034" target="_blank">10.1016/j.cell.2026.07.034</a><br>
+    <span data-zh>解读生成日期：</span><span data-en>Generated: </span>2026-08-14
+  </p>
+</header>
+
+<!-- ===== TOC ===== -->
+<nav class="toc">
+  <h2>📑 <span data-zh>目录</span><span data-en>Contents</span></h2>
+  <ol>
+    <li><a href="#sec-0">阅读导引</a> — 预备知识与符号约定</li>
+    <li><a href="#sec-1">引言：从全基因模型到疾病近端基因（DPG）</a></li>
+    <li><a href="#sec-2">DANDELION 核心框架：两步中介检验</a></li>
+    <li><a href="#sec-3">统计核心：DACT 分裂-聚合复合零假设检验</a></li>
+    <li><a href="#sec-4">仿真与血液性状验证</a></li>
+    <li><a href="#sec-5">哮喘 DPG 识别：21 个候选驱动基因</a></li>
+    <li><a href="#sec-6">CRISPR 功能验证：上皮屏障与 Th2 细胞</a></li>
+    <li><a href="#sec-7">机制深挖：SLC27A3、SCD 与蛋白质棕榈酰化</a></li>
+    <li><a href="#sec-8">小鼠过敏性哮喘模型验证</a></li>
+    <li><a href="#sec-9">讨论、局限与展望</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<!-- ================================================================ -->
+<!-- SECTION 0: 阅读导引 -->
+<!-- ================================================================ -->
+<section id="sec-0">
+<h2>0. 阅读导引</h2>
+
+<div class="intuition">
+  <span class="tag">直观理解</span>
+  <h4>这篇论文在做什么？</h4>
+  <p>想象一场复杂疾病是由一张巨大的"调控指挥网"驱动的：绝大多数与疾病相关的基因变异位于网络的<strong>边缘</strong>，它们并不直接致病，而是通过<strong>反式调控</strong>（trans-regulation）去影响少数几个处于网络中心的"关键节点"基因，再由这些核心基因真正驱动疾病。这篇论文提出的 <strong>DANDELION</strong> 框架，就是去定位这些被 GWAS 常规手段"漏掉"的核心节点基因——作者称之为<strong>疾病近端基因</strong>（disease-proximal genes, DPG）。方法用两类证据"拼接"因果链：上游用反式调控信号（GWAS 变异如何远程影响目标基因表达），下游用全外显子组测序（WES）中罕见有害突变的负担检验（目标基因变异与疾病的关系）。最后用 CRISPR 筛选和小鼠模型验证，在哮喘中发现了一条全新的、可成药的分子通路——<strong>蛋白质棕榈酰化</strong>。</p>
+</div>
+
+<h3>0.1 为什么这篇论文重要？</h3>
+<p>这篇论文有四个层面的贡献：</p>
+<ol>
+  <li><strong>概念层面</strong>：把"全基因模型"（omnigenic model）中一直很抽象的"核心疾病基因"落实为可操作、可检验的定义——疾病近端基因（DPG）。</li>
+  <li><strong>方法层面</strong>：提出 DANDELION——一个整合<strong>反式调控关联</strong>（trans-regulatory associations）与 <strong>WES 负担检验</strong>（gene-level burden tests）的中介启发式（mediation-inspired）统计框架，无需估计因果效应大小，仅通过 DACT 检验筛选显著中介通路。</li>
+  <li><strong>验证层面</strong>：将 DPG 富集于孟德尔疾病基因（直接基因证据），并通过<strong>两轮 CRISPR 筛选</strong>（气道上皮细胞 + Th2 细胞）证明大部分 DPG 确实调节哮喘相关的细胞表型。</li>
+  <li><strong>转化层面</strong>：锁定两个棕榈酰化通路酶 <strong>SLC27A3</strong> 和 <strong>SCD</strong>，并在小鼠过敏性哮喘模型中证明其调控炎症和气道重塑——为哮喘提供了全新的治疗靶点。</li>
+</ol>
+
+<h3>0.2 预备知识速览</h3>
+
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>核心概念一览</h4>
+  <table>
+    <tr><th>概念</th><th>说明</th></tr>
+    <tr><td><strong>疾病近端基因</strong>（DPG, disease-proximal gene）</td><td>处于反式调控网络中心、集中介导其他更远端疾病相关基因效应的基因。DPG 直接作用于疾病的核心生物学通路。</td></tr>
+    <tr><td><strong>反式调控</strong>（trans-regulation）</td><td>某个基因或变异调控<em>位于不同染色体</em>（或相距很远）的另一基因的表达。与 cis 调控（调控同一位置附近的基因）相对。</td></tr>
+    <tr><td><strong>负担检验</strong>（burden test）</td><td>将某基因内所有罕见有害变异（如 LoF + missense）聚合为一个统计量，检验该基因变异负担是否与疾病关联。常用 <code>MAF &lt; 1%</code> 的 LoF+missense 变异集。</td></tr>
+    <tr><td><strong>中介分析</strong>（mediation analysis）</td><td>检验暴露 $X$ 是否通过中介变量 $M$ 影响结局 $Y$。这里 $X$ = 疾病相关变异/基因，$M$ = 候选基因表达，$Y$ = 疾病。</td></tr>
+    <tr><td><strong>DACT</strong>（Divide-Aggregate Composite-null Test）</td><td>分裂-聚合复合零假设检验。把"无中介"这一复合零假设分解为三个互斥情形，分别估计其占比，再聚合出中介检验 p 值。</td></tr>
+    <tr><td><strong>GBAT</strong>（gene-based association test for trans-regulation）</td><td>基于基因型的反式基因调控关联检验。先用 cvBLUP 用所有 cis-SNP 预测基因表达，再检验该预测表达与不同染色体上所有基因的关联。</td></tr>
+    <tr><td><strong>棕榈酰化</strong>（palmitoylation）</td><td>一种翻译后修饰（post-translational modification）：棕榈酸（C16:0）通过硫酯键共价连接到蛋白质的半胱氨酸残基上，调节蛋白质的运输和信号转导。</td></tr>
+  </table>
+</div>
+
+<h3>0.3 与已有论文的关系</h3>
+<table>
+  <tr><th>已有论文</th><th>关系类型</th><th>说明</th></tr>
+  <tr>
+    <td><a href="Sanderson_2022_Mendelian_randomization_zh.html">Sanderson et al. (2022) — MR Primer</a></td>
+    <td><strong>共享基础</strong>（Shared）</td>
+    <td>两篇论文都从遗传变异出发做因果推断。MR Primer 系统讲授了"用遗传变异做因果推断"的方法学基础，DANDELION 则把因果推断范式从"暴露→结局"推广到"变异→中介基因→结局"的三节点中介链，并给出 <code>X→M→Y</code> 的路径检验。</td>
+  </tr>
+  <tr>
+    <td><a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji et al. (2025) — 两步MR</a></td>
+    <td><strong>方法呼应</strong>（Complements）</td>
+    <td>两步MR 精确量化"暴露→蛋白→疾病"单条中介通路；DANDELION 同样是两步（trans 关联 + 负担），但在<em>基因水平</em>做基因组范围扫描，且不估计效应大小而用 p 值排序。两者共享"两步中介"的思想骨架。</td>
+  </tr>
+  <tr>
+    <td><a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025) — <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a></td>
+    <td><strong>应用互补</strong>（Complements）</td>
+    <td>两者都是"疾病驱动分子优先级排序 + 药物靶点发现"范式：Yao 用 cis-pQTL + MR 在蛋白层面筛卒中靶点，DANDELION 用 trans 调控 + WES 负担在基因层面筛哮喘靶点，且都配以功能/动物实验验证。</td>
+  </tr>
+  <tr>
+    <td><a href="Larsson_2023_Mendelian_randomization_cardiovascular_zh.html">Larsson et al. (2023) — MR for CVD</a></td>
+    <td><strong>应用延伸</strong>（Complements）</td>
+    <td>Larsson 展示了中介 MR 在心血管领域的广度应用；DANDELION 把中介推断应用到哮喘，并在实验端闭环验证——展示了"统计中介 → 功能验证 → 机制通路"的完整链条。</td>
+  </tr>
+  <tr>
+    <td><a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) — PISA</a></td>
+    <td><strong>同领域互补</strong>（Complements）</td>
+    <td>两篇论文都研究基因调控与疾病，但视角不同：PISA 解读<em>顺式</em>调控密码（局部序列 → 功能），DANDELION 定位<em>反式</em>调控网络的中心节点。一"cis"一"trans"，共同覆盖了调控基因组的两个维度。</td>
+  </tr>
+</table>
+
+<div class="crossref">
+  <span class="xref-tag">🔗 交叉引用</span>
+  <p>DANDELION 的"两步中介检验"思路与 <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji et al. (2025) 两步MR</a> 直接呼应；而它与 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025) <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a> 共同代表"遗传证据驱动的药物靶点发现"两大流派（cis 蛋白 vs trans 基因）。详见 <a href="../knowledge_graph.html">知识图谱</a>。</p>
+</div>
+
+<h3>0.4 符号约定</h3>
+<table>
+  <tr><th>符号</th><th>含义</th></tr>
+  <tr><td>$X$</td><td>暴露：疾病相关的 SNP 或基因（GWAS 位点 / 远端基因）</td></tr>
+  <tr><td>$M$</td><td>中介：候选 DPG（基因组中的任一基因）</td></tr>
+  <tr><td>$Y$</td><td>结局：复杂疾病性状</td></tr>
+  <tr><td>$p_{XM}$</td><td>反式调控关联 p 值（X→M，来自 trans-eQTL / GBAT）</td></tr>
+  <tr><td>$p_{MY}$</td><td>基因水平负担检验 p 值（M→Y，来自 WES）</td></tr>
+  <tr><td>$\text{DACT}_j$</td><td>候选中介 $j$ 的 DACT 统计量（聚合三类情形的加权 p 值）</td></tr>
+  <tr><td>$\pi_{\text{case}1},\pi_{\text{case}2},\pi_{\text{case}3}$</td><td>基因组范围估计的三种"无中介"情形的占比</td></tr>
+  <tr><td>$\alpha$</td><td>中介路径系数（$X$ 通过 $M$ 影响 $Y$ 的间接效应，检验 $\alpha = 0$）</td></tr>
+</table>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 1: 引言 -->
+<!-- ================================================================ -->
+<section id="sec-1">
+<h2>1. 引言：从全基因模型到疾病近端基因（DPG）</h2>
+
+<h3>1.1 复杂疾病的"全基因模型"困境</h3>
+
+<div class="intuition">
+  <span class="tag">直观理解</span>
+  <h4>为什么 GWAS 找到几千个变异，却很难定位真正的"肇事基因"？</h4>
+  <p>复杂疾病（如哮喘、冠心病）的 GWAS 已经鉴定出成千上万个关联位点。但绝大多数位点的效应量很小，且落在非编码区——它们很可能不是直接致病，而是通过<strong>反式调控</strong>网络间接影响少数几个"中心枢纽"基因。如果把疾病比喻成一场交响乐，GWAS 找到了所有演奏者，但 <strong>DANDELION 要找的是指挥</strong>。</p>
+</div>
+
+<p>这里涉及一个重要的理论背景——<strong>全基因模型</strong>（omnigenic model，Boyle et al. 2017）：复杂疾病几乎受到疾病相关组织中所有表达基因的影响，但绝大多数基因是"远端"（distal）的，它们通过反式调控间接作用于少数核心基因。作者定义：</p>
+
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>疾病近端基因（Disease-proximal gene, DPG）</h4>
+  <p>在反式调控网络中，<strong>集中介导其他更远端疾病相关基因效应</strong>、并直接作用于疾病核心生物学通路的基因。识别 DPG 有助于发现多基因疾病的机制通路与治疗靶点。</p>
+</div>
+
+<h3>1.2 现有方法的三大瓶颈</h3>
+<p>为什么现有的遗传学手段都难以识别 DPG？作者分析了三类主流方法的局限：</p>
+
+<div class="warning">
+  <span class="tag">关键问题</span>
+  <h4>GWAS、WES 负担检验、cis-eQTL 各自的盲区</h4>
+  <ol>
+    <li><strong>GWAS</strong>：天然偏向发现效应量小的常见变异；受选择压力影响，影响关键生物学通路的基因中常见变异稀少，因此 GWAS 难以命中 DPG。</li>
+    <li><strong>WES 负担检验</strong>：能利用罕见有害变异直接定位更"近端"的基因，但受限于队列样本量小，很多性状只能鉴定出少数几个基因。</li>
+    <li><strong>cis-eQTL</strong>：存在系统性差异——疾病基因通常受强选择约束，而强选择约束的基因往往没有强的 cis-eQTL 效应，导致 cis 手段到达瓶颈。</li>
+  </ol>
+</div>
+
+<p>关键洞察在于：<strong>与 cis-QTL 不同，trans-QTL 的靶基因与疾病基因承受相似的选择约束</strong>（Liu et al. 2019）。因此，trans 调控信号恰恰是定位"被选择压力隐藏"的疾病驱动基因的正确通道。这正是 DANDELION 的方法论支点。</p>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>复杂疾病的遗传架构 = 大量远端基因通过 <strong>trans 调控网络</strong>作用于少数中心 <strong>DPG</strong>。GWAS / WES / cis-eQTL 各有盲区，而 trans 信号因选择约束特性，是打通"远端变异 → 中心驱动基因"的关键证据。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 2: DANDELION 核心框架 -->
+<!-- ================================================================ -->
+<section id="sec-2">
+<h2>2. DANDELION 核心框架：两步中介检验</h2>
+
+<div class="intuition">
+  <span class="tag">直观理解</span>
+  <h4>一句话：把"GWAS 位点 → 基因 → 疾病"拼成一条可检验的因果链</h4>
+  <p>DANDELION 把疾病遗传结构建模为一条三段因果链：疾病相关的变异/基因（$X$）→ 候选 DPG（$M$）→ 疾病（$Y$）。它<strong>不需要</strong>昂贵的个体级基因型数据来估计效应大小，而是用两类现成的 p 值——反式调控关联的 p 值和 WES 负担检验的 p 值——来检验"$X$ 通过 $M$ 影响 $Y$"这条中介通路是否显著。显著通路的中间节点 $M$ 就是候选 DPG。</p>
+</div>
+
+<h3>2.1 两条核心关联证据</h3>
+<p>对每一对（暴露 $X$，候选中介 $M$），DANDELION 组合两类统计证据：</p>
+<table>
+  <tr><th>关联</th><th>含义</th><th>数据来源</th></tr>
+  <tr><td><strong>反式调控关联</strong>（$X \to M$）</td><td>疾病相关变异/基因是否<em>反式</em>调控候选基因 $M$ 的表达</td><td>RNA-seq / trans-eQTL 汇总统计</td></tr>
+  <tr><td><strong>基因-疾病关联</strong>（$M \to Y$）</td><td>候选基因 $M$ 的罕见有害变异负担是否与疾病关联</td><td>WES 基因水平负担检验</td></tr>
+</table>
+
+<h3>2.2 两种实现：gene-based 与 SNP-based</h3>
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>两种 DANDELION 管道</h4>
+  <table>
+    <tr><th>管道</th><th>所需数据</th><th>计算方式</th></tr>
+    <tr><td><strong>gene-based DANDELION</strong></td><td>个体级基因型 + 基因表达（RNA-seq）</td><td>用 <strong>GBAT</strong> 计算基因间 trans 关联</td></tr>
+    <tr><td><strong>SNP-based DANDELION</strong></td><td>trans-eQTL 汇总统计（无需个体数据）</td><td>直接使用现成的 trans-eQTL 关联 p 值</td></tr>
+  </table>
+</div>
+
+<p>当没有个体级基因型数据时，SNP-based 管道可以从更大的联盟（如 eQTLGen，$N \approx 31{,}684$）中借用 trans-eQTL 汇总统计——样本量更大，功效更高。作者在仿真中发现，SNP-based（$N = 30{,}000$）比 gene-based（$N = 900$）功效更高，这也是主分析采用 eQTLGen 汇总统计的原因。</p>
+
+<h3>2.3 中介检验：DACT 给出"是否显著"的 p 值</h3>
+<p>对于给定的疾病和疾病相关变异/基因，<strong>基因组中所有基因都可作为候选中介</strong>。DANDELION 应用 <strong>DACT</strong>（Divide-Aggregate Composite-null Test）来评估每条候选中介通路的证据：</p>
+
+<div class="algorithm">
+  <span class="tag">算法</span>
+  <h4>DANDELION 两步框架（Figure 1B）</h4>
+  <ol>
+    <li><strong>上游（X→M）</strong>：对每个疾病相关变异/基因 $X$，计算它对每个候选基因 $M$ 的反式调控关联 p 值 $p_{XM}$。</li>
+    <li><strong>下游（M→Y）</strong>：对每个候选基因 $M$，计算其 WES 负担检验 p 值 $p_{MY}$。</li>
+    <li><strong>聚合</strong>：对每个候选中介 $j$，用 DACT 组合 $p_{XM}$ 与 $p_{MY}$，得到中介 p 值，检验"存在非零中介通路"。</li>
+    <li><strong>定位 DPG</strong>：显著中介通路的中间节点 $M$ 被分类为 DPG；同时这些通路也揭示了连接 GWAS 位点与候选基因的反式调控网络。</li>
+  </ol>
+</div>
+
+<p>下面放上原论文 Figure 1 的完整图版——概念模型（面板 A）、两步流程（面板 B）与血液性状验证证据（面板 C–G）尽收一页，可作为全篇方法的总览图：</p>
+
+<img src="images/Salamone/Salamone_Fig1.jpg" alt="原论文Figure 1：DANDELION的DPG中介模型、两步框架与血液性状验证（面板A-G）">
+
+<p class="fig-caption"><strong>原论文 Figure 1：DANDELION 识别血液性状中的新型 DPG（DANDELION identifies novel DPGs in blood traits）。</strong>(a) 概念模型：DANDELION 把"远端基因 → DPG → 复杂性状"建模为一条待检验的中介路径——与第 2 节的三段因果链一致。(b) 两步框架（正文 2.3，Figure 1B 引用处）：上游用反式调控关联 p 值刻画 X→M，下游用 WES 负担检验 p 值刻画 M→Y，经 DACT 聚合后把显著中介通路的中间节点定位为 DPG。(c)(d) 血液性状验证（正文 4.2，Figure 1C/1D 引用处）：DPG 显著富集于孟德尔血液疾病基因（单侧配对 Wilcoxon 检验，p &lt; 0.01）；且在负担检验显著性水平相同的基因中，DPG 比非 DPG 更富集于孟德尔疾病基因——说明富集来自"中介性"本身，而不只是负担信号。(e) 以 ETV6 为例的反式调控网络：箭头从远端基因指向候选 DPG，红色基因名为在血小板计数（PLTC）负担检验中显著的基因。(f) DANDELION DPG 与 WES、GWAS 显著基因/位点的重叠韦恩图——DPG 集覆盖负担检验的大部分发现，并延伸到 WES/GWAS 之外（正文 4.2）。(g) 不同 GWAS 显著性档位的位点中 DPG、远端主调控因子与远端基因的占比。<br>图源：Salamone et al., <em>Cell</em> (2026)，CC BY-NC。</p>
+
+<div class="warning">
+  <span class="tag">注意事项</span>
+  <h4>重要澄清：DANDELION 不做因果效应估计</h4>
+  <p>尽管 DANDELION 受中介分析启发，但它<strong>不是</strong>在估计因果中介效应的大小（不估计间接效应比例），而是通过 <strong>DACT p 值排序</strong>来筛选候选 DPG。这是一种"优先级排序"工具，而非精确的因果量化工具。</p>
+</div>
+
+<div class="crossref">
+  <span class="xref-tag">🔗 交叉引用</span>
+  <p>"变异 → 中介 → 疾病"的三段式结构与 <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji et al. (2025) 两步MR</a>（BMI→蛋白→CAD）在思想上一脉相承；但与 MR 强调效应估计不同，DANDELION 以 p 值筛选为手段。DANDELION 在基因层面做基因组范围扫描的定位，与 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025)</a> 在蛋白层面做蛋白质组范围扫描形成互补。</p>
+</div>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>DANDELION = <strong>反式调控证据（上游）</strong> + <strong>WES 负担证据（下游）</strong> + <strong>DACT 中介检验（聚合）</strong>。以 GWAS 位点为暴露，基因组所有基因为候选中介，输出显著中介通路的中间节点作为 DPG。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 3: DACT 统计核心 -->
+<!-- ================================================================ -->
+<section id="sec-3">
+<h2>3. 统计核心：DACT 分裂-聚合复合零假设检验</h2>
+
+<h3>3.1 中介模型与四情形分解</h3>
+<p>为了说明 DACT 的零假设结构，作者使用线性结构方程模型（structural equation model）作为示意（该方法不限于线性/连续性状）：</p>
+
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>线性结构方程示意模型</h4>
+  <p>$$Y = \beta_0 + \beta_x X + \beta_M M + \beta_Z^T Z + \varepsilon$$</p>
+  <p>$$M = \gamma_0 + \gamma_X X + \gamma_Z^T Z + \varepsilon_M$$</p>
+  <p>其中 $Y$ 是疾病性状，$X$ 是暴露（SNP/基因），$M$ 是中介（候选 DPG），$Z$ 是协变量，$\varepsilon$ 为零均值常方差正态误差。是否存在中介通路，对应检验 $H_0: \alpha = 0$（$X \to M \to Y$ 的间接效应为零）。</p>
+</div>
+
+<p>关键技巧在于：DACT 把"无中介通路"这一<strong>复合零假设</strong>分解为三个互斥情形，每个情形对应一种独立的"信号缺失"模式：</p>
+
+<div class="theorem">
+  <span class="tag">定理/结论</span>
+  <h4>DACT 的四情形分解</h4>
+  <table>
+    <tr><th>情形</th><th>条件</th><th>含义</th></tr>
+    <tr><td>Case 1</td><td>$\alpha = 0,\; \gamma_X = 0$</td><td>X 既不影响 M，M 也不影响 Y（完全没有中介）</td></tr>
+    <tr><td>Case 2</td><td>$\alpha = 0,\; \gamma_X \neq 0$</td><td>X 影响 M，但 M 不影响 Y（只有上游关联）</td></tr>
+    <tr><td>Case 3</td><td>$\alpha = 0,\; \gamma_X = 0$</td><td>M 影响 Y，但 X 不影响 M（只有下游关联）</td></tr>
+    <tr><td><strong>Case 4</strong></td><td>$\alpha \neq 0,\; \gamma_X \neq 0$</td><td><strong>存在非零中介通路（DANDELION 要找的信号）</strong></td></tr>
+  </table>
+  <p>Cases 1–3 共同构成复合零假设（无中介通路）；Case 4 对应备择假设（存在中介）。</p>
+</div>
+
+<h3>3.2 DACT 统计量</h3>
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>DACT 统计量</h4>
+  <p>$$\text{DACT}_j = \pi_{\text{case}1}\, p_{\text{case}1} + \pi_{\text{case}2}\, p_{\text{case}2} + \pi_{\text{case}3}\, p_{\text{case}3}$$</p>
+  <p>其中 $p_{\text{case}1}$、$p_{\text{case}2}$ 分别取反式调控关联 p 值与负担检验 p 值（对应只缺失一条链的情形），$p_{\text{case}3} = (p_{\max})^2$（$p_{\max}$ 为 MaxP 检验的 p 值，对应两条链都缺失的情形）；$\pi_{\text{case}k}$ 是从基因组范围数据中估计出的各情形占比。</p>
+</div>
+
+<div class="intuition">
+  <span class="tag">直观理解</span>
+  <h4>为什么"加权"能检验中介？</h4>
+  <p>直观上，"无中介"可以通过三种不同方式发生：要么 $X$ 和 $M$ 完全不关联，要么 $M$ 和 $Y$ 完全不关联，要么两者都关联但缺乏真正的间接效应。DACT 先按经验占比 $\pi$ 给这三种"无中介模式"加权，合成一个总体"无中介"的 p 值；如果数据强烈违背所有这些无中介模式，说明存在非零中介，从而得到显著的 DACT p 值。它像一位法官，把三种"无罪"辩护分别评估后合并裁决。</p>
+</div>
+
+<h3>3.3 p 值校准与 FDR 控制</h3>
+<p>得到 $\text{DACT}_j$ 后，进一步做正态校准：用逆正态累积分布函数把 p 值转化为 Z 分数 $Z_j^{\text{DACT}} = \Phi^{-1}(1 - \text{DACT}_j)$，再基于经验零分布 $f_0(z)$ 的均值与标准差校准得到最终 p 值 $p_j = 1 - \Phi\left((Z_j^{\text{DACT}} - \mu)/\sigma\right)$。</p>
+
+<div class="warning">
+  <span class="tag">注意事项</span>
+  <h4>FDR 控制在"每个暴露"层面，而非全局</h4>
+  <p>DANDELION 将 DACT p 值转换为 q 值，并在<strong>每个暴露基因/SNP 层面</strong>控制 FDR（与近期研究一致），而非在性状（全局）层面。这意味着全局 FDR 会比 per-exposure FDR 更高——这是为保功效做出的权衡（见第 9 节局限）。</p>
+</div>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>DACT 把"无中介"这一复合零假设拆成三个互斥情形（缺上游 / 缺下游 / 全缺），估计各情形占比后加权聚合，得到单个中介 p 值。显著 DACT p 值 = 存在非零中介通路，其中介节点即 DPG。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 4: 仿真与血液性状验证 -->
+<!-- ================================================================ -->
+<section id="sec-4">
+<h2>4. 仿真与血液性状验证</h2>
+
+<h3>4.1 仿真设计：与 ARCHIE 对比</h3>
+<p>作者用仿真评估 DANDELION 相对 <strong>ARCHIE</strong>（一种基于稀疏典型相关分析、利用 trans 关联识别疾病基因集合的方法）的性能。仿真模拟了完整的中介路径：SNP 对远端基因的 cis 效应 → 远端基因对靶基因的 trans 效应 → 靶基因对疾病的直接效应。在 1000 个潜在 trans 靶基因中设定 10 个 DPG，对比两种方法的<strong>功效</strong>（识别疾病相关基因的比例）与全局 FDR。</p>
+
+<h3>4.2 血液性状：14–154 个 DPG/性状</h3>
+<p>对每个血液性状，对 GWAS 位点 1 Mb 范围内的每个 SNP，在 5% per-exposure FDR 下识别显著中介通路与 DPG。结果：每个性状识别出 <strong>14–154 个候选 DPG</strong>（Table S1）。</p>
+
+<p>两个关键验证结论：</p>
+<ol>
+  <li><strong>与负担检验的互补性</strong>：用 Bonferroni 阈值（0.05/20,000），负担检验在每个性状只能识别 7–65 个基因，其中 <strong>62.9%–100% 与 DANDELION DPG 重叠</strong>。DANDELION 能捕获负担检验之外的基因——通过整合 trans 介导信息。</li>
+  <li><strong>孟德尔疾病基因富集</strong>（Figure 1C、1D）：DPG 在孟德尔血液疾病基因中显著富集（单侧配对 Wilcoxon 检验，$p < 0.01$）。在负担检验显著性相同的基因中，DPG 比非 DPG 显著更富集于孟德尔疾病基因——说明 DANDELION 的"中介性"筛出了真正与疾病机制更接近的基因。</li>
+</ol>
+
+<div class="theorem">
+  <span class="tag">定理/结论</span>
+  <h4>DPG 的富集证据</h4>
+  <p>DPG 富集于孟德尔疾病基因，且这种富集不能仅用负担检验解释（同显著性水平下 DPG 富集更强）。这提示：<strong>反式调控网络中心性</strong>与<strong>遗传病因学核心性</strong>存在真实的生物学关联。</p>
+</div>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>血液性状上，DANDELION 每个性状识别 14–154 个 DPG，它们富集于孟德尔疾病基因，并捕获负担检验漏掉的基因。仿真表明其功效优于/不弱于 ARCHIE。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 5: 哮喘 DPG 识别 -->
+<!-- ================================================================ -->
+<section id="sec-5">
+<h2>5. 哮喘 DPG 识别：21 个候选驱动基因</h2>
+
+<h3>5.1 哮喘数据组合</h3>
+<p>将 DANDELION 应用于哮喘，作者组合了：</p>
+<ul>
+  <li><strong>GWAS 暴露</strong>：哮喘相关 GWAS 位点/变异（远端基因）。</li>
+  <li><strong>上游 trans 信号</strong>：eQTLGen 全血 trans-eQTL 汇总统计（$N = 31{,}684$）。</li>
+  <li><strong>下游负担信号</strong>：UK Biobank WES 中罕见有害变异的基因水平负担检验（LoF + missense，MAF &lt; 1%）。</li>
+</ul>
+
+<p>结果识别出 <strong>21 个哮喘 DPG</strong>（Figure 2A），例如：<code>SLC27A3</code>、<code>SCD</code>、<code>TAP1</code>、<code>SMPD4</code>、<code>CDC16</code>、<code>MMP8</code>、<code>GNG10</code>、<code>ARHGAP27</code>、<code>CHRM3</code> 等。这些基因的 trans 调控网络揭示了 GWAS 位点如何远程影响这些候选驱动基因。</p>
+
+<p>下图即原论文 Figure 2 的完整图版——21 个 DPG 的反式调控网络与肺细胞表达全景：</p>
+
+<img src="images/Salamone/Salamone_Fig2.jpg" alt="原论文Figure 2：21个哮喘DPG反式调控网络与肺细胞表达（面板A-C）">
+
+<p class="fig-caption"><strong>原论文 Figure 2：DANDELION 识别新型哮喘 DPG（DANDELION identifies novel asthma DPGs）。</strong>(a) 21 个哮喘 DPG 的反式调控网络全景（正文 5.1，Figure 2A 引用处）：箭头从疾病远端基因指向候选 DPG，红色圆圈为 GWAS 全基因组显著位点的最近基因——DPG 居于网络中心、GWAS 位点散布边缘，这正是"最近基因注释"找不到它们的直观原因。(b) 哮喘 DPG 最高表达的肺细胞类型：柱色按细胞谱系（上皮/内皮/免疫/基质）区分，纵轴为细胞类型频率（%）。(c) DPG 跨肺细胞类型的表达热图：平均表达为各细胞类型中表达该基因的细胞的缩放表达（Z 分数）均值——DPG 在多个谱系的多种细胞中表达，提示跨细胞类型的多效性（正文 5.2，Figure 2B/2C 引用处）。<br>图源：Salamone et al., <em>Cell</em> (2026)，CC BY-NC。</p>
+
+<div class="intuition">
+  <span class="tag">直观理解</span>
+  <h4>为什么这些基因 GWAS 发现不了？</h4>
+  <p>很多 DPG 并不靠近任何 GWAS 显著位点——它们处于调控网络的中心，而 GWAS 显著位点散布在网络边缘。因此，仅靠"最近基因注释"根本找不到它们；必须通过 trans 调控网络把它们与 GWAS 位点"连起来"。</p>
+</div>
+
+<h3>5.2 细胞类型表达谱</h3>
+<p>借助人类肺细胞图谱（Human Lung Cell Atlas），作者分析了 DPG 在肺组织中的表达分布（Figure 2B、2C）：DPG 在多种肺细胞类型中表达，横跨上皮、内皮、免疫、基质等多个谱系，提示部分 DPG 可能具有跨细胞类型的多效性（pleiotropy）效应。</p>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>哮喘应用识别出 21 个 DPG，它们大多不靠近 GWAS 显著位点、但在反式调控网络中与 GWAS 位点相连，并在多种肺细胞类型中表达。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 6: CRISPR 功能验证 -->
+<!-- ================================================================ -->
+<section id="sec-6">
+<h2>6. CRISPR 功能验证：上皮屏障与 Th2 细胞</h2>
+
+<h3>6.1 气道上皮细胞：TEER 屏障完整性筛选</h3>
+
+<p>两轮 CRISPR 筛选的实验设计与完整结果汇总在下面的原论文 Figure 3（面板 A–D 为上皮细胞 TEER 筛选，E–G 为 Th2 细胞 IL-13 筛选）：</p>
+
+<img src="images/Salamone/Salamone_Fig3.jpg" alt="原论文Figure 3：上皮细胞与Th2细胞两轮CRISPR筛选结果（面板A-G）">
+
+<p class="fig-caption"><strong>原论文 Figure 3：CRISPR 筛选识别显著影响哮喘细胞表型的 DPG（CRISPR screens identify DPGs that significantly affect asthma cellular phenotypes）。</strong>(a) 上皮细胞（16HBE）CRISPR 筛选流程概览。(b)(c) 跨上皮电阻（TEER）随时间的变化：500 Hz 通道记录初始屏障建立（灰条＝细胞初始接触时刻），4,000 Hz 通道记录归一化到 0 h 的成熟屏障（灰框），右侧柱状图为各 sgRNA 的电阻测量值——其中 SLC27A3 敲低显著抬高电阻，即最强的屏障保护表型（正文 6.1，Figure 3A–3D 引用处）。(d) 各提名类别中显著影响屏障完整性的基因占比（DPG n=14、远端基因 n=29、GWAS 候选 n=26、阴性对照 n=18）：DPG 组占比显著高于远端基因组。(e) 原代 Th2 细胞池式 CRISPR 筛选流程概览：FACS 分离 IL-13 表达最高的前 15% 细胞（正文 6.2，Figure 3E 引用处）。(f) 在 IL-13 高表达细胞中显著耗竭（左）或富集（右）的 sgRNA：阳性对照 IL13 与 GATA3 显著耗竭；DPG 中 SLC27A3、TAP1 耗竭最强，SMPD4 与远端基因 MIER1 富集最强。(g) 各提名类别中 IL-13 表达的显著命中基因占比：DPG 42.1%（8/19）最高，高于 fine-mapped GWAS 基因 23.3%、远端基因 27.9%、最近邻对照 23.7%。统计口径：面板 (b)(c) 为单因素 ANOVA + Dunnett 多重比较，*p &lt; 0.05，mean ± SD。<br>图源：Salamone et al., <em>Cell</em> (2026)，CC BY-NC。</p>
+
+<p>第一个 CRISPR 筛选在支气管上皮细胞（16HBE）中进行，用 sgRNA 靶向候选基因后测量<strong>跨上皮电阻</strong>（transepithelial electrical resistance, TEER）作为屏障完整性的读数。结果（Figure 3A–3D）：</p>
+<ul>
+  <li><strong>DPG 的命中率显著更高</strong>：14/21 的 DPG（约 67%）扰动后显著改变屏障功能，远高于疾病远端基因（distal）组。</li>
+  <li>相比之下，扰动疾病远端基因很少导致上皮功能变化——验证了"DPG 是表型真正的调控者，远端基因只是背景"的假设。</li>
+  <li><strong>SLC27A3 缺失是最强的保护性扰动</strong>：敲低 SLC27A3 显著增强上皮屏障（抵抗破坏屏障）。</li>
+</ul>
+
+<h3>6.2 Th2 细胞：IL-13 产生的池式筛选</h3>
+<p>第二个筛选针对过敏性哮喘的关键细胞——Th2 淋巴细胞。用靶向 132 个基因（包含 DPG、远端基因、GWAS 候选基因）的 sgRNA 文库转染 Th2 极化的原代人 T 细胞，通过荧光激活细胞分选（FACS）分离 IL-13 表达最高的前 15% 细胞，再判断哪些 sgRNA 在这些细胞中被富集或耗竭（Figure 3E）。</p>
+
+<ul>
+  <li><strong>阳性对照验证</strong>：靶向 <code>IL13</code> 和 Th2 谱系主调控因子 <code>GATA3</code> 的 sgRNA 在 IL-13<sup>high</sup> 细胞中显著耗竭——方法学成立。</li>
+  <li><strong>命中率</strong>：42.1%（8/19）的 DPG 与 IL-13 表达显著相关，高于高置信度 fine-mapped GWAS 基因（23.3%）、远端基因（27.9%）和最近邻对照（23.7%）。</li>
+  <li>耗竭最强的是 <code>SLC27A3</code> 和 <code>TAP1</code>；富集最强的是 <code>SMPD4</code> 和远端基因 <code>MIER1</code>。</li>
+</ul>
+
+<div class="theorem">
+  <span class="tag">定理/结论</span>
+  <h4>功能验证的核心结论</h4>
+  <p>在两个独立细胞类型（上皮 + Th2）中，<strong>DPG 扰动显著改变哮喘相关细胞表型的命中率系统性高于 GWAS 候选基因与远端基因</strong>。DANDELION 的优先级排序具有真实的功能相关性。</p>
+</div>
+
+<div class="crossref">
+  <span class="xref-tag">🔗 交叉引用</span>
+  <p>这种"统计定位 → CRISPR 功能验证"的闭环，与 <a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) PISA</a> 中"深度学习预测 → 遗传算法设计 → CRISPR 验证"的闭环在方法论上异曲同工——都是用独立实验检验计算模型输出的生物学真实性。</p>
+</div>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>两轮 CRISPR 筛选证明：DPG 在上皮屏障完整性和 Th2 IL-13 产生两个哮喘核心表型上，命中率均显著高于其他类别基因。SLC27A3 缺失在两处均表现出最强的哮喘保护性表型。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 7: 机制深挖 -->
+<!-- ================================================================ -->
+<section id="sec-7">
+<h2>7. 机制深挖：SLC27A3、SCD 与蛋白质棕榈酰化</h2>
+
+<h3>7.1 SLC27A3：脂肪酸转运 + 酰基-CoA 合成酶</h3>
+<p><code>SLC27A3</code> 属于溶质载体家族 27（solute carrier family 27），是<strong>长链脂肪酸转运蛋白</strong>。它在两个筛选中都产生了最强的保护性表型，作者因此深入探究其机制。</p>
+
+<div class="definition">
+  <span class="tag">正式定义</span>
+  <h4>SLC27A3 的双重功能</h4>
+  <ul>
+    <li><strong>脂肪酸转运蛋白</strong>：介导长链脂肪酸（如花生四烯酸 C20:4、棕榈酸 C16:0）的摄取。</li>
+    <li><strong>酰基-CoA 合成酶</strong>（acyl-CoA synthetase）：催化合成超长链酰基-CoA——这是<strong>蛋白质棕榈酰化</strong>的底物。</li>
+  </ul>
+</div>
+
+<h3>7.2 脂质组学证据</h3>
+<p>脂质组学（lipidomics）显示：<code>SLC27A3<sup>−/−</sup></code> 细胞的培养基中长链脂肪酸（棕榈酸、花生四烯酸）显著增多（摄取减少），而胞内花生四烯酸储存形式减少。RNA-seq 显示差异表达基因极少（16HBE 中 53 个、Th2 中 9 个）——说明 <strong>SLC27A3 缺失的作用主要通过翻译后效应，而非转录改变</strong>。</p>
+
+<p>这条通路有两个直接的炎症含义：</p>
+<ol>
+  <li><strong>花生四烯酸减少</strong> → 炎症脂质介质（白三烯、前列腺素）合成减少。白三烯是哮喘经典炎症介质，白三烯受体拮抗剂是临床哮喘用药。</li>
+  <li><strong>棕榈酰-CoA 减少</strong> → 蛋白质棕榈酰化整体下降。</li>
+</ol>
+
+<h3>7.3 SCD：棕榈酰化的"反向调节器"</h3>
+<p>有趣的是，通路中另一个酶 <code>SCD</code>（硬脂酰-CoA 去饱和酶）也被 DANDELION 提名为 DPG。SCD 催化棕榈酰-CoA 转化为单不饱和棕榈油酰-CoA，从而<strong>降低棕榈酰化底物的可用性</strong>——与 SLC27A3 的作用方向<strong>相反</strong>。</p>
+
+<div class="theorem">
+  <span class="tag">定理/结论</span>
+  <h4>同一通路、相反方向的两个 DPG</h4>
+  <p>SLC27A3 和 SCD 对棕榈酰-CoA 可用性具有相反方向的效应，因此预期对哮喘有相反作用。CRISPR 实验证实：<strong>SLC27A3 敲低保护</strong>（增强屏障、降低 IL-13），<strong>SCD 敲低致病</strong>（破坏屏障、升高 IL-13）。同一代谢通路中两个方向相反的 DPG，构成一个漂亮的内部一致性验证。</p>
+</div>
+
+<h3>7.4 棕榈酰化与 STAT3 激活</h3>
+<p>进一步实验发现：<code>SLC27A3<sup>−/−</sup></code> 细胞中全局棕榈酰化水平下降（C16:0-alkyne 探针标记实验），其中 <strong>STAT3 的棕榈酰化与磷酸化激活均显著降低</strong>（总 STAT3 蛋白量不变）。已知 STAT3 激活对哮喘气道高反应性至关重要，因此这条"棕榈酰化 → STAT3 激活"的机制链条为哮喘保护表型提供了分子解释。</p>
+
+<div class="crossref">
+  <span class="xref-tag">🔗 交叉引用</span>
+  <p>这条"从遗传定位到代谢/翻译后修饰机制"的深入挖掘路径，与 <a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025)</a> 在卒中中"遗传定位 → 蛋白机制 → 药物数据库"的靶点发现链异曲同工。而"同一通路相反方向两个基因互相印证"的设计，在思路上呼应了两步MR中 <a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji et al.</a> 对中介效应的精确解剖。</p>
+</div>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>SLC27A3 通过脂肪酸摄取、脂质介质合成和蛋白质棕榈酰化三重机制影响哮喘表型；其与 SCD 方向相反的效应构成内部一致性验证。蛋白质棕榈酰化——尤其是 STAT3 的棕榈酰化——是此前未被探索的哮喘发病机制。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 8: 小鼠模型验证 -->
+<!-- ================================================================ -->
+<section id="sec-8">
+<h2>8. 小鼠过敏性哮喘模型验证</h2>
+
+<h3>8.1 体内验证：Slc27a3 缺失保护、Scd1 缺失恶化</h3>
+
+<p>进入体内验证之前，先看原论文 Figure 4 汇总的完整证据链——从脂质转运与蛋白质棕榈酰化（面板 A–G）到小鼠过敏性哮喘模型（H–O）与患者队列（P）：</p>
+
+<img src="images/Salamone/Salamone_Fig4.jpg" alt="原论文Figure 4：SLC27A3缺失的脂质机制、小鼠模型与患者队列验证（面板A-P）">
+
+<p class="fig-caption"><strong>原论文 Figure 4：SLC27A3 缺失通过多重脂质相关机制改善肺功能（Loss of SLC27A3 improves lung function through multiple lipid-related mechanisms）。</strong>图版含 16 个字母面板、25 个分面板，细节密集，可浏览器放大查看（Ctrl+滚轮缩放或另存图片后打开）。(a) 培养 24 h 后培养基中残留的游离脂肪酸：SLC27A3 敲除（KO）细胞培养基中长链脂肪酸（棕榈酸 C16:0、花生四烯酸 C20:4 等）显著多于野生型（WT），反映脂肪酸摄取减少（正文 7.2）。(b)(c) 16HBE 胞内含 C20:4 磷脂的相对丰度与含 C16:0 酰基肉碱的相对丰度：KO 中均下降，即胞内花生四烯酸储存与棕榈酰-CoA 储备减少。(d) 蛋白质棕榈酰化机制概览：SLC27A3（合成棕榈酰-CoA）与 SCD（消耗棕榈酰-CoA）从相反方向调控底物可用性（正文 7.3）。(e) C16:0-alkyne 探针标记的全局棕榈酰化：黑箭头所指蛋白区域在 SLC27A3 sgRNA 处理的细胞中标记下降（正文 7.4）。(f)(g) 酰基-生物素交换+链霉亲和素 pull-down 与 western blot：KO 细胞中 STAT3 棕榈酰化与 p-STAT3 磷酸化激活均下降，总 STAT3 蛋白量不变——正是正文 7.4 的"棕榈酰化→STAT3 激活"机制链。(h) 过敏性致敏模型概览：Alternaria alternata 致敏、休息 2 周后激发（正文 8.1，Figure 4H 引用处）。(i)–(m) Slc27a3 缺失小鼠的肺泡灌洗与气道切片：过敏原诱导的气道嗜酸性粒细胞显著减少（p=0.022）；H&E 所示上皮增厚（p=0.0047）、PAS 所示黏液表达（p=0.0075）、Masson 所示胶原沉积（p=0.044）均显著减弱。(n)(o) Scd1 缺失小鼠：气道嗜酸性粒细胞增多（p=0.0455）、气道旁与血管旁炎症加重（p=0.0156、p=0.0062）——与 Slc27a3 缺失方向相反，构成体内双基因验证。(p) 严重哮喘患者（IMSA 队列）支气管刷检中 SLC27A3 表达显著升高（edgeR，BH 校正 p &lt; 0.05，正文 8.2，Figure 4P 引用处）。统计口径：面板 (a)–(o) 为 Welch t 检验，*p &lt; 0.05，mean ± SD。<br>图源：Salamone et al., <em>Cell</em> (2026)，CC BY-NC。</p>
+
+<p>作者构建了 <code>Slc27a3<sup>−/−</sup></code> 和 <code>Scd1<sup>−/−</sup></code> 敲除小鼠，用真菌过敏原 <em>Alternaria alternata</em>（Alt）诱导过敏性哮喘模型（致敏 + 激发，Figure 4H）。</p>
+
+<div class="theorem">
+  <span class="tag">定理/结论</span>
+  <h4>体内结果与体外高度一致</h4>
+  <table>
+    <tr><th>基因型</th><th>表型效应</th></tr>
+    <tr><td><code>Slc27a3<sup>−/−</sup></code></td><td>显著降低过敏原诱导的气道嗜酸性粒细胞招募（$p=0.022$）；显著减弱上皮增厚（$p=0.0047$）、黏液表达（PAS，$p=0.0075$）、胶原沉积（Masson trichrome，$p=0.044$）——即<strong>抑制气道重塑</strong>。</td></tr>
+    <tr><td><code>Scd1<sup>−/−</sup></code></td><td>显著加重炎症：气道嗜酸性粒细胞增多（$p=0.0455$）、气道旁与血管旁炎症加重（$p=0.0156$、$p=0.0062$）——即<strong>加重哮喘</strong>。</td></tr>
+  </table>
+</div>
+
+<h3>8.2 临床相关性</h3>
+<p>在严重哮喘患者队列（IMSA）的支气管刷检中，<code>SLC27A3</code> 表达显著升高（Figure 4P），与 DPG 在发病中起驱动作用一致。相反，<code>SCD</code> 在哮喘患者支气管上皮中表达显著降低——与"SCD 缺失致病"的方向吻合。</p>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>小鼠模型在体内证实了体外观察：<strong>Slc27a3 缺失保护、Scd1 缺失恶化</strong>过敏性哮喘，且与患者组织表达数据方向一致。这为"棕榈酰化是哮喘可干预的新机制"提供了转化级证据。</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<!-- SECTION 9: 讨论与局限 -->
+<!-- ================================================================ -->
+<section id="sec-9">
+<h2>9. 讨论、局限与展望</h2>
+
+<h3>9.1 主要发现</h3>
+<ol>
+  <li><strong>GWAS 位点的可解释性提升</strong>：DANDELION 将 GWAS 位点与 DPG 在反式调控网络中连接，使散落的 GWAS 信号获得功能解读。GWAS 显著性与"高连通性核心基因"（HCG）比例相关——网络连通性越高的基因越富集疾病遗传力。</li>
+  <li><strong>方法学的灵活性</strong>：不限于 bulk trans-QTL，可直接应用于 perturb-seq 数据（如人原代 CD4+ 细胞），从而更纯地捕获胞内反式调控效应。</li>
+  <li><strong>转化潜力</strong>：识别出 SLC27A3 / SCD / 棕榈酰化这一可成药的哮喘新通路。未来既可靶向 SLC27A3 特异性干预，也可更广泛地调节棕榈酰化。</li>
+</ol>
+
+<h3>9.2 局限与权衡</h3>
+<div class="warning">
+  <span class="tag">注意事项</span>
+  <h4>五项重要局限</h4>
+  <ol>
+    <li><strong>高约束基因功效受限</strong>：对罕见 LoF 变异极稀少的强约束基因，负担检验功效不足。但 trans 信息可"救援"——例如 SCD（pLI=1，负担 p 值 0.002 不显著）仍被 DANDELION 提名为 PKN3 GWAS 位点的候选中介。</li>
+    <li><strong>组织特异性</strong>：trans 信号高度组织特异，用错组织可能导致假阳性。</li>
+    <li><strong>FDR 控制在暴露层面</strong>：per-exposure FDR 控制提高了功效，但全局（trait-level）FDR 更高。全局 FDR 校正虽更严格，却导致功效骤降——这是 trans 信号方法固有的权衡。</li>
+    <li><strong>不独立于 GWAS</strong>：DPG 的富集不应解读为独立于 GWAS 抽样，而是对连接 GWAS 位点与疾病风险的候选中介的优先级排序。</li>
+    <li><strong>祖先可移植性未建立</strong>：分析限于 UK Biobank 欧洲队列（缺乏其他人群同等规模的罕见变异负担检验）。</li>
+  </ol>
+</div>
+
+<h3>9.3 展望</h3>
+<p>随着更多组织/细胞类型的转录组与蛋白质组数据可得、WES 样本量扩大，DANDELION 可推广到更多复杂性状与疾病，有望持续产出具有药物开发潜力的 DPG 及其反式调控网络。未来跨祖先的负担检验可移植性研究将扩大其适用范围。</p>
+
+<div class="summary">
+  <span class="tag">要点总结</span>
+  <p>DANDELION 建立了一种"<strong>反式调控 + 负担检验 + 中介检验</strong>"的疾病驱动基因定位范式，并完成了从统计预测到 CRISPR 验证再到小鼠模型的完整闭环。它揭示了蛋白质棕榈酰化这一哮喘新机制，展示了整合统计遗传学与功能基因组学的威力。</p>
+</div>
+</section>
+
+</main>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="related-bar">
+    <h3>📚 相关论文解读</h3>
+    <ul>
+      <li><a href="Yao_2025_Proteome_Wide_Genetic_zh.html">Yao et al. (2025) — <span data-zh>卒中蛋白组MR</span><span data-en>Proteome MR for Stroke</span></a>：cis 蛋白层面的药物靶点发现范式</li>
+      <li><a href="Yoshiji_2025_Integrative_proteogenomic_analysis_zh.html">Yoshiji et al. (2025) — 两步MR</a>：中介效应精确量化的方法参照</li>
+      <li><a href="Sanderson_2022_Mendelian_randomization_zh.html">Sanderson et al. (2022) — MR Primer</a>：遗传变异因果推断的方法学基础</li>
+      <li><a href="McAnany_2026_Positional_Interpretation_Cis-Regulatory_zh.html">McAnany et al. (2026) — PISA</a>：cis 调控解读，与本文 trans 视角互补</li>
+      <li><a href="../knowledge_graph.html"><span data-zh>🧠 知识图谱</span><span data-en>🧠 Knowledge Graph</span></a>：跨论文概念关联网络</li>
+    </ul>
+  </div>
+  <p style="text-align:center; margin-top:16px;">
+    <span data-zh>解读生成于 2026-08-14</span><span data-en>Interpretation generated 2026-08-14</span> &nbsp;|&nbsp;
+    <span data-zh>原始论文 © The Authors 2026, CC BY-NC</span><span data-en>Original paper © The Authors 2026, CC BY-NC</span> &nbsp;|&nbsp;
+    <span data-zh>解读文本基于 </span><span data-en>Interpretation based on </span><a href="https://doi.org/10.1016/j.cell.2026.07.034" target="_blank">Salamone et al. (2026) <em>Cell</em></a>
+  </p>
+</footer>
+
+<!-- 主题切换 + 入场渐显 + 阅读进度（与其余三个模板逐字相同） -->
+<script>
+(function () {
+  var PACK = window.PAPER_EXPLAINER_THEME_PACK;
+  var KEY = 'paper-explainer-theme';
+  var root = document.documentElement;
+  if (!PACK) return;
+
+  function findTheme(id) { for (var i = 0; i < PACK.THEMES.length; i++) if (PACK.THEMES[i].id === id) return PACK.THEMES[i]; return null; }
+  function apply(id, save) {
+    var el = document.getElementById('theme-css');
+    var t = findTheme(id);
+    if (!t) { id = PACK.DEFAULT_THEME; t = null; }
+    if (t && id !== PACK.DEFAULT_THEME) {
+      el.textContent = t.css; root.setAttribute('data-theme', id); root.style.colorScheme = t.mode;
+    } else {
+      el.textContent = ''; root.removeAttribute('data-theme'); root.style.colorScheme = 'light';
+    }
+    if (save) { try { localStorage.setItem(KEY, id); localStorage.setItem(KEY + '-set', '1'); } catch (e) {} }
+    var items = document.querySelectorAll('.ts-item');
+    for (var i = 0; i < items.length; i++) items[i].classList.toggle('cur', items[i].getAttribute('data-id') === id);
+  }
+
+  /* 切换方块（右下角） */
+  var btn = document.createElement('button');
+  btn.id = 'ts-btn'; btn.type = 'button'; btn.setAttribute('aria-label', '切换主题');
+  btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8C13.06 3.04 12.54 3 12 3z"/></svg>';
+  var panel = document.createElement('div');
+  panel.id = 'ts-panel'; panel.setAttribute('role', 'listbox'); panel.setAttribute('aria-label', '主题列表');
+  var html = '';
+  for (var i = 0; i < PACK.THEMES.length; i++) {
+    var t = PACK.THEMES[i];
+    html += '<button class="ts-item" type="button" role="option" data-id="' + t.id + '">'
+      + '<span class="ts-dot" style="background:linear-gradient(135deg,' + t.swatch[0] + ' 33%,' + t.swatch[1] + ' 33% 66%,' + t.swatch[2] + ' 66%)"></span>'
+      + '<span class="ts-name">' + t.name + '<span class="ts-en"> ' + t.en + '</span></span>'
+      + '<span class="ts-mode">' + (t.mode === 'dark' ? '暗' : '明') + '</span></button>';
+  }
+  panel.innerHTML = html;
+  document.body.appendChild(btn); document.body.appendChild(panel);
+  btn.addEventListener('click', function (ev) { ev.stopPropagation(); panel.classList.toggle('open'); });
+  document.addEventListener('click', function (ev) { if (!panel.contains(ev.target) && !btn.contains(ev.target)) panel.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') panel.classList.remove('open'); });
+  panel.addEventListener('click', function (ev) {
+    var it = ev.target.closest('.ts-item'); if (!it) return; apply(it.getAttribute('data-id'), true);
+  });
+
+  /* 入场渐显（尊重 prefers-reduced-motion） */
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var targets = document.querySelectorAll('header, nav.toc, .definition, .intuition, .example, .theorem, .algorithm, .summary, .warning, .crossref, figure, table.data, .paper-node, .rel-card, .roadmap-steps li, .phase, .step, .supp, .concept, .kg-header');
+  if (!reduce && 'IntersectionObserver' in window && targets.length) {
+    root.classList.add('rv-on');
+    var io = new IntersectionObserver(function (ents) {
+      for (var i = 0; i < ents.length; i++) if (ents[i].isIntersecting) { ents[i].target.classList.add('in'); io.unobserve(ents[i].target); }
+    }, { threshold: 0.08, rootMargin: '0px 0px -4% 0px' });
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].classList.add('rv');
+      targets[i].style.transitionDelay = (i % 4) * 55 + 'ms';
+      io.observe(targets[i]);
+    }
+  }
+
+  /* 顶部阅读进度 */
+  var bar = document.querySelector('.progress');
+  if (bar) {
+    var tick = function () {
+      var h = document.documentElement;
+      var max = h.scrollHeight - h.clientHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, (window.pageYOffset || h.scrollTop) / max) : 0) + ')';
+    };
+    window.addEventListener('scroll', tick, { passive: true });
+    window.addEventListener('resize', tick, { passive: true });
+    tick();
+  }
+
+  var saved0 = (function () { try { return localStorage.getItem(KEY); } catch (e) { return null; } })();
+  if (saved0 === PACK.DEFAULT_THEME) {
+    /* 旧版默认无主动选择标记时视为遗留记忆,回落新默认 */
+    try { if (!localStorage.getItem(KEY + '-set')) saved0 = null; } catch (e) { saved0 = null; }
+  }
+  apply(saved0 || root.getAttribute('data-theme') || PACK.DEFAULT_THEME, false);
+})();
+</script>
+</body>
+</html>
