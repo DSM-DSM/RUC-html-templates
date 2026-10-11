@@ -436,7 +436,35 @@
             font-size: 12px;
             color: var(--ink-2);
             font-variant-numeric: tabular-nums;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 10px;
         }
+
+        /* 子站访问量：卡右下角；hover 淡出给箭头让位 */
+        .meta .visits {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11.5px;
+            opacity: .85;
+            transition: opacity .16s ease-out;
+        }
+
+        .meta .visits[hidden] { display: none; }
+
+        .meta .visits svg {
+            width: 12px;
+            height: 12px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .card:hover .visits, .card:focus-visible .visits { opacity: 0; }
 
         .arw {
             position: absolute;
@@ -686,6 +714,34 @@
         html[data-mode="dark"] .pref-btn .ic-sun { display: none; }
         html:not([data-mode="dark"]) .pref-btn .ic-moon { display: none; }
 
+        /* —— 总访问量徽章（NAS cron 统计 visit_counts.json；file:// 无数据保持隐藏） —— */
+        .pref-visits {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
+            padding: 0 13px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--ink-2);
+            font-size: 12.5px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .pref-visits[hidden] { display: none; }
+
+        .pref-visits svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         @media (prefers-reduced-motion: reduce) {
             .topline, .masthead, .stats, .sec-head, .skill, .skill-note, .card, .road, footer {
                 animation: none;
@@ -715,6 +771,10 @@
 <body>
 <div aria-hidden="true" class="topline"></div>
 <div class="pref-bar">
+    <div class="pref-visits" id="prefVisits" hidden title="总访问量 / Total visits">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+        <span id="visitTotal">—</span>
+    </div>
     <button class="pref-btn" id="pref-lang" type="button" aria-label="切换语言 / Switch language"><span data-zh>EN</span><span data-en>中文</span></button>
     <button class="pref-btn" id="pref-mode" type="button" aria-label="切换明暗 / Toggle light & dark">
         <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
@@ -799,7 +859,7 @@
                 <span aria-hidden="true" class="no">01</span>
             </div>
             <p><span data-zh>「幕 + 卡」结构的滚动讲演长页，侧边目录自动生成，支持公式渲染与导出 PDF。</span><span data-en>A scrolling act-and-slide lecture page with auto-generated side TOC, formula rendering, and PDF export.</span></p>
-            <span class="meta"><span data-zh>17 套主题 · 双击即用</span><span data-en>17 themes · double-click ready</span></span>
+            <span class="meta"><span data-zh>17 套主题 · 双击即用</span><span data-en>17 themes · double-click ready</span><span class="visits" hidden data-key="lecture"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
@@ -810,7 +870,7 @@
                 <span aria-hidden="true" class="no">02</span>
             </div>
             <p><span data-zh>总览页 + 子页面小站，进度写在 JSON 里每周更新，含 3D 方法转盘与进度时间线。</span><span data-en>Overview hub + sub-page mini-site; weekly progress in JSON, with a 3D method carousel and progress timeline.</span></p>
-            <span class="meta"><span data-zh>11 套主题 · 需本地服务器</span><span data-en>11 themes · needs a local server</span></span>
+            <span class="meta"><span data-zh>11 套主题 · 需本地服务器</span><span data-en>11 themes · needs a local server</span><span class="visits" hidden data-key="lab-meeting"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
@@ -821,7 +881,7 @@
                 <span aria-hidden="true" class="no">03</span>
             </div>
             <p><span data-zh>面向合作方与甲方的能力展示，滚动与翻页混合形态，翻页笔可直接使用。</span><span data-en>Capability showcase for partners: a scroll-and-slide hybrid that works with a presentation clicker.</span></p>
-            <span class="meta"><span data-zh>7 套主题 · 需本地服务器</span><span data-en>7 themes · needs a local server</span></span>
+            <span class="meta"><span data-zh>7 套主题 · 需本地服务器</span><span data-en>7 themes · needs a local server</span><span class="visits" hidden data-key="commerical-lecture"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
@@ -832,7 +892,7 @@
                 <span aria-hidden="true" class="no">04</span>
             </div>
             <p><span data-zh>四类页面互联的精读库：阅读路径、逐章详解、背景词典与知识图谱。</span><span data-en>Four interlinked page types: reading path, chapter-by-chapter deep dives, background glossary, and knowledge graph.</span></p>
-            <span class="meta"><span data-zh>8 套主题 · 双击即用</span><span data-en>8 themes · double-click ready</span></span>
+            <span class="meta"><span data-zh>8 套主题 · 双击即用</span><span data-en>8 themes · double-click ready</span><span class="visits" hidden data-key="paper-explainer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
@@ -843,7 +903,7 @@
                 <span aria-hidden="true" class="no">05</span>
             </div>
             <p><span data-zh>教师与研究生通用的学术主页，16 学科主题配全套示例，中英双语一键切换。</span><span data-en>Academic homepage for faculty and students: 16 discipline themes with full samples and built-in bilingual toggle.</span></p>
-            <span class="meta"><span data-zh>34 套主题 · 双击即用</span><span data-en>34 themes · double-click ready</span></span>
+            <span class="meta"><span data-zh>34 套主题 · 双击即用</span><span data-en>34 themes · double-click ready</span><span class="visits" hidden data-key="personal-homepage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></span>
             <svg aria-hidden="true" class="arw" viewBox="0 0 12 12">
                 <path d="M2 6h7M6 2.5 9.5 6 6 9.5"/>
             </svg>
@@ -914,6 +974,28 @@
     d.setAttribute('data-mode', m);
     try { localStorage.setItem('a4r-mode', m); } catch (e) {}
   });
+})();
+/* 访问量：读 NAS cron 统计的 visit_counts.json（同目录相对路径）；
+   file:// 双击或本地无数据时 fetch 失败 → 徽章保持隐藏，不打扰页面 */
+(function () {
+  fetch('visit_counts.json', { cache: 'no-store' }).then(function (r) {
+    return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status));
+  }).then(function (d) {
+    if (!d) return;
+    if (typeof d.total === 'number') {
+      var t = document.getElementById('visitTotal');
+      if (t) t.textContent = d.total.toLocaleString();
+      var pv = document.getElementById('prefVisits');
+      if (pv) pv.hidden = false;
+    }
+    if (d.pages) {
+      document.querySelectorAll('.meta .visits[data-key]').forEach(function (v) {
+        var n = d.pages[v.getAttribute('data-key')];
+        var el = v.querySelector('.n');
+        if (typeof n === 'number' && el) { el.textContent = n.toLocaleString(); v.hidden = false; }
+      });
+    }
+  }).catch(function () { /* 无数据：保持隐藏 */ });
 })();
 </script>
 </body>
