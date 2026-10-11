@@ -334,8 +334,8 @@
             text-underline-offset: 3px;
         }
 
-        /* 成品链接 pill 内访问量（数据同 counts.json；无数据保持隐藏） */
-        .sk-links a .lk-visits {
+        /* 链接 pill 内访问量/点击量（sk-links 与 repo 方块通用；无数据保持隐藏） */
+        .lk-visits {
             display: inline-flex;
             align-items: center;
             gap: 3px;
@@ -346,9 +346,9 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .sk-links a .lk-visits[hidden] { display: none; }
+        .lk-visits[hidden] { display: none; }
 
-        .sk-links a .lk-visits svg {
+        .lk-visits svg {
             width: 10px;
             height: 10px;
             stroke: currentColor;
@@ -947,17 +947,19 @@
         </div>
         <p class="skill-note"><span data-zh>技能持续蒸馏沉淀 · 预留合作者扩展位——欢迎带着你的场景来共建下一个技能</span><span data-en>Skills keep distilling · contributor slots reserved — bring your scenario and co-build the next one</span></p>
         <div class="grid-repos">
-            <a class="repo" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc">
+            <a class="repo lk-track" data-key="gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc">
                 Gitee
                 <svg aria-hidden="true" viewBox="0 0 12 12">
                     <path d="M3 9 9 3M4.5 3H9v4.5"/>
                 </svg>
+                <span class="lk-visits" hidden data-key="gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
             </a>
-            <a class="repo" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc">
+            <a class="repo lk-track" data-key="github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc">
                 GitHub
                 <svg aria-hidden="true" viewBox="0 0 12 12">
                     <path d="M3 9 9 3M4.5 3H9v4.5"/>
                 </svg>
+                <span class="lk-visits" hidden data-key="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
             </a>
         </div>
     </section>
@@ -1027,17 +1029,19 @@
     </main>
 
     <div class="grid-repos">
-        <a class="repo" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc">
+        <a class="repo lk-track" data-key="gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc">
             Gitee
             <svg aria-hidden="true" viewBox="0 0 12 12">
                 <path d="M3 9 9 3M4.5 3H9v4.5"/>
             </svg>
+            <span class="lk-visits" hidden data-key="gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
         </a>
-        <a class="repo" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc">
+        <a class="repo lk-track" data-key="github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc">
             GitHub
             <svg aria-hidden="true" viewBox="0 0 12 12">
                 <path d="M3 9 9 3M4.5 3H9v4.5"/>
             </svg>
+            <span class="lk-visits" hidden data-key="github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
         </a>
     </div>
 
@@ -1107,7 +1111,7 @@
     var m = d.pages || {};
     if (d.clicks) Object.keys(d.clicks).forEach(function (k) { m[k] = d.clicks[k]; });
     if (m) {
-      document.querySelectorAll('.meta .visits[data-key], .sk-links a .lk-visits[data-key]').forEach(function (v) {
+      document.querySelectorAll('.meta .visits[data-key], .lk-visits[data-key]').forEach(function (v) {
         var n = m[v.getAttribute('data-key')];
         var el = v.querySelector('.n');
         if (typeof n === 'number' && el) { el.textContent = n.toLocaleString(); v.hidden = false; }
