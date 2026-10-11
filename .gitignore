@@ -23,3 +23,4 @@
 
 # NAS 部署配置(含内网信息,不入库)
 deploy-nas/
+html-templates/visit_counts.json

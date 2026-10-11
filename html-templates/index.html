@@ -334,6 +334,30 @@
             text-underline-offset: 3px;
         }
 
+        /* 成品链接 pill 内访问量（数据同 counts.json；无数据保持隐藏） */
+        .sk-links a .lk-visits {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: 7px;
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--ink-2);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .sk-links a .lk-visits[hidden] { display: none; }
+
+        .sk-links a .lk-visits svg {
+            width: 10px;
+            height: 10px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
         .skill-note {
             margin-top: 14px;
             font-size: 12.5px;
@@ -820,8 +844,8 @@
                 </dl>
                 <div class="sk-links">
                     <span class="sk-label"><span data-zh>真实成品</span><span data-en>Live demos</span></span>
-                    <a href="showcase/paper-reading/nav/reading_path.html"><span data-zh>阅读路径页</span><span data-en>Reading Path</span></a>
-                    <a href="showcase/paper-reading/knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span></a>
+                    <a href="showcase/paper-reading/nav/reading_path.html"><span data-zh>阅读路径页</span><span data-en>Reading Path</span><span class="lk-visits" hidden data-key="reading-path"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                    <a href="showcase/paper-reading/knowledge_graph.html"><span data-zh>知识图谱</span><span data-en>Knowledge Graph</span><span class="lk-visits" hidden data-key="knowledge-graph"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                 </div>
             </article>
             <article class="skill">
@@ -838,8 +862,8 @@
                 </dl>
                 <div class="sk-links">
                     <span class="sk-label"><span data-zh>真实成品</span><span data-en>Live demos</span></span>
-                    <a href="showcase/weekly-report/index.html"><span data-zh>组会周报站</span><span data-en>Weekly Lab Report</span></a>
-                    <a href="showcase/skills-briefing/index.html"><span data-zh>AI 技能汇报页</span><span data-en>Skills Briefing</span></a>
+                    <a href="showcase/weekly-report/index.html"><span data-zh>组会周报站</span><span data-en>Weekly Lab Report</span><span class="lk-visits" hidden data-key="weekly-report"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                    <a href="showcase/skills-briefing/index.html"><span data-zh>AI 技能汇报页</span><span data-en>Skills Briefing</span><span class="lk-visits" hidden data-key="skills-briefing"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                 </div>
             </article>
         </div>
@@ -989,7 +1013,7 @@
       if (pv) pv.hidden = false;
     }
     if (d.pages) {
-      document.querySelectorAll('.meta .visits[data-key]').forEach(function (v) {
+      document.querySelectorAll('.meta .visits[data-key], .sk-links a .lk-visits[data-key]').forEach(function (v) {
         var n = d.pages[v.getAttribute('data-key')];
         var el = v.querySelector('.n');
         if (typeof n === 'number' && el) { el.textContent = n.toLocaleString(); v.hidden = false; }
