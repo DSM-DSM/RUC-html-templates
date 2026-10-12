@@ -273,6 +273,26 @@
             margin-top: 9px;
         }
 
+        .sk-example {
+            margin-top: 10px;
+            padding: 9px 12px;
+            border-left: 3px solid var(--red);
+            background: var(--bg);
+            border-radius: 0 8px 8px 0;
+            font-size: 12.5px;
+            color: var(--ink-2);
+            line-height: 1.7;
+        }
+
+        .sk-example .ex-tag {
+            display: block;
+            font-weight: 600;
+            color: var(--red);
+            font-size: 11.5px;
+            letter-spacing: .08em;
+            margin-bottom: 2px;
+        }
+
         .sk-facts {
             margin-top: 12px;
             border-top: 1px dashed var(--line-strong);
@@ -875,7 +895,7 @@
         <div class="sec-head">
             <span class="sec-kicker">Skills</span>
             <h2 class="sec-title"><span data-zh>AI Agent 技能</span><span data-en>AI Agent Skills</span></h2>
-            <p class="sec-sub"><span data-zh>模板由技能驱动——先看技能，再看模板。六项技能皆可一键安装，两项附可打开核验的真实成品。</span><span data-en>Templates are skill-driven — skills first, templates second. All six skills install in one line; two ship verifiable live demos.</span></p>
+            <p class="sec-sub"><span data-zh>AI Agent 就是能替你动手干活的 AI 助手；下面每一项「技能」，是教会它的一种新本事。技能皆可一键安装，两项附能直接打开的真实成品。</span><span data-en>An AI agent is an assistant that does hands-on work for you; each skill below teaches it a new trick. One-line install; two ship demos you can open right now.</span></p>
         </div>
         <div class="skill-grid">
             <article class="skill">
@@ -883,12 +903,9 @@
                     <h2><span data-zh>论文精读引擎</span><span data-en>Paper Reading Engine</span><span class="en">paper-explainer</span></h2>
                     <span aria-hidden="true" class="no">01</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>把陌生领域的论文 PDF 批量转为深入浅出的中文详解网页，并维护跨论文知识图谱。</span><span data-en>Turn PDFs in an unfamiliar field into accessible annotated pages, with a cross-paper knowledge graph kept in sync.</span></p>
+                <p class="sk-tagline"><span data-zh>刚进一个陌生领域，论文 PDF 读不懂也读不完？把 PDF 都丢给它——每篇变成一篇像老师带着读的中文讲解网页，读完全部还会画出一张知识点关系图。</span><span data-en>New to a field, staring at a pile of PDFs? Drop them all in — each becomes an annotated page that walks you through the paper, and a knowledge graph ties everything together at the end.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>你刚接触「孟德尔随机化」，手头有 10 篇核心论文。交给它之后，先看阅读路径知道该先读哪篇；每篇的重点公式都有大白话解释；最后一张知识图谱告诉你哪几篇的方法是相通的——一周的入门功课，两三天过完。</span><span data-en>You're starting on Mendelian randomization with ten core papers. It hands you a reading path, explains every key formula in plain words, and maps which papers share methods — a week of onboarding done in two or three days.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>科研新手、跨方向合作者、需要快速吃透陌生领域的研究生</span><span data-en>Research newcomers, cross-field collaborators, and graduate students entering an unfamiliar area</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>批量精读 PDF、组会文献分享、新领域入门与知识体系梳理</span><span data-en>Batch PDF reading, lab-meeting literature sharing, and structured onboarding to a new field</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>每篇一份中文详解网页 + 跨论文知识图谱 + 阅读路径页</span><span data-en>One annotated page per paper + a cross-paper knowledge graph + a reading-path hub</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>10 篇 MR×AI 论文互联成库：公式先直觉后形式，原文图表逐面板中文解读</span><span data-en>A library of 10 interconnected MR×AI papers: intuition before formulas, panel-by-panel figure walkthroughs</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
                 <div class="sk-links">
@@ -908,12 +925,9 @@
                     <h2><span data-zh>网页设计引擎</span><span data-en>Web Design Engine</span><span class="en">html-beautify</span></h2>
                     <span aria-hidden="true" class="no">02</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>从设计系统与素材库出发，从零构建或打磨任何网页——本站即其作品。</span><span data-en>Builds or polishes any page from design systems and asset libraries — this very site is its work.</span></p>
+                <p class="sk-tagline"><span data-zh>不会写网页，又想要一个不套模板、拿得出手的学术页面？把需求说给它，它自己找设计参考、直接产出能用的网页——你现在看到的这个网站就是它做的。</span><span data-en>Want a polished academic page without writing code? Tell it what you need; it picks a design direction and ships a working page — this very site is its work.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>组会前想给老师看一页「实验进展看板」，自己又不会前端。跟它说清楚要展示什么，它先挑一个合适的设计风格，再生成带图表、能换主题的页面——半天之内就能把链接发出去。</span><span data-en>Before a lab meeting you want a progress dashboard for your advisor, but you don't do frontend. Describe what to show, and it returns a themed page with charts — a shareable link within half a day.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>想要高级感页面但不懂前端的科研人、需向合作方展示成果的团队</span><span data-en>Researchers who want polished pages without frontend skills; teams presenting results to partners</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>从零构建学术网页、美化已有页面、校准去「AI 味」的设计</span><span data-en>Building academic pages from scratch, refining existing ones, de-defaulting AI-flavored design</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>本站 5 套模板与 77 套主题、组会周报站、AI 技能汇报页</span><span data-en>This site (5 templates, 77 themes), the weekly lab-report site, and the skills briefing page</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>两组对外成品可直接打开核验：真实实验周报站与四线叙事技能汇报</span><span data-en>Two public outputs you can open and verify: a real lab-report site and a four-thread skills briefing</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
                 <div class="sk-links">
@@ -933,12 +947,9 @@
                     <h2><span data-zh>提示词优化</span><span data-en>Prompt Enhancer</span><span class="en">prompt-enhancer</span></h2>
                     <span aria-hidden="true" class="no">03</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>把写不清楚的想法整理成 Agent 能直接执行的提示词，改完会说明改了哪里、为什么。</span><span data-en>Turns fuzzy ideas into prompts an agent can actually execute, then explains what changed and why.</span></p>
+                <p class="sk-tagline"><span data-zh>跟 AI 说话总说不到点子上、它答非所问？用大白话把你想干嘛告诉它，它帮你翻译成 AI 能听懂、条理清楚的要求，还会告诉你改了哪里——用久了，你自然就学会怎么向 AI 提要求。</span><span data-en>AI keeps misunderstanding what you asked? Say it in plain words — this skill rewrites your request into one the AI can act on, and tells you what it changed. Use it long enough and you learn to brief AI yourself.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>你只丢一句「帮我改改这段代码」，AI 只能瞎猜你想要什么。它会把这句话扩成「目标是什么、输入输出是什么、有什么限制」，AI 拿到就能一次改对。</span><span data-en>"Fix this code" tells the AI nothing about the goal. It expands that into target, inputs, outputs and constraints — and the fix lands in one shot.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>提示词总写不清需求的研究者；想系统提升 AI 输出质量的深度用户</span><span data-en>Researchers whose prompts underspecify needs; power users seeking systematic output quality</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>把模糊想法变成可执行提示词；评测迭代已有提示词；跨模型移植</span><span data-en>Turning fuzzy ideas into executable prompts; iterating with evals; porting across models</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>结构化提示词（角色/任务/动机/步骤/输出契约）+ What Changed 改进说明</span><span data-en>A structured prompt (role/task/motivation/steps/output contract) plus a What Changed note</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>三模式自动路由，交付附改进理由，越用越清楚怎么向 AI 叙述需求</span><span data-en>Three modes auto-routed; deliveries explain what changed — the more you use it, the better you brief AI</span></dd></div>
                     <div><dt><span data-zh>来源</span><span data-en>Origin</span></dt><dd><span data-zh>整合两个上游项目，结合科研提示词场景自研路由与质检</span><span data-en>Fuses two upstream projects; routing and QA self-built for research workflows</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
@@ -959,12 +970,9 @@
                     <h2><span data-zh>会话接力棒</span><span data-en>Session Baton</span><span class="en">baton</span></h2>
                     <span aria-hidden="true" class="no">04</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>上下文快满或要换窗口时，把手头的进展、踩过的坑和下一步存成一页接力棒，下一个会话接住就跑。</span><span data-en>When context runs low or you switch windows, it saves progress, dead ends and next steps into one page the next session picks up and runs with.</span></p>
+                <p class="sk-tagline"><span data-zh>AI 的聊天窗口有「记忆上限」：聊久了它会忘掉前面说过的话，换个窗口更是全部重来。这个技能让 AI 收工前把「做到哪了、踩过什么坑、下一步干嘛」写成一页备忘，下次新开窗口把备忘交给它，接着干。</span><span data-en>AI chat windows forget: past the context limit, earlier talk is gone — and a new window starts from zero. This skill has the AI write down "where we are, what failed, what's next" into a one-page baton the next session picks up.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>改论文的任务聊到一半窗口满了，存一页接力棒。第二天新开对话，AI 读完接力棒直接从上次断的地方继续，不用你从头解释一遍论文背景和已经试过的改法。</span><span data-en>A paper-editing task hits the context limit mid-way — drop a baton. Next day, a fresh session reads it and continues exactly where you left off, no re-explaining the background or the fixes you already tried.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>多会话/多智能体并行工作的开发者；长任务跨天推进的科研人</span><span data-en>Developers juggling parallel sessions/agents; researchers pushing long tasks across days</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>上下文将耗尽时存档接续；新会话零冷启动；合并整理历史交接记录</span><span data-en>Checkpoint before context runs out; cold-start a fresh session in seconds; consolidate past handoffs</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>单文件 markdown 接力棒：意图、已排除的死胡同、精确下一步、经 git 核实的状态</span><span data-en>A single markdown baton: intent, ruled-out dead ends, the exact next step, git-verified state</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>下一棒免重推导直接冲刺；本工作区已 15 棒稳定运转</span><span data-en>The next runner sprints instead of re-deriving; 15 batons and counting in this workspace</span></dd></div>
                     <div><dt><span data-zh>来源</span><span data-en>Origin</span></dt><dd><span data-zh>整合上游项目，按科研工作流深度定制（落棒前 git 核实的铁律等）</span><span data-en>Upstream project, deeply customized for research workflows (git-verify-before-drop iron rule, etc.)</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
@@ -980,12 +988,9 @@
                     <h2><span data-zh>实时搜索引擎</span><span data-en>AnySearch</span><span class="en">anysearch</span></h2>
                     <span aria-hidden="true" class="no">05</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>要查最新的资料、新闻或专业领域数据，直接问它，能并行搜多个来源，把整页正文一并取回。</span><span data-en>Ask it for current facts, news or domain data — it searches several sources in parallel and pulls back the full page text.</span></p>
+                <p class="sk-tagline"><span data-zh>AI 只知道训练时「背」过的东西，最新的信息它不知道。装上它，AI 就能当场上网查：普通网页、新闻都行，股票、学术论文这类专门渠道也能查，还能一次同时查好几个问题。</span><span data-en>AI models only know what they were trained on — nothing recent. With this skill they can look things up live: general web, news, even stock and academic channels, several queries at once.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>写综述时想知道「某个方法 2026 年有没有新进展」，它当场搜到最新论文和网页，把要点连同原文链接一起给你——不用自己开十几个浏览器标签页。</span><span data-en>Writing a review, you wonder whether a method saw new results in 2026. It searches on the spot and hands you the findings with source links — no ten tabs of your own.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>需要实时信息检索的科研与调研场景；不想配置 MCP server 的用户</span><span data-en>Research workflows needing live retrieval; users who skip MCP server setup</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>事实核查与新闻文档查询；金融/学术/法律/安全垂直域；一次并行 N 个查询</span><span data-en>Fact-checks, news and docs; finance/academic/legal/security verticals; N queries in one parallel batch</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>结构化搜索结果与网页正文，跨平台 CLI 直调</span><span data-en>Structured results and full-page text via a cross-platform CLI</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>Stock/CVE/DOI 等结构化标识符精准命中；与 agent-reach 广度/深度互补成对</span><span data-en>Precise hits on Stock/CVE/DOI identifiers; pairs with agent-reach as breadth/depth complements</span></dd></div>
                     <div><dt><span data-zh>来源</span><span data-en>Origin</span></dt><dd><span data-zh>社区项目搬运（仓库内保留原样，便于一键安装）</span><span data-en>Community project, shipped as-is for one-line install</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
@@ -1005,12 +1010,9 @@
                     <h2><span data-zh>互联网能力路由器</span><span data-en>Agent Reach</span><span class="en">agent-reach</span></h2>
                     <span aria-hidden="true" class="no">06</span>
                 </div>
-                <p class="sk-tagline"><span data-zh>小红书、微博、B 站这些要登录的平台，它用你已有的登录态把帖子、评论读出来，调研省事很多。</span><span data-en>Reads posts and comments from login-walled platforms like Xiaohongshu, Weibo and Bilibili by reusing your logged-in sessions.</span></p>
+                <p class="sk-tagline"><span data-zh>很多有用的信息锁在要登录的 App 里——小红书、微博、B 站的帖子，AI 平时看不到。它借用你电脑上已经登录的账号，让 AI 直接把这些平台里的帖子和评论读出来。</span><span data-en>Useful content sits behind logins — posts on Xiaohongshu, Weibo, Bilibili that AI can't normally see. Using the accounts you're already logged into, it lets the AI read those posts and comments directly.</span></p>
+                <p class="sk-example"><span class="ex-tag"><span data-zh>举个例子</span><span data-en>For example</span></span><span data-zh>想知道「大家实际怎么用某个工具」，它替你翻小红书的经验帖和 B 站教程的评论，把真实用户的说法整理好交给你——比自己在搜索框里翻半天快得多。</span><span data-en>Want to know how people actually use a tool? It browses Xiaohongshu tips and Bilibili tutorial comments, and summarizes what real users say — far faster than digging through search results yourself.</span></p>
                 <dl class="sk-facts">
-                    <div><dt><span data-zh>适用人群</span><span data-en>Audience</span></dt><dd><span data-zh>需要社媒/社区一手信息的调研者；全网讨论与舆情分析场景</span><span data-en>Researchers needing first-hand social content; network-wide discussion and sentiment analysis</span></dd></div>
-                    <div><dt><span data-zh>适用场景</span><span data-en>Scenarios</span></dt><dd><span data-zh>平台内容调研；帖子、评论、视频字幕等深层读取；多后端自动路由</span><span data-en>Platform research; deep reads of posts, comments, subtitles; multi-backend auto routing</span></dd></div>
-                    <div><dt><span data-zh>产出物</span><span data-en>Outputs</span></dt><dd><span data-zh>平台内容结构化提取，单入口覆盖 15 平台</span><span data-en>Structured platform content, 15 platforms behind one entry</span></dd></div>
-                    <div><dt><span data-zh>产出效果</span><span data-en>Highlights</span></dt><dd><span data-zh>doctor 体检 + 失败重试链，6 渠道零配置；与 anysearch 互为兜底</span><span data-en>Doctor checkup + retry chain, 6 zero-config channels; mutual fallback with anysearch</span></dd></div>
                     <div><dt><span data-zh>来源</span><span data-en>Origin</span></dt><dd><span data-zh>社区项目搬运（仓库内保留原样，便于一键安装）</span><span data-en>Community project, shipped as-is for one-line install</span></dd></div>
                     <div><dt><span data-zh>作者</span><span data-en>Author</span></dt><dd><span data-zh>俞锦越</span><span data-en>Jinyue Yu</span></dd></div>
                 </dl>
