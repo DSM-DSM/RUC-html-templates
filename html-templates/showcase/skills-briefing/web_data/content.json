@@ -630,10 +630,10 @@
      ]
     },
     {
-     "name": "agent-reach · 互联网能力路由器",
-     "name_en": "agent-reach · internet capability router",
-     "tagline": "登录类平台资源的路由器：小红书、微博、B 站……一个入口覆盖 15 个平台。",
-     "tagline_en": "A router for login-gated platforms: Xiaohongshu, Weibo, Bilibili… one entry covering 15 platforms.",
+     "name": "agent-reach · 社媒搜索引擎",
+     "name_en": "agent-reach · social media search",
+     "tagline": "搜 App 里的内容：小红书、微博、B 站……一个入口搜遍 15 个平台。",
+     "tagline_en": "Search inside the apps: Xiaohongshu, Weibo, Bilibili… one entry, 15 platforms.",
      "purpose": "很多高质量信息只存在于需要登录的客户端里：小红书、微博、B 站……agent-reach 把这些平台统一成一张路由表，借助社交软件的推荐机制，能高效搜到感兴趣领域的知识——比如 AI 圈的最新动态。",
      "purpose_en": "Lots of high-quality information exists only inside login-required clients: Xiaohongshu, Weibo, Bilibili… agent-reach unifies them into one routing table; leaning on social platforms' recommendation machinery, it efficiently surfaces knowledge in a field you care about — say the latest moves in the AI scene.",
      "capabilities": [
@@ -759,10 +759,10 @@
       ]
      },
      {
-      "name": "agent-reach · 互联网能力路由器",
-      "name_en": "agent-reach · internet capability router",
-      "desc": "登录类社交平台资源路由器，借推荐机制获取圈内消息。",
-      "desc_en": "Router for login-gated social platforms; rides recommendations for insider news.",
+      "name": "agent-reach · 社媒搜索引擎",
+      "name_en": "agent-reach · social media search",
+      "desc": "搜小红书、B 站这些 App 里的内容，借推荐机制获取圈内消息。",
+      "desc_en": "Searches inside apps like Xiaohongshu and Bilibili; rides recommendations for insider news.",
       "shot": "assets/line04-c.webp",
       "build": [
        {
