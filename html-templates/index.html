@@ -120,7 +120,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            padding: 58px 0 0;
+            padding: 26px 0 0;
             animation: rise .55s .10s cubic-bezier(.16, 1, .3, 1) both;
         }
 
@@ -684,8 +684,12 @@
 
         @media (max-width: 560px) {
             .masthead {
-                padding-top: 42px;
+                padding-top: 18px;
             }
+
+            .nav-brand .brand-suffix { display: none; }
+
+            .topnav-inner { padding: 7px 20px; }
 
             .grid-repos {
                 justify-content: flex-start;
@@ -697,16 +701,48 @@
             }
         }
 
-        /* —— 全站偏好：语言显隐 + 顶部切换钮 —— */
+        /* —— 吸顶导航栏：品牌字标 + 偏好控件，常驻顶部不遮挡内容 —— */
+        .topnav {
+            position: sticky;
+            top: 0;
+            z-index: 1200;
+            background: var(--bg);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .topnav-inner {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 7px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .nav-brand {
+            font-family: var(--serif);
+            font-size: 13.5px;
+            letter-spacing: .02em;
+            color: var(--ink-2);
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color .16s ease-out;
+        }
+
+        .nav-brand:hover { color: var(--red-hover); }
+
+        .nav-brand b { font-weight: 600; color: var(--ink); }
+
+        /* —— 全站偏好：语言显隐 + 导航栏切换钮 —— */
         html[data-lang="en"] [data-zh] { display: none !important; }
         html[data-lang="zh"] [data-en] { display: none !important; }
 
         .pref-bar {
-            position: fixed;
-            top: 14px;
-            right: 16px;
-            z-index: 1200;
             display: flex;
+            flex: none;
             gap: 8px;
         }
 
@@ -800,8 +836,11 @@
 </script>
 </head>
 <body>
-<div aria-hidden="true" class="topline"></div>
-<div class="pref-bar">
+<header class="topnav">
+    <div aria-hidden="true" class="topline"></div>
+    <div class="topnav-inner">
+        <a class="nav-brand" href="#" title="回到顶部 / Back to top"><b>ai-agent4research</b><span class="brand-suffix">-isbd-ruc</span></a>
+        <div class="pref-bar">
     <div class="pref-visits" id="prefVisits" hidden title="总访问量 / Total visits">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
         <span id="visitTotal">—</span>
@@ -811,7 +850,9 @@
         <svg class="ic-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
         <svg class="ic-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></svg>
     </button>
-</div>
+        </div>
+    </div>
+</header>
 <div class="page">
 
     <header class="masthead">
@@ -1120,6 +1161,11 @@
 <script>
 (function () {
   var d = document.documentElement;
+  var brand = document.querySelector('.nav-brand');
+  if (brand) brand.addEventListener('click', function (e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
   function syncTitle() { try { document.title = window.__A4R_TITLES[d.getAttribute('data-lang') === 'en' ? 'en' : 'zh']; } catch (e) {} }
   var bl = document.getElementById('pref-lang');
   if (bl) bl.addEventListener('click', function () {
