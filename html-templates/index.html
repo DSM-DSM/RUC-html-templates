@@ -258,6 +258,16 @@
             animation-delay: .31s;
         }
 
+        /* 左右两卡条目水平对齐：卡内 5 个区块声明为 subgrid 行，同排两卡共享行高
+           （每行取两卡中较高者，输入/输出/作者/链接等条目基线一致）；不支持时回落 flex 现状 */
+        @supports (grid-template-rows: subgrid) {
+            .skill {
+                display: grid;
+                grid-row: span 5;
+                grid-template-rows: subgrid;
+            }
+        }
+
         .skill:hover {
             transform: translateY(-3px);
             box-shadow: var(--lift);
