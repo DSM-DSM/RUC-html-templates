@@ -375,17 +375,19 @@
 
         .lk-visits[hidden] { display: none; }
 
-        /* 上游 GitHub 链接的翻墙标注小徽章 */
+        /* 内嵌于上游 GitHub 链接内的需翻墙小徽章 */
         .lk-flag {
             display: inline-flex;
             align-items: center;
-            font-size: 10.5px;
+            margin-left: 6px;
+            font-size: 10px;
             line-height: 1.4;
             color: var(--ink-2);
             border: 1px dashed var(--line-strong);
             border-radius: 999px;
-            padding: 2px 8px;
+            padding: 1px 6px;
             white-space: nowrap;
+            vertical-align: 1px;
         }
 
         .lk-visits svg {
@@ -931,9 +933,8 @@
                     </div>
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="paper-explainer" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="paper-explainer" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="paper-explainer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="paper-explainer-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="paper-explainer-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="paper-explainer-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="paper-explainer-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                 </div>
             </article>
@@ -957,9 +958,8 @@
                     </div>
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="html-beautify" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="html-beautify" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="html-beautify"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="html-beautify-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="html-beautify-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="html-beautify-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="html-beautify-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                 </div>
             </article>
@@ -979,15 +979,13 @@
                 <div class="sk-links">
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="prompt-enhancer" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="prompt-enhancer" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="prompt-enhancer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="prompt-enhancer-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="prompt-enhancer-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="prompt-enhancer-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="prompt-enhancer-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>上游项目</span><span data-en>Upstream</span></span>
-                        <a href="https://github.com/getsentry/skills">getsentry/skills</a>
-                        <a href="https://github.com/PhAlves23/prompt-engineering-skill">prompt-engineering-skill</a>
-                        <span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span>
+                        <a href="https://github.com/getsentry/skills">getsentry/skills<span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span></a>
+                        <a href="https://github.com/PhAlves23/prompt-engineering-skill">prompt-engineering-skill<span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span></a>
                     </div>
                 </div>
             </article>
@@ -1007,9 +1005,8 @@
                 <div class="sk-links">
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="baton" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="baton" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="baton"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="baton-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="baton-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="baton-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="baton-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                 </div>
             </article>
@@ -1027,14 +1024,12 @@
                 <div class="sk-links">
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="anysearch" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="anysearch" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="anysearch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="anysearch-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="anysearch-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="anysearch-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="anysearch-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>上游项目</span><span data-en>Upstream</span></span>
-                        <a href="https://github.com/anysearch-ai/anysearch-skill">anysearch-ai/anysearch-skill</a>
-                        <span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span>
+                        <a href="https://github.com/anysearch-ai/anysearch-skill">anysearch-ai/anysearch-skill<span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span></a>
                     </div>
                 </div>
             </article>
@@ -1052,14 +1047,12 @@
                 <div class="sk-links">
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>获取技能</span><span data-en>Get skill</span></span>
-                        <a class="lk-track" data-key="agent-reach" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span></a>
-                        <a class="lk-track" data-key="agent-reach" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span></a>
-                        <span class="lk-visits" hidden data-key="agent-reach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span>
+                        <a class="lk-track" data-key="agent-reach-gitee" href="https://gitee.com/AiALi7-9-22/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 免翻墙</span><span data-en>Install · no VPN</span><span class="lk-visits" hidden data-key="agent-reach-gitee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
+                        <a class="lk-track" data-key="agent-reach-github" href="https://github.com/DSM-DSM/ai-agent4research-isbd-ruc#quick-install"><span data-zh>一键安装 · 需翻墙</span><span data-en>Install · VPN needed</span><span class="lk-visits" hidden data-key="agent-reach-github"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><span class="n"></span></span></a>
                     </div>
                     <div class="sk-row">
                         <span class="sk-label"><span data-zh>上游项目</span><span data-en>Upstream</span></span>
-                        <a href="https://github.com/Panniantong/Agent-Reach">Panniantong/Agent-Reach</a>
-                        <span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span>
+                        <a href="https://github.com/Panniantong/Agent-Reach">Panniantong/Agent-Reach<span class="lk-flag"><span data-zh>需翻墙</span><span data-en>VPN needed</span></span></a>
                     </div>
                 </div>
             </article>
