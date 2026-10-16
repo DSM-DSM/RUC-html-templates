@@ -21,6 +21,12 @@
 .idea/
 
 
-# NAS 部署配置(含内网信息,不入库)
-deploy-nas/
+# NAS 部署配置
+# 2026-10-16 决策：deploy-nas/ 正式入库（已脱敏版随 master 公开；含真值的版本只存在本地
+# deploy-nas 分支，不推远端）。"凭据文件"永远排除——它是唯一含真实账号密码的东西。
+!deploy-nas/
+# 本机专属覆盖值（如 v6 前缀真值）不入库
+*.local
+deploy-nas/campus-auth/credentials.json
+deploy-nas/campus-auth/*.log
 html-templates/visit_counts.json

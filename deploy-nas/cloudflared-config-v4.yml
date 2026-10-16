@@ -1,0 +1,28 @@
+# 备选连接器：强制 IPv4 边缘（quic）。**默认不启用**，是"v6 断网时的备胎"。
+#
+# ⚠️ 为什么不常态化开启（2026-10-15 20:30 实测结论，别推翻重来）：
+#   同一时刻连测 5 轮 v4 边缘 TCP 7844 可达率 = 3/3 → 2/3 → 1/3 → 0/3 → 0/3，
+#   同期 v6 = 3/3 稳定；v4 连接器启动 49 秒内 Registered 7 次 / datagram 超时 10 次 /
+#   连接终止 9 次 / 拨号失败 7 次。**v4 路径是"连接得上但数据面随时死"的劣质路径。**
+#   而 CF 对 replica 不做健康感知的分流，只会就近+失败重试 —— 让一个"看着活着、实则半死"
+#   的 replica 上线，等于把访客请求送给它，反而制造 502。故 v4 只做备胎，不做常驻。
+#
+# ⚠️ 启用时必须带 --metrics 127.0.0.1:20252：
+#   现役 cloudflared 以 --net host 跑，已占用 127.0.0.1:20241；第二个实例默认也绑 20241
+#   → 端口冲突会导致指标端点起不来/行为异常。换端口即可。
+#
+# 启用条件：v6 也断了（看门狗会自己切，见 ruc-logs/tunnel_watchdog.sh），
+#           或人工确认 v4 路径恢复稳定（连续多轮 3/3 可达）后手工启用。
+# 启用命令：
+#   docker run -d --name cloudflared-v4 --user 0 --net host --restart always \
+#     -v /volume1/docker/cloudflared:/etc/cloudflared \
+#     cloudflared:latest --no-autoupdate --metrics 127.0.0.1:20252 \
+#     tunnel --config /etc/cloudflared/config-v4.yml run ruc-nas
+edge-ip-version: "4"
+protocol: quic
+tunnel: 00000000-0000-0000-0000-000000000000
+credentials-file: /etc/cloudflared/tunnel-cred.json
+ingress:
+  - hostname: example.com
+    service: http://localhost:18080
+  - service: http_status:404

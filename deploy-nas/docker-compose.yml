@@ -1,0 +1,14 @@
+services:
+  web:
+    image: ruc-nginx           # 本地构建镜像：nginx:alpine + Dockerfile 注册 uid1000（见同目录 Dockerfile）
+    container_name: ruc-templates
+    restart: unless-stopped
+    ports:
+      - "18080:80"             # 局域网 + IPv6 公网都走这个端口（避开运营商封的 80/443）
+    volumes:
+      - /volume1/docker/deploy-nas/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /volume1/docker/RUC-html-templates:/usr/share/nginx/html:ro   # 活目录，改模板即时生效
+# 注意：
+# 1. nginx.conf 里必须 `user root;` —— UGOS 内核钩子禁止容器内非 root 进程读 /volume1（含 docker 卷），
+#    与文件权限无关；UGOS 官方应用镜像同样以 root worker 运行。
+# 2. 重建命令（NAS 上）：sudo docker compose -f /volume1/docker/deploy-nas/docker-compose.yml up -d

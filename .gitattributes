@@ -1,0 +1,11 @@
+# 统一换行符：本仓库内容同时供 Windows 本地与 NAS(Linux) 使用。
+# shell 脚本若带 CR，在 Linux 上会出现 "#!/bin/sh: No such file" 或变量值尾部带 \r
+# 导致比较失败（2026-10-15 实测踩过），故强制 LF。
+* text=auto
+*.sh   text eol=lf
+*.cron text eol=lf
+*.yml  text eol=lf
+*.py   text eol=lf
+*.md   text eol=lf
+*.conf text eol=lf
+Dockerfile text eol=lf
