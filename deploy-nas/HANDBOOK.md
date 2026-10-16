@@ -72,6 +72,16 @@ tar -C 本地父目录 -cf - 目录名 | ssh nasuser@192.168.1.100 "tar -xf - -C
 | 本地源 | `D:\RUC-html-templates\html-templates\` | 模板源头（与 NAS 网页根目录对应） |
 | 本地部署套件 | `D:\RUC-html-templates\deploy-nas\` | 与 NAS deploy-nas 同步（2026-10-05 已对齐） |
 
+> **★本目录的入库与脱敏约定（2026-10-16 定）★**
+> 本仓库 `master` 是**公开**的，因此入库版已脱敏：内网 IP、SSH 登录名、真实域名、隧道 UUID、
+> IPv6 前缀、权威 NS 名全部替换为样例值（`192.168.1.100` / `nasuser` / `example.com` /
+> 全零 UUID / `2001:db8:1234:5678` / `ns1.example-ns.com`）。
+> - **含真值的版本只存在本地 `deploy-nas` 分支**（查看：`git show deploy-nas:deploy-nas/HANDBOOK.md`），永不推远端。
+> - 因此**从公开仓库取文件推回 NAS 会覆盖掉真值**——改动先同步回 `deploy-nas` 分支，或直接从 NAS 取回真值。
+> - `campus-auth/credentials.json`、`*.log`、`*.local` 永久忽略（凭据 + 本机专属值）。
+> - 脚本里凡"因机而异"的值（如守夜人的 `V6_PREFIX`）一律走同目录 `tunnel_watchdog.local` 覆盖，
+>   不写进入库文件——否则换网络后该功能会**静默失效**（守夜人的 v6 前缀告警就踩过这个设计缺陷）。
+
 ## 5. 日常操作
 
 ### 5.1 加/更新网页（最高频）
