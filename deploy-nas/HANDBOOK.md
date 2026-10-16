@@ -272,10 +272,9 @@ sudo -n docker run -d --name ruc-templates --restart unless-stopped -p 18080:80 
 
 | 资源 | 位置 |
 |---|---|
-| 方法论技能（本部署的完整复盘） | `C:\Users\YJY\.claude\skills\nas-home-broadband-publishing\SKILL.md` |
-| 带宽归属/孤儿进程排查技能 | `C:\Users\YJY\.claude\skills\windows-disk-io-attribution\SKILL.md` |
-| NAS 上的 sEFPC 项目硬规则 | `E:\Exp-family-PCA\sEFPC\CLAUDE.md`（此 NAS 目录禁无界递归 grep） |
-| 域名/DNSPod 控制台 | https://console.dnspod.site （域名续费、解析记录） |
+| 方法论技能（本部署的完整复盘） | `%USERPROFILE%\.claude\skills\nas-home-broadband-publishing\SKILL.md` |
+| 带宽归属/孤儿进程排查技能 | `%USERPROFILE%\.claude\skills\windows-disk-io-attribution\SKILL.md` |
+| 域名/DNSPod 控制台 | https://console.dnspod.cn （域名续费、解析记录） |
 | 腾讯云 API 密钥页 | https://console.cloud.tencent.com/cam/capi |
 
 ## 10. 维护姿态 / Next Steps

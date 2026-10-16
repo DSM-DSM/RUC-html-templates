@@ -1,1 +1,10 @@
+# example.com 隧道守夜人 —— 部署到 NAS 的 /etc/cron.d/ 目录
+#
+# ★部署时文件名必须去掉 .cron 后缀★：
+#     cp tunnel-watchdog.cron /etc/cron.d/tunnel-watchdog     # 注意目标名无 .cron
+#     chmod 644 /etc/cron.d/tunnel-watchdog
+# 原因：Debian 系 run-parts 会忽略 /etc/cron.d 下文件名含点的条目，带后缀会让
+# 守夜人静默不执行（表现为"日志不再更新"且无任何报错）。仓库里带 .cron 只为固定 LF 属性。
+#
+# 频率：每分钟。判据与恢复策略见脚本头部注释；本机专属真值放同目录 tunnel_watchdog.local。
 */1 * * * * root /volume1/docker/ruc-logs/tunnel_watchdog.sh >/dev/null 2>&1

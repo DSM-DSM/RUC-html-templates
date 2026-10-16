@@ -9,3 +9,6 @@
 *.md   text eol=lf
 *.conf text eol=lf
 Dockerfile text eol=lf
+# 本机专属覆盖值。*.local 被 gitignore，git 不会规范化它，这条只约束未忽略的同名
+# 文件与编辑器行为；真正落盘时的 CR 由守夜人脚本内的 tr -d '\r' 兜底。
+*.local text eol=lf

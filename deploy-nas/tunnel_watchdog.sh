@@ -25,6 +25,7 @@
 LOG=/volume1/docker/ruc-logs/watchdog.log
 STATE=/volume1/docker/ruc-logs/.tunnel-state   # "<当前族> <上次故障epoch> <上次切换epoch>"
 V6STATE=/volume1/docker/ruc-logs/.v6-prefix    # 上次见到的 v6 全局地址（前缀漂移告警）
+V6RASTATE=/volume1/docker/ruc-logs/.v6-ra-warned  # "RA 推不到前缀"只告警一次的标记
 CONFIG=/volume1/docker/cloudflared/config.yml
 METRICS=http://127.0.0.1:20241/ready
 URL=https://example.com/
@@ -43,18 +44,51 @@ if [ "$CUR_FAM" = "unknown" ] && [ -f "$CONFIG" ]; then
 fi
 
 # ---- v6 前缀漂移检测（不阻塞主流程） ----
-# V6_PREFIX = 本机运营商下发的前缀。★部署时必须按实际网络覆盖★，否则本节静默失效
-# （awk 匹配不到地址 → NOWV6 为空 → 前缀漂移告警永远不会触发）。
-# 真值不要写进本文件（本文件入库），放在同目录的 tunnel_watchdog.local（已 gitignore，随脚本一起推到 NAS）：
-#   V6_PREFIX=<你的前缀>
-# 本脚本会自动 source 它；也可用环境变量覆盖（优先级：环境变量 > .local > 下面这个占位默认值）。
-# 中国大陆三家运营商的前缀各不相同，取 `ip -6 addr show scope global` 里那条 /128 dynamic 的开头即可。
+# 目标：盯住"隧道真正依赖的那条 v6 稳定全局地址"，变了就告警（v6 前缀靠路由器 RA 下发，
+# 前缀一变隧道就断，且只能人工处置）。
+#
+# 为什么不用硬编码前缀：本机运营商前缀各不相同，写死进脚本后换网络就静默失效
+# （awk 匹配不到 → NOWV6 为空 → 告警永远不触发）。仓库入库版也不能写真实前缀。
+# 因此按三级取值，**优先级从高到低**：
+#   ① 本目录 tunnel_watchdog.local 里的 V6_PREFIX（本机专属值，gitignore，不随仓库分发）
+#   ② 环境变量 V6_PREFIX（注意：若 .local 存在，它的赋值会覆盖环境变量——POSIX source 语义）
+#   ③ 从 RA 通告的默认路由自动推导（见下，默认路径，无需任何配置）
+# 中国大陆三家运营商前缀不同，需要手填时取 `ip -6 addr show scope global` 里那条 /128 dynamic 的开头。
 [ -f "$(dirname "$0")/tunnel_watchdog.local" ] && . "$(dirname "$0")/tunnel_watchdog.local"
-V6_PREFIX="${V6_PREFIX:-2001:db8:}"
+# 去掉可能混入的 CR/BOM：.local 常在 Windows 上编辑后经 `cat >` 逐字节透传，
+# 若带 \r 则 V6_PREFIX 尾附回车 → 下面 awk 模式永不匹配 → 又是同一种静默失效。
+[ -n "$V6_PREFIX" ] && V6_PREFIX=$(printf '%s' "$V6_PREFIX" | tr -d '\r\n')
+# ③ 自动推导：取 RA 通告默认路由的 /64 前缀（把 "xxxx:xxxx:xxxx:xxxx::/64" 归一成 "xxxx:xxxx:xxxx:xxxx:"）。
+# 该地址由路由器 RA 下发，正是隧道与 DDNS 依赖的那条；隐私扩展地址（stable-privacy）不在此前缀下时
+# 天然被排除，无需再按接口/标志位过滤。
+if [ -z "$V6_PREFIX" ]; then
+  V6_PREFIX=$(ip -6 route show default 2>/dev/null | awk '
+    /via/ && !/unreachable/ {
+      for (i = 1; i <= NF; i++) {
+        if ($i ~ /^[0-9a-fA-F:]+:\/64$/) { sub(/:\/64$/, ":", $i); print $i; exit }
+      }
+    }')
+fi
+# 说明：不少路由器/内核的默认路由只写 `via fe80::… dev ethX`，不带 ::/64 字面量，
+# 此时推导为空 → 退回"空前缀=匹配任意前缀"，仍能取到 /128 稳定地址（实测本机即此情形）。
+if [ -z "$V6_PREFIX" ]; then
+  # 只在首次（或前缀来源变化后）告警一次，避免每分钟刷屏把真信号淹掉
+  if [ ! -f "$V6RASTATE" ]; then
+    echo "$STAMP WARN v6 前缀未能从 RA 路由推导（默认路由不含 ::/64）：退回全前缀匹配（本条只报一次）" >> "$LOG"
+    : > "$V6RASTATE"
+  fi
+fi
 # 只认 /128 scope global dynamic 那条（DHCPv6 下发的稳定全局地址），它才是隧道/DDNS 真正依赖的地址。
 # 刻意排除 mngtmpaddr stable-privacy 那些 /64 —— 那是内核隐私扩展地址，会每隔几小时自动轮换，
 # 盯它只会刷无意义的 WARN（实测踩过）。
-NOWV6=$(ip -6 addr show scope global 2>/dev/null | awk -v p="$V6_PREFIX" '$0 ~ ("inet6 " p) && /\/128/ && /dynamic/ {print $2; exit}')
+# 注：掩码用 /\/128([[:space:]]|$)/ 而非 /\/128/ —— 后者是子串匹配，/1280 之类会误命中。
+# ★别写成 (\/|$) 这种交替★：NAS 上是 busybox awk，不支持 (...) 交替语法，会让整条 awk 静默返回空
+# （2026-10-16 实测：busybox awk 下 A 写法可用、B/C 写法返回空；[[:space:]] 是 POSIX 字符类，两者都支持）。
+NOWV6=$(ip -6 addr show scope global 2>/dev/null | awk -v p="$V6_PREFIX" '$0 ~ ("inet6 " p) && /\/128([[:space:]]|$)/ && /dynamic/ {print $2; exit}')
+# 取不到就明确告警一次，别让本节悄悄空转（这就是本机制此前踩过的坑）
+if [ -z "$NOWV6" ]; then
+  echo "$STAMP WARN v6 前缀检测未取到稳定地址（V6_PREFIX='${V6_PREFIX:-空}'）：本节空转，请核对前缀配置" >> "$LOG"
+fi
 OLDV6=$(cat "$V6STATE" 2>/dev/null)
 if [ -n "$NOWV6" ] && [ "$NOWV6" != "$OLDV6" ]; then
   [ -n "$OLDV6" ] && echo "$STAMP WARN v6 稳定全局地址变化: $OLDV6 -> $NOWV6（前缀漂移，隧道可能断）" >> "$LOG"
