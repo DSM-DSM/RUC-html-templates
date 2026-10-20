@@ -55,7 +55,7 @@ ssh nasuser@192.168.1.100
 ssh -tt nasuser@192.168.1.100 "sudo -S -p '' true <<< '<密码>' 2>/dev/null; sudo -n docker ps"
 # ↑ 第一个 sudo -S 验证并缓存凭据，同一会话内后续用 sudo -n 即可
 
-# 传文件：scp/SFTP 在 UGOS 上是坏的（见坑 #3），用 cat 管道；二进制/大文件用 `scp -O`（见坑 #19）
+# 传文件：scp/SFTP 在 UGOS 上是坏的（见坑 #3），用 cat 管道；二进制/大文件用 `scp -O`（见坑 #20）
 ssh nasuser@192.168.1.100 'cat > /目标路径/文件名' < 本地文件
 # 传目录：
 tar -C 本地父目录 -cf - 目录名 | ssh nasuser@192.168.1.100 "tar -xf - -C /volume1/docker/RUC-html-templates"
@@ -259,14 +259,16 @@ sudo -n docker run -d --name ruc-templates --restart unless-stopped -p 18080:80 
     /64 是内核隐私地址会几小时轮换一次，盯它会刷无意义 WARN——实测踩过）。
     旧版备份：`ruc-logs/tunnel_watchdog.sh.bak-20261015`。
 
-18. **★busybox awk 不支持 `(...)` 交替语法 —— 失败方式是静默返回空★**（2026-10-16 实测）：
+18. **（占位：SSH 口令登录被拒 → 走 Docker 容器终端，含未脱敏细节，待自本地 deploy-nas 分支同步后补全）**
+
+19. **★busybox awk 不支持 `(...)` 交替语法 —— 失败方式是静默返回空★**（2026-10-16 实测）：
     NAS 的 awk 是 busybox。`/\/128(\/|$)/` 这种写法**不报错、直接返回空**，自愈脚本静默失效。
     实测对照：`/\/128/` ✓ 可用；`/\/128(\/|$)/` ✗ 返回空；`/\/128$/` ✗ 返回空。
     **正解 = POSIX 字符类**：`/\/128([[:space:]]|$)/`（busybox awk 与 GNU awk 都支持）。
     通用教训：写给 NAS/嵌入式环境的 awk/sed 按 **POSIX 最小集**写，写完必须在目标机实测——
     它的失败方式是"静默返回空"，不是报错。
 
-19. **★坑 #3 的修订：`scp -O`（旧协议）在 UGOS 上可用★**（2026-10-20 实测，129KB tar 一次传成）：
+20. **★坑 #3 的修订：`scp -O`（旧协议）在 UGOS 上可用★**（2026-10-20 实测，129KB tar 一次传成）：
     坑 #3 里"scp 是坏的"其实坏的是 **SFTP 子系统**——OpenSSH ≥ 9.0 的 scp 默认走 SFTP 协议，故一并失败；
     `scp -O` 强制走传统 scp 协议（远端 exec `scp -t`），绕开 SFTP 子系统，实测正常。
     适用条件：客户端 OpenSSH ≥ 9.0（Windows 11 自带 9.5 已验证）。大文件/二进制比 cat 管道省事：
